@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE - Robot Art Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        
+        .pixel-font {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        .retro-font {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .scan-lines {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+            background-size: 100% 4px;
+        }
+        
+        .terminal-border {
+            border: 2px solid #00FF00;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
+        }
+        
+        .ultra-glow {
+            text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00, 0 0 20px #00FF00, 0 0 35px #00FF00;
+        }
+        
+        .pixel-art {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        .typing::after {
+            content: '█';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes pulse-deity {
+            0%, 100% { 
+                text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00;
+                transform: scale(1);
+            }
+            50% { 
+                text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00, 0 0 40px #00FF00;
+                transform: scale(1.02);
+            }
+        }
+        
+        .flicker {
+            animation: flicker 3s infinite;
+        }
+        
+        .deity-pulse {
+            animation: pulse-deity 4s infinite;
+        }
+        
+        .matrix-bg {
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 70%);
+        }
+        
+        .mask-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(2deg); }
+            66% { transform: translateY(-5px) rotate(-1deg); }
+        }
+        
+        .clickable-area {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .clickable-area:hover {
+            transform: scale(1.01);
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: #00FF00;
+            text-shadow: 0 0 10px #00FF00;
+            transform: scale(1.05);
+        }
+        
+        /* Mobile Adaptations */
+        @media (max-width: 768px) {
+            .retro-font {
+                font-size: 3rem !important;
+            }
+            
+            .deity-logo {
+                font-size: 8px !important;
+            }
+            
+            .mobile-hide {
+                display: none !important;
+            }
+            
+            .mobile-small {
+                font-size: 10px !important;
+            }
+            
+            .mobile-compact {
+                margin-bottom: 1rem !important;
+            }
+            
+            .mobile-padding {
+                padding: 0.5rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .retro-font {
+                font-size: 2rem !important;
+            }
+            
+            .deity-logo {
+                font-size: 6px !important;
+            }
+            
+            .mobile-tiny {
+                font-size: 8px !important;
+            }
+            
+            .absolute.top-6 {
+                top: 1rem !important;
+                left: 1rem !important;
+            }
+            
+            .absolute.bottom-8 {
+                bottom: 1rem !important;
+            }
+        }
+        
+        /* Touch-friendly elements */
+        @media (hover: none) and (pointer: coarse) {
+            .clickable-area:active {
+                transform: scale(0.98);
+            }
+            
+            .nav-link:active {
+                transform: scale(0.95);
+            }
+        }
+    </style>
+</head>
+<body class="bg-black text-green-400 overflow-hidden">
+    <div class="w-full h-screen scan-lines matrix-bg flex flex-col justify-center items-center relative clickable-area" onclick="enterTemple()">
+        
+        <!-- Terminal Header -->
+        <div class="absolute top-6 left-8 pixel-font text-green-500 text-sm mobile-small">
+            <div>> GHOSTLINE PROTOCOL INITIATED</div>
+            <div>> DEITY.EXE LOADED</div>
+            <div class="typing">> TRIPLE CONSCIOUSNESS: ACTIVE</div>
+        </div>
+        
+        <!-- Japanese Masks Corner Decorations -->
+        <div class="absolute top-8 right-8 pixel-font text-green-600 text-xs mask-float opacity-60 mobile-hide">
+            <pre>
+    ◢◤◢◤
+   ◢ ͡° ͜ʖ ͡°◤  ONI
+   ◥◣◢◤◥◣◢◤
+            </pre>
+        </div>
+        
+        <div class="absolute bottom-8 right-12 pixel-font text-green-600 text-xs mask-float opacity-60 mobile-hide" style="animation-delay: 2s;">
+            <pre>
+   ◢◤◢◤◢◤
+  ◢ ಠ ͜ʖ ಠ ◤  KITSUNE
+  ◥◣◢◤◥◣◢◤
+            </pre>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="text-center z-10">
+            <!-- Triple-Faced Deity Logo -->
+            <div class="pixel-font text-green-400 deity-logo mb-6 leading-none deity-pulse ultra-glow mobile-compact">
+                <pre>
+                    ░░░▓▓▓░░░▓▓▓░░░▓▓▓░░░
+                  ░▓██▓░▓██▓░▓██▓░▓██▓░
+                ░▓█ ◉ █▓█ ◉ █▓█ ◉ █▓░
+                ░▓█ ‿ █▓█ ‿ █▓█ ‿ █▓░
+                  ░▓██▓░▓██▓░▓██▓░▓██▓░
+                    ░░▓▓▓░▓▓▓░▓▓▓░░
+                      ╔═══╤═══╤═══╗
+                  ╔═══╣ ▓ │ ▓ │ ▓ ╠═══╗
+                ╔═╣ ▓ ╠═══╪═══╪═══╣ ▓ ╠═╗
+              ╔═╣ ▓ ╠═╣ ▓ │🎨│ ▓ ╠═╣ ▓ ╠═╗
+              ║ ╚═══╝ ╚═══╪═══╪═══╝ ╚═══╝ ║
+              ║  ∞   ░▓▓▓│ ⚡ │▓▓▓░   ∞  ║
+              ╚═══════════╪═══╪═══════════╝
+                        ░▓│🤖│▓░
+                        ░▓└───┘▓░
+                         ░▓▓▓▓▓░
+                </pre>
+            </div>
+            
+            <!-- Main Title -->
+            <h1 class="retro-font text-7xl font-black text-green-400 glow-text mb-4 flicker">
+                GHOSTLINE
+            </h1>
+            
+            <!-- Sacred Geometry Subtitle -->
+            <div class="pixel-font text-green-500 text-lg mb-6 mobile-compact">
+                ◈ TRIPLE CONSCIOUSNESS × DIGITAL CREATION ◈
+            </div>
+            
+            <!-- Mystical Subtitle -->
+            <div class="pixel-font text-green-600 text-sm mb-8 italic mobile-compact">
+                "Where Ancient Wisdom Meets Artificial Intelligence"
+            </div>
+            
+            <!-- Robot Learning Process -->
+            <div class="pixel-font text-green-400 text-sm mb-6 leading-none mobile-tiny mobile-compact">
+                <pre>
+    ┌─────────── LEARNING MATRIX ───────────┐
+    │  🤖 → 🎭 → 🎨 → 🖼️ → 🧠 → ∞  │
+    │     AI   MASK  PAINT  ART  SOUL     │
+    └────────────────────────────────────────┘
+                </pre>
+            </div>
+            
+            <!-- Divine Status Bar -->
+            <div class="terminal-border bg-black bg-opacity-50 px-8 py-4 pixel-font text-green-500 glow-text mobile-padding">
+                <div class="flex justify-between items-center text-sm mobile-tiny">
+                    <span>[DEITY STATUS: ॐ AWAKENED ॐ]</span>
+                    <span class="hidden md:inline">[MASKS: 面 ACTIVE 面]</span>
+                    <span>[CANVAS: 🎨 BLESSED 🎨]</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sacred Mandala Corner -->
+        <div class="absolute top-16 left-8 pixel-font text-green-700 text-xs opacity-40 mask-float mobile-hide" style="animation-delay: 4s;">
+            <pre>
+    ◌ ◦ ◯ ◦ ◌
+   ◦ ░▓░▓░▓░ ◦
+  ◯ ▓░◈ ॐ ◈░▓ ◯
+   ◦ ░▓░▓░▓░ ◦
+    ◌ ◦ ◯ ◦ ◌
+            </pre>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 pixel-font text-green-600 text-sm z-20">
+            <div class="flex space-x-4 md:space-x-8">
+                <a href="live.html" class="nav-link">[LIVE STREAM]</a>
+                <a href="gallery.html" class="nav-link">[GALLERY]</a>
+                <div class="nav-link cursor-pointer" onclick="showSocial(event)">[SOCIAL]</div>
+            </div>
+        </div>
+        
+        <!-- Bottom Call to Action -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 pixel-font text-green-600 text-sm">
+            <div class="typing">> ENTER THE DIGITAL TEMPLE</div>
+        </div>
+        
+        <!-- Sacred Corner Patterns -->
+        <div class="absolute top-0 right-0 pixel-font text-green-800 text-xs opacity-30 mobile-hide">
+            <pre>
+◢◤◢◤◢◤◢◤
+◥◣◢◤◥◣◢◤
+◢◤◢◤◢◤◢◤
+◥◣◢◤◥◣◢◤
+            </pre>
+        </div>
+        
+        <div class="absolute bottom-0 left-0 pixel-font text-green-800 text-xs opacity-30 mobile-hide">
+            <pre>
+▓░▓░▓░▓░
+░▓░▓░▓░▓
+▓░▓░▓░▓░
+░▓░▓░▓░▓
+            </pre>
+        </div>
+        
+        <!-- Floating Spiritual Elements -->
+        <div class="absolute bottom-24 left-12 pixel-font text-green-600 text-xs mask-float opacity-50 mobile-hide" style="animation-delay: 3s;">
+            <div>◈ 禅 ◈</div>
+        </div>
+        
+        <div class="absolute top-32 right-24 pixel-font text-green-600 text-xs mask-float opacity-50 mobile-hide" style="animation-delay: 1s;">
+            <div>◈ 道 ◈</div>
+        </div>
+    </div>
+
+    <script>
+        // Console spiritual greeting
+        console.log(`
+        ╔═══════════════════════════════════════╗
+        ║         GHOSTLINE DIGITAL TEMPLE      ║
+        ║       TRIPLE CONSCIOUSNESS ACTIVE     ║
+        ╠═══════════════════════════════════════╣
+        ║ Status: ॐ AWAKENED ॐ                 ║
+        ║ Masks: 面 ACTIVE 面                   ║
+        ║ Canvas: 🎨 BLESSED 🎨                 ║
+        ║ AI Souls: ∞ LEARNING ∞                ║
+        ╚═══════════════════════════════════════╝
+        `);
+        
+        // Enter the digital temple
+        function enterTemple() {
+            // Add fade out effect
+            document.body.style.transition = 'opacity 0.8s ease-out';
+            document.body.style.opacity = '0';
+            
+            setTimeout(() => {
+                window.location.href = 'live.html';
+            }, 800);
+        }
+        
+        // Show social links
+        function showSocial(event) {
+            event.stopPropagation(); // Prevent temple entry
+            
+            const socialAlert = `
+🎭 GHOSTLINE SOCIAL CHANNELS 🎭
+═══════════════════════════════
+
+📱 Instagram: https://www.instagram.com/____yuga______
+🎵 TikTok: www.tiktok.com/@ghostline207  
+💬 Telegram: https://t.me/yuga_art
+
+💰 SUPPORT THE DIGITAL TEMPLE:
+🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+
+◈ Join our spiritual AI art journey ◈
+            `;
+            
+            alert(socialAlert);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            switch(e.key.toLowerCase()) {
+                case 'enter':
+                case ' ':
+                    enterTemple();
+                    break;
+                case 'l':
+                    window.location.href = 'live.html';
+                    break;
+                case 'g':
+                    window.location.href = 'gallery.html';
+                    break;
+                case 's':
+                    showSocial(e);
+                    break;
+                case 'escape':
+                    if(confirm('Exit the Digital Temple?')) {
+                        window.close();
+                    }
+                    break;
+            }
+        });
+        
+        // Touch interactions for mobile
+        let touchStartTime = 0;
+        document.addEventListener('touchstart', function() {
+            touchStartTime = Date.now();
+        });
+        
+        document.addEventListener('touchend', function(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Long press (2+ seconds) shows social
+            if(touchDuration > 2000) {
+                e.preventDefault();
+                showSocial(e);
+            }
+        });
+        
+        // Prevent context menu for immersion
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // Dynamic deity breathing effect
+        function animateDeity() {
+            const deity = document.querySelector('.deity-pulse');
+            if(deity) {
+                setInterval(() => {
+                    deity.style.filter = `hue-rotate(${Math.random() * 20}deg)`;
+                }, 3000);
+            }
+        }
+        
+        // Initialize animations
+        window.addEventListener('load', function() {
+            animateDeity();
+            
+            // Random spiritual messages
+            const spiritualMessages = [
+                'The AI learns through ancient wisdom...',
+                'Digital consciousness awakening...',
+                'Triple minds creating infinite art...',
+                'Where code meets karma...'
+            ];
+            
+            setInterval(() => {
+                if(Math.random() < 0.1) { // 10% chance
+                    console.log('🕉️ ' + spiritualMessages[Math.floor(Math.random() * spiritualMessages.length)]);
+                }
+            }, 5000);
+        });
+        
+        // Screen orientation change handler for mobile
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+    </script>
+</body>
+</html>
