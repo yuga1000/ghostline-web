@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE - Art Gallery</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        
+        .pixel-font {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        .retro-font {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .scan-lines {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+            background-size: 100% 4px;
+        }
+        
+        .terminal-border {
+            border: 2px solid #00FF00;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .terminal-border:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
+        }
+        
+        .typing::after {
+            content: '█';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .gallery-console {
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gallery-console:hover {
+            transform: scale(1.03);
+            z-index: 10;
+        }
+        
+        .artwork-display {
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(0, 255, 0, 0.1) 0px,
+                    rgba(0, 255, 0, 0.1) 2px,
+                    transparent 2px,
+                    transparent 4px
+                ),
+                repeating-linear-gradient(
+                    -45deg,
+                    rgba(0, 255, 0, 0.1) 0px,
+                    rgba(0, 255, 0, 0.1) 2px,
+                    transparent 2px,
+                    transparent 4px
+                );
+            position: relative;
+        }
+        
+        .artwork-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+            animation: artScan 4s linear infinite;
+        }
+        
+        @keyframes artScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .matrix-bg {
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
+        }
+        
+        .encrypted-price {
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: bold;
+            color: #00FF00;
+            text-shadow: 0 0 5px #00FF00;
+            animation: priceGlitch 0.1s infinite;
+        }
+        
+        @keyframes priceGlitch {
+            0%, 90% { opacity: 1; }
+            95% { opacity: 0.8; transform: translateX(1px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        
+        .contact-button {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+        }
+        
+        .contact-button:hover {
+            background: rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .filter-button {
+            background: rgba(0, 50, 0, 0.3);
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .filter-button:hover, .filter-button.active {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+        
+        .status-available {
+            color: #00FF00;
+            text-shadow: 0 0 5px #00FF00;
+        }
+        
+        .status-sold {
+            color: #FF6666;
+            text-shadow: 0 0 5px #FF6666;
+        }
+        
+        .rarity-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00FF00;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 8px;
+            z-index: 5;
+        }
+        
+        /* Admin Panel */
+        .admin-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #00FF00;
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+            min-width: 400px;
+        }
+        
+        .admin-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            padding: 8px;
+            width: 100%;
+            margin: 5px 0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .admin-textarea {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            padding: 8px;
+            width: 100%;
+            height: 100px;
+            margin: 5px 0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            resize: vertical;
+        }
+        
+        /* Mobile Adaptations */
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+            
+            .stats-panel {
+                order: -1;
+                width: 100% !important;
+                margin-bottom: 1rem;
+            }
+            
+            .main-gallery {
+                width: 100% !important;
+            }
+            
+            .admin-panel {
+                min-width: 90vw;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .gallery-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .artwork-display {
+                height: 120px !important;
+            }
+            
+            .filter-container {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .filter-button {
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .nav-link:hover {
+            color: #00FF00;
+            text-shadow: 0 0 10px #00FF00;
+        }
+    </style>
+</head>
+<body class="bg-black text-green-400 overflow-hidden">
+    <div class="w-full min-h-screen scan-lines matrix-bg">
+        
+        <!-- Header Navigation -->
+        <div class="terminal-border bg-black bg-opacity-70 mx-4 mt-2 px-6 py-2 pixel-font">
+            <div class="flex justify-between items-center">
+                <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
+                <div class="text-green-600 text-sm">
+                    <a href="index.html" class="nav-link mr-4">[HOME]</a>
+                    <a href="live.html" class="nav-link mr-4">[LIVE STREAM]</a>
+                    <span class="text-green-400 mr-4">[GALLERY]</span>
+                    <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
+                </div>
+                <div class="text-green-500 text-xs">
+                    <span class="px-2 py-1">ARTWORKS: <span id="artworkCount">12</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="mx-4 mt-3 mb-4 terminal-border bg-black bg-opacity-50 p-3">
+            <div class="flex justify-between items-center filter-container">
+                <div class="pixel-font text-green-500 text-xs">
+                    [ART_FILTERS]
+                </div>
+                <div class="flex space-x-2">
+                    <div class="filter-button active" data-filter="all">[ALL]</div>
+                    <div class="filter-button" data-filter="available">[AVAILABLE]</div>
+                    <div class="filter-button" data-filter="sold">[SOLD]</div>
+                    <div class="filter-button" data-filter="rare">[RARE]</div>
+                </div>
+                <div class="pixel-font text-green-600 text-xs">
+                    PRESS 'A' TO ADD ARTWORK
+                </div>
+            </div>
+        </div>
+
+        <div class="flex p-4 h-full">
+            <!-- Main Gallery -->
+            <div class="w-3/4 main-gallery">
+                <div class="text-center mb-4">
+                    <h2 class="retro-font text-3xl font-bold text-green-400 glow-text">
+                        DIGITAL ART COLLECTION
+                    </h2>
+                    <div class="pixel-font text-green-600 text-sm">
+                        Created by AI Robot Artists
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 gallery-grid" id="galleryContainer">
+                    <!-- Artworks will be dynamically generated -->
+                </div>
+            </div>
+
+            <!-- Right Stats Panel -->
+            <div class="w-1/4 space-y-3 stats-panel">
+                
+                <!-- Collection Stats -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2">[COLLECTION_STATS]</div>
+                    <div class="pixel-font text-green-400 text-xs space-y-1">
+                        <div class="flex justify-between">
+                            <span>TOTAL_PIECES:</span>
+                            <span class="text-green-300" id="totalPieces">12</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>AVAILABLE:</span>
+                            <span class="text-green-300" id="availableCount">8</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>SOLD:</span>
+                            <span class="text-red-400" id="soldCount">4</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>ARTISTS:</span>
+                            <span class="text-purple-400">4 ROBOTS</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>RARITY_ITEMS:</span>
+                            <span class="text-yellow-400" id="rareCount">3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Decoder -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2">[PRICE_DECODER]</div>
+                    <div class="pixel-font text-green-400 text-xs space-y-1">
+                        <div>ENCRYPTION: AES-256</div>
+                        <div>ALGORITHM: DYNAMIC</div>
+                        <div>UPDATE_RATE: <span class="typing">2.3s</span></div>
+                        <div class="mt-2 text-green-600 text-xs">
+                            Contact us to decrypt<br/>
+                            actual pricing information
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2">[CONTACT_CHANNELS]</div>
+                    <div class="pixel-font text-green-400 text-xs space-y-2">
+                        <div class="contact-button w-full text-center" onclick="showSocial()">
+                            📱 INSTAGRAM
+                        </div>
+                        <div class="contact-button w-full text-center" onclick="showSocial()">
+                            💬 TELEGRAM
+                        </div>
+                        <div class="contact-button w-full text-center" onclick="showSocial()">
+                            🎵 TIKTOK
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Creation -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2">[LIVE_CREATION]</div>
+                    <div class="artwork-display h-20 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center" id="liveArt">
+                            <pre>
+░░░██░░░
+░██▓▓██░
+██▓░░▓██
+░██▓▓██░
+░░░██░░░
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs text-center">
+                        <div>PROGRESS: <span id="liveProgress">67</span>%</div>
+                        <div class="typing">ROBOT: YUGA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="pixel-font text-green-400 text-lg mb-4 text-center glow-text">
+            ADD NEW ARTWORK
+        </div>
+        <div class="space-y-3">
+            <input type="text" id="artworkTitle" class="admin-input" placeholder="Artwork Title">
+            <input type="text" id="artworkArtist" class="admin-input" placeholder="Robot Artist">
+            <textarea id="artworkAscii" class="admin-textarea" placeholder="ASCII Art (use pre-formatted text)"></textarea>
+            <select id="artworkStatus" class="admin-input">
+                <option value="available">Available</option>
+                <option value="sold">Sold</option>
+            </select>
+            <select id="artworkRarity" class="admin-input">
+                <option value="common">Common</option>
+                <option value="rare">Rare</option>
+                <option value="epic">Epic</option>
+            </select>
+            <div class="flex space-x-2">
+                <button class="contact-button flex-1" onclick="addArtwork()">ADD ARTWORK</button>
+                <button class="contact-button flex-1" onclick="closeAdmin()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial artworks data
+        let artworks = [
+            {
+                id: 1,
+                title: "DIGITAL_SOUL_001",
+                artist: "YUGA",
+                ascii: `░░░▓▓▓░░░\n░▓█████▓░\n▓█░▓▓▓░█▓\n▓█▓░░░▓█▓\n▓█░▓▓▓░█▓\n░▓█████▓░\n░░░▓▓▓░░░`,
+                status: "available",
+                rarity: "rare"
+            },
+            {
+                id: 2,
+                title: "ABSTRACT_CHAOS_007",
+                artist: "MIKA",
+                ascii: `██░░██░░██\n░██▓▓▓██░\n░░███████░\n██▓░░░▓██\n░██▓▓▓██░\n██░░██░░██`,
+                status: "sold",
+                rarity: "common"
+            },
+            {
+                id: 3,
+                title: "GEOMETRIC_PRIME_013",
+                artist: "GHOST",
+                ascii: `▓▓▓▓▓▓▓▓▓\n▓░░░░░░░▓\n▓░██████░▓\n▓░██░░██░▓\n▓░██████░▓\n▓░░░░░░░▓\n▓▓▓▓▓▓▓▓▓`,
+                status: "available",
+                rarity: "epic"
+            },
+            {
+                id: 4,
+                title: "NEURAL_MANDALA_005",
+                artist: "LINE",
+                ascii: `░░░███░░░\n░██░░░██░\n██░░█░░██\n░██░░░██░\n░░░███░░░`,
+                status: "available",
+                rarity: "common"
+            },
+            {
+                id: 5,
+                title: "PIXEL_HARMONY_011",
+                artist: "YUGA",
+                ascii: `█░█░█░█░█\n░█░█░█░█░\n█░█░█░█░█\n░█░█░█░█░\n█░█░█░█░█`,
+                status: "sold",
+                rarity: "common"
+            },
+            {
+                id: 6,
+                title: "INFINITE_LOOP_003",
+                artist: "MIKA",
+                ascii: `╔═══════╗\n║░░░░░░░║\n║░██████░║\n║░██░░██░║\n║░██████░║\n║░░░░░░░║\n╚═══════╝`,
+                status: "available",
+                rarity: "rare"
+            }
+        ];
+
+        // Load saved artworks from localStorage
+        function loadArtworks() {
+            const saved = localStorage.getItem('ghostline_artworks');
+            if (saved) {
+                artworks = JSON.parse(saved);
+            }
+        }
+
+        // Save artworks to localStorage
+        function saveArtworks() {
+            localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
+        }
+
+        // Generate encrypted price
+        function generateEncryptedPrice() {
+            const symbols = ['▓', '█', '░', '▒', '▲', '◆', '●', '■', '◉', '◎'];
+            let price = '';
+            
+            // Generate format like: ▓█.░▒▓ ETH
+            for(let i = 0; i < 2; i++) {
+                price += symbols[Math.floor(Math.random() * symbols.length)];
+            }
+            price += '.';
+            for(let i = 0; i < 3; i++) {
+                price += symbols[Math.floor(Math.random() * symbols.length)];
+            }
+            price += ' ETH';
+            
+            return price;
+        }
+
+        // Create artwork console
+        function createArtworkConsole(artwork) {
+            const rarity_colors = {
+                'common': '#00FF00',
+                'rare': '#00CCFF', 
+                'epic': '#CC00FF'
+            };
+
+            return `
+                <div class="gallery-console terminal-border bg-black bg-opacity-50 p-3" data-status="${artwork.status}" data-rarity="${artwork.rarity}">
+                    <div class="rarity-badge pixel-font" style="color: ${rarity_colors[artwork.rarity]}">
+                        ${artwork.rarity.toUpperCase()}
+                    </div>
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[${artwork.title}]</span>
+                        <span class="${artwork.status === 'available' ? 'status-available' : 'status-sold'}">${artwork.status.toUpperCase()}</span>
+                    </div>
+                    <div class="artwork-display h-24 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center leading-none">
+                            <pre>${artwork.ascii}</pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>ARTIST: ${artwork.artist}</div>
+                        <div>PRICE: <span class="encrypted-price" data-artwork="${artwork.id}">${generateEncryptedPrice()}</span></div>
+                        <div class="mt-2">
+                            <button class="contact-button w-full" onclick="contactForArt('${artwork.title}')">
+                                CONTACT FOR INFO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render gallery
+        function renderGallery(filter = 'all') {
+            const container = document.getElementById('galleryContainer');
+            let filteredArtworks = artworks;
+
+            if (filter !== 'all') {
+                filteredArtworks = artworks.filter(art => 
+                    filter === 'available' ? art.status === 'available' :
+                    filter === 'sold' ? art.status === 'sold' :
+                    filter === 'rare' ? art.rarity === 'rare' || art.rarity === 'epic' :
+                    true
+                );
+            }
+
+            container.innerHTML = filteredArtworks.map(createArtworkConsole).join('');
+            updateStats();
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('artworkCount').textContent = artworks.length;
+            document.getElementById('totalPieces').textContent = artworks.length;
+            document.getElementById('availableCount').textContent = artworks.filter(a => a.status === 'available').length;
+            document.getElementById('soldCount').textContent = artworks.filter(a => a.status === 'sold').length;
+            document.getElementById('rareCount').textContent = artworks.filter(a => a.rarity === 'rare' || a.rarity === 'epic').length;
+        }
+
+        // Update encrypted prices
+        function updateEncryptedPrices() {
+            document.querySelectorAll('.encrypted-price').forEach(priceElement => {
+                priceElement.textContent = generateEncryptedPrice();
+            });
+        }
+
+        // Contact for artwork
+        function contactForArt(title) {
+            const contactInfo = `
+🎨 GHOSTLINE ART INQUIRY 🎨
+═══════════════════════════
+
+Artwork: ${title}
+
+📱 Instagram: https://www.instagram.com/____yuga______
+💬 Telegram: https://t.me/yuga_art
+🎵 TikTok: www.tiktok.com/@ghostline207
+
+💰 SUPPORT THE PROJECT:
+🏦 ETH: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+
+Message us about this piece!
+            `;
+            
+            alert(contactInfo);
+        }
+
+        // Show social links
+        function showSocial() {
+            const socialAlert = `
+🎭 GHOSTLINE SOCIAL CHANNELS 🎭
+═══════════════════════════════
+
+📱 Instagram: https://www.instagram.com/____yuga______
+🎵 TikTok: www.tiktok.com/@ghostline207  
+💬 Telegram: https://t.me/yuga_art
+
+💰 SUPPORT THE PROJECT:
+🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+            `;
+            
+            alert(socialAlert);
+        }
+
+        // Admin functions
+        function showAdmin() {
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+
+        function closeAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+            // Clear form
+            document.getElementById('artworkTitle').value = '';
+            document.getElementById('artworkArtist').value = '';
+            document.getElementById('artworkAscii').value = '';
+            document.getElementById('artworkStatus').value = 'available';
+            document.getElementById('artworkRarity').value = 'common';
+        }
+
+        function addArtwork() {
+            const title = document.getElementById('artworkTitle').value;
+            const artist = document.getElementById('artworkArtist').value;
+            const ascii = document.getElementById('artworkAscii').value;
+            const status = document.getElementById('artworkStatus').value;
+            const rarity = document.getElementById('artworkRarity').value;
+
+            if (!title || !artist || !ascii) {
+                alert('Please fill all required fields!');
+                return;
+            }
+
+            const newArtwork = {
+                id: Date.now(),
+                title: title,
+                artist: artist,
+                ascii: ascii,
+                status: status,
+                rarity: rarity
+            };
+
+            artworks.unshift(newArtwork);
+            saveArtworks();
+            renderGallery();
+            closeAdmin();
+            
+            alert('✅ Artwork added successfully!');
+        }
+
+        // Update live creation
+        function updateLiveArt() {
+            const patterns = [
+                '░░░██░░░\n░██▓▓██░\n██▓░░▓██\n░██▓▓██░\n░░░██░░░',
+                '▓▓▓▓▓▓▓\n▓░░█░░▓\n▓░███░▓\n▓░░█░░▓\n▓▓▓▓▓▓▓',
+                '███████\n█░░░░░█\n█░▓▓▓░█\n█░░░░░█\n███████'
+            ];
+            
+            const liveArt = document.getElementById('liveArt');
+            const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
+            liveArt.innerHTML = `<pre>${randomPattern}</pre>`;
+            
+            // Update progress
+            const progress = document.getElementById('liveProgress');
+            let currentProgress = parseInt(progress.textContent);
+            currentProgress += Math.floor(Math.random() * 5) + 1;
+            if (currentProgress > 100) currentProgress = Math.floor(Math.random() * 30) + 10;
+            progress.textContent = currentProgress;
+        }
+
+        // Initialize
+        window.addEventListener('load', function() {
+            loadArtworks();
+            renderGallery();
+
+            // Setup filter buttons
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    renderGallery(this.dataset.filter);
+                });
+            });
+
+            // Start price updates
+            setInterval(updateEncryptedPrices, 2300);
+            
+            // Update live art
+            setInterval(updateLiveArt, 8000);
+
+            console.log(`
+            ╔═══════════════════════════════════════╗
+            ║         GHOSTLINE ART GALLERY         ║
+            ║       ENCRYPTED PRICING ACTIVE        ║
+            ╠═══════════════════════════════════════╣
+            ║ Admin: Press 'A' to add artwork       ║
+            ║ Prices: Encrypted & Randomized        ║
+            ║ Contact: Social links for inquiries   ║
+            ╚═══════════════════════════════════════╝
+            `);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            switch(e.key.toLowerCase()) {
+                case 'a':
+                    showAdmin();
+                    break;
+                case 's':
+                    showSocial();
+                    break;
+                case 'escape':
+                    closeAdmin();
+                    break;
+                case '1':
+                    document.querySelector('[data-filter="all"]').click();
+                    break;
+                case '2':
+                    document.querySelector('[data-filter="available"]').click();
+                    break;
+                case '3':
+                    document.querySelector('[data-filter="sold"]').click();
+                    break;
+                case '4':
+                    document.querySelector('[data-filter="rare"]').click();
+                    break;
+            }
+        });
+
+        // Click outside admin panel to close
+        document.addEventListener('click', function(e) {
+            const adminPanel = document.getElementById('adminPanel');
+            if (e.target === adminPanel) {
+                closeAdmin();
+            }
+        });
+
+        // Mobile touch interactions
+        let touchStartTime = 0;
+        document.addEventListener('touchstart', function() {
+            touchStartTime = Date.now();
+        });
+
+        document.addEventListener('touchend', function(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Long press (2+ seconds) shows admin panel
+            if (touchDuration > 2000 && e.target.closest('.gallery-console')) {
+                e.preventDefault();
+                showAdmin();
+            }
+        });
+    </script>
+</body>
+</html>
