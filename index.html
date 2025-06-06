@@ -19,9 +19,15 @@
         }
         
         .console-border {
-            border: 1px solid #00FF00;
+            border: 2px solid #00FF00;
             border-radius: 0;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+        }
+        
+        .console-border-thick {
+            border: 3px solid #00FF00;
+            border-radius: 0;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
         }
         
         .subtle-glow {
@@ -43,53 +49,170 @@
                 radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 70%);
         }
         
-        .clickable-area {
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* PIXEL RAIN */
+        .pixel-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
         }
         
-        .clickable-area:hover {
-            transform: scale(1.005);
+        .pixel-drop {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00FF00;
+            animation: pixelFall 3s linear infinite;
+            opacity: 0.6;
         }
         
-        .nav-link {
-            transition: all 0.3s ease;
-            text-decoration: none;
-            cursor: pointer;
+        @keyframes pixelFall {
+            0% { 
+                transform: translateY(-10px); 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 0.8; 
+            }
+            90% { 
+                opacity: 0.3; 
+            }
+            100% { 
+                transform: translateY(100vh); 
+                opacity: 0; 
+            }
         }
         
-        .nav-link:hover {
-            color: #00FF00;
-            text-shadow: 0 0 3px #00FF00;
+        /* FIREFLIES */
+        .firefly {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00FF00;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.7;
         }
         
-        /* ZOOM TO CAMERA EFFECT */
-        .zoom-out {
-            transition: all 0.8s ease-out;
-            transform: scale(0) translateZ(-1000px);
+        @keyframes float {
+            0%, 100% { 
+                transform: translate(0, 0);
+                opacity: 0.4;
+            }
+            25% { 
+                transform: translate(20px, -30px);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translate(-15px, -60px);
+                opacity: 0.6;
+            }
+            75% { 
+                transform: translate(25px, -40px);
+                opacity: 0.9;
+            }
+        }
+        
+        /* FALLING STARS */
+        .falling-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00FF00;
+            animation: starFall 2s linear;
             opacity: 0;
         }
         
-        .zoom-in {
-            animation: zoomIn 0.8s ease-out;
-        }
-        
-        @keyframes zoomIn {
+        @keyframes starFall {
             0% {
-                transform: scale(10) translateZ(1000px);
-                opacity: 0;
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(100px, 50px) scale(1.2);
             }
             100% {
-                transform: scale(1) translateZ(0);
-                opacity: 1;
+                opacity: 0;
+                transform: translate(200px, 100px) scale(0.5);
             }
         }
         
-        /* Custom minimal emojis */
-        .robot-icon::before { content: '[R]'; }
-        .brush-icon::before { content: '[B]'; }
-        .art-icon::before { content: '[A]'; }
-        .arrow-icon::before { content: '->'; }
+        /* PIXEL TELEPORTATION EFFECT */
+        .pixel-element {
+            opacity: 0;
+            animation: pixelTeleport 0.1s ease-out forwards;
+        }
+        
+        @keyframes pixelTeleport {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(180deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        /* HYPERSPACE JUMP EFFECT */
+        .hyperspace-pixel {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00FF00;
+            animation: hyperJump 0.8s ease-out forwards;
+        }
+        
+        @keyframes hyperJump {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--jump-x), var(--jump-y)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        .nav-console {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .nav-console:hover {
+            background: rgba(0, 100, 0, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* RANDOM CONSOLE ELEMENTS */
+        .random-element {
+            animation: randomFlicker 2s infinite;
+        }
+        
+        @keyframes randomFlicker {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* LOGO */
+        .logo-container {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            z-index: 10;
+        }
+        
+        .pixel-logo {
+            font-size: 4px;
+            line-height: 1;
+            color: #00FF00;
+        }
         
         /* Mobile adaptations */
         @media (max-width: 768px) {
@@ -101,8 +224,18 @@
                 font-size: 2rem !important;
             }
             
-            .mobile-hide {
-                display: none !important;
+            .logo-container {
+                top: 20px;
+                left: 20px;
+            }
+            
+            .pixel-logo {
+                font-size: 3px;
+            }
+            
+            .nav-consoles {
+                flex-direction: column !important;
+                gap: 1rem !important;
             }
         }
         
@@ -114,14 +247,77 @@
             .main-title {
                 font-size: 1.5rem !important;
             }
+            
+            .pixel-logo {
+                font-size: 2px;
+            }
         }
     </style>
 </head>
 <body class="bg-black text-green-400 overflow-hidden">
-    <div class="w-full h-screen scan-lines matrix-bg flex flex-col justify-center items-center relative clickable-area" onclick="navigateToNext()">
+    <!-- Pixel Effects Container -->
+    <div class="pixel-rain" id="pixelRain"></div>
+    
+    <div class="w-full h-screen scan-lines matrix-bg flex flex-col justify-center items-center relative">
         
-        <!-- System Status - Top Left -->
-        <div class="absolute top-6 left-6 pixel-font text-green-500 text-sm">
+        <!-- Logo - Top Left -->
+        <div class="logo-container pixel-element" style="animation-delay: 1s;">
+            <div class="pixel-font pixel-logo subtle-glow">
+                <pre id="pixelLogo">
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██████████████████████░░░░░██████████████████████
+██████████████████░░░░░░░░░░░░░███████████████████
+████████████████░░░░░░░░░░░░░░░░░█████████████████
+██████████████░░░░░██░░░░░░░██░░░░░███████████████
+████████████░░░░░████░░░░░░░████░░░░░█████████████
+██████████░░░░░██████░░░░░░░██████░░░░░███████████
+████████░░░░░░████████░░░░░████████░░░░░░█████████
+██████░░░░░░██████████░░░░░██████████░░░░░░███████
+████░░░░░░████████████░░░░░████████████░░░░░░█████
+██░░░░░░██████████████░░░░░██████████████░░░░░░███
+░░░░░░████████████████░░░░░████████████████░░░░░░█
+░░░░████████████████████░████████████████████░░░░
+░░██████████████████████░██████████████████████░░
+████████████████████████░████████████████████████
+████████████████████████░████████████████████████
+████████████████████████░████████████████████████
+████████████████████████░████████████████████████
+░░██████████████████████░██████████████████████░░
+░░░░████████████████████░████████████████████░░░░
+░░░░░░████████████████░░░░░████████████████░░░░░░█
+██░░░░░░██████████████░░░░░██████████████░░░░░░███
+████░░░░░░████████████░░░░░████████████░░░░░░█████
+██████░░░░░░██████████░░░░░██████████░░░░░░███████
+████████░░░░░░████████░░░░░████████░░░░░░█████████
+██████████░░░░░██████░░░░░░░██████░░░░░███████████
+████████████░░░░░████░░░░░░░████░░░░░█████████████
+██████████████░░░░░██░░░░░░░██░░░░░███████████████
+████████████████░░░░░░░░░░░░░░░░░█████████████████
+██████████████████░░░░░░░░░░░░░███████████████████
+██████████████████████░░░░░██████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+████████████████████████████████████████████████
+                </pre>
+            </div>
+        </div>
+        
+        <!-- System Status - Top Right -->
+        <div class="absolute top-6 right-6 pixel-font text-green-500 text-sm pixel-element" style="animation-delay: 1.5s;">
             <div>> GHOSTLINE PROTOCOL INITIATED</div>
             <div>> NEURAL NETWORK: ACTIVE</div>
             <div class="typing">> TEACHING ALGORITHMS LOADED</div>
@@ -131,7 +327,7 @@
         <div class="text-center z-10">
             
             <!-- ASCII GHOSTLINE Logo -->
-            <div class="pixel-font text-green-400 ascii-logo mb-6 leading-none subtle-glow">
+            <div class="pixel-font text-white ascii-logo mb-6 leading-none subtle-glow pixel-element" style="animation-delay: 2s;">
                 <pre>
 ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗██╗     ██╗███╗   ██╗███████╗
 ██╔════╝ ██║  ██║██╔═══██╗██╔════╝╚══██╔══╝██║     ██║████╗  ██║██╔════╝
@@ -142,95 +338,186 @@
                 </pre>
             </div>
             
-            <!-- Core Message -->
-            <div class="pixel-font text-green-500 text-lg mb-8">
-                TEACHING ROBOTS DRAWING
-            </div>
-            
-            <!-- Simple Learning Process -->
-            <div class="pixel-font text-green-400 text-sm mb-6 leading-none">
-                <pre>
-┌──────── LEARNING PROCESS ────────┐
-│                                  │
-│  <span class="robot-icon"></span> <span class="arrow-icon"></span> <span class="brush-icon"></span> <span class="arrow-icon"></span> <span class="art-icon"></span> <span class="arrow-icon"></span> [LOOP]  │
-│                                  │
-│  AI    PAINT   ART    REPEAT     │
-└──────────────────────────────────┘
-                </pre>
+            <!-- Core Message Console -->
+            <div class="console-border bg-black bg-opacity-60 px-6 py-3 pixel-font text-green-500 mb-8 pixel-element" style="animation-delay: 2.5s;">
+                <div class="text-center">
+                    <div class="typing">TEACHING ROBOTS DRAWING</div>
+                </div>
             </div>
             
             <!-- Status Console -->
-            <div class="console-border bg-black bg-opacity-50 px-8 py-4 pixel-font text-green-500">
+            <div class="console-border bg-black bg-opacity-50 px-8 py-4 pixel-font text-green-500 mb-8 pixel-element" style="animation-delay: 3s;">
                 <div class="flex justify-between items-center text-sm">
                     <span>[STATUS: OPERATIONAL]</span>
-                    <span>[ROBOTS: 4 ACTIVE]</span>
+                    <span>[ROBOTS: <span class="random-element">4</span> ACTIVE]</span>
                     <span>[CANVAS: READY]</span>
                 </div>
             </div>
         </div>
         
-        <!-- Navigation Links - Bottom -->
-        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 pixel-font text-green-600 text-sm">
-            <div class="flex space-x-8">
-                <a href="live.html" class="nav-link">[LIVE STREAM]</a>
-                <a href="gallery.html" class="nav-link">[GALLERY]</a>
-                <div class="nav-link cursor-pointer" onclick="showSocial(event)">[SOCIAL]</div>
+        <!-- Navigation Consoles -->
+        <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-6 nav-consoles pixel-element" style="animation-delay: 3.5s;">
+            
+            <!-- Live Stream Console -->
+            <div class="nav-console console-border-thick px-6 py-4 pixel-font text-green-400" onclick="navigateToPage('live.html')">
+                <div class="text-center">
+                    <div class="text-xs mb-1">[01]</div>
+                    <div class="text-sm">LIVE STREAM</div>
+                    <div class="text-xs mt-1">
+                        <span class="random-element">[●]</span> 
+                        <span class="random-element">ONLINE</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <!-- Enter Prompt -->
-        <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 pixel-font text-green-700 text-xs">
-            <div class="typing">> CLICK TO ENTER</div>
-        </div>
-        
-        <!-- Grid Pattern - Corners -->
-        <div class="absolute top-0 right-0 pixel-font text-green-800 text-xs opacity-20 mobile-hide">
-            <pre>
-┌─┬─┬─┬─┐
-├─┼─┼─┼─┤
-├─┼─┼─┼─┤
-├─┼─┼─┼─┤
-└─┴─┴─┴─┘
-            </pre>
-        </div>
-        
-        <div class="absolute bottom-0 left-0 pixel-font text-green-800 text-xs opacity-20 mobile-hide">
-            <pre>
-┌─┬─┬─┬─┐
-├─┼─┼─┼─┤
-├─┼─┼─┼─┤
-├─┼─┼─┼─┤
-└─┴─┴─┴─┘
-            </pre>
+            
+            <!-- Gallery Console -->
+            <div class="nav-console console-border-thick px-6 py-4 pixel-font text-green-400" onclick="navigateToPage('gallery.html')">
+                <div class="text-center">
+                    <div class="text-xs mb-1">[02]</div>
+                    <div class="text-sm">GALLERY</div>
+                    <div class="text-xs mt-1">
+                        <span class="random-element">[▓]</span> 
+                        <span class="random-element">12 ITEMS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Social Console -->
+            <div class="nav-console console-border-thick px-6 py-4 pixel-font text-green-400" onclick="showSocial()">
+                <div class="text-center">
+                    <div class="text-xs mb-1">[03]</div>
+                    <div class="text-sm">SOCIAL</div>
+                    <div class="text-xs mt-1">
+                        <span class="random-element">[◆]</span> 
+                        <span class="random-element">CONNECT</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Console greeting
-        console.log(`
-        ╔═══════════════════════════════════════╗
-        ║         GHOSTLINE SYSTEM v1.0         ║
-        ║       TEACHING ROBOTS DRAWING         ║
-        ╠═══════════════════════════════════════╣
-        ║ Status: OPERATIONAL                   ║
-        ║ Mode: LEARNING                        ║
-        ║ Canvas: READY                         ║
-        ╚═══════════════════════════════════════╝
-        `);
+        // Create pixel rain
+        function createPixelRain() {
+            const container = document.getElementById('pixelRain');
+            
+            for(let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel-drop';
+                    pixel.style.left = Math.random() * 100 + '%';
+                    pixel.style.animationDelay = Math.random() * 3 + 's';
+                    pixel.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    
+                    container.appendChild(pixel);
+                    
+                    setTimeout(() => {
+                        if(pixel.parentNode) {
+                            pixel.parentNode.removeChild(pixel);
+                        }
+                    }, 5000);
+                }, i * 100);
+            }
+        }
         
-        // Navigate with zoom effect
-        function navigateToNext() {
-            document.body.classList.add('zoom-out');
+        // Create fireflies
+        function createFireflies() {
+            const container = document.getElementById('pixelRain');
+            
+            for(let i = 0; i < 15; i++) {
+                const firefly = document.createElement('div');
+                firefly.className = 'firefly';
+                firefly.style.left = Math.random() * 100 + '%';
+                firefly.style.top = Math.random() * 100 + '%';
+                firefly.style.animationDelay = Math.random() * 6 + 's';
+                firefly.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                
+                container.appendChild(firefly);
+            }
+        }
+        
+        // Create falling stars
+        function createFallingStar() {
+            const container = document.getElementById('pixelRain');
+            const star = document.createElement('div');
+            star.className = 'falling-star';
+            star.style.left = Math.random() * 80 + '%';
+            star.style.top = Math.random() * 20 + '%';
+            
+            container.appendChild(star);
             
             setTimeout(() => {
-                window.location.href = 'live.html';
+                if(star.parentNode) {
+                    star.parentNode.removeChild(star);
+                }
+            }, 2000);
+        }
+        
+        // Update random console elements
+        function updateRandomElements() {
+            const elements = document.querySelectorAll('.random-element');
+            const symbols = ['●', '◆', '▓', '░', '▲', '▼', '◄', '►'];
+            const states = ['ONLINE', 'ACTIVE', 'READY', 'SYNC', 'LIVE'];
+            const numbers = ['3', '4', '5', '8', '12', '16'];
+            
+            elements.forEach(el => {
+                const text = el.textContent;
+                if(text.includes('[') && text.includes(']')) {
+                    el.textContent = '[' + symbols[Math.floor(Math.random() * symbols.length)] + ']';
+                } else if(isNaN(parseInt(text.split(' ')[0]))) {
+                    el.textContent = states[Math.floor(Math.random() * states.length)];
+                } else {
+                    el.textContent = numbers[Math.floor(Math.random() * numbers.length)] + ' ' + text.split(' ').slice(1).join(' ');
+                }
+            });
+        }
+        
+        // Hyperspace jump navigation
+        function navigateToPage(url) {
+            createHyperspaceJump();
+            
+            setTimeout(() => {
+                window.location.href = url;
             }, 800);
         }
         
-        // Show social links
-        function showSocial(event) {
-            event.stopPropagation();
+        // Create hyperspace jump effect
+        function createHyperspaceJump() {
+            const container = document.getElementById('pixelRain');
             
+            for(let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'hyperspace-pixel';
+                    
+                    const startX = Math.random() * window.innerWidth;
+                    const startY = Math.random() * window.innerHeight;
+                    
+                    pixel.style.left = startX + 'px';
+                    pixel.style.top = startY + 'px';
+                    
+                    // Calculate jump direction (towards center and beyond)
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const jumpX = (startX - centerX) * 3;
+                    const jumpY = (startY - centerY) * 3;
+                    
+                    pixel.style.setProperty('--jump-x', jumpX + 'px');
+                    pixel.style.setProperty('--jump-y', jumpY + 'px');
+                    
+                    container.appendChild(pixel);
+                    
+                    setTimeout(() => {
+                        if(pixel.parentNode) {
+                            pixel.parentNode.removeChild(pixel);
+                        }
+                    }, 800);
+                }, i * 5);
+            }
+        }
+        
+        // Show social links
+        function showSocial() {
             const socialAlert = `
 GHOSTLINE SOCIAL CHANNELS
 ========================
@@ -246,28 +533,49 @@ ETH: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
             alert(socialAlert);
         }
         
+        // Initialize everything
+        window.addEventListener('load', function() {
+            // Create background effects
+            createFireflies();
+            
+            // Start periodic effects
+            setInterval(createPixelRain, 5000);
+            setInterval(createFallingStar, 8000);
+            setInterval(updateRandomElements, 2000);
+            
+            // Initial effects
+            setTimeout(createPixelRain, 1000);
+            setTimeout(createFallingStar, 3000);
+            
+            console.log(`
+            ╔═══════════════════════════════════════╗
+            ║         GHOSTLINE SYSTEM v2.0         ║
+            ║       TEACHING ROBOTS DRAWING         ║
+            ╠═══════════════════════════════════════╣
+            ║ Status: OPERATIONAL                   ║
+            ║ Effects: PIXEL RAIN + FIREFLIES       ║
+            ║ Navigation: HYPERSPACE ENABLED        ║
+            ╚═══════════════════════════════════════╝
+            `);
+        });
+        
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             switch(e.key.toLowerCase()) {
+                case '1':
+                    navigateToPage('live.html');
+                    break;
+                case '2':
+                    navigateToPage('gallery.html');
+                    break;
+                case '3':
+                    showSocial();
+                    break;
                 case 'enter':
                 case ' ':
-                    navigateToNext();
-                    break;
-                case 'l':
-                    window.location.href = 'live.html';
-                    break;
-                case 'g':
-                    window.location.href = 'gallery.html';
-                    break;
-                case 's':
-                    showSocial(e);
+                    navigateToPage('live.html');
                     break;
             }
-        });
-        
-        // Page load animation
-        window.addEventListener('load', function() {
-            document.body.classList.add('zoom-in');
         });
         
         // Prevent context menu
