@@ -19,11 +19,13 @@
     }
     
     .slide-container {
-        width: 1280px;
-        min-height: 720px;
+        width: 100%;
+        max-width: 1280px;
+        min-height: 100vh;
         margin: 0 auto;
         position: relative;
         background: radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.1) 0%, rgba(0, 0, 0, 0.9) 70%);
+        padding-bottom: 60px;
     }
     
     .terminal-border {
@@ -96,7 +98,7 @@
         background: linear-gradient(45deg, #001100, #003300);
         border: 2px solid #00ff00;
         color: #00ff00;
-        padding: 15px 30px;
+        padding: 12px 24px;
         text-decoration: none;
         display: inline-block;
         transition: all 0.3s ease;
@@ -152,32 +154,32 @@
     <div class="flex flex-col items-center justify-center h-full px-8">
         
         <!-- Logo Section -->
-        <div class="mb-8 relative">
-            <div class="w-64 h-64 mx-auto mb-6 terminal-border pulse-border logo-container p-6 flex items-center justify-center">
-                <!-- Replace this src with your actual logo file path -->
-                <img src="logo.png" alt="GHOSTLINE Logo" class="ghost-logo w-full h-full object-contain" 
+        <div class="mb-6 relative">
+            <div class="w-48 h-48 mx-auto mb-4 terminal-border pulse-border logo-container p-4 flex items-center justify-center">
+                <!-- Your original logo - replace "YOUR_LOGO_PATH_HERE" with actual file path -->
+                <img src="YOUR_LOGO_PATH_HERE" alt="GHOSTLINE Logo" class="ghost-logo w-full h-full object-contain" 
                      style="image-rendering: pixelated; filter: brightness(0) saturate(100%) invert(31%) sepia(95%) saturate(4448%) hue-rotate(86deg) brightness(119%) contrast(119%);">
             </div>
         </div>
         
         <!-- Title Section -->
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-bold mb-4 glow-text pixel-text">
+        <div class="text-center mb-6">
+            <h1 class="text-4xl font-bold mb-3 glow-text pixel-text">
                 GHOSTLINE
             </h1>
-            <div class="terminal-border bg-black p-4 mb-6">
-                <div class="text-lg glow-text pixel-text">LEARNING ART WITH ROBOTS</div>
+            <div class="terminal-border bg-black p-3 mb-4">
+                <div class="text-base glow-text pixel-text">LEARNING ART WITH ROBOTS</div>
             </div>
-            <div class="text-base text-green-400 mb-2">An Experimental Digital Art Project</div>
-            <div class="text-sm text-green-600">Where Artificial Intelligence Discovers Creativity</div>
+            <div class="text-sm text-green-400 mb-1">An Experimental Digital Art Project</div>
+            <div class="text-xs text-green-600">Where Artificial Intelligence Discovers Creativity</div>
         </div>
         
         <!-- Navigation Buttons -->
-        <div class="flex space-x-8 mb-8">
-            <a href="gallery.html" class="nav-button pixel-text text-lg glow-text">
+        <div class="flex space-x-6 mb-6">
+            <a href="gallery.html" class="nav-button pixel-text text-base glow-text">
                 GALLERY
             </a>
-            <a href="stream.html" class="nav-button pixel-text text-lg glow-text">
+            <a href="stream.html" class="nav-button pixel-text text-base glow-text">
                 STREAM
             </a>
         </div>
