@@ -39,16 +39,17 @@
     
     .terminal-border {
         border: 2px solid #00ff00;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
     }
     
     .glow-text {
-        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+        text-shadow: 0 0 3px #00ff00;
     }
     
     .pixel-text {
         font-family: 'Press Start 2P', cursive;
         image-rendering: pixelated;
+        color: #ffffff;
     }
     
     .scanlines {
@@ -106,19 +107,19 @@
     .nav-button {
         background: linear-gradient(45deg, #001100, #003300);
         border: 2px solid #00ff00;
-        color: #00ff00;
+        color: #ffffff;
         padding: 12px 24px;
         text-decoration: none;
         display: inline-block;
         transition: all 0.3s ease;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
         position: relative;
         overflow: hidden;
     }
     
     .nav-button:hover {
         background: linear-gradient(45deg, #002200, #004400);
-        box-shadow: 0 0 40px rgba(0, 255, 0, 0.6);
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
         transform: translateY(-2px);
     }
     
@@ -177,7 +178,7 @@
         
         <!-- Logo Section -->
         <div class="mb-6 relative">
-            <div class="w-32 h-32 mx-auto mb-4 terminal-border pulse-border logo-container p-2 flex items-center justify-center">
+            <div class="w-48 h-48 mx-auto mb-4 terminal-border logo-container p-2 flex items-center justify-center">
                 <!-- Animated GIF as main logo -->
                 <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="w-full h-full object-contain" 
                      style="image-rendering: pixelated;">
