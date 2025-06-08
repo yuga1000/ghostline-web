@@ -11,11 +11,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 ```
-    body {
-        background: #000000;
+    html, body {
+        background: #000000 !important;
         color: #00ff00;
         font-family: 'Share Tech Mono', monospace;
         overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
     }
     
     .slide-container {
@@ -131,6 +134,17 @@
     .logo-container {
         background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(0, 0, 0, 0.8));
     }
+    
+    .bottom-gif {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        width: 200px;
+        height: auto;
+        filter: drop-shadow(0 0 15px #00ff00);
+    }
 </style>
 ```
 
@@ -155,10 +169,10 @@
         
         <!-- Logo Section -->
         <div class="mb-6 relative">
-            <div class="w-48 h-48 mx-auto mb-4 terminal-border pulse-border logo-container p-4 flex items-center justify-center">
-                <!-- Your original logo - replace "YOUR_LOGO_PATH_HERE" with actual file path -->
-                <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="ghost-logo w-full h-full object-contain" 
-                     style="image-rendering: pixelated; filter: brightness(0) saturate(100%) invert(31%) sepia(95%) saturate(4448%) hue-rotate(86deg) brightness(119%) contrast(119%);">
+            <div class="w-32 h-32 mx-auto mb-4 terminal-border pulse-border logo-container p-2 flex items-center justify-center">
+                <!-- Static logo for header -->
+                <img src="IMG_8729.png" alt="GHOSTLINE Logo" class="ghost-logo w-full h-full object-contain" 
+                     style="image-rendering: pixelated;">
             </div>
         </div>
         
@@ -185,7 +199,7 @@
         </div>
         
         <!-- Status Display -->
-        <div class="grid grid-cols-3 gap-4 w-full max-w-4xl">
+        <div class="grid grid-cols-3 gap-4 w-full max-w-4xl mb-20">
             <div class="terminal-border bg-black p-3 text-center">
                 <div class="text-xs text-green-400 mb-1">ROBOT STATUS</div>
                 <div class="glow-text font-bold pixel-text">ACTIVE</div>
@@ -199,15 +213,18 @@
                 <div class="glow-text font-bold pixel-text">LIVE</div>
             </div>
         </div>
-        
-        <!-- Footer Command Line -->
-        <div class="absolute bottom-4 left-4 right-4">
-            <div class="terminal-border bg-black p-2">
-                <div class="text-sm">
-                    <span class="text-green-400">root@ghostline:~$</span> 
-                    <span class="glow-text">initiate_art_sequence</span>
-                    <span class="blink ml-2">█</span>
-                </div>
+    </div>
+    
+    <!-- Bottom GIF - replace with your animated GIF filename -->
+    <img src="YOUR_GIF_FILENAME.gif" alt="Animated Logo" class="bottom-gif">
+    
+    <!-- Footer Command Line -->
+    <div class="absolute bottom-4 left-4 right-4" style="z-index: 5;">
+        <div class="terminal-border bg-black p-2">
+            <div class="text-sm">
+                <span class="text-green-400">root@ghostline:~$</span> 
+                <span class="glow-text">initiate_art_sequence</span>
+                <span class="blink ml-2">█</span>
             </div>
         </div>
     </div>
