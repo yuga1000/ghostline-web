@@ -1,245 +1,191 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTLINE: Teaching Robots Drawing</title>
+    <title>GHOSTLINE: Learning Art with Robots</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-```
-    body {
-        background: #000000;
-        color: #00ff00;
-        font-family: 'Share Tech Mono', monospace;
-        overflow-x: hidden;
-    }
-    
-    .container {
-        width: 100%;
-        max-width: 1280px;
-        min-height: 100vh;
-        margin: 0 auto;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem;
-    }
-    
-    .terminal-border {
-        border: 2px solid #00ff00;
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
-    }
-    
-    .subtle-glow {
-        text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
-    }
-    
-    .pixel-text {
-        font-family: 'Press Start 2P', cursive;
-        image-rendering: pixelated;
-        -webkit-font-smoothing: none;
-    }
-    
-    .scanlines {
-        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
-        background-size: 100% 4px;
-        animation: scanlines 8s linear infinite;
-    }
-    
-    @keyframes scanlines {
-        0% { background-position: 0 0; }
-        100% { background-position: 0 10px; }
-    }
-    
-    @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0; }
-    }
-    
-    .blink {
-        animation: blink 1s infinite;
-    }
-    
-    .nav-button {
-        background: #000;
-        border: 2px solid #00ff00;
-        color: #00ff00;
-        padding: 1rem 2rem;
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 1.125rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-    }
-    
-    .nav-button:hover {
-        background: rgba(0, 255, 0, 0.1);
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        transform: translateY(-2px);
-    }
-    
-    .logo-container {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto 2rem;
-        filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.3));
-    }
-    
-    /* Минималистичный Matrix эффект */
-    .matrix-char {
-        position: absolute;
-        color: #00ff00;
-        font-family: 'Share Tech Mono', monospace;
-        animation: fall 10s linear infinite;
-        opacity: 0.1;
-    }
-    
-    @keyframes fall {
-        0% { 
-            transform: translateY(-100px); 
-            opacity: 0;
+        
+        body {
+            background: #000000;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
         }
-        10% { 
-            opacity: 0.1;
+        
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            margin: 0 auto;
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.1) 0%, rgba(0, 0, 0, 0.9) 70%);
         }
-        90% { 
-            opacity: 0.1;
+        
+        .terminal-border {
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
         }
-        100% { 
-            transform: translateY(100vh); 
-            opacity: 0;
+        
+        .glow-text {
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
         }
-    }
-    
-    /* Рандомные числа */
-    .random-number {
-        display: inline-block;
-        min-width: 20px;
-    }
-</style>
-```
-
+        
+        .pixel-text {
+            font-family: 'Press Start 2P', cursive;
+            image-rendering: pixelated;
+        }
+        
+        .scanlines {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+            background-size: 100% 4px;
+            animation: scanlines 0.1s linear infinite;
+        }
+        
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes matrix-rain {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        
+        .matrix-char {
+            position: absolute;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            animation: matrix-rain 3s linear infinite;
+            opacity: 0.3;
+        }
+        
+        .ghost-logo {
+            filter: drop-shadow(0 0 20px #00ff00);
+            image-rendering: pixelated;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.6); }
+            100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
+        }
+        
+        .pulse-border {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+    </style>
 </head>
-<body class="scanlines">
-    <div class="container">
-        <!-- Минималистичный Matrix Rain -->
+<body>
+    <div class="slide-container scanlines">
+        <!-- Matrix Rain Effect -->
         <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
-
-```
-    <!-- Main Content -->
-    <div class="relative z-10 text-center">
         
-        <!-- Logo -->
-        <div class="logo-container">
-            <img src="logo.png" alt="GHOSTLINE" class="w-full h-full" style="image-rendering: pixelated;">
+        <!-- Header Terminal Bar -->
+        <div class="terminal-border bg-black p-2 m-4">
+            <div class="flex justify-between items-center text-xs">
+                <span class="glow-text">>>> SYSTEM STATUS: ONLINE</span>
+                <span class="blink">█</span>
+                <span class="glow-text">GHOSTLINE v14.5.7</span>
+            </div>
         </div>
         
-        <!-- Title -->
-        <h1 class="text-5xl md:text-6xl pixel-text text-white mb-8">
-            GHOSTLINE
-        </h1>
-        
-        <!-- Subtitle -->
-        <div class="mb-12">
-            <p class="text-xl mb-2 subtle-glow">TEACHING ROBOTS DRAWING</p>
-            <p class="text-sm text-green-600">Digital Art Experiment</p>
-        </div>
-        
-        <!-- Navigation Buttons -->
-        <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12">
-            <a href="live.html" class="nav-button">
-                <span>▶</span> LIVE STREAM
-            </a>
-            <a href="gallery.html" class="nav-button">
-                <span>◼</span> GALLERY
-            </a>
-            <button onclick="showSocial()" class="nav-button">
-                <span>⟐</span> CONNECT
-            </button>
-        </div>
-        
-        <!-- Simple Status -->
-        <div class="text-sm text-green-400">
-            <span>ROBOTS: <span class="random-number" id="robots">4</span></span>
-            <span class="mx-4">•</span>
-            <span>STATUS: ONLINE</span>
-            <span class="mx-4">•</span>
-            <span>ARTWORKS: <span class="random-number" id="artworks">127</span></span>
+        <!-- Main Content -->
+        <div class="flex flex-col items-center justify-center h-full px-8">
+            
+            <!-- Logo Section -->
+            <div class="mb-8 relative">
+                <div class="w-48 h-48 mx-auto mb-6 terminal-border pulse-border bg-black p-4 flex items-center justify-center">
+                    <div class="text-6xl pixel-text glow-text text-center">
+                        👁️<br/>
+                        <div class="text-2xl mt-2">GHOST</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Title Section -->
+            <div class="text-center mb-8">
+                <h1 class="text-6xl font-bold mb-4 glow-text pixel-text" style="font-family: 'Orbitron', sans-serif;">
+                    GHOSTLINE
+                </h1>
+                <div class="terminal-border bg-black p-4 mb-6">
+                    <div class="text-xl glow-text">LEARNING ART WITH ROBOTS</div>
+                </div>
+                <div class="text-lg text-green-400 mb-2">An Experimental Digital Art Project</div>
+                <div class="text-sm text-green-600">Where Artificial Intelligence Discovers Creativity</div>
+            </div>
+            
+            <!-- Status Display -->
+            <div class="grid grid-cols-3 gap-4 w-full max-w-4xl">
+                <div class="terminal-border bg-black p-3 text-center">
+                    <div class="text-xs text-green-400 mb-1">ROBOT STATUS</div>
+                    <div class="glow-text font-bold">ACTIVE</div>
+                </div>
+                <div class="terminal-border bg-black p-3 text-center">
+                    <div class="text-xs text-green-400 mb-1">AI LEARNING</div>
+                    <div class="glow-text font-bold">EVOLVING</div>
+                </div>
+                <div class="terminal-border bg-black p-3 text-center">
+                    <div class="text-xs text-green-400 mb-1">ART GENERATION</div>
+                    <div class="glow-text font-bold">LIVE</div>
+                </div>
+            </div>
+            
+            <!-- Footer Command Line -->
+            <div class="absolute bottom-4 left-4 right-4">
+                <div class="terminal-border bg-black p-2">
+                    <div class="text-sm">
+                        <span class="text-green-400">root@ghostline:~$</span> 
+                        <span class="glow-text">initiate_art_sequence</span>
+                        <span class="blink ml-2">█</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
-    <!-- Terminal Line (optional) -->
-    <div class="absolute bottom-4 left-4 right-4 text-xs text-green-600">
-        <span>root@ghostline:~$</span> 
-        <span class="subtle-glow">ready</span>
-        <span class="blink ml-2">█</span>
-    </div>
-</div>
-
-<script>
-    // Минималистичный Matrix Rain
-    function createMatrixRain() {
-        const container = document.getElementById('matrix-container');
-        const chars = '01';
-        
-        // Создаем только несколько падающих символов
-        for(let i = 0; i < 20; i++) {
-            setTimeout(() => {
+    <script>
+        // Matrix Rain Effect
+        function createMatrixRain() {
+            const container = document.getElementById('matrix-container');
+            const chars = '01GHOSTLINE アートロボット';
+            
+            setInterval(() => {
                 const char = document.createElement('div');
                 char.className = 'matrix-char';
                 char.textContent = chars[Math.floor(Math.random() * chars.length)];
                 char.style.left = Math.random() * 100 + '%';
-                char.style.fontSize = Math.random() * 10 + 14 + 'px';
-                char.style.animationDelay = Math.random() * 10 + 's';
-                char.style.animationDuration = (Math.random() * 5 + 10) + 's';
+                char.style.fontSize = Math.random() * 10 + 10 + 'px';
+                char.style.animationDelay = Math.random() * 2 + 's';
+                char.style.animationDuration = Math.random() * 3 + 2 + 's';
                 
                 container.appendChild(char);
-            }, i * 500);
+                
+                setTimeout(() => {
+                    if (char.parentNode) {
+                        char.parentNode.removeChild(char);
+                    }
+                }, 5000);
+            }, 200);
         }
-    }
-    
-    // Рандомайзер чисел
-    function randomizeNumbers() {
-        const robots = document.getElementById('robots');
-        const artworks = document.getElementById('artworks');
         
-        setInterval(() => {
-            robots.textContent = Math.floor(Math.random() * 3) + 3; // 3-5
-            artworks.textContent = Math.floor(Math.random() * 50) + 100; // 100-150
-        }, 3000);
-    }
-    
-    // Social popup
-    function showSocial() {
-        alert(`
-```
-
-GHOSTLINE CONNECT
-═══════════════════
-
-Instagram: @****yuga****__
-TikTok: @ghostline207
-Telegram: t.me/yuga_art
-
-ETH: 0x6971Cc1DB72c179a…
-`);
-}
-
-```
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        createMatrixRain();
-        randomizeNumbers();
-    });
-</script>
-```
-
+        // Initialize effects
+        document.addEventListener('DOMContentLoaded', function() {
+            createMatrixRain();
+        });
+    </script>
 </body>
 </html>
