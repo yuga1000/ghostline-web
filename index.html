@@ -104,6 +104,7 @@
         overflow: hidden;
         font-family: 'Press Start 2P', cursive;
         font-size: 12px;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
     }
     
     .console-button:hover {
@@ -155,16 +156,19 @@
         transition: all 0.2s ease;
         flex-direction: column;
         gap: 8px;
+        box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
     }
     
     .social-button:hover {
         background: #001100;
         transform: translateY(-2px);
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
     }
     
     .enlarged-logo {
-        transform: scale(2);
+        transform: scale(1.4);
         transform-origin: center;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
     }
 </style>
 ```
