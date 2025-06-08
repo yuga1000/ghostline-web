@@ -82,77 +82,89 @@
     .matrix-char {
         position: absolute;
         color: #00ff00;
-        font-family: 'Share Tech Mono', monospace;
+        font-family: 'Press Start 2P', cursive;
         animation: matrix-rain 3s linear infinite;
         opacity: 0.3;
-    }
-    
-    .ghost-logo {
-        filter: drop-shadow(0 0 20px #00ff00);
-        image-rendering: pixelated;
-        max-width: 100%;
-        height: auto;
-    }
-    
-    @keyframes pulse-glow {
-        0% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
-        50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.6); }
-        100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
-    }
-    
-    .pulse-border {
-        animation: pulse-glow 2s ease-in-out infinite;
-    }
-    
-    .nav-button {
-        background: linear-gradient(45deg, #001100, #003300);
-        border: 2px solid #00ff00;
-        color: #ffffff;
-        padding: 12px 24px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .nav-button:hover {
-        background: linear-gradient(45deg, #002200, #004400);
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
-        transform: translateY(-2px);
-    }
-    
-    .nav-button:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
-        transition: left 0.5s;
-    }
-    
-    .nav-button:hover:before {
-        left: 100%;
+        font-size: 12px;
     }
     
     .logo-container {
         background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(0, 0, 0, 0.8));
     }
     
-    .bottom-gif {
+    .console-button {
+        background: #000000;
+        border: 1px solid #00ff00;
+        color: #ffffff;
+        padding: 8px 16px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 12px;
+    }
+    
+    .console-button:hover {
+        background: #001100;
+        color: #00ff00;
+    }
+    
+    .console-button:active {
+        background: #002200;
+        transform: scale(0.95);
+    }
+    
+    .pixel-particle {
         position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 15;
-        width: 150px;
-        height: 150px;
-        object-fit: contain;
-        filter: drop-shadow(0 0 15px #00ff00);
+        width: 4px;
+        height: 4px;
+        background: #00ff00;
+        pointer-events: none;
+        z-index: 1000;
+    }
+    
+    @keyframes pixelFall {
+        0% {
+            transform: translateY(0px);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100px);
+            opacity: 0;
+        }
+    }
+    
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        background: #00ff00;
+        display: inline-block;
         image-rendering: pixelated;
+    }
+    
+    .social-button {
+        background: #000000;
+        border: 1px solid #00ff00;
+        padding: 12px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .social-button:hover {
+        background: #001100;
+        transform: translateY(-2px);
+    }
+    
+    .enlarged-logo {
+        transform: scale(2);
+        transform-origin: center;
     }
 </style>
 ```
@@ -178,9 +190,9 @@
         
         <!-- Logo Section -->
         <div class="mb-6 relative">
-            <div class="w-48 h-48 mx-auto mb-4 terminal-border logo-container p-2 flex items-center justify-center">
-                <!-- Animated GIF as main logo -->
-                <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="w-full h-full object-contain" 
+            <div class="w-48 h-48 mx-auto mb-4 terminal-border logo-container p-1 flex items-center justify-center overflow-hidden">
+                <!-- Animated GIF as main logo - enlarged -->
+                <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="enlarged-logo" 
                      style="image-rendering: pixelated;">
             </div>
         </div>
@@ -198,29 +210,72 @@
         </div>
         
         <!-- Navigation Buttons -->
-        <div class="flex space-x-6 mb-6">
-            <a href="gallery.html" class="nav-button pixel-text text-base glow-text">
+        <div class="flex space-x-6 mb-8">
+            <a href="gallery.html" class="console-button" id="galleryBtn">
                 GALLERY
             </a>
-            <a href="stream.html" class="nav-button pixel-text text-base glow-text">
+            <a href="stream.html" class="console-button" id="streamBtn">
                 STREAM
             </a>
         </div>
         
-        <!-- Status Display -->
-        <div class="grid grid-cols-3 gap-4 w-full max-w-4xl mb-20">
-            <div class="terminal-border bg-black p-3 text-center">
-                <div class="text-xs text-green-400 mb-1">ROBOT STATUS</div>
-                <div class="glow-text font-bold pixel-text">ACTIVE</div>
-            </div>
-            <div class="terminal-border bg-black p-3 text-center">
-                <div class="text-xs text-green-400 mb-1">AI LEARNING</div>
-                <div class="glow-text font-bold pixel-text">EVOLVING</div>
-            </div>
-            <div class="terminal-border bg-black p-3 text-center">
-                <div class="text-xs text-green-400 mb-1">ART GENERATION</div>
-                <div class="glow-text font-bold pixel-text">LIVE</div>
-            </div>
+        <!-- Social Media Section -->
+        <div class="grid grid-cols-4 gap-4 w-full max-w-2xl mb-20">
+            <a href="#" class="social-button">
+                <!-- Instagram Icon -->
+                <svg class="social-icon" viewBox="0 0 40 40">
+                    <g fill="#00ff00">
+                        <rect x="4" y="4" width="32" height="32"/>
+                        <rect x="8" y="8" width="24" height="24" fill="#000000"/>
+                        <rect x="12" y="12" width="16" height="16"/>
+                        <rect x="16" y="16" width="8" height="8" fill="#000000"/>
+                        <rect x="28" y="8" width="4" height="4"/>
+                    </g>
+                </svg>
+                <span class="text-xs pixel-text text-green-400">INSTA</span>
+            </a>
+            
+            <a href="#" class="social-button">
+                <!-- TikTok Icon -->
+                <svg class="social-icon" viewBox="0 0 40 40">
+                    <g fill="#00ff00">
+                        <rect x="12" y="4" width="8" height="24"/>
+                        <rect x="16" y="8" width="12" height="4"/>
+                        <rect x="20" y="12" width="8" height="4"/>
+                        <rect x="8" y="20" width="16" height="8"/>
+                        <rect x="12" y="28" width="8" height="8"/>
+                    </g>
+                </svg>
+                <span class="text-xs pixel-text text-green-400">TIKTOK</span>
+            </a>
+            
+            <a href="#" class="social-button">
+                <!-- Telegram Icon -->
+                <svg class="social-icon" viewBox="0 0 40 40">
+                    <g fill="#00ff00">
+                        <rect x="8" y="8" width="24" height="24"/>
+                        <rect x="12" y="12" width="16" height="16" fill="#000000"/>
+                        <rect x="16" y="16" width="8" height="4"/>
+                        <rect x="20" y="20" width="8" height="4"/>
+                        <rect x="12" y="20" width="4" height="4"/>
+                    </g>
+                </svg>
+                <span class="text-xs pixel-text text-green-400">TELEGRAM</span>
+            </a>
+            
+            <a href="#" class="social-button">
+                <!-- YouTube Icon -->
+                <svg class="social-icon" viewBox="0 0 40 40">
+                    <g fill="#00ff00">
+                        <rect x="4" y="12" width="32" height="16"/>
+                        <rect x="8" y="8" width="24" height="4"/>
+                        <rect x="8" y="28" width="24" height="4"/>
+                        <rect x="16" y="16" width="4" height="8"/>
+                        <rect x="20" y="18" width="4" height="4"/>
+                    </g>
+                </svg>
+                <span class="text-xs pixel-text text-green-400">YOUTUBE</span>
+            </a>
         </div>
     </div>
     
@@ -237,17 +292,19 @@
 </div>
 
 <script>
-    // Matrix Rain Effect
+    // Pixel characters for background
+    const pixelChars = ['░', '▒', '▓', '█', '◆', '◇', '♦', '♢', '▲', '▼', '◄', '►', '●', '○', '■', '□', '▪', '▫'];
+    
+    // Matrix Rain Effect with pixel characters
     function createMatrixRain() {
         const container = document.getElementById('matrix-container');
-        const chars = '01GHOSTLINE アートロボット';
         
         setInterval(() => {
             const char = document.createElement('div');
             char.className = 'matrix-char';
-            char.textContent = chars[Math.floor(Math.random() * chars.length)];
+            char.textContent = pixelChars[Math.floor(Math.random() * pixelChars.length)];
             char.style.left = Math.random() * 100 + '%';
-            char.style.fontSize = Math.random() * 10 + 10 + 'px';
+            char.style.fontSize = Math.random() * 8 + 8 + 'px';
             char.style.animationDelay = Math.random() * 2 + 's';
             char.style.animationDuration = Math.random() * 3 + 2 + 's';
             
@@ -258,8 +315,41 @@
                     char.parentNode.removeChild(char);
                 }
             }, 5000);
-        }, 200);
+        }, 300);
     }
+    
+    // Pixel rain effect for buttons
+    function createPixelRain(button) {
+        const rect = button.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        for (let i = 0; i < 15; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel-particle';
+            pixel.style.left = centerX + (Math.random() - 0.5) * 60 + 'px';
+            pixel.style.top = centerY + 'px';
+            pixel.style.animation = `pixelFall ${Math.random() * 0.5 + 0.5}s ease-out forwards`;
+            pixel.style.animationDelay = Math.random() * 0.2 + 's';
+            
+            document.body.appendChild(pixel);
+            
+            setTimeout(() => {
+                if (pixel.parentNode) {
+                    pixel.parentNode.removeChild(pixel);
+                }
+            }, 1000);
+        }
+    }
+    
+    // Add click effects to buttons
+    document.getElementById('galleryBtn').addEventListener('click', function(e) {
+        createPixelRain(this);
+    });
+    
+    document.getElementById('streamBtn').addEventListener('click', function(e) {
+        createPixelRain(this);
+    });
     
     // Initialize effects
     document.addEventListener('DOMContentLoaded', function() {
