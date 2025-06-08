@@ -52,6 +52,28 @@
         color: #ffffff;
     }
     
+    .pixel-text-lg {
+        font-family: 'Press Start 2P', cursive;
+        image-rendering: pixelated;
+        color: #ffffff;
+        font-size: 16px;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    }
+    
+    .pixel-text-sm {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff00;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+    
+    .pixel-text-xs {
+        font-family: 'Share Tech Mono', monospace;
+        color: #66ff66;
+        font-size: 10px;
+        text-shadow: 0 0 2px rgba(102, 255, 102, 0.5);
+    }
+    
     .scanlines {
         background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
         background-size: 100% 4px;
@@ -119,11 +141,12 @@
     
     .pixel-particle {
         position: fixed;
-        width: 4px;
-        height: 4px;
+        width: 2px;
+        height: 2px;
         background: #00ff00;
         pointer-events: none;
         z-index: 1000;
+        box-shadow: 0 0 2px #00ff00;
     }
     
     @keyframes pixelFall {
@@ -203,14 +226,14 @@
         
         <!-- Title Section -->
         <div class="text-center mb-6">
-            <h1 class="text-4xl font-bold mb-3 glow-text pixel-text">
+            <h1 class="text-4xl font-bold mb-3 glow-text pixel-text-lg">
                 GHOSTLINE
             </h1>
             <div class="terminal-border bg-black p-3 mb-4">
                 <div class="text-base glow-text pixel-text">LEARNING ART WITH ROBOTS</div>
             </div>
-            <div class="text-sm text-green-400 mb-1">An Experimental Digital Art Project</div>
-            <div class="text-xs text-green-600">Where Artificial Intelligence Discovers Creativity</div>
+            <div class="text-sm pixel-text-sm mb-1">An Experimental Digital Art Project</div>
+            <div class="text-xs pixel-text-xs">Where Artificial Intelligence Discovers Creativity</div>
         </div>
         
         <!-- Navigation Buttons -->
