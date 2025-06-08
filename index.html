@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHOSTLINE: Learning Art with Robots</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -52,12 +52,13 @@
         color: #ffffff;
     }
     
-    .pixel-text-lg {
-        font-family: 'Press Start 2P', cursive;
-        image-rendering: pixelated;
+    .pixel-text-title {
+        font-family: 'Audiowide', cursive;
         color: #ffffff;
-        font-size: 16px;
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        font-size: 32px;
+        letter-spacing: 4px;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 16px rgba(0, 255, 0, 0.3);
+        text-transform: uppercase;
     }
     
     .pixel-text-sm {
@@ -161,8 +162,8 @@
     }
     
     .social-icon {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
         background: #00ff00;
         display: inline-block;
         image-rendering: pixelated;
@@ -171,15 +172,25 @@
     .social-button {
         background: #000000;
         border: 1px solid #00ff00;
-        padding: 12px;
+        padding: 8px;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
         box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
+        width: 80px;
+        height: 80px;
+    }
+    
+    .social-text {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 8px;
+        color: #00ff00;
+        font-weight: 300;
+        letter-spacing: 0.5px;
     }
     
     .social-button:hover {
@@ -226,7 +237,7 @@
         
         <!-- Title Section -->
         <div class="text-center mb-6">
-            <h1 class="text-4xl font-bold mb-3 glow-text pixel-text-lg">
+            <h1 class="text-4xl font-bold mb-3 pixel-text-title">
                 GHOSTLINE
             </h1>
             <div class="terminal-border bg-black p-3 mb-4">
@@ -247,61 +258,61 @@
         </div>
         
         <!-- Social Media Section -->
-        <div class="grid grid-cols-4 gap-4 w-full max-w-2xl mb-20">
+        <div class="grid grid-cols-4 gap-3 w-full max-w-lg mb-20">
             <a href="#" class="social-button">
                 <!-- Instagram Icon -->
-                <svg class="social-icon" viewBox="0 0 40 40">
+                <svg class="social-icon" viewBox="0 0 30 30">
                     <g fill="#00ff00">
-                        <rect x="4" y="4" width="32" height="32"/>
-                        <rect x="8" y="8" width="24" height="24" fill="#000000"/>
-                        <rect x="12" y="12" width="16" height="16"/>
-                        <rect x="16" y="16" width="8" height="8" fill="#000000"/>
-                        <rect x="28" y="8" width="4" height="4"/>
+                        <rect x="3" y="3" width="24" height="24"/>
+                        <rect x="6" y="6" width="18" height="18" fill="#000000"/>
+                        <rect x="9" y="9" width="12" height="12"/>
+                        <rect x="12" y="12" width="6" height="6" fill="#000000"/>
+                        <rect x="21" y="6" width="3" height="3"/>
                     </g>
                 </svg>
-                <span class="text-xs pixel-text text-green-400">INSTA</span>
+                <span class="social-text">INSTA</span>
             </a>
             
             <a href="#" class="social-button">
                 <!-- TikTok Icon -->
-                <svg class="social-icon" viewBox="0 0 40 40">
+                <svg class="social-icon" viewBox="0 0 30 30">
                     <g fill="#00ff00">
-                        <rect x="12" y="4" width="8" height="24"/>
-                        <rect x="16" y="8" width="12" height="4"/>
-                        <rect x="20" y="12" width="8" height="4"/>
-                        <rect x="8" y="20" width="16" height="8"/>
-                        <rect x="12" y="28" width="8" height="8"/>
+                        <rect x="9" y="3" width="6" height="18"/>
+                        <rect x="12" y="6" width="9" height="3"/>
+                        <rect x="15" y="9" width="6" height="3"/>
+                        <rect x="6" y="15" width="12" height="6"/>
+                        <rect x="9" y="21" width="6" height="6"/>
                     </g>
                 </svg>
-                <span class="text-xs pixel-text text-green-400">TIKTOK</span>
+                <span class="social-text">TIKTOK</span>
             </a>
             
             <a href="#" class="social-button">
                 <!-- Telegram Icon -->
-                <svg class="social-icon" viewBox="0 0 40 40">
+                <svg class="social-icon" viewBox="0 0 30 30">
                     <g fill="#00ff00">
-                        <rect x="8" y="8" width="24" height="24"/>
-                        <rect x="12" y="12" width="16" height="16" fill="#000000"/>
-                        <rect x="16" y="16" width="8" height="4"/>
-                        <rect x="20" y="20" width="8" height="4"/>
-                        <rect x="12" y="20" width="4" height="4"/>
+                        <rect x="6" y="6" width="18" height="18"/>
+                        <rect x="9" y="9" width="12" height="12" fill="#000000"/>
+                        <rect x="12" y="12" width="6" height="3"/>
+                        <rect x="15" y="15" width="6" height="3"/>
+                        <rect x="9" y="15" width="3" height="3"/>
                     </g>
                 </svg>
-                <span class="text-xs pixel-text text-green-400">TELEGRAM</span>
+                <span class="social-text">TELEGRAM</span>
             </a>
             
             <a href="#" class="social-button">
                 <!-- YouTube Icon -->
-                <svg class="social-icon" viewBox="0 0 40 40">
+                <svg class="social-icon" viewBox="0 0 30 30">
                     <g fill="#00ff00">
-                        <rect x="4" y="12" width="32" height="16"/>
-                        <rect x="8" y="8" width="24" height="4"/>
-                        <rect x="8" y="28" width="24" height="4"/>
-                        <rect x="16" y="16" width="4" height="8"/>
-                        <rect x="20" y="18" width="4" height="4"/>
+                        <rect x="3" y="9" width="24" height="12"/>
+                        <rect x="6" y="6" width="18" height="3"/>
+                        <rect x="6" y="21" width="18" height="3"/>
+                        <rect x="12" y="12" width="3" height="6"/>
+                        <rect x="15" y="13.5" width="3" height="3"/>
                     </g>
                 </svg>
-                <span class="text-xs pixel-text text-green-400">YOUTUBE</span>
+                <span class="social-text">YOUTUBE</span>
             </a>
         </div>
     </div>
@@ -351,13 +362,18 @@
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 25; i++) {
             const pixel = document.createElement('div');
             pixel.className = 'pixel-particle';
-            pixel.style.left = centerX + (Math.random() - 0.5) * 60 + 'px';
+            pixel.style.left = centerX + (Math.random() - 0.5) * 80 + 'px';
             pixel.style.top = centerY + 'px';
-            pixel.style.animation = `pixelFall ${Math.random() * 0.5 + 0.5}s ease-out forwards`;
-            pixel.style.animationDelay = Math.random() * 0.2 + 's';
+            pixel.style.animation = `pixelFall ${Math.random() * 0.8 + 0.4}s ease-out forwards`;
+            pixel.style.animationDelay = Math.random() * 0.3 + 's';
+            
+            // Random pixel colors
+            const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99'];
+            pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
+            pixel.style.boxShadow = `0 0 2px ${pixel.style.background}`;
             
             document.body.appendChild(pixel);
             
@@ -365,7 +381,7 @@
                 if (pixel.parentNode) {
                     pixel.parentNode.removeChild(pixel);
                 }
-            }, 1000);
+            }, 1200);
         }
     }
     
