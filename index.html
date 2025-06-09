@@ -1054,7 +1054,7 @@
                         
                         callback();
                     }
-                }, 30); // Скорость печати
+                }, 4); // Скорость печати
             }
             
             function processNextMessage() {
@@ -1081,8 +1081,8 @@
                         
                         setTimeout(() => {
                             document.getElementById('terminal-loading').style.display = 'none';
-                        }, 100);
-                    }, 100);
+                        }, 30);
+                    }, 20);
                 }
             }
             
