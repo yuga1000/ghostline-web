@@ -310,38 +310,9 @@
         animation: batFly 3s ease-in-out infinite;
     }
     
-    .firefly {
-        position: absolute;
-        width: 2px;
-        height: 2px;
-        background: #ffff00;
-        border-radius: 50%;
-        box-shadow: 0 0 4px #ffff00, 0 0 8px #ffaa00;
-        pointer-events: none;
-        z-index: 999;
-    }
-    
-    @keyframes fireflyFloat {
-        0% {
-            transform: translate(0, 0);
-            opacity: 0.3;
-        }
-        25% {
-            transform: translate(var(--x1), var(--y1));
-            opacity: 1;
-        }
-        50% {
-            transform: translate(var(--x2), var(--y2));
-            opacity: 0.6;
-        }
-        75% {
-            transform: translate(var(--x3), var(--y3));
-            opacity: 1;
-        }
-        100% {
-            transform: translate(var(--x4), var(--y4));
-            opacity: 0.3;
-        }
+    @keyframes batFly {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-3px); }
     }
 </style>
 ```
@@ -654,70 +625,38 @@
         }
     }
     
-    // Fireflies around buttons
-    function createFireflies() {
-        const buttons = [document.getElementById('galleryBtn'), document.getElementById('streamBtn')];
+    // Create bouncing meteor effect
+    function createMeteorBounce(meteorRect, buttonRect) {
+        const bounceMeteor = document.createElement('div');
+        bounceMeteor.className = 'matrix-char';
+        bounceMeteor.textContent = ['✨', '💥', '⚡', '🌟'][Math.floor(Math.random() * 4)];
+        bounceMeteor.style.position = 'fixed';
+        bounceMeteor.style.left = meteorRect.left + 'px';
+        bounceMeteor.style.top = meteorRect.top + 'px';
+        bounceMeteor.style.fontSize = '4px';
+        bounceMeteor.style.color = '#ffff00';
+        bounceMeteor.style.pointerEvents = 'none';
+        bounceMeteor.style.zIndex = '1001';
         
-        buttons.forEach(button => {
-            if (!button) return;
-            
-            // Create 3-4 fireflies per button
-            for (let i = 0; i < 4; i++) {
-                setTimeout(() => {
-                    createSingleFirefly(button);
-                }, i * 800); // Stagger creation
-            }
-        });
-    }
-    
-    function createSingleFirefly(button) {
-        const firefly = document.createElement('div');
-        firefly.className = 'firefly';
+        // Calculate bounce direction
+        const centerX = buttonRect.left + buttonRect.width / 2;
+        const centerY = buttonRect.top + buttonRect.height / 2;
+        const bounceX = meteorRect.left < centerX ? -50 : 50;
+        const bounceY = meteorRect.top < centerY ? -50 : 50;
         
-        const rect = button.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+        bounceMeteor.style.setProperty('--start-x', '0px');
+        bounceMeteor.style.setProperty('--start-y', '0px');
+        bounceMeteor.style.setProperty('--end-x', bounceX + 'px');
+        bounceMeteor.style.setProperty('--end-y', bounceY + 'px');
+        bounceMeteor.style.animation = 'meteorBounce 0.8s ease-out forwards';
         
-        firefly.style.left = centerX + 'px';
-        firefly.style.top = centerY + 'px';
+        document.body.appendChild(bounceMeteor);
         
-        // Random floating path around button
-        const radius = 60; // Distance from button
-        const x1 = (Math.random() - 0.5) * radius;
-        const y1 = (Math.random() - 0.5) * radius;
-        const x2 = (Math.random() - 0.5) * radius;
-        const y2 = (Math.random() - 0.5) * radius;
-        const x3 = (Math.random() - 0.5) * radius;
-        const y3 = (Math.random() - 0.5) * radius;
-        const x4 = (Math.random() - 0.5) * radius;
-        const y4 = (Math.random() - 0.5) * radius;
-        
-        firefly.style.setProperty('--x1', x1 + 'px');
-        firefly.style.setProperty('--y1', y1 + 'px');
-        firefly.style.setProperty('--x2', x2 + 'px');
-        firefly.style.setProperty('--y2', y2 + 'px');
-        firefly.style.setProperty('--x3', x3 + 'px');
-        firefly.style.setProperty('--y3', y3 + 'px');
-        firefly.style.setProperty('--x4', x4 + 'px');
-        firefly.style.setProperty('--y4', y4 + 'px');
-        
-        firefly.style.animation = `fireflyFloat ${3 + Math.random() * 2}s ease-in-out infinite`;
-        firefly.style.animationDelay = Math.random() * 2 + 's';
-        
-        document.body.appendChild(firefly);
-        
-        // Remove and recreate firefly to keep them continuous
         setTimeout(() => {
-            if (firefly.parentNode) {
-                firefly.parentNode.removeChild(firefly);
+            if (bounceMeteor.parentNode) {
+                bounceMeteor.parentNode.removeChild(bounceMeteor);
             }
-            // Create new firefly to replace this one
-            setTimeout(() => {
-                if (document.getElementById('galleryBtn') || document.getElementById('streamBtn')) {
-                    createSingleFirefly(button);
-                }
-            }, Math.random() * 1000);
-        }, 5000 + Math.random() * 3000);
+        }, 800);
     }
     
     // Exploding pixel rain effect for buttons - ALL DIRECTIONS
@@ -826,7 +765,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         createCosmicMeteors();
         createBackgroundParticles();
-        createFireflies();
         
         // Update random numbers every 2 seconds
         setInterval(updateRandomNumbers, 2000);
