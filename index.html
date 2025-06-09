@@ -468,7 +468,54 @@
         // }
     </script>
 
-    <div class="slide-container scanlines">
+    <!-- Экран загрузки -->
+    <div id="terminal-loading" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000000;
+        color: #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    ">
+        <div style="max-width: 600px; width: 90%;">
+            <div style="font-family: 'Press Start 2P', cursive; font-size: 32px; margin-bottom: 40px; text-shadow: 0 0 10px #00ff00;">
+                GHOSTLINE
+            </div>
+            
+            <div style="text-align: left; font-size: 12px; height: 200px; overflow: hidden; margin-bottom: 30px;" id="terminal-output">
+                <div style="color: #666;">GHOSTLINE Terminal v14.5.7</div>
+                <div style="color: #666;">Copyright (c) 2025 Neural Networks Inc.</div>
+                <div style="color: #666;">All rights reserved.</div>
+                <div style="margin: 10px 0;"></div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <div style="border: 2px solid #00ff00; height: 20px; background: #000000; position: relative;">
+                    <div id="progress-fill" style="
+                        height: 100%;
+                        background: linear-gradient(90deg, #00ff00, #44ff44);
+                        width: 0%;
+                        transition: width 0.3s ease;
+                        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+                    "></div>
+                </div>
+                <div style="margin-top: 10px; font-size: 14px;">
+                    <span id="progress-text">Initializing...</span> 
+                    <span id="progress-percent" style="color: #44ff44;">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-container scanlines" id="main-content" style="opacity: 0; transition: opacity 1s ease;">
         <!-- Matrix Rain Effect -->
         <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
 
@@ -961,10 +1008,95 @@
             });
         }
         
+        // Terminal loading simulation
+        function startTerminalLoading() {
+            const loadingMessages = [
+                { text: "Initializing neural networks...", delay: 500 },
+                { text: "Loading AI core systems...", delay: 800 },
+                { text: "Connecting to quantum servers...", delay: 600 },
+                { text: "Calibrating creativity engines...", delay: 700 },
+                { text: "Loading visual processing units...", delay: 500 },
+                { text: "Initializing robot artist protocols...", delay: 900 },
+                { text: "Scanning art databases...", delay: 600 },
+                { text: "Activating pixel generators...", delay: 400 },
+                { text: "Loading color matrices...", delay: 500 },
+                { text: "Establishing neural connections...", delay: 700 },
+                { text: "Synchronizing memory banks...", delay: 600 },
+                { text: "Finalizing startup sequence...", delay: 800 },
+                { text: "System ready. Welcome to GHOSTLINE.", delay: 1000 }
+            ];
+
+            const terminalOutput = document.getElementById('terminal-output');
+            const progressFill = document.getElementById('progress-fill');
+            const progressPercent = document.getElementById('progress-percent');
+            const progressText = document.getElementById('progress-text');
+            
+            let currentMessage = 0;
+            let progress = 0;
+            
+            function typeMessage(message, callback) {
+                const messageDiv = document.createElement('div');
+                messageDiv.style.color = '#00ff00';
+                messageDiv.style.marginBottom = '2px';
+                terminalOutput.appendChild(messageDiv);
+                
+                let charIndex = 0;
+                const typingInterval = setInterval(() => {
+                    if (charIndex < message.length) {
+                        messageDiv.textContent = '> ' + message.substring(0, charIndex + 1) + '_';
+                        charIndex++;
+                    } else {
+                        messageDiv.textContent = '> ' + message;
+                        clearInterval(typingInterval);
+                        
+                        // Прокрутка вниз
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                        
+                        callback();
+                    }
+                }, 30); // Скорость печати
+            }
+            
+            function processNextMessage() {
+                if (currentMessage < loadingMessages.length) {
+                    const message = loadingMessages[currentMessage];
+                    progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
+                    
+                    // Обновляем прогресс бар
+                    progressFill.style.width = progress + '%';
+                    progressPercent.textContent = Math.floor(progress) + '%';
+                    progressText.textContent = message.text;
+                    
+                    typeMessage(message.text, () => {
+                        setTimeout(() => {
+                            currentMessage++;
+                            processNextMessage();
+                        }, message.delay);
+                    });
+                } else {
+                    // Загрузка завершена
+                    setTimeout(() => {
+                        document.getElementById('terminal-loading').style.opacity = '0';
+                        document.getElementById('main-content').style.opacity = '1';
+                        
+                        setTimeout(() => {
+                            document.getElementById('terminal-loading').style.display = 'none';
+                        }, 1000);
+                    }, 1000);
+                }
+            }
+            
+            // Начинаем процесс загрузки
+            setTimeout(processNextMessage, 1000);
+        }
+        
         // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Запускаем терминальную загрузку
+            startTerminalLoading();
+            
             try {
-                // Start all effects
+                // Start all effects (but they'll be hidden until loading completes)
                 createCosmicMeteors();
                 
                 // Floating pixels every 10 seconds
