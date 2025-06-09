@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE Loading</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-container {
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .logo-loading {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 48px;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.6), 
+                         0 0 16px rgba(0, 255, 0, 0.4);
+            margin-bottom: 40px;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoGlow {
+            0% { 
+                text-shadow: 0 0 8px rgba(0, 255, 0, 0.6), 
+                            0 0 16px rgba(0, 255, 0, 0.4);
+            }
+            100% { 
+                text-shadow: 0 0 12px rgba(0, 255, 0, 0.8), 
+                            0 0 24px rgba(0, 255, 0, 0.6),
+                            0 0 36px rgba(0, 255, 0, 0.4);
+            }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            animation: textBlink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes textBlink {
+            0%, 50% { opacity: 0.8; }
+            51%, 100% { opacity: 0.4; }
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            border: 2px solid #00ff00;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #44ff44);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+            animation: progressGlow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes progressGlow {
+            0% { box-shadow: 0 0 15px rgba(0, 255, 0, 0.6); }
+            100% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.8); }
+        }
+
+        .loading-messages {
+            height: 120px;
+            text-align: left;
+            font-size: 12px;
+            opacity: 0.7;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .loading-message {
+            margin-bottom: 5px;
+            opacity: 0;
+            animation: messageAppear 0.5s ease-in-out forwards;
+        }
+
+        @keyframes messageAppear {
+            0% { 
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% { 
+                opacity: 0.7;
+                transform: translateX(0);
+            }
+        }
+
+        .percentage {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #44ff44;
+            text-shadow: 0 0 5px rgba(68, 255, 68, 0.5);
+        }
+
+        /* Scanlines effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+            background-size: 100% 4px;
+            animation: scanlines 0.1s linear infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 4px; }
+        }
+
+        /* Matrix rain background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .matrix-char-bg {
+            position: absolute;
+            color: #00ff00;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            opacity: 0.1;
+            animation: matrixFall 8s linear infinite;
+        }
+
+        @keyframes matrixFall {
+            0% { 
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { 
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="matrix-bg" id="matrixBg"></div>
+    
+    <div class="loading-container">
+        <div class="logo-loading">GHOSTLINE</div>
+        <div class="loading-text">INITIALIZING NEURAL NETWORKS...</div>
+        
+        <div class="percentage" id="percentage">0%</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="loading-messages" id="loadingMessages">
+            <!-- Сообщения будут добавляться динамически -->
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            '> Connecting to AI servers...',
+            '> Loading neural network models...',
+            '> Initializing creativity engine...',
+            '> Calibrating color matrices...',
+            '> Preparing visual algorithms...',
+            '> Loading robot artist protocols...',
+            '> Synchronizing art databases...',
+            '> Activating pixel generators...',
+            '> Establishing quantum connections...',
+            '> Loading complete. Welcome to GHOSTLINE.'
+        ];
+
+        let currentMessage = 0;
+        let progress = 0;
+
+        // Create matrix background
+        function createMatrixBackground() {
+            const matrixBg = document.getElementById('matrixBg');
+            const chars = ['0', '1', '█', '▓', '▒', '░'];
+            
+            setInterval(() => {
+                const char = document.createElement('div');
+                char.className = 'matrix-char-bg';
+                char.textContent = chars[Math.floor(Math.random() * chars.length)];
+                char.style.left = Math.random() * 100 + '%';
+                char.style.animationDuration = Math.random() * 3 + 5 + 's';
+                
+                matrixBg.appendChild(char);
+                
+                setTimeout(() => {
+                    if (char.parentNode) {
+                        char.parentNode.removeChild(char);
+                    }
+                }, 8000);
+            }, 500);
+        }
+
+        // Update loading progress
+        function updateProgress() {
+            const progressBar = document.getElementById('progressBar');
+            const percentage = document.getElementById('percentage');
+            const loadingMessages = document.getElementById('loadingMessages');
+
+            if (progress <= 100 && currentMessage < messages.length) {
+                // Update progress bar
+                progressBar.style.width = progress + '%';
+                percentage.textContent = Math.floor(progress) + '%';
+
+                // Add new message
+                if (progress >= (currentMessage + 1) * 10) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'loading-message';
+                    messageDiv.textContent = messages[currentMessage];
+                    loadingMessages.appendChild(messageDiv);
+                    
+                    // Remove old messages if too many
+                    if (loadingMessages.children.length > 6) {
+                        loadingMessages.removeChild(loadingMessages.firstChild);
+                    }
+                    
+                    currentMessage++;
+                }
+
+                progress += Math.random() * 3 + 1;
+
+                if (progress >= 100) {
+                    progress = 100;
+                    progressBar.style.width = '100%';
+                    percentage.textContent = '100%';
+                    
+                    // Redirect to main page after completion
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                }
+            }
+        }
+
+        // Initialize loading screen
+        document.addEventListener('DOMContentLoaded', function() {
+            createMatrixBackground();
+            
+            // Start loading simulation
+            const loadingInterval = setInterval(() => {
+                updateProgress();
+                
+                if (progress >= 100) {
+                    clearInterval(loadingInterval);
+                }
+            }, 200 + Math.random() * 300); // Random intervals for realistic feel
+        });
+    </script>
+</body>
+</html>
