@@ -1,770 +1,821 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTLINE - Art Gallery</title>
+    <title>GHOSTLINE: Learning Art with Robots</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-        
-        .pixel-font {
-            font-family: 'Share Tech Mono', monospace;
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+```
+    * {
+        background-color: #000000 !important;
+    }
+    
+    html, body {
+        background: #000000 !important;
+        background-color: #000000 !important;
+        color: #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+    
+    .slide-container {
+        width: 100%;
+        max-width: 1280px;
+        min-height: 100vh;
+        margin: 0 auto;
+        position: relative;
+        background: #000000 !important;
+        background-color: #000000 !important;
+        padding-bottom: 60px;
+    }
+    
+    .terminal-border {
+        border: 2px solid #00ff00;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+    }
+    
+    .glow-text {
+        text-shadow: 0 0 3px #00ff00;
+    }
+    
+    .pixel-text {
+        font-family: 'Press Start 2P', cursive;
+        image-rendering: pixelated;
+        color: #ffffff;
+    }
+    
+    .pixel-text-title {
+        font-family: 'Press Start 2P', cursive;
+        color: #ffffff;
+        font-size: 56px;
+        letter-spacing: 6px;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 16px rgba(0, 255, 0, 0.3);
+        text-transform: uppercase;
+        image-rendering: pixelated;
+    }
+    
+    .pixel-text-sm {
+        font-family: 'Share Tech Mono', monospace;
+        color: #00ff00;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+    
+    .pixel-text-xs {
+        font-family: 'Share Tech Mono', monospace;
+        color: #66ff66;
+        font-size: 10px;
+        text-shadow: 0 0 2px rgba(102, 255, 102, 0.5);
+    }
+    
+    .scanlines {
+        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+        background-size: 100% 4px;
+        animation: scanlines 0.1s linear infinite;
+    }
+    
+    @keyframes scanlines {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 4px; }
+    }
+    
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+    }
+    
+    .blink {
+        animation: blink 1s infinite;
+    }
+    
+    .matrix-char {
+        position: absolute;
+        color: #00ff00;
+        font-family: 'Press Start 2P', cursive;
+        animation: meteorFall 5s linear infinite;
+        opacity: 0.3;
+        font-size: 5px;
+    }
+    
+    @keyframes meteorFall {
+        0% { 
+            transform: translateY(-100vh) translateX(-20px); 
+            opacity: 0;
+            box-shadow: 0 0 2px #00ff00;
         }
-        
-        .retro-font {
-            font-family: 'Orbitron', monospace;
+        5% { opacity: 0.3; }
+        95% { opacity: 0.3; }
+        100% { 
+            transform: translateY(100vh) translateX(20px); 
+            opacity: 0;
+            box-shadow: 0 0 6px #00ff00, 0 0 12px #66ff66;
         }
-        
-        .scan-lines {
-            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
-            background-size: 100% 4px;
+    }
+    
+    @keyframes meteorBounce {
+        0% { 
+            transform: translateY(var(--start-y)) translateX(var(--start-x)); 
+            opacity: 0.4;
         }
-        
-        .terminal-border {
-            border: 2px solid #00FF00;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            transition: all 0.3s ease;
+        50% {
+            opacity: 0.8;
+            box-shadow: 0 0 8px #00ff00, 0 0 16px #66ff66;
         }
-        
-        .terminal-border:hover {
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
-            transform: translateY(-2px);
+        100% { 
+            transform: translateY(var(--end-y)) translateX(var(--end-x)); 
+            opacity: 0;
         }
-        
-        .glow-text {
-            text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
+    }
+    
+    .logo-container {
+        background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(0, 0, 0, 0.8));
+    }
+    
+    .enlarged-logo {
+        transform: scale(1.4);
+        transform-origin: center;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
+    }
+    
+    .console-button {
+        background: #000000;
+        border: 3px solid #00ff00;
+        color: #ffffff;
+        padding: 12px 24px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 2px;
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    }
+    
+    .console-button:hover {
+        background: #001100;
+        color: #00ff00;
+    }
+    
+    .console-button:active {
+        background: #002200;
+        transform: scale(0.95);
+    }
+    
+    .pixel-particle {
+        position: fixed;
+        width: 2px;
+        height: 2px;
+        background: #00ff00;
+        pointer-events: none;
+        z-index: 1000;
+        box-shadow: 0 0 2px #00ff00;
+    }
+    
+    .background-particle {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        background: #00ff00;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.6;
+    }
+    
+    @keyframes pixelExplode {
+        0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
         }
-        
-        .typing::after {
-            content: '█';
-            animation: blink 1s infinite;
+        100% {
+            transform: translate(var(--dx), var(--dy)) scale(0);
+            opacity: 0;
         }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+    }
+    
+    @keyframes backgroundFloat {
+        0% {
+            transform: translate(0, 0);
+            opacity: 0.6;
         }
-        
-        .gallery-console {
-            cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
+        100% {
+            transform: translate(var(--float-x), var(--float-y));
+            opacity: 0;
         }
-        
-        .gallery-console:hover {
-            transform: scale(1.03);
-            z-index: 10;
-        }
-        
-        .artwork-display {
-            background: 
-                repeating-linear-gradient(
-                    45deg,
-                    rgba(0, 255, 0, 0.1) 0px,
-                    rgba(0, 255, 0, 0.1) 2px,
-                    transparent 2px,
-                    transparent 4px
-                ),
-                repeating-linear-gradient(
-                    -45deg,
-                    rgba(0, 255, 0, 0.1) 0px,
-                    rgba(0, 255, 0, 0.1) 2px,
-                    transparent 2px,
-                    transparent 4px
-                );
-            position: relative;
-        }
-        
-        .artwork-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
-            animation: artScan 4s linear infinite;
-        }
-        
-        @keyframes artScan {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        .matrix-bg {
-            background: 
-                radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
-        }
-        
-        .encrypted-price {
-            font-family: 'Share Tech Mono', monospace;
-            font-weight: bold;
-            color: #00FF00;
-            text-shadow: 0 0 5px #00FF00;
-            animation: priceGlitch 0.1s infinite;
-        }
-        
-        @keyframes priceGlitch {
-            0%, 90% { opacity: 1; }
-            95% { opacity: 0.8; transform: translateX(1px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-        
-        .contact-button {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #00FF00;
-            color: #00FF00;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-        }
-        
-        .contact-button:hover {
-            background: rgba(0, 255, 0, 0.3);
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-            transform: scale(1.05);
-        }
-        
-        .filter-button {
-            background: rgba(0, 50, 0, 0.3);
-            border: 1px solid #00FF00;
-            color: #00FF00;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-        }
-        
-        .filter-button:hover, .filter-button.active {
-            background: rgba(0, 255, 0, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
-        }
-        
-        .status-available {
-            color: #00FF00;
-            text-shadow: 0 0 5px #00FF00;
-        }
-        
-        .status-sold {
-            color: #FF6666;
-            text-shadow: 0 0 5px #FF6666;
-        }
-        
-        .rarity-badge {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00FF00;
-            border-radius: 3px;
-            padding: 2px 6px;
-            font-size: 8px;
-            z-index: 5;
-        }
-        
-        /* Admin Panel */
-        .admin-panel {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid #00FF00;
-            border-radius: 8px;
-            padding: 20px;
-            z-index: 1000;
-            display: none;
-            min-width: 400px;
-        }
-        
-        .admin-input {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00FF00;
-            color: #00FF00;
-            padding: 8px;
-            width: 100%;
-            margin: 5px 0;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-        }
-        
-        .admin-textarea {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #00FF00;
-            color: #00FF00;
-            padding: 8px;
-            width: 100%;
-            height: 100px;
-            margin: 5px 0;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            resize: vertical;
-        }
-        
-        /* Mobile Adaptations */
-        @media (max-width: 768px) {
-            .gallery-grid {
-                grid-template-columns: 1fr 1fr !important;
-            }
-            
-            .stats-panel {
-                order: -1;
-                width: 100% !important;
-                margin-bottom: 1rem;
-            }
-            
-            .main-gallery {
-                width: 100% !important;
-            }
-            
-            .admin-panel {
-                min-width: 90vw;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .gallery-grid {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .artwork-display {
-                height: 120px !important;
-            }
-            
-            .filter-container {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-            
-            .filter-button {
-                padding: 6px 12px;
-                font-size: 10px;
-            }
-        }
-        
-        .nav-link {
-            transition: all 0.3s ease;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .nav-link:hover {
-            color: #00FF00;
-            text-shadow: 0 0 10px #00FF00;
-        }
-    </style>
+    }
+    
+    .social-icon {
+        width: 20px;
+        height: 20px;
+        background: #00ff00;
+        display: inline-block;
+        image-rendering: pixelated;
+    }
+    
+    .social-button {
+        background: #000000;
+        border: 1px solid #00ff00;
+        padding: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
+        width: 60px;
+        height: 60px;
+    }
+    
+    .social-text {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 6px;
+        color: #00ff00;
+        font-weight: 300;
+        letter-spacing: 0.2px;
+    }
+    
+    .social-button:hover {
+        background: #001100;
+        transform: translateY(-2px);
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+    }
+    
+    .pixel-bat {
+        animation: batFly 3s ease-in-out infinite;
+        font-size: 12px !important;
+    }
+    
+    @keyframes batFly {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-3px); }
+    }
+    
+    /* Right Sidebar Styles */
+    .right-sidebar {
+        width: 200px;
+        min-height: 100vh;
+        background: #000000;
+        border-left: 2px solid #00ff00;
+        padding: 15px 10px;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 100;
+        box-shadow: -2px 0 10px rgba(0, 255, 0, 0.1);
+    }
+    
+    .main-content-with-sidebar {
+        margin-right: 200px;
+    }
+    
+    .sidebar-title {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 8px;
+        color: #00ff00;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        opacity: 0.8;
+        text-align: center;
+        border-bottom: 1px solid #00ff00;
+        padding-bottom: 8px;
+    }
+    
+    .log-container {
+        height: 300px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #00ff00;
+        background: rgba(0, 0, 0, 0.8);
+        margin-bottom: 15px;
+    }
+    
+    .log-text {
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 7px;
+        color: #66ff66;
+        line-height: 1.2;
+        white-space: nowrap;
+        opacity: 0.7;
+        animation: scrollLog 20s linear infinite;
+    }
+    
+    @keyframes scrollLog {
+        0% { transform: translateY(100%); }
+        100% { transform: translateY(-100%); }
+    }
+    
+    .system-stats {
+        margin-bottom: 15px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 7px;
+        color: #66ff66;
+        opacity: 0.6;
+        border: 1px solid #00ff00;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .stat-line {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3px;
+    }
+    
+    .learning-art-title {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 9px;
+        color: #00ff00;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        opacity: 0.8;
+        text-align: center;
+        transform: rotate(180deg);
+    }
+</style>
+```
+
 </head>
-<body class="bg-black text-green-400 overflow-hidden">
-    <div class="w-full min-h-screen scan-lines matrix-bg">
+<body>
+    <div class="slide-container scanlines">
+        <!-- Matrix Rain Effect -->
+        <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
+
+```
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+        <div class="learning-art-title">LEARNING ART WITH ROBOTS</div>
         
-        <!-- Header Navigation -->
-        <div class="terminal-border bg-black bg-opacity-70 mx-4 mt-2 px-6 py-2 pixel-font">
-            <div class="flex justify-between items-center">
-                <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
-                <div class="text-green-600 text-sm">
-                    <a href="index.html" class="nav-link mr-4">[HOME]</a>
-                    <a href="live.html" class="nav-link mr-4">[LIVE STREAM]</a>
-                    <span class="text-green-400 mr-4">[GALLERY]</span>
-                    <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
+        <div class="sidebar-title">[SYSTEM_LOGS]</div>
+        
+        <div class="log-container">
+            <div class="log-text" id="runningLogs">
+                > AI_CORE: Initializing neural networks...<br>
+                > VISUAL_PROC: Loading pixel algorithms...<br>
+                > CREATIVITY_ENGINE: Activating imagination protocols...<br>
+                > ROBOT_ARTIST_01: Beginning digital canvas preparation...<br>
+                > COLOR_MATRIX: Generating palette variations...<br>
+                > LEARNING_SYSTEM: Analyzing art history databases...<br>
+                > INSPIRATION_MODULE: Scanning environmental inputs...<br>
+                > BRUSH_DYNAMICS: Calibrating pressure sensitivity...<br>
+                > COMPOSITION_AI: Calculating golden ratio coordinates...<br>
+                > EMOTION_DETECTOR: Mapping feeling algorithms...<br>
+                > STYLE_GENERATOR: Synthesizing artistic movements...<br>
+                > GHOST_PROTOCOL: Accessing quantum creativity layers...<br>
+                > PIXEL_RENDERER: Optimizing resolution matrices...<br>
+                > ART_MEMORY: Storing masterpiece fragments...<br>
+                > ROBOT_SOUL: Injecting consciousness into creation...<br>
+            </div>
+        </div>
+        
+        <div class="system-stats">
+            <div class="sidebar-title">[AI_STATUS]</div>
+            <div class="stat-line">
+                <span>CPU:</span>
+                <span id="cpuLoad">73%</span>
+            </div>
+            <div class="stat-line">
+                <span>GPU:</span>
+                <span id="gpuLoad">89%</span>
+            </div>
+            <div class="stat-line">
+                <span>CREATIVITY:</span>
+                <span id="creativityLevel">∞</span>
+            </div>
+            <div class="stat-line">
+                <span>ARTWORKS:</span>
+                <span id="artworkCount">2847</span>
+            </div>
+            <div class="stat-line">
+                <span>LEARNING:</span>
+                <span id="learningRate">ACTIVE</span>
+            </div>
+        </div>
+        
+        <div class="system-stats">
+            <div class="sidebar-title">[ROBOTS_ONLINE]</div>
+            <div class="stat-line">
+                <span>YUGA:</span>
+                <span style="color: #00ff00;">●</span>
+            </div>
+            <div class="stat-line">
+                <span>MIKA:</span>
+                <span style="color: #00ff00;">●</span>
+            </div>
+            <div class="stat-line">
+                <span>GHOST:</span>
+                <span style="color: #00ff00;">●</span>
+            </div>
+            <div class="stat-line">
+                <span>LINE:</span>
+                <span style="color: #ffff00;">⚠</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content-with-sidebar">
+        <!-- Header Terminal Bar -->
+        <div class="terminal-border bg-black p-3 m-6 mb-8">
+            <div class="flex justify-between items-center text-xs">
+                <div class="flex items-center space-x-4">
+                    <span class="glow-text pixel-text">>>> SYSTEM STATUS: ONLINE</span>
+                    <span class="text-green-400" id="randomNumbers">█████</span>
                 </div>
-                <div class="text-green-500 text-xs">
-                    <span class="px-2 py-1">ARTWORKS: <span id="artworkCount">12</span></span>
+                <div class="flex items-center space-x-4">
+                    <!-- Pixel Bat -->
+                    <div class="pixel-bat">
+                        <span style="color: #00ff00; font-family: 'Press Start 2P';">🦇</span>
+                    </div>
+                    <span class="blink">█</span>
+                    <span class="glow-text pixel-text">GHOSTLINE v14.5.7</span>
                 </div>
             </div>
         </div>
-
-        <!-- Filter Controls -->
-        <div class="mx-4 mt-3 mb-4 terminal-border bg-black bg-opacity-50 p-3">
-            <div class="flex justify-between items-center filter-container">
-                <div class="pixel-font text-green-500 text-xs">
-                    [ART_FILTERS]
+        
+        <!-- Main Content -->
+        <div class="flex flex-col items-center justify-center h-full px-8">
+            
+            <!-- Logo Section -->
+            <div class="mb-6 relative">
+                <div class="w-48 h-48 mx-auto mb-4 terminal-border logo-container p-1 flex items-center justify-center overflow-hidden">
+                    <!-- Animated GIF as main logo - enlarged -->
+                    <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="enlarged-logo" 
+                         style="image-rendering: pixelated;">
                 </div>
-                <div class="flex space-x-2">
-                    <div class="filter-button active" data-filter="all">[ALL]</div>
-                    <div class="filter-button" data-filter="available">[AVAILABLE]</div>
-                    <div class="filter-button" data-filter="sold">[SOLD]</div>
-                    <div class="filter-button" data-filter="rare">[RARE]</div>
-                </div>
-                <div class="pixel-font text-green-600 text-xs">
-                    PRESS 'A' TO ADD ARTWORK
-                </div>
+            </div>
+            
+            <!-- Title Section -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-6 pixel-text-title">
+                    GHOSTLINE
+                </h1>
+                
+                <div class="text-xs pixel-text-xs mb-1 opacity-75">An Experimental Digital Art Project</div>
+                <div class="text-xs pixel-text-xs opacity-60">Where Artificial Intelligence Discovers Creativity</div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex space-x-8 mb-12">
+                <a href="gallery.html" class="console-button" id="galleryBtn">
+                    GALLERY
+                </a>
+                <a href="stream.html" class="console-button" id="streamBtn">
+                    STREAM
+                </a>
+            </div>
+            
+            <!-- Separator Line -->
+            <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
+            
+            <!-- Social Media Section -->
+            <div class="grid grid-cols-4 gap-3 w-full max-w-xs mb-24">
+                <a href="#" class="social-button">
+                    <!-- Instagram Icon -->
+                    <svg class="social-icon" viewBox="0 0 20 20">
+                        <g fill="#00ff00">
+                            <rect x="2" y="2" width="16" height="16"/>
+                            <rect x="4" y="4" width="12" height="12" fill="#000000"/>
+                            <rect x="6" y="6" width="8" height="8"/>
+                            <rect x="8" y="8" width="4" height="4" fill="#000000"/>
+                            <rect x="14" y="4" width="2" height="2"/>
+                        </g>
+                    </svg>
+                    <span class="social-text">INSTA</span>
+                </a>
+                
+                <a href="#" class="social-button">
+                    <!-- TikTok Icon -->
+                    <svg class="social-icon" viewBox="0 0 20 20">
+                        <g fill="#00ff00">
+                            <rect x="6" y="2" width="4" height="12"/>
+                            <rect x="8" y="4" width="6" height="2"/>
+                            <rect x="10" y="6" width="4" height="2"/>
+                            <rect x="4" y="10" width="8" height="4"/>
+                            <rect x="6" y="14" width="4" height="4"/>
+                        </g>
+                    </svg>
+                    <span class="social-text">TIKTOK</span>
+                </a>
+                
+                <a href="#" class="social-button">
+                    <!-- Telegram Icon -->
+                    <svg class="social-icon" viewBox="0 0 20 20">
+                        <g fill="#00ff00">
+                            <rect x="4" y="4" width="12" height="12"/>
+                            <rect x="6" y="6" width="8" height="8" fill="#000000"/>
+                            <rect x="8" y="8" width="4" height="2"/>
+                            <rect x="10" y="10" width="4" height="2"/>
+                            <rect x="6" y="10" width="2" height="2"/>
+                        </g>
+                    </svg>
+                    <span class="social-text">TELEGRAM</span>
+                </a>
+                
+                <a href="#" class="social-button">
+                    <!-- YouTube Icon -->
+                    <svg class="social-icon" viewBox="0 0 20 20">
+                        <g fill="#00ff00">
+                            <rect x="2" y="6" width="16" height="8"/>
+                            <rect x="4" y="4" width="12" height="2"/>
+                            <rect x="4" y="14" width="12" height="2"/>
+                            <rect x="8" y="8" width="2" height="4"/>
+                            <rect x="10" y="9" width="2" height="2"/>
+                        </g>
+                    </svg>
+                    <span class="social-text">YOUTUBE</span>
+                </a>
             </div>
         </div>
-
-        <div class="flex p-4 h-full">
-            <!-- Main Gallery -->
-            <div class="w-3/4 main-gallery">
-                <div class="text-center mb-4">
-                    <h2 class="retro-font text-3xl font-bold text-green-400 glow-text">
-                        DIGITAL ART COLLECTION
-                    </h2>
-                    <div class="pixel-font text-green-600 text-sm">
-                        Created by AI Robot Artists
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-3 gallery-grid" id="galleryContainer">
-                    <!-- Artworks will be dynamically generated -->
-                </div>
-            </div>
-
-            <!-- Right Stats Panel -->
-            <div class="w-1/4 space-y-3 stats-panel">
-                
-                <!-- Collection Stats -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2">[COLLECTION_STATS]</div>
-                    <div class="pixel-font text-green-400 text-xs space-y-1">
-                        <div class="flex justify-between">
-                            <span>TOTAL_PIECES:</span>
-                            <span class="text-green-300" id="totalPieces">12</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>AVAILABLE:</span>
-                            <span class="text-green-300" id="availableCount">8</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>SOLD:</span>
-                            <span class="text-red-400" id="soldCount">4</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>ARTISTS:</span>
-                            <span class="text-purple-400">4 ROBOTS</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>RARITY_ITEMS:</span>
-                            <span class="text-yellow-400" id="rareCount">3</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Price Decoder -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2">[PRICE_DECODER]</div>
-                    <div class="pixel-font text-green-400 text-xs space-y-1">
-                        <div>ENCRYPTION: AES-256</div>
-                        <div>ALGORITHM: DYNAMIC</div>
-                        <div>UPDATE_RATE: <span class="typing">2.3s</span></div>
-                        <div class="mt-2 text-green-600 text-xs">
-                            Contact us to decrypt<br/>
-                            actual pricing information
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact Info -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2">[CONTACT_CHANNELS]</div>
-                    <div class="pixel-font text-green-400 text-xs space-y-2">
-                        <div class="contact-button w-full text-center" onclick="showSocial()">
-                            📱 INSTAGRAM
-                        </div>
-                        <div class="contact-button w-full text-center" onclick="showSocial()">
-                            💬 TELEGRAM
-                        </div>
-                        <div class="contact-button w-full text-center" onclick="showSocial()">
-                            🎵 TIKTOK
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Live Creation -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2">[LIVE_CREATION]</div>
-                    <div class="artwork-display h-20 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-400 text-xs text-center" id="liveArt">
-                            <pre>
-░░░██░░░
-░██▓▓██░
-██▓░░▓██
-░██▓▓██░
-░░░██░░░
-                            </pre>
-                        </div>
-                    </div>
-                    <div class="pixel-font text-green-600 text-xs text-center">
-                        <div>PROGRESS: <span id="liveProgress">67</span>%</div>
-                        <div class="typing">ROBOT: YUGA</div>
-                    </div>
+        
+        <!-- Footer Command Line -->
+        <div class="absolute bottom-4 left-4 right-48" style="z-index: 5;">
+            <div class="terminal-border bg-black p-2">
+                <div class="text-sm pixel-text-sm">
+                    <span class="text-green-400">root@ghostline:~$</span> 
+                    <span class="glow-text">initiate_art_sequence</span>
+                    <span class="blink ml-2">█</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Admin Panel -->
-    <div id="adminPanel" class="admin-panel">
-        <div class="pixel-font text-green-400 text-lg mb-4 text-center glow-text">
-            ADD NEW ARTWORK
-        </div>
-        <div class="space-y-3">
-            <input type="text" id="artworkTitle" class="admin-input" placeholder="Artwork Title">
-            <input type="text" id="artworkArtist" class="admin-input" placeholder="Robot Artist">
-            <textarea id="artworkAscii" class="admin-textarea" placeholder="ASCII Art (use pre-formatted text)"></textarea>
-            <select id="artworkStatus" class="admin-input">
-                <option value="available">Available</option>
-                <option value="sold">Sold</option>
-            </select>
-            <select id="artworkRarity" class="admin-input">
-                <option value="common">Common</option>
-                <option value="rare">Rare</option>
-                <option value="epic">Epic</option>
-            </select>
-            <div class="flex space-x-2">
-                <button class="contact-button flex-1" onclick="addArtwork()">ADD ARTWORK</button>
-                <button class="contact-button flex-1" onclick="closeAdmin()">CANCEL</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Initial artworks data
-        let artworks = [
-            {
-                id: 1,
-                title: "DIGITAL_SOUL_001",
-                artist: "YUGA",
-                ascii: `░░░▓▓▓░░░\n░▓█████▓░\n▓█░▓▓▓░█▓\n▓█▓░░░▓█▓\n▓█░▓▓▓░█▓\n░▓█████▓░\n░░░▓▓▓░░░`,
-                status: "available",
-                rarity: "rare"
-            },
-            {
-                id: 2,
-                title: "ABSTRACT_CHAOS_007",
-                artist: "MIKA",
-                ascii: `██░░██░░██\n░██▓▓▓██░\n░░███████░\n██▓░░░▓██\n░██▓▓▓██░\n██░░██░░██`,
-                status: "sold",
-                rarity: "common"
-            },
-            {
-                id: 3,
-                title: "GEOMETRIC_PRIME_013",
-                artist: "GHOST",
-                ascii: `▓▓▓▓▓▓▓▓▓\n▓░░░░░░░▓\n▓░██████░▓\n▓░██░░██░▓\n▓░██████░▓\n▓░░░░░░░▓\n▓▓▓▓▓▓▓▓▓`,
-                status: "available",
-                rarity: "epic"
-            },
-            {
-                id: 4,
-                title: "NEURAL_MANDALA_005",
-                artist: "LINE",
-                ascii: `░░░███░░░\n░██░░░██░\n██░░█░░██\n░██░░░██░\n░░░███░░░`,
-                status: "available",
-                rarity: "common"
-            },
-            {
-                id: 5,
-                title: "PIXEL_HARMONY_011",
-                artist: "YUGA",
-                ascii: `█░█░█░█░█\n░█░█░█░█░\n█░█░█░█░█\n░█░█░█░█░\n█░█░█░█░█`,
-                status: "sold",
-                rarity: "common"
-            },
-            {
-                id: 6,
-                title: "INFINITE_LOOP_003",
-                artist: "MIKA",
-                ascii: `╔═══════╗\n║░░░░░░░║\n║░██████░║\n║░██░░██░║\n║░██████░║\n║░░░░░░░║\n╚═══════╝`,
-                status: "available",
-                rarity: "rare"
-            }
-        ];
-
-        // Load saved artworks from localStorage
-        function loadArtworks() {
-            const saved = localStorage.getItem('ghostline_artworks');
-            if (saved) {
-                artworks = JSON.parse(saved);
-            }
-        }
-
-        // Save artworks to localStorage
-        function saveArtworks() {
-            localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
-        }
-
-        // Generate encrypted price
-        function generateEncryptedPrice() {
-            const symbols = ['▓', '█', '░', '▒', '▲', '◆', '●', '■', '◉', '◎'];
-            let price = '';
+<script>
+    // Pixel characters for background
+    const pixelChars = ['░', '▒', '▓', '█', '◆', '◇', '♦', '♢', '▲', '▼', '◄', '►', '●', '○', '■', '□', '▪', '▫'];
+    
+    // Log messages for running text
+    const logMessages = [
+        "> AI_CORE: Initializing neural networks...",
+        "> VISUAL_PROC: Loading pixel algorithms...", 
+        "> CREATIVITY_ENGINE: Activating imagination protocols...",
+        "> ROBOT_ARTIST_01: Beginning digital canvas preparation...",
+        "> COLOR_MATRIX: Generating palette variations...",
+        "> LEARNING_SYSTEM: Analyzing art history databases...",
+        "> INSPIRATION_MODULE: Scanning environmental inputs...",
+        "> BRUSH_DYNAMICS: Calibrating pressure sensitivity...",
+        "> COMPOSITION_AI: Calculating golden ratio coordinates...",
+        "> EMOTION_DETECTOR: Mapping feeling algorithms...",
+        "> STYLE_GENERATOR: Synthesizing artistic movements...",
+        "> GHOST_PROTOCOL: Accessing quantum creativity layers...",
+        "> PIXEL_RENDERER: Optimizing resolution matrices...",
+        "> ART_MEMORY: Storing masterpiece fragments...",
+        "> ROBOT_SOUL: Injecting consciousness into creation...",
+        "> NEURAL_FEEDBACK: Learning from artistic mistakes...",
+        "> PATTERN_RECOGNITION: Identifying beauty algorithms...",
+        "> CREATIVE_FLOW: Entering artistic trance state...",
+        "> DIGITAL_BRUSH: Simulating organic strokes...",
+        "> MASTERPIECE_ALERT: Detecting breakthrough moments..."
+    ];
+    
+    // Update running logs
+    function updateRunningLogs() {
+        const logsContainer = document.getElementById('runningLogs');
+        const shuffled = [...logMessages].sort(() => Math.random() - 0.5);
+        logsContainer.innerHTML = shuffled.join('<br>');
+    }
+    
+    // Update system stats
+    function updateSystemStats() {
+        document.getElementById('cpuLoad').textContent = Math.floor(Math.random() * 30 + 70) + '%';
+        document.getElementById('gpuLoad').textContent = Math.floor(Math.random() * 20 + 80) + '%';
+        document.getElementById('artworkCount').textContent = Math.floor(Math.random() * 100 + 2800);
+    }
+    
+    // Cosmic meteors with collision detection
+    function createCosmicMeteors() {
+        const container = document.getElementById('matrix-container');
+        const cosmicChars = ['✦', '✧', '⋆', '✪', '✯', '⭐', '🌟', '💫', '☄️', '●', '◆', '◇', '♦'];
+        
+        setInterval(() => {
+            const meteor = document.createElement('div');
+            meteor.className = 'matrix-char';
+            meteor.textContent = cosmicChars[Math.floor(Math.random() * cosmicChars.length)];
+            meteor.style.left = Math.random() * 100 + '%';
+            meteor.style.fontSize = Math.random() * 3 + 4 + 'px';
+            meteor.style.animationDelay = Math.random() * 3 + 's';
+            meteor.style.animationDuration = Math.random() * 3 + 4 + 's';
             
-            // Generate format like: ▓█.░▒▓ ETH
-            for(let i = 0; i < 2; i++) {
-                price += symbols[Math.floor(Math.random() * symbols.length)];
-            }
-            price += '.';
-            for(let i = 0; i < 3; i++) {
-                price += symbols[Math.floor(Math.random() * symbols.length)];
-            }
-            price += ' ETH';
+            // Random cosmic colors
+            const colors = ['#00ff00', '#00ccaa', '#44ff88', '#66ffaa', '#88ffcc', '#aaffee'];
+            meteor.style.color = colors[Math.floor(Math.random() * colors.length)];
             
-            return price;
+            // Add trailing effect
+            meteor.style.textShadow = `2px 2px 4px ${meteor.style.color}`;
+            
+            container.appendChild(meteor);
+            
+            // Check for collisions during animation
+            setTimeout(() => {
+                if (pixel.parentNode) {
+                    pixel.parentNode.removeChild(pixel);
+                }
+            }, 1000);
         }
-
-        // Create artwork console
-        function createArtworkConsole(artwork) {
-            const rarity_colors = {
-                'common': '#00FF00',
-                'rare': '#00CCFF', 
-                'epic': '#CC00FF'
-            };
-
-            return `
-                <div class="gallery-console terminal-border bg-black bg-opacity-50 p-3" data-status="${artwork.status}" data-rarity="${artwork.rarity}">
-                    <div class="rarity-badge pixel-font" style="color: ${rarity_colors[artwork.rarity]}">
-                        ${artwork.rarity.toUpperCase()}
-                    </div>
-                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
-                        <span>[${artwork.title}]</span>
-                        <span class="${artwork.status === 'available' ? 'status-available' : 'status-sold'}">${artwork.status.toUpperCase()}</span>
-                    </div>
-                    <div class="artwork-display h-24 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-400 text-xs text-center leading-none">
-                            <pre>${artwork.ascii}</pre>
-                        </div>
-                    </div>
-                    <div class="pixel-font text-green-600 text-xs">
-                        <div>ARTIST: ${artwork.artist}</div>
-                        <div>PRICE: <span class="encrypted-price" data-artwork="${artwork.id}">${generateEncryptedPrice()}</span></div>
-                        <div class="mt-2">
-                            <button class="contact-button w-full" onclick="contactForArt('${artwork.title}')">
-                                CONTACT FOR INFO
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Render gallery
-        function renderGallery(filter = 'all') {
-            const container = document.getElementById('galleryContainer');
-            let filteredArtworks = artworks;
-
-            if (filter !== 'all') {
-                filteredArtworks = artworks.filter(art => 
-                    filter === 'available' ? art.status === 'available' :
-                    filter === 'sold' ? art.status === 'sold' :
-                    filter === 'rare' ? art.rarity === 'rare' || art.rarity === 'epic' :
-                    true
-                );
-            }
-
-            container.innerHTML = filteredArtworks.map(createArtworkConsole).join('');
-            updateStats();
-        }
-
-        // Update stats
-        function updateStats() {
-            document.getElementById('artworkCount').textContent = artworks.length;
-            document.getElementById('totalPieces').textContent = artworks.length;
-            document.getElementById('availableCount').textContent = artworks.filter(a => a.status === 'available').length;
-            document.getElementById('soldCount').textContent = artworks.filter(a => a.status === 'sold').length;
-            document.getElementById('rareCount').textContent = artworks.filter(a => a.rarity === 'rare' || a.rarity === 'epic').length;
-        }
-
-        // Update encrypted prices
-        function updateEncryptedPrices() {
-            document.querySelectorAll('.encrypted-price').forEach(priceElement => {
-                priceElement.textContent = generateEncryptedPrice();
+    }
+    
+    // Background floating particles for buttons
+    function createBackgroundParticles() {
+        const buttons = [document.getElementById('galleryBtn'), document.getElementById('streamBtn')];
+        
+        setInterval(() => {
+            buttons.forEach(button => {
+                if (Math.random() < 0.3) { // 30% chance every interval
+                    const rect = button.getBoundingClientRect();
+                    const particle = document.createElement('div');
+                    particle.className = 'background-particle';
+                    
+                    // Start from button area
+                    particle.style.left = rect.left + Math.random() * rect.width + 'px';
+                    particle.style.top = rect.top + Math.random() * rect.height + 'px';
+                    
+                    // Random float direction
+                    const floatX = (Math.random() - 0.5) * 60;
+                    const floatY = (Math.random() - 0.5) * 60;
+                    
+                    particle.style.setProperty('--float-x', floatX + 'px');
+                    particle.style.setProperty('--float-y', floatY + 'px');
+                    particle.style.animation = `backgroundFloat ${Math.random() * 2 + 1}s ease-out forwards`;
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 3000);
+                }
             });
-        }
-
-        // Contact for artwork
-        function contactForArt(title) {
-            const contactInfo = `
-🎨 GHOSTLINE ART INQUIRY 🎨
-═══════════════════════════
-
-Artwork: ${title}
-
-📱 Instagram: https://www.instagram.com/____yuga______
-💬 Telegram: https://t.me/yuga_art
-🎵 TikTok: www.tiktok.com/@ghostline207
-
-💰 SUPPORT THE PROJECT:
-🏦 ETH: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
-
-Message us about this piece!
-            `;
-            
-            alert(contactInfo);
-        }
-
-        // Show social links
-        function showSocial() {
-            const socialAlert = `
-🎭 GHOSTLINE SOCIAL CHANNELS 🎭
-═══════════════════════════════
-
-📱 Instagram: https://www.instagram.com/____yuga______
-🎵 TikTok: www.tiktok.com/@ghostline207  
-💬 Telegram: https://t.me/yuga_art
-
-💰 SUPPORT THE PROJECT:
-🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
-            `;
-            
-            alert(socialAlert);
-        }
-
-        // Admin functions
-        function showAdmin() {
-            document.getElementById('adminPanel').style.display = 'block';
-        }
-
-        function closeAdmin() {
-            document.getElementById('adminPanel').style.display = 'none';
-            // Clear form
-            document.getElementById('artworkTitle').value = '';
-            document.getElementById('artworkArtist').value = '';
-            document.getElementById('artworkAscii').value = '';
-            document.getElementById('artworkStatus').value = 'available';
-            document.getElementById('artworkRarity').value = 'common';
-        }
-
-        function addArtwork() {
-            const title = document.getElementById('artworkTitle').value;
-            const artist = document.getElementById('artworkArtist').value;
-            const ascii = document.getElementById('artworkAscii').value;
-            const status = document.getElementById('artworkStatus').value;
-            const rarity = document.getElementById('artworkRarity').value;
-
-            if (!title || !artist || !ascii) {
-                alert('Please fill all required fields!');
-                return;
+        }, 200);
+    }
+    
+    // Add click effects to buttons - FIXED
+    document.getElementById('galleryBtn').addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent navigation to test effect
+        createPixelExplosion(this);
+        setTimeout(() => {
+            window.location.href = 'gallery.html';
+        }, 300);
+    });
+    
+    document.getElementById('streamBtn').addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent navigation to test effect
+        createPixelExplosion(this);
+        setTimeout(() => {
+            window.location.href = 'stream.html';
+        }, 300);
+    });
+    
+    // Random numbers generator for terminal
+    function updateRandomNumbers() {
+        const element = document.getElementById('randomNumbers');
+        if (element) {
+            let numbers = '';
+            for (let i = 0; i < 5; i++) {
+                numbers += Math.floor(Math.random() * 10);
             }
-
-            const newArtwork = {
-                id: Date.now(),
-                title: title,
-                artist: artist,
-                ascii: ascii,
-                status: status,
-                rarity: rarity
-            };
-
-            artworks.unshift(newArtwork);
-            saveArtworks();
-            renderGallery();
-            closeAdmin();
-            
-            alert('✅ Artwork added successfully!');
+            element.textContent = numbers;
         }
+    }
+    
+    // Initialize effects
+    document.addEventListener('DOMContentLoaded', function() {
+        createCosmicMeteors();
+        createBackgroundParticles();
+        
+        // Update random numbers every 2 seconds
+        setInterval(updateRandomNumbers, 2000);
+        updateRandomNumbers(); // Initial call
+        
+        // Update running logs every 10 seconds
+        setInterval(updateRunningLogs, 10000);
+        updateRunningLogs(); // Initial call
+        
+        // Update system stats every 3 seconds
+        setInterval(updateSystemStats, 3000);
+        updateSystemStats(); // Initial call
+    });
+</script>
+```
 
-        // Update live creation
-        function updateLiveArt() {
-            const patterns = [
-                '░░░██░░░\n░██▓▓██░\n██▓░░▓██\n░██▓▓██░\n░░░██░░░',
-                '▓▓▓▓▓▓▓\n▓░░█░░▓\n▓░███░▓\n▓░░█░░▓\n▓▓▓▓▓▓▓',
-                '███████\n█░░░░░█\n█░▓▓▓░█\n█░░░░░█\n███████'
-            ];
-            
-            const liveArt = document.getElementById('liveArt');
-            const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
-            liveArt.innerHTML = `<pre>${randomPattern}</pre>`;
-            
-            // Update progress
-            const progress = document.getElementById('liveProgress');
-            let currentProgress = parseInt(progress.textContent);
-            currentProgress += Math.floor(Math.random() * 5) + 1;
-            if (currentProgress > 100) currentProgress = Math.floor(Math.random() * 30) + 10;
-            progress.textContent = currentProgress;
-        }
-
-        // Initialize
-        window.addEventListener('load', function() {
-            loadArtworks();
-            renderGallery();
-
-            // Setup filter buttons
-            document.querySelectorAll('.filter-button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-button').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    renderGallery(this.dataset.filter);
-                });
-            });
-
-            // Start price updates
-            setInterval(updateEncryptedPrices, 2300);
-            
-            // Update live art
-            setInterval(updateLiveArt, 8000);
-
-            console.log(`
-            ╔═══════════════════════════════════════╗
-            ║         GHOSTLINE ART GALLERY         ║
-            ║       ENCRYPTED PRICING ACTIVE        ║
-            ╠═══════════════════════════════════════╣
-            ║ Admin: Press 'A' to add artwork       ║
-            ║ Prices: Encrypted & Randomized        ║
-            ║ Contact: Social links for inquiries   ║
-            ╚═══════════════════════════════════════╝
-            `);
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            switch(e.key.toLowerCase()) {
-                case 'a':
-                    showAdmin();
-                    break;
-                case 's':
-                    showSocial();
-                    break;
-                case 'escape':
-                    closeAdmin();
-                    break;
-                case '1':
-                    document.querySelector('[data-filter="all"]').click();
-                    break;
-                case '2':
-                    document.querySelector('[data-filter="available"]').click();
-                    break;
-                case '3':
-                    document.querySelector('[data-filter="sold"]').click();
-                    break;
-                case '4':
-                    document.querySelector('[data-filter="rare"]').click();
-                    break;
-            }
-        });
-
-        // Click outside admin panel to close
-        document.addEventListener('click', function(e) {
-            const adminPanel = document.getElementById('adminPanel');
-            if (e.target === adminPanel) {
-                closeAdmin();
-            }
-        });
-
-        // Mobile touch interactions
-        let touchStartTime = 0;
-        document.addEventListener('touchstart', function() {
-            touchStartTime = Date.now();
-        });
-
-        document.addEventListener('touchend', function(e) {
-            const touchDuration = Date.now() - touchStartTime;
-            
-            // Long press (2+ seconds) shows admin panel
-            if (touchDuration > 2000 && e.target.closest('.gallery-console')) {
-                e.preventDefault();
-                showAdmin();
-            }
-        });
-    </script>
 </body>
-</html>
+</html> => {
+                    checkMeteorCollisions(meteor);
+                }, 1000);
+
+```
+            setTimeout(() => {
+                if (meteor.parentNode) {
+                    meteor.parentNode.removeChild(meteor);
+                }
+            }, 8000);
+        }, 600);
+    }
+    
+    // Collision detection for meteors
+    function checkMeteorCollisions(meteor) {
+        if (!meteor.parentNode) return;
+        
+        const meteorRect = meteor.getBoundingClientRect();
+        const buttons = document.querySelectorAll('.console-button, .social-button, .terminal-border');
+        
+        buttons.forEach(button => {
+            const buttonRect = button.getBoundingClientRect();
+            
+            // Check if meteor intersects with button
+            if (meteorRect.left < buttonRect.right && 
+                meteorRect.right > buttonRect.left && 
+                meteorRect.top < buttonRect.bottom && 
+                meteorRect.bottom > buttonRect.top) {
+                
+                // Create bounce effect
+                createMeteorBounce(meteorRect, buttonRect);
+            }
+        });
+        
+        // Continue checking if meteor still exists
+        if (meteor.parentNode) {
+            setTimeout(() => checkMeteorCollisions(meteor), 100);
+        }
+    }
+    
+    // Create bouncing meteor effect
+    function createMeteorBounce(meteorRect, buttonRect) {
+        const bounceMeteor = document.createElement('div');
+        bounceMeteor.className = 'matrix-char';
+        bounceMeteor.textContent = ['✨', '💥', '⚡', '🌟'][Math.floor(Math.random() * 4)];
+        bounceMeteor.style.position = 'fixed';
+        bounceMeteor.style.left = meteorRect.left + 'px';
+        bounceMeteor.style.top = meteorRect.top + 'px';
+        bounceMeteor.style.fontSize = '6px';
+        bounceMeteor.style.color = '#ffff00';
+        bounceMeteor.style.pointerEvents = 'none';
+        bounceMeteor.style.zIndex = '1001';
+        
+        // Calculate bounce direction
+        const centerX = buttonRect.left + buttonRect.width / 2;
+        const centerY = buttonRect.top + buttonRect.height / 2;
+        const bounceX = meteorRect.left < centerX ? -50 : 50;
+        const bounceY = meteorRect.top < centerY ? -50 : 50;
+        
+        bounceMeteor.style.setProperty('--start-x', '0px');
+        bounceMeteor.style.setProperty('--start-y', '0px');
+        bounceMeteor.style.setProperty('--end-x', bounceX + 'px');
+        bounceMeteor.style.setProperty('--end-y', bounceY + 'px');
+        bounceMeteor.style.animation = 'meteorBounce 0.8s ease-out forwards';
+        
+        document.body.appendChild(bounceMeteor);
+        
+        setTimeout(() => {
+            if (bounceMeteor.parentNode) {
+                bounceMeteor.parentNode.removeChild(bounceMeteor);
+            }
+        }, 800);
+    }
+    
+    // Exploding pixel rain effect for buttons - ALL DIRECTIONS
+    function createPixelExplosion(button) {
+        const rect = button.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        for (let i = 0; i < 30; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel-particle';
+            pixel.style.left = centerX + 'px';
+            pixel.style.top = centerY + 'px';
+            
+            // Random direction in 360 degrees
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 150 + 50;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+            
+            pixel.style.setProperty('--dx', dx + 'px');
+            pixel.style.setProperty('--dy', dy + 'px');
+            pixel.style.animation = `pixelExplode ${Math.random() * 0.8 + 0.6}s ease-out forwards`;
+            pixel.style.animationDelay = Math.random() * 0.2 + 's';
+            
+            // Random pixel colors
+            const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99', '#ffffff'];
+            pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
+            pixel.style.boxShadow = `0 0 3px ${pixel.style.background}`;
+            
+            document.body.appendChild(pixel);
+            
+            setTimeout(()
+```
