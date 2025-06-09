@@ -181,25 +181,28 @@
             }
         }
         
-        @keyframes meteorBounce {
-            0% { 
-                transform: translateY(var(--start-y)) translateX(var(--start-x)); 
-                opacity: 0.4;
-            }
-            50% {
-                opacity: 0.8;
-                box-shadow: 0 0 8px #00ff00, 0 0 16px #66ff66;
-            }
-            100% { 
-                transform: translateY(var(--end-y)) translateX(var(--end-x)); 
-                opacity: 0;
-            }
+        .logo-container {
+            background: #000000;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 4px rgba(0, 255, 0, 0.8), 
+                        0 0 8px rgba(0, 255, 0, 0.6),
+                        0 0 12px rgba(0, 255, 0, 0.4);
+            animation: logoPixelGlow 2s ease-in-out infinite alternate;
         }
         
-        .logo-container {
-            background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(0, 0, 0, 0.8));
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        @keyframes logoPixelGlow {
+            0% { 
+                box-shadow: 0 0 4px rgba(0, 255, 0, 0.8), 
+                           0 0 8px rgba(0, 255, 0, 0.6),
+                           0 0 12px rgba(0, 255, 0, 0.4);
+                border-color: #00ff00;
+            }
+            100% { 
+                box-shadow: 0 0 6px rgba(0, 255, 0, 1), 
+                           0 0 12px rgba(0, 255, 0, 0.8),
+                           0 0 18px rgba(0, 255, 0, 0.6);
+                border-color: #44ff44;
+            }
         }
         
         .enlarged-logo {
@@ -270,16 +273,6 @@
             box-shadow: 0 0 2px #00ff00;
         }
         
-        .background-particle {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            background: #00ff00;
-            pointer-events: none;
-            z-index: 999;
-            opacity: 0.6;
-        }
-        
         @keyframes pixelExplode {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -287,17 +280,6 @@
             }
             100% {
                 transform: translate(var(--dx), var(--dy)) scale(0);
-                opacity: 0;
-            }
-        }
-        
-        @keyframes backgroundFloat {
-            0% {
-                transform: translate(0, 0);
-                opacity: 0.6;
-            }
-            100% {
-                transform: translate(var(--float-x), var(--float-y));
                 opacity: 0;
             }
         }
@@ -397,13 +379,43 @@
             50% { transform: translateY(-3px); }
         }
         
+        /* Floating pixel elements */
+        .floating-pixels {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff00;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 997;
+            animation: pixelFloat 8s ease-in-out infinite;
+        }
+        
+        @keyframes pixelFloat {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+                opacity: 0.7;
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-10px) translateX(-15px);
+                opacity: 0.8;
+            }
+            75% {
+                transform: translateY(-30px) translateX(5px);
+                opacity: 0.9;
+            }
+        }
+        
         /* Firefly styles */
         .firefly {
             position: absolute;
             width: 3px;
             height: 3px;
             background: #ffff00;
-            border-radius: 50%;
             box-shadow: 0 0 3px #ffff00, 0 0 6px #ffff00, 0 0 9px #ffff00;
             opacity: 0;
             pointer-events: none;
@@ -468,7 +480,7 @@
                     
                     <!-- Logo Section -->
                     <div class="mb-8 relative">
-                        <div class="w-48 h-48 mx-auto mb-4 logo-container p-2 flex items-center justify-center overflow-hidden">
+                        <div class="w-64 h-64 mx-auto mb-4 logo-container p-2 flex items-center justify-center overflow-hidden">
                             <!-- Animated GIF as main logo - enlarged -->
                             <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="enlarged-logo" 
                                  style="image-rendering: pixelated;">
@@ -579,52 +591,6 @@
                         <div>> LEARNING_SYSTEM: Analyzing databases...</div>
                     </div>
                 </div>
-
-                <!-- AI Status -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-text-sm text-green-500 text-xs mb-2">[AI_STATUS]</div>
-                    <div class="pixel-text-xs text-green-400 space-y-1">
-                        <div class="flex justify-between">
-                            <span>CPU:</span>
-                            <span class="text-green-300" id="cpuLoad">73%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>GPU:</span>
-                            <span class="text-green-300" id="gpuLoad">89%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>CREATIVITY:</span>
-                            <span class="text-yellow-400">∞</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>ARTWORKS:</span>
-                            <span class="text-green-300" id="artworkCount">2847</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Robots Online -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-text-sm text-green-500 text-xs mb-2">[ROBOTS_ONLINE]</div>
-                    <div class="pixel-text-xs text-green-400 space-y-1">
-                        <div class="flex justify-between">
-                            <span>YUGA:</span>
-                            <span style="color: #00ff00;">●</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>MIKA:</span>
-                            <span style="color: #00ff00;">●</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>GHOST:</span>
-                            <span style="color: #00ff00;">●</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>LINE:</span>
-                            <span style="color: #ffff00;">⚠</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -641,8 +607,22 @@
     </div>
 
     <script>
-        // Pixel characters for background
-        const pixelChars = ['░', '▒', '▓', '█', '◆', '◇', '♦', '♢', '▲', '▼', '◄', '►', '●', '○', '■', '□', '▪', '▫'];
+        // Безопасные функции без ошибок
+        function safeGetElement(id) {
+            try {
+                return document.getElementById(id);
+            } catch (e) {
+                return null;
+            }
+        }
+        
+        function safeQuerySelector(selector) {
+            try {
+                return document.querySelector(selector);
+            } catch (e) {
+                return null;
+            }
+        }
         
         // System logs
         const logMessages = [
@@ -651,210 +631,184 @@
             "> CREATIVITY_ENGINE: Activating imagination...",
             "> ROBOT_ARTIST_01: Preparing digital canvas...",
             "> COLOR_MATRIX: Generating palette variations...",
-            "> LEARNING_SYSTEM: Analyzing art databases...",
-            "> INSPIRATION_MODULE: Scanning environmental inputs...",
-            "> BRUSH_DYNAMICS: Calibrating pressure sensitivity...",
-            "> COMPOSITION_AI: Calculating golden ratio coordinates...",
-            "> EMOTION_DETECTOR: Mapping feeling algorithms..."
+            "> LEARNING_SYSTEM: Analyzing art databases..."
         ];
         
         // Update system logs
         function updateSystemLogs() {
-            const logsContainer = document.getElementById('systemLogs');
-            const shuffled = [...logMessages].sort(() => Math.random() - 0.5);
-            logsContainer.innerHTML = shuffled.slice(0, 6).map(log => `<div>${log}</div>`).join('');
-        }
-        
-        // Update stats
-        function updateSystemStats() {
-            document.getElementById('cpuLoad').textContent = Math.floor(Math.random() * 30 + 70) + '%';
-            document.getElementById('gpuLoad').textContent = Math.floor(Math.random() * 20 + 80) + '%';
-            document.getElementById('artworkCount').textContent = Math.floor(Math.random() * 100 + 2800);
-        }
-        
-        // Cosmic meteors with collision detection
-        function createCosmicMeteors() {
-            const container = document.getElementById('matrix-container');
-            const cosmicChars = ['✦', '✧', '⋆', '✪', '✯', '⭐', '🌟', '💫', '☄️', '●', '◆', '◇', '♦'];
-            
-            setInterval(() => {
-                const meteor = document.createElement('div');
-                meteor.className = 'matrix-char';
-                meteor.textContent = cosmicChars[Math.floor(Math.random() * cosmicChars.length)];
-                meteor.style.left = Math.random() * 100 + '%';
-                meteor.style.fontSize = Math.random() * 3 + 4 + 'px';
-                meteor.style.animationDelay = Math.random() * 3 + 's';
-                meteor.style.animationDuration = Math.random() * 3 + 4 + 's';
-                
-                // Random cosmic colors
-                const colors = ['#00ff00', '#00ccaa', '#44ff88', '#66ffaa', '#88ffcc', '#aaffee'];
-                meteor.style.color = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Add trailing effect
-                meteor.style.textShadow = `2px 2px 4px ${meteor.style.color}`;
-                
-                container.appendChild(meteor);
-                
-                // Check for collisions during animation
-                setTimeout(() => {
-                    checkMeteorCollisions(meteor);
-                }, 1000);
-                
-                setTimeout(() => {
-                    if (meteor.parentNode) {
-                        meteor.parentNode.removeChild(meteor);
-                    }
-                }, 8000);
-            }, 600);
-        }
-        
-        // Collision detection for meteors
-        function checkMeteorCollisions(meteor) {
-            if (!meteor.parentNode) return;
-            
-            const meteorRect = meteor.getBoundingClientRect();
-            const buttons = document.querySelectorAll('.console-button, .social-button, .terminal-border');
-            
-            buttons.forEach(button => {
-                const buttonRect = button.getBoundingClientRect();
-                
-                // Check if meteor intersects with button
-                if (meteorRect.left < buttonRect.right && 
-                    meteorRect.right > buttonRect.left && 
-                    meteorRect.top < buttonRect.bottom && 
-                    meteorRect.bottom > buttonRect.top) {
-                    
-                    // Create bounce effect
-                    createMeteorBounce(meteorRect, buttonRect);
+            const logsContainer = safeGetElement('systemLogs');
+            if (logsContainer) {
+                try {
+                    const shuffled = [...logMessages].sort(() => Math.random() - 0.5);
+                    logsContainer.innerHTML = shuffled.slice(0, 6).map(log => `<div>${log}</div>`).join('');
+                } catch (e) {
+                    console.log('Log update error:', e);
                 }
-            });
-            
-            // Continue checking if meteor still exists
-            if (meteor.parentNode) {
-                setTimeout(() => checkMeteorCollisions(meteor), 100);
             }
         }
         
-        // Create bouncing meteor effect
-        function createMeteorBounce(meteorRect, buttonRect) {
-            const bounceMeteor = document.createElement('div');
-            bounceMeteor.className = 'matrix-char';
-            bounceMeteor.textContent = ['✨', '💥', '⚡', '🌟'][Math.floor(Math.random() * 4)];
-            bounceMeteor.style.position = 'fixed';
-            bounceMeteor.style.left = meteorRect.left + 'px';
-            bounceMeteor.style.top = meteorRect.top + 'px';
-            bounceMeteor.style.fontSize = '6px';
-            bounceMeteor.style.color = '#ffff00';
-            bounceMeteor.style.pointerEvents = 'none';
-            bounceMeteor.style.zIndex = '1001';
+        // Create cosmic meteors
+        function createCosmicMeteors() {
+            const container = safeGetElement('matrix-container');
+            if (!container) return;
             
-            // Calculate bounce direction
-            const centerX = buttonRect.left + buttonRect.width / 2;
-            const centerY = buttonRect.top + buttonRect.height / 2;
-            const bounceX = meteorRect.left < centerX ? -50 : 50;
-            const bounceY = meteorRect.top < centerY ? -50 : 50;
+            const cosmicChars = ['✦', '✧', '⋆', '✪', '✯', '●', '◆', '◇', '♦'];
             
-            bounceMeteor.style.setProperty('--start-x', '0px');
-            bounceMeteor.style.setProperty('--start-y', '0px');
-            bounceMeteor.style.setProperty('--end-x', bounceX + 'px');
-            bounceMeteor.style.setProperty('--end-y', bounceY + 'px');
-            bounceMeteor.style.animation = 'meteorBounce 0.8s ease-out forwards';
-            
-            document.body.appendChild(bounceMeteor);
-            
-            setTimeout(() => {
-                if (bounceMeteor.parentNode) {
-                    bounceMeteor.parentNode.removeChild(bounceMeteor);
+            setInterval(() => {
+                try {
+                    const meteor = document.createElement('div');
+                    meteor.className = 'matrix-char';
+                    meteor.textContent = cosmicChars[Math.floor(Math.random() * cosmicChars.length)];
+                    meteor.style.left = Math.random() * 100 + '%';
+                    meteor.style.fontSize = Math.random() * 3 + 4 + 'px';
+                    meteor.style.animationDelay = Math.random() * 3 + 's';
+                    meteor.style.animationDuration = Math.random() * 3 + 4 + 's';
+                    
+                    const colors = ['#00ff00', '#00ccaa', '#44ff88', '#66ffaa'];
+                    meteor.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    meteor.style.textShadow = `2px 2px 4px ${meteor.style.color}`;
+                    
+                    container.appendChild(meteor);
+                    
+                    setTimeout(() => {
+                        if (meteor.parentNode) {
+                            meteor.parentNode.removeChild(meteor);
+                        }
+                    }, 8000);
+                } catch (e) {
+                    console.log('Meteor creation error:', e);
                 }
-            }, 800);
+            }, 600);
         }
         
-        // Exploding pixel rain effect for buttons - ALL DIRECTIONS
+        // Create pixel explosion
         function createPixelExplosion(button) {
-            const rect = button.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
+            if (!button) return;
             
-            for (let i = 0; i < 30; i++) {
-                const pixel = document.createElement('div');
-                pixel.className = 'pixel-particle';
-                pixel.style.left = centerX + 'px';
-                pixel.style.top = centerY + 'px';
+            try {
+                const rect = button.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
                 
-                // Random direction in 360 degrees
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 150 + 50;
-                const dx = Math.cos(angle) * distance;
-                const dy = Math.sin(angle) * distance;
-                
-                pixel.style.setProperty('--dx', dx + 'px');
-                pixel.style.setProperty('--dy', dy + 'px');
-                pixel.style.animation = `pixelExplode ${Math.random() * 0.8 + 0.6}s ease-out forwards`;
-                pixel.style.animationDelay = Math.random() * 0.2 + 's';
-                
-                // Random pixel colors
-                const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99', '#ffffff'];
-                pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
-                pixel.style.boxShadow = `0 0 3px ${pixel.style.background}`;
-                
-                document.body.appendChild(pixel);
-                
-                setTimeout(() => {
-                    if (pixel.parentNode) {
-                        pixel.parentNode.removeChild(pixel);
-                    }
-                }, 1000);
+                for (let i = 0; i < 20; i++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel-particle';
+                    pixel.style.setProperty('--dx', dx + 'px');
+                    pixel.style.setProperty('--dy', dy + 'px');
+                    pixel.style.animation = `pixelExplode ${Math.random() * 0.8 + 0.6}s ease-out forwards`;
+                    pixel.style.animationDelay = Math.random() * 0.2 + 's';
+                    
+                    const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99', '#ffffff'];
+                    pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    pixel.style.boxShadow = `0 0 3px ${pixel.style.background}`;
+                    
+                    document.body.appendChild(pixel);
+                    
+                    setTimeout(() => {
+                        if (pixel.parentNode) {
+                            pixel.parentNode.removeChild(pixel);
+                        }
+                    }, 1000);
+                }
+            } catch (e) {
+                console.log('Pixel explosion error:', e);
             }
         }
         
         // Create fireflies around buttons
         function createFireflies() {
-            const buttons = [document.getElementById('galleryBtn'), document.getElementById('streamBtn')];
+            const galleryBtn = safeGetElement('galleryBtn');
+            const streamBtn = safeGetElement('streamBtn');
+            const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
             
             buttons.forEach(button => {
-                if (button && Math.random() < 0.4) { // 40% chance every interval
-                    const rect = button.getBoundingClientRect();
-                    const firefly = document.createElement('div');
-                    firefly.className = 'firefly';
-                    
-                    // Start position around button (extended radius)
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 80 + Math.random() * 40; // 80-120px radius
-                    const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
-                    const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
-                    
-                    firefly.style.left = startX + 'px';
-                    firefly.style.top = startY + 'px';
-                    
-                    // Random flight path
-                    const flyDistance = 60 + Math.random() * 80;
-                    const flyAngle = Math.random() * Math.PI * 2;
-                    const flyX = Math.cos(flyAngle) * flyDistance;
-                    const flyY = Math.sin(flyAngle) * flyDistance;
-                    
-                    firefly.style.setProperty('--fly-x', flyX + 'px');
-                    firefly.style.setProperty('--fly-y', flyY + 'px');
-                    
-                    // Animation settings
-                    const duration = 3 + Math.random() * 4; // 3-7 seconds
-                    firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.5s ease-in-out infinite`;
-                    firefly.style.animationDelay = Math.random() * 2 + 's';
-                    
-                    document.body.appendChild(firefly);
-                    
-                    setTimeout(() => {
-                        if (firefly.parentNode) {
-                            firefly.parentNode.removeChild(firefly);
-                        }
-                    }, (duration + 2) * 1000);
+                if (Math.random() < 0.4) {
+                    try {
+                        const rect = button.getBoundingClientRect();
+                        const firefly = document.createElement('div');
+                        firefly.className = 'firefly';
+                        
+                        const angle = Math.random() * Math.PI * 2;
+                        const radius = 80 + Math.random() * 40;
+                        const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
+                        const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
+                        
+                        firefly.style.left = startX + 'px';
+                        firefly.style.top = startY + 'px';
+                        
+                        const flyDistance = 60 + Math.random() * 80;
+                        const flyAngle = Math.random() * Math.PI * 2;
+                        const flyX = Math.cos(flyAngle) * flyDistance;
+                        const flyY = Math.sin(flyAngle) * flyDistance;
+                        
+                        firefly.style.setProperty('--fly-x', flyX + 'px');
+                        firefly.style.setProperty('--fly-y', flyY + 'px');
+                        
+                        const duration = 3 + Math.random() * 4;
+                        firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.5s ease-in-out infinite`;
+                        firefly.style.animationDelay = Math.random() * 2 + 's';
+                        
+                        document.body.appendChild(firefly);
+                        
+                        setTimeout(() => {
+                            if (firefly.parentNode) {
+                                firefly.parentNode.removeChild(firefly);
+                            }
+                        }, (duration + 2) * 1000);
+                    } catch (e) {
+                        console.log('Firefly creation error:', e);
+                    }
                 }
             });
         }
         
-        // Add click effects to buttons
-        function addButtonClickEffects() {
-            const galleryBtn = document.getElementById('galleryBtn');
-            const streamBtn = document.getElementById('streamBtn');
+        // Create floating pixels
+        function createFloatingPixels() {
+            try {
+                for (let i = 0; i < 4; i++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'floating-pixels';
+                    
+                    pixel.style.left = Math.random() * window.innerWidth + 'px';
+                    pixel.style.top = Math.random() * window.innerHeight + 'px';
+                    pixel.style.animationDelay = Math.random() * 8 + 's';
+                    
+                    const colors = ['#00ff00', '#33ff33', '#66ff66', '#44ff44'];
+                    pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    document.body.appendChild(pixel);
+                    
+                    setTimeout(() => {
+                        if (pixel.parentNode) {
+                            pixel.parentNode.removeChild(pixel);
+                        }
+                    }, 8000 + Math.random() * 2000);
+                }
+            } catch (e) {
+                console.log('Floating pixels error:', e);
+            }
+        }
+        
+        // Random numbers generator
+        function updateRandomNumbers() {
+            const element = safeGetElement('randomNumbers');
+            if (element) {
+                try {
+                    let numbers = '';
+                    for (let i = 0; i < 5; i++) {
+                        numbers += Math.floor(Math.random() * 10);
+                    }
+                    element.textContent = numbers;
+                } catch (e) {
+                    console.log('Random numbers error:', e);
+                }
+            }
+        }
+        
+        // Add button click effects
+        function addButtonEffects() {
+            const galleryBtn = safeGetElement('galleryBtn');
+            const streamBtn = safeGetElement('streamBtn');
             
             if (galleryBtn) {
                 galleryBtn.addEventListener('click', function(e) {
@@ -876,8 +830,9 @@
                 });
             }
             
-            // Add click effects to social buttons
-            document.querySelectorAll('.social-button').forEach(button => {
+            // Social buttons
+            const socialButtons = document.querySelectorAll('.social-button');
+            socialButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     createPixelExplosion(this);
@@ -885,116 +840,125 @@
             });
         }
         
-        // Random numbers generator for terminal
-        function updateRandomNumbers() {
-            const element = document.getElementById('randomNumbers');
-            if (element) {
-                let numbers = '';
-                for (let i = 0; i < 5; i++) {
-                    numbers += Math.floor(Math.random() * 10);
-                }
-                element.textContent = numbers;
-            }
-        }
-        
-        // Initialize effects when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            createCosmicMeteors();
-            
-            // Start fireflies around buttons
-            setInterval(createFireflies, 800);
-            createFireflies(); // Initial call
-            
-            // Update random numbers every 2 seconds
-            setInterval(updateRandomNumbers, 2000);
-            updateRandomNumbers(); // Initial call
-            
-            // Update system logs every 5 seconds
-            setInterval(updateSystemLogs, 5000);
-            updateSystemLogs(); // Initial call
-            
-            // Update system stats every 3 seconds
-            setInterval(updateSystemStats, 3000);
-            updateSystemStats(); // Initial call
-            
-            // Add button click effects
-            addButtonClickEffects();
-        });
-        
-        // Add mouse movement particle trail
-        document.addEventListener('mousemove', function(e) {
-            if (Math.random() < 0.1) { // 10% chance to create particle on mouse move
-                const particle = document.createElement('div');
-                particle.className = 'pixel-particle';
-                particle.style.left = e.clientX + 'px';
-                particle.style.top = e.clientY + 'px';
-                particle.style.width = '1px';
-                particle.style.height = '1px';
-                particle.style.background = '#00ff00';
-                particle.style.opacity = '0.5';
-                particle.style.animation = 'pixelExplode 1s ease-out forwards';
-                
-                const dx = (Math.random() - 0.5) * 20;
-                const dy = (Math.random() - 0.5) * 20;
-                particle.style.setProperty('--dx', dx + 'px');
-                particle.style.setProperty('--dy', dy + 'px');
-                
-                document.body.appendChild(particle);
-                
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
-                    }
-                }, 1000);
-            }
-        });
-        
-        // Add terminal typing effect to footer
-        function typeCommand() {
+        // Command changer
+        function changeCommand() {
             const commands = [
                 'initiate_art_sequence',
                 'loading_neural_networks',
                 'processing_creativity_data',
                 'analyzing_color_patterns',
-                'generating_art_matrix',
-                'calibrating_robot_brushes',
-                'scanning_inspiration_feed'
+                'generating_art_matrix'
             ];
             
-            const commandElement = document.querySelector('.glow-text');
+            const commandElement = safeQuerySelector('.glow-text');
             if (commandElement) {
-                const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-                commandElement.textContent = randomCommand;
+                try {
+                    const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+                    commandElement.textContent = randomCommand;
+                } catch (e) {
+                    console.log('Command change error:', e);
+                }
             }
         }
         
-        // Change command every 8 seconds
-        setInterval(typeCommand, 8000);
-        
-        // Add hover effect for logo
-        const logo = document.querySelector('.enlarged-logo');
-        if (logo) {
-            logo.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.4)';
-                this.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
-            });
-            
-            logo.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1.2)';
-                this.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.4))';
-            });
-        }
-        
-        // Add robot status blinking for warning
-        function blinkWarningStatus() {
-            const warningElement = document.querySelector('[style="color: #ffff00;"]');
-            if (warningElement) {
-                warningElement.style.animation = 'blink 0.5s infinite';
+        // Logo hover effects
+        function addLogoEffects() {
+            const logo = safeQuerySelector('.enlarged-logo');
+            if (logo) {
+                logo.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.4)';
+                    this.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+                });
+                
+                logo.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1.2)';
+                    this.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.4))';
+                });
             }
         }
         
-        // Start warning blink
-        blinkWarningStatus();
+        // Mouse trail effect
+        function addMouseTrail() {
+            document.addEventListener('mousemove', function(e) {
+                if (Math.random() < 0.1) {
+                    try {
+                        const particle = document.createElement('div');
+                        particle.className = 'pixel-particle';
+                        particle.style.left = e.clientX + 'px';
+                        particle.style.top = e.clientY + 'px';
+                        particle.style.width = '1px';
+                        particle.style.height = '1px';
+                        particle.style.background = '#00ff00';
+                        particle.style.opacity = '0.5';
+                        particle.style.animation = 'pixelExplode 1s ease-out forwards';
+                        
+                        const dx = (Math.random() - 0.5) * 20;
+                        const dy = (Math.random() - 0.5) * 20;
+                        particle.style.setProperty('--dx', dx + 'px');
+                        particle.style.setProperty('--dy', dy + 'px');
+                        
+                        document.body.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 1000);
+                    } catch (e) {
+                        console.log('Mouse trail error:', e);
+                    }
+                }
+            });
+        }
+        
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Start all effects
+                createCosmicMeteors();
+                
+                // Floating pixels every 10 seconds
+                setInterval(createFloatingPixels, 10000);
+                createFloatingPixels();
+                
+                // Fireflies every 800ms
+                setInterval(createFireflies, 800);
+                createFireflies();
+                
+                // Random numbers every 2 seconds
+                setInterval(updateRandomNumbers, 2000);
+                updateRandomNumbers();
+                
+                // System logs every 5 seconds
+                setInterval(updateSystemLogs, 5000);
+                updateSystemLogs();
+                
+                // Command change every 8 seconds
+                setInterval(changeCommand, 8000);
+                
+                // Add button effects
+                addButtonEffects();
+                
+                // Add logo effects
+                addLogoEffects();
+                
+                // Add mouse trail
+                addMouseTrail();
+                
+            } catch (e) {
+                console.log('Initialization error:', e);
+            }
+        });
     </script>
 </body>
-</html>
+</html>left = centerX + 'px';
+                    pixel.style.top = centerY + 'px';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 100 + 30;
+                    const dx = Math.cos(angle) * distance;
+                    const dy = Math.sin(angle) * distance;
+                    
+                    pixel.style.setProperty('--dx', dx + 'px');
+                    pixel.style.setProperty('--dy', dy + 'px');
+                    pixel.style.
