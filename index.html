@@ -53,12 +53,13 @@
     }
     
     .pixel-text-title {
-        font-family: 'Audiowide', cursive;
+        font-family: 'Press Start 2P', cursive;
         color: #ffffff;
-        font-size: 32px;
-        letter-spacing: 4px;
+        font-size: 28px;
+        letter-spacing: 3px;
         text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 0 16px rgba(0, 255, 0, 0.3);
         text-transform: uppercase;
+        image-rendering: pixelated;
     }
     
     .pixel-text-sm {
@@ -150,13 +151,34 @@
         box-shadow: 0 0 2px #00ff00;
     }
     
-    @keyframes pixelFall {
+    .background-particle {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        background: #00ff00;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.6;
+    }
+    
+    @keyframes pixelExplode {
         0% {
-            transform: translateY(0px);
+            transform: translate(0, 0) scale(1);
             opacity: 1;
         }
         100% {
-            transform: translateY(100px);
+            transform: translate(var(--dx), var(--dy)) scale(0);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes backgroundFloat {
+        0% {
+            transform: translate(0, 0);
+            opacity: 0.6;
+        }
+        100% {
+            transform: translate(var(--float-x), var(--float-y));
             opacity: 0;
         }
     }
@@ -320,7 +342,7 @@
     <!-- Footer Command Line -->
     <div class="absolute bottom-4 left-4 right-4" style="z-index: 5;">
         <div class="terminal-border bg-black p-2">
-            <div class="text-sm">
+            <div class="text-sm pixel-text-sm">
                 <span class="text-green-400">root@ghostline:~$</span> 
                 <span class="glow-text">initiate_art_sequence</span>
                 <span class="blink ml-2">█</span>
@@ -356,24 +378,33 @@
         }, 300);
     }
     
-    // Pixel rain effect for buttons
-    function createPixelRain(button) {
+    // Exploding pixel rain effect for buttons - ALL DIRECTIONS
+    function createPixelExplosion(button) {
         const rect = button.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < 30; i++) {
             const pixel = document.createElement('div');
             pixel.className = 'pixel-particle';
-            pixel.style.left = centerX + (Math.random() - 0.5) * 80 + 'px';
+            pixel.style.left = centerX + 'px';
             pixel.style.top = centerY + 'px';
-            pixel.style.animation = `pixelFall ${Math.random() * 0.8 + 0.4}s ease-out forwards`;
-            pixel.style.animationDelay = Math.random() * 0.3 + 's';
+            
+            // Random direction in 360 degrees
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 150 + 50;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+            
+            pixel.style.setProperty('--dx', dx + 'px');
+            pixel.style.setProperty('--dy', dy + 'px');
+            pixel.style.animation = `pixelExplode ${Math.random() * 0.8 + 0.6}s ease-out forwards`;
+            pixel.style.animationDelay = Math.random() * 0.2 + 's';
             
             // Random pixel colors
-            const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99'];
+            const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99', '#ffffff'];
             pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
-            pixel.style.boxShadow = `0 0 2px ${pixel.style.background}`;
+            pixel.style.boxShadow = `0 0 3px ${pixel.style.background}`;
             
             document.body.appendChild(pixel);
             
@@ -381,22 +412,58 @@
                 if (pixel.parentNode) {
                     pixel.parentNode.removeChild(pixel);
                 }
-            }, 1200);
+            }, 1000);
         }
+    }
+    
+    // Background floating particles for buttons
+    function createBackgroundParticles() {
+        const buttons = [document.getElementById('galleryBtn'), document.getElementById('streamBtn')];
+        
+        setInterval(() => {
+            buttons.forEach(button => {
+                if (Math.random() < 0.3) { // 30% chance every interval
+                    const rect = button.getBoundingClientRect();
+                    const particle = document.createElement('div');
+                    particle.className = 'background-particle';
+                    
+                    // Start from button area
+                    particle.style.left = rect.left + Math.random() * rect.width + 'px';
+                    particle.style.top = rect.top + Math.random() * rect.height + 'px';
+                    
+                    // Random float direction
+                    const floatX = (Math.random() - 0.5) * 60;
+                    const floatY = (Math.random() - 0.5) * 60;
+                    
+                    particle.style.setProperty('--float-x', floatX + 'px');
+                    particle.style.setProperty('--float-y', floatY + 'px');
+                    particle.style.animation = `backgroundFloat ${Math.random() * 2 + 1}s ease-out forwards`;
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 3000);
+                }
+            });
+        }, 200);
     }
     
     // Add click effects to buttons
     document.getElementById('galleryBtn').addEventListener('click', function(e) {
-        createPixelRain(this);
+        createPixelExplosion(this);
     });
     
     document.getElementById('streamBtn').addEventListener('click', function(e) {
-        createPixelRain(this);
+        createPixelExplosion(this);
     });
     
     // Initialize effects
     document.addEventListener('DOMContentLoaded', function() {
         createMatrixRain();
+        createBackgroundParticles();
     });
 </script>
 ```
