@@ -107,9 +107,39 @@
         position: absolute;
         color: #00ff00;
         font-family: 'Press Start 2P', cursive;
-        animation: matrix-rain 4s linear infinite;
-        opacity: 0.15;
-        font-size: 4px;
+        animation: meteorFall 5s linear infinite;
+        opacity: 0.1;
+        font-size: 3px;
+    }
+    
+    @keyframes meteorFall {
+        0% { 
+            transform: translateY(-100vh) translateX(-20px); 
+            opacity: 0;
+            box-shadow: 0 0 2px #00ff00;
+        }
+        5% { opacity: 0.3; }
+        95% { opacity: 0.3; }
+        100% { 
+            transform: translateY(100vh) translateX(20px); 
+            opacity: 0;
+            box-shadow: 0 0 6px #00ff00, 0 0 12px #66ff66;
+        }
+    }
+    
+    @keyframes meteorBounce {
+        0% { 
+            transform: translateY(var(--start-y)) translateX(var(--start-x)); 
+            opacity: 0.4;
+        }
+        50% {
+            opacity: 0.8;
+            box-shadow: 0 0 8px #00ff00, 0 0 16px #66ff66;
+        }
+        100% { 
+            transform: translateY(var(--end-y)) translateX(var(--end-x)); 
+            opacity: 0;
+        }
     }
     
     .logo-container {
@@ -223,10 +253,13 @@
         box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
     }
     
-    .enlarged-logo {
-        transform: scale(1.4);
-        transform-origin: center;
-        filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
+    .pixel-bat {
+        animation: batFly 3s ease-in-out infinite;
+    }
+    
+    @keyframes batFly {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-3px); }
     }
 </style>
 ```
@@ -239,11 +272,20 @@
 
 ```
     <!-- Header Terminal Bar -->
-    <div class="terminal-border bg-black p-2 m-4">
+    <div class="terminal-border bg-black p-3 m-6 mb-8">
         <div class="flex justify-between items-center text-xs">
-            <span class="glow-text pixel-text">>>> SYSTEM STATUS: ONLINE</span>
-            <span class="blink">█</span>
-            <span class="glow-text pixel-text">GHOSTLINE v14.5.7</span>
+            <div class="flex items-center space-x-4">
+                <span class="glow-text pixel-text">>>> SYSTEM STATUS: ONLINE</span>
+                <span class="text-green-400" id="randomNumbers">█████</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Pixel Bat -->
+                <div class="pixel-bat">
+                    <span style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 8px;">🦇</span>
+                </div>
+                <span class="blink">█</span>
+                <span class="glow-text pixel-text">GHOSTLINE v14.5.7</span>
+            </div>
         </div>
     </div>
     
@@ -260,19 +302,23 @@
         </div>
         
         <!-- Title Section -->
-        <div class="text-center mb-6">
-            <h1 class="text-4xl font-bold mb-3 pixel-text-title">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-6 pixel-text-title">
                 GHOSTLINE
             </h1>
-            <div class="terminal-border bg-black p-3 mb-4">
-                <div class="text-base glow-text pixel-text">LEARNING ART WITH ROBOTS</div>
+            
+            <!-- Separator -->
+            <div class="w-32 h-px bg-green-400 mx-auto mb-6 opacity-50"></div>
+            
+            <div class="terminal-border bg-black p-2 mb-6">
+                <div class="text-xs glow-text pixel-text-sm">LEARNING ART WITH ROBOTS</div>
             </div>
-            <div class="text-sm pixel-text-sm mb-1">An Experimental Digital Art Project</div>
-            <div class="text-xs pixel-text-xs">Where Artificial Intelligence Discovers Creativity</div>
+            <div class="text-xs pixel-text-xs mb-1 opacity-75">An Experimental Digital Art Project</div>
+            <div class="text-xs pixel-text-xs opacity-60">Where Artificial Intelligence Discovers Creativity</div>
         </div>
         
         <!-- Navigation Buttons -->
-        <div class="flex space-x-6 mb-8">
+        <div class="flex space-x-8 mb-12">
             <a href="gallery.html" class="console-button" id="galleryBtn">
                 GALLERY
             </a>
@@ -281,8 +327,67 @@
             </a>
         </div>
         
+        <!-- Separator Line -->
+        <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
+        
         <!-- Social Media Section -->
-        <div class="grid grid-cols-4 gap-2 w-full max-w-xs mb-20">
+        <div class="grid grid-cols-4 gap-4 w-full max-w-xs mb-24">
+            <a href="#" class="social-button">
+                <!-- Instagram Icon -->
+                <svg class="social-icon" viewBox="0 0 24 24">
+                    <g fill="#00ff00">
+                        <rect x="2" y="2" width="20" height="20"/>
+                        <rect x="4" y="4" width="16" height="16" fill="#000000"/>
+                        <rect x="7" y="7" width="10" height="10"/>
+                        <rect x="9" y="9" width="6" height="6" fill="#000000"/>
+                        <rect x="17" y="5" width="2" height="2"/>
+                    </g>
+                </svg>
+                <span class="social-text">INSTA</span>
+            </a>
+            
+            <a href="#" class="social-button">
+                <!-- TikTok Icon -->
+                <svg class="social-icon" viewBox="0 0 24 24">
+                    <g fill="#00ff00">
+                        <rect x="7" y="2" width="5" height="15"/>
+                        <rect x="9" y="5" width="7" height="2"/>
+                        <rect x="12" y="7" width="5" height="2"/>
+                        <rect x="5" y="12" width="10" height="5"/>
+                        <rect x="7" y="17" width="5" height="5"/>
+                    </g>
+                </svg>
+                <span class="social-text">TIKTOK</span>
+            </a>
+            
+            <a href="#" class="social-button">
+                <!-- Telegram Icon -->
+                <svg class="social-icon" viewBox="0 0 24 24">
+                    <g fill="#00ff00">
+                        <rect x="5" y="5" width="14" height="14"/>
+                        <rect x="7" y="7" width="10" height="10" fill="#000000"/>
+                        <rect x="10" y="10" width="5" height="2"/>
+                        <rect x="12" y="12" width="5" height="2"/>
+                        <rect x="7" y="12" width="2" height="2"/>
+                    </g>
+                </svg>
+                <span class="social-text">TELEGRAM</span>
+            </a>
+            
+            <a href="#" class="social-button">
+                <!-- YouTube Icon -->
+                <svg class="social-icon" viewBox="0 0 24 24">
+                    <g fill="#00ff00">
+                        <rect x="2" y="7" width="20" height="10"/>
+                        <rect x="4" y="5" width="16" height="2"/>
+                        <rect x="4" y="17" width="16" height="2"/>
+                        <rect x="10" y="10" width="2" height="4"/>
+                        <rect x="12" y="11" width="2" height="2"/>
+                    </g>
+                </svg>
+                <span class="social-text">YOUTUBE</span>
+            </a>
+        </div>
             <a href="#" class="social-button">
                 <!-- Instagram Icon -->
                 <svg class="social-icon" viewBox="0 0 24 24">
@@ -357,31 +462,101 @@
     // Pixel characters for background
     const pixelChars = ['░', '▒', '▓', '█', '◆', '◇', '♦', '♢', '▲', '▼', '◄', '►', '●', '○', '■', '□', '▪', '▫'];
     
-    // Matrix Rain Effect with pixel characters - more creative
-    function createMatrixRain() {
+    // Cosmic meteors with collision detection
+    function createCosmicMeteors() {
         const container = document.getElementById('matrix-container');
+        const cosmicChars = ['✦', '✧', '⋆', '✪', '✯', '⭐', '🌟', '💫', '☄️', '●', '◆', '◇', '♦'];
         
         setInterval(() => {
-            const char = document.createElement('div');
-            char.className = 'matrix-char';
-            char.textContent = pixelChars[Math.floor(Math.random() * pixelChars.length)];
-            char.style.left = Math.random() * 100 + '%';
-            char.style.fontSize = Math.random() * 4 + 4 + 'px';
-            char.style.animationDelay = Math.random() * 3 + 's';
-            char.style.animationDuration = Math.random() * 4 + 3 + 's';
+            const meteor = document.createElement('div');
+            meteor.className = 'matrix-char';
+            meteor.textContent = cosmicChars[Math.floor(Math.random() * cosmicChars.length)];
+            meteor.style.left = Math.random() * 100 + '%';
+            meteor.style.fontSize = Math.random() * 3 + 2 + 'px';
+            meteor.style.animationDelay = Math.random() * 3 + 's';
+            meteor.style.animationDuration = Math.random() * 3 + 4 + 's';
             
-            // Random colors for more creativity
-            const colors = ['#00ff00', '#00cc00', '#009900', '#00ff44', '#44ff44'];
-            char.style.color = colors[Math.floor(Math.random() * colors.length)];
+            // Random cosmic colors
+            const colors = ['#00ff00', '#00ccaa', '#44ff88', '#66ffaa', '#88ffcc', '#aaffee'];
+            meteor.style.color = colors[Math.floor(Math.random() * colors.length)];
             
-            container.appendChild(char);
+            // Add trailing effect
+            meteor.style.textShadow = `2px 2px 4px ${meteor.style.color}`;
+            
+            container.appendChild(meteor);
+            
+            // Check for collisions during animation
+            setTimeout(() => {
+                checkMeteorCollisions(meteor);
+            }, 1000);
             
             setTimeout(() => {
-                if (char.parentNode) {
-                    char.parentNode.removeChild(char);
+                if (meteor.parentNode) {
+                    meteor.parentNode.removeChild(meteor);
                 }
-            }, 7000);
-        }, 400);
+            }, 8000);
+        }, 600);
+    }
+    
+    // Collision detection for meteors
+    function checkMeteorCollisions(meteor) {
+        if (!meteor.parentNode) return;
+        
+        const meteorRect = meteor.getBoundingClientRect();
+        const buttons = document.querySelectorAll('.console-button, .social-button, .terminal-border');
+        
+        buttons.forEach(button => {
+            const buttonRect = button.getBoundingClientRect();
+            
+            // Check if meteor intersects with button
+            if (meteorRect.left < buttonRect.right && 
+                meteorRect.right > buttonRect.left && 
+                meteorRect.top < buttonRect.bottom && 
+                meteorRect.bottom > buttonRect.top) {
+                
+                // Create bounce effect
+                createMeteorBounce(meteorRect, buttonRect);
+            }
+        });
+        
+        // Continue checking if meteor still exists
+        if (meteor.parentNode) {
+            setTimeout(() => checkMeteorCollisions(meteor), 100);
+        }
+    }
+    
+    // Create bouncing meteor effect
+    function createMeteorBounce(meteorRect, buttonRect) {
+        const bounceMeteor = document.createElement('div');
+        bounceMeteor.className = 'matrix-char';
+        bounceMeteor.textContent = ['✨', '💥', '⚡', '🌟'][Math.floor(Math.random() * 4)];
+        bounceMeteor.style.position = 'fixed';
+        bounceMeteor.style.left = meteorRect.left + 'px';
+        bounceMeteor.style.top = meteorRect.top + 'px';
+        bounceMeteor.style.fontSize = '4px';
+        bounceMeteor.style.color = '#ffff00';
+        bounceMeteor.style.pointerEvents = 'none';
+        bounceMeteor.style.zIndex = '1001';
+        
+        // Calculate bounce direction
+        const centerX = buttonRect.left + buttonRect.width / 2;
+        const centerY = buttonRect.top + buttonRect.height / 2;
+        const bounceX = meteorRect.left < centerX ? -50 : 50;
+        const bounceY = meteorRect.top < centerY ? -50 : 50;
+        
+        bounceMeteor.style.setProperty('--start-x', '0px');
+        bounceMeteor.style.setProperty('--start-y', '0px');
+        bounceMeteor.style.setProperty('--end-x', bounceX + 'px');
+        bounceMeteor.style.setProperty('--end-y', bounceY + 'px');
+        bounceMeteor.style.animation = 'meteorBounce 0.8s ease-out forwards';
+        
+        document.body.appendChild(bounceMeteor);
+        
+        setTimeout(() => {
+            if (bounceMeteor.parentNode) {
+                bounceMeteor.parentNode.removeChild(bounceMeteor);
+            }
+        }, 800);
     }
     
     // Exploding pixel rain effect for buttons - ALL DIRECTIONS
@@ -474,10 +649,26 @@
         }, 300);
     });
     
+    // Random numbers generator for terminal
+    function updateRandomNumbers() {
+        const element = document.getElementById('randomNumbers');
+        if (element) {
+            let numbers = '';
+            for (let i = 0; i < 5; i++) {
+                numbers += Math.floor(Math.random() * 10);
+            }
+            element.textContent = numbers;
+        }
+    }
+    
     // Initialize effects
     document.addEventListener('DOMContentLoaded', function() {
-        createMatrixRain();
+        createCosmicMeteors();
         createBackgroundParticles();
+        
+        // Update random numbers every 2 seconds
+        setInterval(updateRandomNumbers, 2000);
+        updateRandomNumbers(); // Initial call
     });
 </script>
 ```
