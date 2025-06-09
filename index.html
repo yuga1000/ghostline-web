@@ -10,18 +10,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
         * {
-            background-color: #000000 !important;
+            box-sizing: border-box;
         }
         
         html, body {
             background: #000000 !important;
-            background-color: #000000 !important;
             color: #00ff00;
             font-family: 'Share Tech Mono', monospace;
-            overflow-x: hidden;
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
         .slide-container {
@@ -30,9 +29,8 @@
             min-height: 100vh;
             margin: 0 auto;
             position: relative;
-            background: #000000 !important;
-            background-color: #000000 !important;
-            padding-bottom: 60px;
+            background: #000000;
+            padding-bottom: 80px;
         }
         
         .terminal-border {
@@ -83,8 +81,8 @@
         .pixel-text-title {
             font-family: 'Press Start 2P', cursive;
             color: #ffffff;
-            font-size: 56px;
-            letter-spacing: 6px;
+            font-size: 48px;
+            letter-spacing: 4px;
             text-shadow: 0 0 4px rgba(255, 255, 255, 0.8), 
                          0 0 8px rgba(0, 255, 0, 0.6), 
                          0 0 16px rgba(0, 255, 0, 0.4),
@@ -200,10 +198,14 @@
         
         .logo-container {
             background: radial-gradient(circle, rgba(0, 255, 0, 0.1), rgba(0, 0, 0, 0.8));
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
         }
         
         .enlarged-logo {
-            transform: scale(1.4);
+            max-width: 100%;
+            max-height: 100%;
+            transform: scale(1.2);
             transform-origin: center;
             filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
         }
@@ -446,27 +448,27 @@
         <div class="terminal-border bg-black p-3 m-6 mb-8">
             <div class="flex justify-between items-center text-xs">
                 <div class="flex items-center space-x-4">
-                    <span class="glow-text pixel-text">>>> SYSTEM STATUS: ONLINE</span>
+                    <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
                     <span class="text-green-400" id="randomNumbers">█████</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <!-- Pixel Bat -->
                     <div class="pixel-bat"></div>
                     <span class="blink">█</span>
-                    <span class="glow-text pixel-text">GHOSTLINE v14.5.7</span>
+                    <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
                 </div>
             </div>
         </div>
 
         <!-- Main Layout with Sidebar -->
-        <div class="flex p-4 h-full">
+        <div class="flex flex-col lg:flex-row p-4 h-full gap-6">
             <!-- Main Content (Left) -->
-            <div class="w-3/4">
+            <div class="w-full lg:w-3/4">
                 <div class="flex flex-col items-center justify-center px-4">
                     
                     <!-- Logo Section -->
-                    <div class="mb-6 relative">
-                        <div class="w-48 h-48 mx-auto mb-4 terminal-border logo-container p-1 flex items-center justify-center overflow-hidden">
+                    <div class="mb-8 relative">
+                        <div class="w-48 h-48 mx-auto mb-4 logo-container p-2 flex items-center justify-center overflow-hidden">
                             <!-- Animated GIF as main logo - enlarged -->
                             <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="enlarged-logo" 
                                  style="image-rendering: pixelated;">
@@ -475,16 +477,16 @@
                     
                     <!-- Title Section -->
                     <div class="text-center mb-8">
-                        <h1 class="text-4xl font-bold mb-6 pixel-text-title">
+                        <h1 class="pixel-text-title mb-6">
                             GHOSTLINE
                         </h1>
                         
-                        <div class="text-xs pixel-text-xs mb-1 opacity-75">An Experimental Digital Art Project</div>
-                        <div class="text-xs pixel-text-xs opacity-60">Where Artificial Intelligence Discovers Creativity</div>
+                        <div class="pixel-text-xs mb-2 opacity-75">An Experimental Digital Art Project</div>
+                        <div class="pixel-text-xs opacity-60">Where Artificial Intelligence Discovers Creativity</div>
                     </div>
                     
                     <!-- Navigation Buttons -->
-                    <div class="flex space-x-8 mb-12">
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
                         <a href="gallery.html" class="console-button" id="galleryBtn">
                             GALLERY
                         </a>
@@ -558,11 +560,11 @@
             </div>
 
             <!-- Right Sidebar -->
-            <div class="w-1/4 space-y-3">
+            <div class="w-full lg:w-1/4 space-y-4">
                 
                 <!-- LEARNING ART WITH ROBOTS Title -->
                 <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-text-sm text-green-500 text-center mb-2">LEARNING ART WITH ROBOTS</div>
+                    <div class="pixel-text-sm text-green-500 text-center">LEARNING ART WITH ROBOTS</div>
                 </div>
                 
                 <!-- System Logs -->
@@ -679,308 +681,4 @@
                 const meteor = document.createElement('div');
                 meteor.className = 'matrix-char';
                 meteor.textContent = cosmicChars[Math.floor(Math.random() * cosmicChars.length)];
-                meteor.style.left = Math.random() * 100 + '%';
-                meteor.style.fontSize = Math.random() * 3 + 4 + 'px';
-                meteor.style.animationDelay = Math.random() * 3 + 's';
-                meteor.style.animationDuration = Math.random() * 3 + 4 + 's';
-                
-                // Random cosmic colors
-                const colors = ['#00ff00', '#00ccaa', '#44ff88', '66ffaa', '#88ffcc', '#aaffee'];
-                meteor.style.color = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Add trailing effect
-                meteor.style.textShadow = `2px 2px 4px ${meteor.style.color}`;
-                
-                container.appendChild(meteor);
-                
-                // Check for collisions during animation
-                setTimeout(() => {
-                    checkMeteorCollisions(meteor);
-                }, 1000);
-                
-                setTimeout(() => {
-                    if (meteor.parentNode) {
-                        meteor.parentNode.removeChild(meteor);
-                    }
-                }, 8000);
-            }, 600);
-        }
-        
-        // Collision detection for meteors
-        function checkMeteorCollisions(meteor) {
-            if (!meteor.parentNode) return;
-            
-            const meteorRect = meteor.getBoundingClientRect();
-            const buttons = document.querySelectorAll('.console-button, .social-button, .terminal-border');
-            
-            buttons.forEach(button => {
-                const buttonRect = button.getBoundingClientRect();
-                
-                // Check if meteor intersects with button
-                if (meteorRect.left < buttonRect.right && 
-                    meteorRect.right > buttonRect.left && 
-                    meteorRect.top < buttonRect.bottom && 
-                    meteorRect.bottom > buttonRect.top) {
-                    
-                    // Create bounce effect
-                    createMeteorBounce(meteorRect, buttonRect);
-                }
-            });
-            
-            // Continue checking if meteor still exists
-            if (meteor.parentNode) {
-                setTimeout(() => checkMeteorCollisions(meteor), 100);
-            }
-        }
-        
-        // Create bouncing meteor effect
-        function createMeteorBounce(meteorRect, buttonRect) {
-            const bounceMeteor = document.createElement('div');
-            bounceMeteor.className = 'matrix-char';
-            bounceMeteor.textContent = ['✨', '💥', '⚡', '🌟'][Math.floor(Math.random() * 4)];
-            bounceMeteor.style.position = 'fixed';
-            bounceMeteor.style.left = meteorRect.left + 'px';
-            bounceMeteor.style.top = meteorRect.top + 'px';
-            bounceMeteor.style.fontSize = '6px';
-            bounceMeteor.style.color = '#ffff00';
-            bounceMeteor.style.pointerEvents = 'none';
-            bounceMeteor.style.zIndex = '1001';
-            
-            // Calculate bounce direction
-            const centerX = buttonRect.left + buttonRect.width / 2;
-            const centerY = buttonRect.top + buttonRect.height / 2;
-            const bounceX = meteorRect.left < centerX ? -50 : 50;
-            const bounceY = meteorRect.top < centerY ? -50 : 50;
-            
-            bounceMeteor.style.setProperty('--start-x', '0px');
-            bounceMeteor.style.setProperty('--start-y', '0px');
-            bounceMeteor.style.setProperty('--end-x', bounceX + 'px');
-            bounceMeteor.style.setProperty('--end-y', bounceY + 'px');
-            bounceMeteor.style.animation = 'meteorBounce 0.8s ease-out forwards';
-            
-            document.body.appendChild(bounceMeteor);
-            
-            setTimeout(() => {
-                if (bounceMeteor.parentNode) {
-                    bounceMeteor.parentNode.removeChild(bounceMeteor);
-                }
-            }, 800);
-        }
-        
-        // Exploding pixel rain effect for buttons - ALL DIRECTIONS
-        function createPixelExplosion(button) {
-            const rect = button.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            for (let i = 0; i < 30; i++) {
-                const pixel = document.createElement('div');
-                pixel.className = 'pixel-particle';
-                pixel.style.left = centerX + 'px';
-                pixel.style.top = centerY + 'px';
-                
-                // Random direction in 360 degrees
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 150 + 50;
-                const dx = Math.cos(angle) * distance;
-                const dy = Math.sin(angle) * distance;
-                
-                pixel.style.setProperty('--dx', dx + 'px');
-                pixel.style.setProperty('--dy', dy + 'px');
-                pixel.style.animation = `pixelExplode ${Math.random() * 0.8 + 0.6}s ease-out forwards`;
-                pixel.style.animationDelay = Math.random() * 0.2 + 's';
-                
-                // Random pixel colors
-                const colors = ['#00ff00', '#66ff66', '#33ff33', '#99ff99', '#ffffff'];
-                pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
-                pixel.style.boxShadow = `0 0 3px ${pixel.style.background}`;
-                
-                document.body.appendChild(pixel);
-                
-                setTimeout(() => {
-                    if (pixel.parentNode) {
-                        pixel.parentNode.removeChild(pixel);
-                    }
-                }, 1000);
-            }
-        }
-        
-        // Create fireflies around buttons
-        function createFireflies() {
-            const buttons = [document.getElementById('galleryBtn'), document.getElementById('streamBtn')];
-            
-            buttons.forEach(button => {
-                if (Math.random() < 0.4) { // 40% chance every interval
-                    const rect = button.getBoundingClientRect();
-                    const firefly = document.createElement('div');
-                    firefly.className = 'firefly';
-                    
-                    // Start position around button (extended radius)
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 80 + Math.random() * 40; // 80-120px radius
-                    const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
-                    const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
-                    
-                    firefly.style.left = startX + 'px';
-                    firefly.style.top = startY + 'px';
-                    
-                    // Random flight path
-                    const flyDistance = 60 + Math.random() * 80;
-                    const flyAngle = Math.random() * Math.PI * 2;
-                    const flyX = Math.cos(flyAngle) * flyDistance;
-                    const flyY = Math.sin(flyAngle) * flyDistance;
-                    
-                    firefly.style.setProperty('--fly-x', flyX + 'px');
-                    firefly.style.setProperty('--fly-y', flyY + 'px');
-                    
-                    // Animation settings
-                    const duration = 3 + Math.random() * 4; // 3-7 seconds
-                    firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.5s ease-in-out infinite`;
-                    firefly.style.animationDelay = Math.random() * 2 + 's';
-                    
-                    document.body.appendChild(firefly);
-                    
-                    setTimeout(() => {
-                        if (firefly.parentNode) {
-                            firefly.parentNode.removeChild(firefly);
-                        }
-                    }, (duration + 2) * 1000);
-                }
-            });
-        }
-        
-        // Add click effects to buttons
-        document.getElementById('galleryBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            createPixelExplosion(this);
-            setTimeout(() => {
-                window.location.href = 'gallery.html';
-            }, 300);
-        });
-        
-        document.getElementById('streamBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            createPixelExplosion(this);
-            setTimeout(() => {
-                window.location.href = 'stream.html';
-            }, 300);
-        });
-        
-        // Add click effects to social buttons
-        document.querySelectorAll('.social-button').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                createPixelExplosion(this);
-            });
-        });
-        
-        // Random numbers generator for terminal
-        function updateRandomNumbers() {
-            const element = document.getElementById('randomNumbers');
-            if (element) {
-                let numbers = '';
-                for (let i = 0; i < 5; i++) {
-                    numbers += Math.floor(Math.random() * 10);
-                }
-                element.textContent = numbers;
-            }
-        }
-        
-        // Initialize effects when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            createCosmicMeteors();
-            
-            // Start fireflies around buttons
-            setInterval(createFireflies, 800);
-            createFireflies(); // Initial call
-            
-            // Update random numbers every 2 seconds
-            setInterval(updateRandomNumbers, 2000);
-            updateRandomNumbers(); // Initial call
-            
-            // Update system logs every 5 seconds
-            setInterval(updateSystemLogs, 5000);
-            updateSystemLogs(); // Initial call
-            
-            // Update system stats every 3 seconds
-            setInterval(updateSystemStats, 3000);
-            updateSystemStats(); // Initial call
-        });
-        
-        // Add mouse movement particle trail
-        document.addEventListener('mousemove', function(e) {
-            if (Math.random() < 0.1) { // 10% chance to create particle on mouse move
-                const particle = document.createElement('div');
-                particle.className = 'pixel-particle';
-                particle.style.left = e.clientX + 'px';
-                particle.style.top = e.clientY + 'px';
-                particle.style.width = '1px';
-                particle.style.height = '1px';
-                particle.style.background = '#00ff00';
-                particle.style.opacity = '0.5';
-                particle.style.animation = 'pixelExplode 1s ease-out forwards';
-                
-                const dx = (Math.random() - 0.5) * 20;
-                const dy = (Math.random() - 0.5) * 20;
-                particle.style.setProperty('--dx', dx + 'px');
-                particle.style.setProperty('--dy', dy + 'px');
-                
-                document.body.appendChild(particle);
-                
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
-                    }
-                }, 1000);
-            }
-        });
-        
-        // Add terminal typing effect to footer
-        function typeCommand() {
-            const commands = [
-                'initiate_art_sequence',
-                'loading_neural_networks',
-                'processing_creativity_data',
-                'analyzing_color_patterns',
-                'generating_art_matrix',
-                'calibrating_robot_brushes',
-                'scanning_inspiration_feed'
-            ];
-            
-            const commandElement = document.querySelector('.glow-text');
-            if (commandElement) {
-                const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-                commandElement.textContent = randomCommand;
-            }
-        }
-        
-        // Change command every 8 seconds
-        setInterval(typeCommand, 8000);
-        
-        // Add hover effect for logo
-        const logo = document.querySelector('.enlarged-logo');
-        if (logo) {
-            logo.addEventListener('mouseenter', function() {
-                this.style.transform = 'scale(1.6)';
-                this.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
-            });
-            
-            logo.addEventListener('mouseleave', function() {
-                this.style.transform = 'scale(1.4)';
-                this.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.4))';
-            });
-        }
-        
-        // Add robot status blinking for warning
-        function blinkWarningStatus() {
-            const warningElement = document.querySelector('[style="color: #ffff00;"]');
-            if (warningElement) {
-                warningElement.style.animation = 'blink 0.5s infinite';
-            }
-        }
-        
-        // Start warning blink
-        blinkWarningStatus();
-    </script>
-</body>
-</html>
+                meteor.style.left = Math.random() *
