@@ -35,6 +35,59 @@
         background: #000000 !important;
         background-color: #000000 !important;
         padding-bottom: 60px;
+        display: flex;
+    }
+    
+    .sidebar {
+        width: 200px;
+        min-height: 100vh;
+        background: #000000;
+        border-right: 2px solid #00ff00;
+        padding: 20px 15px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 100;
+        box-shadow: 2px 0 10px rgba(0, 255, 0, 0.1);
+    }
+    
+    .main-content {
+        flex: 1;
+        margin-left: 200px;
+    }
+    
+    .sidebar-title {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 10px;
+        color: #00ff00;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        opacity: 0.8;
+    }
+    
+    .industrial-log {
+        margin-bottom: 15px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 8px;
+        color: #66ff66;
+        opacity: 0.6;
+        border-left: 1px solid #00ff00;
+        padding-left: 8px;
+    }
+    
+    .log-icon {
+        color: #00ff00;
+        margin-right: 5px;
+    }
+    
+    .log-separator {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #00ff00, transparent);
+        margin: 10px 0;
+        opacity: 0.3;
     }
     
     .terminal-border {
@@ -108,8 +161,8 @@
         color: #00ff00;
         font-family: 'Press Start 2P', cursive;
         animation: meteorFall 5s linear infinite;
-        opacity: 0.1;
-        font-size: 3px;
+        opacity: 0.3;
+        font-size: 4px;
     }
     
     @keyframes meteorFall {
@@ -257,9 +310,38 @@
         animation: batFly 3s ease-in-out infinite;
     }
     
-    @keyframes batFly {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-3px); }
+    .firefly {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background: #ffff00;
+        border-radius: 50%;
+        box-shadow: 0 0 20px #ffff00, 0 0 40px #ffaa00, 0 0 60px #ffff00;
+        pointer-events: none;
+        z-index: 999;
+    }
+    
+    @keyframes fireflyFloat {
+        0% {
+            transform: translate(0, 0);
+            opacity: 0.3;
+        }
+        25% {
+            transform: translate(var(--x1), var(--y1));
+            opacity: 1;
+        }
+        50% {
+            transform: translate(var(--x2), var(--y2));
+            opacity: 0.6;
+        }
+        75% {
+            transform: translate(var(--x3), var(--y3));
+            opacity: 1;
+        }
+        100% {
+            transform: translate(var(--x4), var(--y4));
+            opacity: 0.3;
+        }
     }
 </style>
 ```
@@ -267,10 +349,63 @@
 </head>
 <body>
     <div class="slide-container scanlines">
-        <!-- Matrix Rain Effect -->
-        <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
+        <!-- Industrial Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-title">LEARNING ART WITH ROBOTS</div>
 
 ```
+        <div class="log-separator"></div>
+        
+        <div class="industrial-log">
+            <span class="log-icon">⚡</span>PWR: 98.4%
+            </div>
+</div>
+        <div class="industrial-log">
+            <span class="log-icon">🔋</span>CORE: STABLE
+        </div>
+        <div class="industrial-log">
+            <span class="log-icon">📡</span>SIGNAL: 5/5
+        </div>
+        
+        <div class="log-separator"></div>
+        
+        <div class="industrial-log">
+            <span class="log-icon">🚨</span>ALERT: NONE
+        </div>
+        <div class="industrial-log">
+            <span class="log-icon">🔒</span>SEC: LOCKED
+        </div>
+        <div class="industrial-log">
+            <span class="log-icon">🌡️</span>TEMP: 23.7°C
+        </div>
+        
+        <div class="log-separator"></div>
+        
+        <div class="industrial-log">
+            <span class="log-icon">⚙️</span>SYS: 14.5.7
+        </div>
+        <div class="industrial-log">
+            <span class="log-icon">🔧</span>MAINT: OK
+        </div>
+        <div class="industrial-log">
+            <span class="log-icon">📊</span>LOAD: 67%
+        </div>
+        
+        <div class="log-separator"></div>
+        
+        <div class="industrial-log">
+            <span class="log-icon">🔐</span>ACCESS: AUTH
+        </div>
+        <div class="industrial-log">
+            <span class="log-icon">📋</span>LOG: 2847 ENTRIES
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Matrix Rain Effect -->
+        <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
+    
     <!-- Header Terminal Bar -->
     <div class="terminal-border bg-black p-3 m-6 mb-8">
         <div class="flex justify-between items-center text-xs">
@@ -307,12 +442,6 @@
                 GHOSTLINE
             </h1>
             
-            <!-- Separator -->
-            <div class="w-32 h-px bg-green-400 mx-auto mb-6 opacity-50"></div>
-            
-            <div class="terminal-border bg-black p-2 mb-6">
-                <div class="text-xs glow-text pixel-text-sm">LEARNING ART WITH ROBOTS</div>
-            </div>
             <div class="text-xs pixel-text-xs mb-1 opacity-75">An Experimental Digital Art Project</div>
             <div class="text-xs pixel-text-xs opacity-60">Where Artificial Intelligence Discovers Creativity</div>
         </div>
@@ -525,38 +654,70 @@
         }
     }
     
-    // Create bouncing meteor effect
-    function createMeteorBounce(meteorRect, buttonRect) {
-        const bounceMeteor = document.createElement('div');
-        bounceMeteor.className = 'matrix-char';
-        bounceMeteor.textContent = ['✨', '💥', '⚡', '🌟'][Math.floor(Math.random() * 4)];
-        bounceMeteor.style.position = 'fixed';
-        bounceMeteor.style.left = meteorRect.left + 'px';
-        bounceMeteor.style.top = meteorRect.top + 'px';
-        bounceMeteor.style.fontSize = '4px';
-        bounceMeteor.style.color = '#ffff00';
-        bounceMeteor.style.pointerEvents = 'none';
-        bounceMeteor.style.zIndex = '1001';
+    // Fireflies around buttons
+    function createFireflies() {
+        const buttons = [document.getElementById('galleryBtn'), document.getElementById('streamBtn')];
         
-        // Calculate bounce direction
-        const centerX = buttonRect.left + buttonRect.width / 2;
-        const centerY = buttonRect.top + buttonRect.height / 2;
-        const bounceX = meteorRect.left < centerX ? -50 : 50;
-        const bounceY = meteorRect.top < centerY ? -50 : 50;
-        
-        bounceMeteor.style.setProperty('--start-x', '0px');
-        bounceMeteor.style.setProperty('--start-y', '0px');
-        bounceMeteor.style.setProperty('--end-x', bounceX + 'px');
-        bounceMeteor.style.setProperty('--end-y', bounceY + 'px');
-        bounceMeteor.style.animation = 'meteorBounce 0.8s ease-out forwards';
-        
-        document.body.appendChild(bounceMeteor);
-        
-        setTimeout(() => {
-            if (bounceMeteor.parentNode) {
-                bounceMeteor.parentNode.removeChild(bounceMeteor);
+        buttons.forEach(button => {
+            if (!button) return;
+            
+            // Create 3-4 fireflies per button
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    createSingleFirefly(button);
+                }, i * 800); // Stagger creation
             }
-        }, 800);
+        });
+    }
+    
+    function createSingleFirefly(button) {
+        const firefly = document.createElement('div');
+        firefly.className = 'firefly';
+        
+        const rect = button.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        firefly.style.left = centerX + 'px';
+        firefly.style.top = centerY + 'px';
+        
+        // Random floating path around button
+        const radius = 60; // Distance from button
+        const x1 = (Math.random() - 0.5) * radius;
+        const y1 = (Math.random() - 0.5) * radius;
+        const x2 = (Math.random() - 0.5) * radius;
+        const y2 = (Math.random() - 0.5) * radius;
+        const x3 = (Math.random() - 0.5) * radius;
+        const y3 = (Math.random() - 0.5) * radius;
+        const x4 = (Math.random() - 0.5) * radius;
+        const y4 = (Math.random() - 0.5) * radius;
+        
+        firefly.style.setProperty('--x1', x1 + 'px');
+        firefly.style.setProperty('--y1', y1 + 'px');
+        firefly.style.setProperty('--x2', x2 + 'px');
+        firefly.style.setProperty('--y2', y2 + 'px');
+        firefly.style.setProperty('--x3', x3 + 'px');
+        firefly.style.setProperty('--y3', y3 + 'px');
+        firefly.style.setProperty('--x4', x4 + 'px');
+        firefly.style.setProperty('--y4', y4 + 'px');
+        
+        firefly.style.animation = `fireflyFloat ${3 + Math.random() * 2}s ease-in-out infinite`;
+        firefly.style.animationDelay = Math.random() * 2 + 's';
+        
+        document.body.appendChild(firefly);
+        
+        // Remove and recreate firefly to keep them continuous
+        setTimeout(() => {
+            if (firefly.parentNode) {
+                firefly.parentNode.removeChild(firefly);
+            }
+            // Create new firefly to replace this one
+            setTimeout(() => {
+                if (document.getElementById('galleryBtn') || document.getElementById('streamBtn')) {
+                    createSingleFirefly(button);
+                }
+            }, Math.random() * 1000);
+        }, 5000 + Math.random() * 3000);
     }
     
     // Exploding pixel rain effect for buttons - ALL DIRECTIONS
@@ -665,6 +826,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         createCosmicMeteors();
         createBackgroundParticles();
+        createFireflies();
         
         // Update random numbers every 2 seconds
         setInterval(updateRandomNumbers, 2000);
