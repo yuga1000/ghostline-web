@@ -208,7 +208,7 @@
         .enlarged-logo {
             max-width: 100%;
             max-height: 100%;
-            transform: scale(1.8);
+            transform: scale(3.6);
             transform-origin: center;
             filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
         }
@@ -459,7 +459,12 @@
             font-size: 12px;
             color: #00ff00;
             opacity: 0.3;
-            animation: scrollHorizontal 20s linear infinite;
+            animation: scrollHorizontal 10s linear infinite;
+        }
+        
+        @keyframes scrollHorizontal {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
         
         @keyframes fireflyGlow {
@@ -515,9 +520,6 @@
                         <h1 class="pixel-text-title mb-6">
                             GHOSTLINE
                         </h1>
-                        
-                        <div class="pixel-text-xs mb-2 opacity-75">An Experimental Digital Art Project</div>
-                        <div class="pixel-text-xs opacity-60">Where Artificial Intelligence Discovers Creativity</div>
                     </div>
                     
                     <!-- Navigation Buttons -->
@@ -630,20 +632,14 @@
         
         <!-- Scrolling Text Horizon -->
         <div class="scrolling-text">
-            <div class="scroll-line" style="bottom: 160px; animation-delay: 0s; opacity: 0.1;">
+            <div class="scroll-line" style="bottom: 120px; animation-delay: 0s; opacity: 0.2;">
                 GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE
             </div>
-            <div class="scroll-line" style="bottom: 140px; animation-delay: -5s; opacity: 0.15;">
+            <div class="scroll-line" style="bottom: 100px; animation-delay: -2.5s; opacity: 0.25;">
                 LEARNING ART WITH ROBOTS LEARNING ART WITH ROBOTS LEARNING ART WITH ROBOTS LEARNING ART WITH ROBOTS
             </div>
-            <div class="scroll-line" style="bottom: 120px; animation-delay: -10s; opacity: 0.2;">
+            <div class="scroll-line" style="bottom: 80px; animation-delay: -5s; opacity: 0.3;">
                 AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY
-            </div>
-            <div class="scroll-line" style="bottom: 100px; animation-delay: -15s; opacity: 0.25;">
-                DIGITAL ART PROJECT DIGITAL ART PROJECT DIGITAL ART PROJECT DIGITAL ART PROJECT DIGITAL ART PROJECT
-            </div>
-            <div class="scroll-line" style="bottom: 80px; animation-delay: -3s; opacity: 0.3;">
-                NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS
             </div>
         </div>
     </div>
@@ -735,6 +731,14 @@
                 for (let i = 0; i < 20; i++) {
                     const pixel = document.createElement('div');
                     pixel.className = 'pixel-particle';
+                    pixel.style.left = centerX + 'px';
+                    pixel.style.top = centerY + 'px';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 100 + 30;
+                    const dx = Math.cos(angle) * distance;
+                    const dy = Math.sin(angle) * distance;
+                    
                     pixel.style.setProperty('--dx', dx + 'px');
                     pixel.style.setProperty('--dy', dy + 'px');
                     pixel.style.animation = `pixelExplode ${Math.random() * 0.8 + 0.6}s ease-out forwards`;
@@ -764,23 +768,20 @@
             const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
             
             buttons.forEach(button => {
-                // Увеличиваем вероятность появления светлячков
                 if (Math.random() < 0.7) {
                     try {
                         const rect = button.getBoundingClientRect();
                         const firefly = document.createElement('div');
                         firefly.className = 'firefly';
                         
-                        // Ближе к кнопкам
                         const angle = Math.random() * Math.PI * 2;
-                        const radius = 40 + Math.random() * 60; // 40-100px radius
+                        const radius = 40 + Math.random() * 60;
                         const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
                         const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
                         
                         firefly.style.left = startX + 'px';
                         firefly.style.top = startY + 'px';
                         
-                        // Больше движения
                         const flyDistance = 80 + Math.random() * 120;
                         const flyAngle = Math.random() * Math.PI * 2;
                         const flyX = Math.cos(flyAngle) * flyDistance;
@@ -789,7 +790,7 @@
                         firefly.style.setProperty('--fly-x', flyX + 'px');
                         firefly.style.setProperty('--fly-y', flyY + 'px');
                         
-                        const duration = 2 + Math.random() * 3; // Быстрее
+                        const duration = 2 + Math.random() * 3;
                         firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1s ease-in-out infinite`;
                         firefly.style.animationDelay = Math.random() * 1 + 's';
                         
@@ -911,12 +912,12 @@
             const logo = safeQuerySelector('.enlarged-logo');
             if (logo) {
                 logo.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(1.4)';
+                    this.style.transform = 'scale(4.0)';
                     this.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
                 });
                 
                 logo.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scale(1.2)';
+                    this.style.transform = 'scale(3.6)';
                     this.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.4))';
                 });
             }
@@ -966,7 +967,7 @@
                 setInterval(createFloatingPixels, 10000);
                 createFloatingPixels();
                 
-                // Fireflies every 400ms (чаще)
+                // Fireflies every 400ms
                 setInterval(createFireflies, 400);
                 createFireflies();
                 
@@ -996,14 +997,4 @@
         });
     </script>
 </body>
-</html>left = centerX + 'px';
-                    pixel.style.top = centerY + 'px';
-                    
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = Math.random() * 100 + 30;
-                    const dx = Math.cos(angle) * distance;
-                    const dy = Math.sin(angle) * distance;
-                    
-                    pixel.style.setProperty('--dx', dx + 'px');
-                    pixel.style.setProperty('--dy', dy + 'px');
-                    pixel.style.
+</html>
