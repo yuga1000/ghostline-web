@@ -157,31 +157,38 @@
             animation: blink 1s infinite;
         }
         
-        /* Зеленые квадратные метеоры */
+        /* Зеленые квадратные метеоры с шлейфом */
         .matrix-char {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 2px;
+            height: 2px;
             background: #00ff00;
-            animation: meteorFall 5s linear infinite;
-            opacity: 0.8;
-            box-shadow: 0 0 2px #00ff00, 
-                        0 0 4px #00ff00,
-                        0 1px 0 rgba(0, 255, 0, 0.5),
-                        1px 0 0 rgba(0, 255, 0, 0.5),
-                        0 -1px 0 rgba(0, 255, 0, 0.5),
-                        -1px 0 0 rgba(0, 255, 0, 0.5);
+            animation: meteorFall 6s linear infinite;
+            opacity: 0.9;
+            box-shadow: 0 0 1px #00ff00, 
+                        0 0 2px #00ff00;
+        }
+        
+        .matrix-char::before {
+            content: '';
+            position: absolute;
+            width: 1px;
+            height: 8px;
+            background: linear-gradient(to bottom, #00ff00, transparent);
+            left: 0.5px;
+            top: -8px;
+            opacity: 0.6;
         }
         
         @keyframes meteorFall {
             0% { 
-                transform: translateY(-100vh) translateX(-20px); 
+                transform: translateY(-100vh) translateX(-40px) rotate(25deg); 
                 opacity: 0;
             }
-            5% { opacity: 0.8; }
-            95% { opacity: 0.7; }
+            5% { opacity: 0.9; }
+            95% { opacity: 0.8; }
             100% { 
-                transform: translateY(100vh) translateX(20px); 
+                transform: translateY(100vh) translateX(40px) rotate(25deg); 
                 opacity: 0;
             }
         }
@@ -289,24 +296,24 @@
             }
         }
         
-        /* Эффект взрыва искр вверх */
-        .spark-particle {
+        /* Эффект взрыва светлячков вверх */
+        .firefly-spark {
             position: fixed;
             width: 2px;
             height: 2px;
             background: #00ff00;
             pointer-events: none;
-            z-index: 1001;
+            z-index: 1002;
             box-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00;
         }
         
-        @keyframes sparkExplode {
+        @keyframes fireflySparkUp {
             0% {
                 transform: translate(0, 0) scale(1);
                 opacity: 1;
             }
             100% {
-                transform: translate(var(--dx), var(--dy)) scale(0);
+                transform: translate(var(--dx), var(--dy)) scale(0.3);
                 opacity: 0;
             }
         }
@@ -497,7 +504,7 @@
                     
                     <!-- Navigation Buttons -->
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
-                        <a href="gallery.html" class="console-button" id="galleryBtn">
+                        <a href="index.html" class="console-button" id="galleryBtn">
                             GALLERY
                         </a>
                         <a href="stream.html" class="console-button" id="streamBtn">
@@ -658,7 +665,7 @@
             }
         }
         
-        // Create cosmic meteors - теперь зеленые квадратики
+        // Create cosmic meteors - уменьшенная интенсивность в 4 раза
         function createCosmicMeteors() {
             const container = safeGetElement('matrix-container');
             if (!container) return;
@@ -668,8 +675,8 @@
                     const meteor = document.createElement('div');
                     meteor.className = 'matrix-char';
                     meteor.style.left = Math.random() * 100 + '%';
-                    meteor.style.animationDelay = Math.random() * 3 + 's';
-                    meteor.style.animationDuration = Math.random() * 3 + 4 + 's';
+                    meteor.style.animationDelay = Math.random() * 4 + 's';
+                    meteor.style.animationDuration = Math.random() * 2 + 5 + 's';
                     
                     container.appendChild(meteor);
                     
@@ -677,15 +684,15 @@
                         if (meteor.parentNode) {
                             meteor.parentNode.removeChild(meteor);
                         }
-                    }, 8000);
+                    }, 10000);
                 } catch (e) {
                     console.log('Meteor creation error:', e);
                 }
-            }, 400);
+            }, 1600); // Было 400ms, стало 1600ms (в 4 раза реже)
         }
         
-        // Create spark explosion effect
-        function createSparkExplosion(button) {
+        // Create firefly explosion effect - светлячки летят вверх
+        function createFireflyExplosion(button) {
             if (!button) return;
             
             try {
@@ -693,34 +700,34 @@
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
                 
-                // Создаем 25 искр
-                for (let i = 0; i < 25; i++) {
-                    const spark = document.createElement('div');
-                    spark.className = 'spark-particle';
-                    spark.style.left = centerX + 'px';
-                    spark.style.top = centerY + 'px';
+                // Создаем 15 светлячков, летящих вверх
+                for (let i = 0; i < 15; i++) {
+                    const firefly = document.createElement('div');
+                    firefly.className = 'firefly-spark';
+                    firefly.style.left = centerX + 'px';
+                    firefly.style.top = centerY + 'px';
                     
-                    // Искры летят вверх с разбросом
-                    const angle = Math.random() * Math.PI - Math.PI/2; // Вверх с разбросом
-                    const distance = Math.random() * 150 + 50;
-                    const dx = Math.cos(angle) * distance;
-                    const dy = Math.sin(angle) * distance - Math.random() * 50; // Больше вверх
+                    // Светлячки летят преимущественно вверх
+                    const angle = -Math.PI/2 + (Math.random() - 0.5) * Math.PI/3; // Вверх с разбросом ±30°
+                    const distance = Math.random() * 120 + 80;
+                    const dx = Math.cos(angle) * distance * 0.3; // Меньше по горизонтали
+                    const dy = Math.sin(angle) * distance; // Больше вверх
                     
-                    spark.style.setProperty('--dx', dx + 'px');
-                    spark.style.setProperty('--dy', dy + 'px');
-                    spark.style.animation = `sparkExplode ${Math.random() * 1.2 + 0.8}s ease-out forwards`;
-                    spark.style.animationDelay = Math.random() * 0.1 + 's';
+                    firefly.style.setProperty('--dx', dx + 'px');
+                    firefly.style.setProperty('--dy', dy + 'px');
+                    firefly.style.animation = `fireflySparkUp ${Math.random() * 1.5 + 1}s ease-out forwards`;
+                    firefly.style.animationDelay = Math.random() * 0.2 + 's';
                     
-                    document.body.appendChild(spark);
+                    document.body.appendChild(firefly);
                     
                     setTimeout(() => {
-                        if (spark.parentNode) {
-                            spark.parentNode.removeChild(spark);
+                        if (firefly.parentNode) {
+                            firefly.parentNode.removeChild(firefly);
                         }
-                    }, 2000);
+                    }, 2500);
                 }
             } catch (e) {
-                console.log('Spark explosion error:', e);
+                console.log('Firefly explosion error:', e);
             }
         }
         
@@ -822,20 +829,20 @@
             if (galleryBtn) {
                 galleryBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    createSparkExplosion(this);
+                    createFireflyExplosion(this);
                     setTimeout(() => {
-                        window.location.href = 'gallery.html';
-                    }, 500);
+                        window.location.href = 'index.html'; // Исправлено на index.html
+                    }, 600);
                 });
             }
             
             if (streamBtn) {
                 streamBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    createSparkExplosion(this);
+                    createFireflyExplosion(this);
                     setTimeout(() => {
                         window.location.href = 'stream.html';
-                    }, 500);
+                    }, 600);
                 });
             }
             
@@ -844,7 +851,7 @@
             socialButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-                    createSparkExplosion(this);
+                    createFireflyExplosion(this);
                 });
             });
         }
