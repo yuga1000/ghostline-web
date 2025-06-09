@@ -19,18 +19,18 @@
             font-family: 'Share Tech Mono', monospace;
             margin: 0;
             padding: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden;
         }
         
         .slide-container {
             width: 100%;
             max-width: 1280px;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0 auto;
             position: relative;
             background: #000000;
-            padding-bottom: 80px;
+            overflow: hidden;
         }
         
         .terminal-border {
@@ -208,7 +208,7 @@
         .enlarged-logo {
             max-width: 100%;
             max-height: 100%;
-            transform: scale(1.2);
+            transform: scale(1.8);
             transform-origin: center;
             filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
         }
@@ -439,6 +439,29 @@
             }
         }
         
+        /* Scrolling text horizon effect */
+        .scrolling-text {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .scroll-line {
+            position: absolute;
+            width: 200%;
+            white-space: nowrap;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: #00ff00;
+            opacity: 0.3;
+            animation: scrollHorizontal 20s linear infinite;
+        }
+        
         @keyframes fireflyGlow {
             0%, 100% {
                 box-shadow: 0 0 3px #ffff00, 0 0 6px #ffff00, 0 0 9px #ffff00;
@@ -480,7 +503,7 @@
                     
                     <!-- Logo Section -->
                     <div class="mb-8 relative">
-                        <div class="w-64 h-64 mx-auto mb-4 logo-container p-2 flex items-center justify-center overflow-hidden">
+                        <div class="w-48 h-48 mx-auto mb-4 logo-container p-2 flex items-center justify-center overflow-hidden">
                             <!-- Animated GIF as main logo - enlarged -->
                             <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="enlarged-logo" 
                                  style="image-rendering: pixelated;">
@@ -604,6 +627,25 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Scrolling Text Horizon -->
+        <div class="scrolling-text">
+            <div class="scroll-line" style="bottom: 160px; animation-delay: 0s; opacity: 0.1;">
+                GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE GHOSTLINE
+            </div>
+            <div class="scroll-line" style="bottom: 140px; animation-delay: -5s; opacity: 0.15;">
+                LEARNING ART WITH ROBOTS LEARNING ART WITH ROBOTS LEARNING ART WITH ROBOTS LEARNING ART WITH ROBOTS
+            </div>
+            <div class="scroll-line" style="bottom: 120px; animation-delay: -10s; opacity: 0.2;">
+                AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY AI CREATIVITY
+            </div>
+            <div class="scroll-line" style="bottom: 100px; animation-delay: -15s; opacity: 0.25;">
+                DIGITAL ART PROJECT DIGITAL ART PROJECT DIGITAL ART PROJECT DIGITAL ART PROJECT DIGITAL ART PROJECT
+            </div>
+            <div class="scroll-line" style="bottom: 80px; animation-delay: -3s; opacity: 0.3;">
+                NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS NEURAL NETWORKS
+            </div>
+        </div>
     </div>
 
     <script>
@@ -722,21 +764,24 @@
             const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
             
             buttons.forEach(button => {
-                if (Math.random() < 0.4) {
+                // Увеличиваем вероятность появления светлячков
+                if (Math.random() < 0.7) {
                     try {
                         const rect = button.getBoundingClientRect();
                         const firefly = document.createElement('div');
                         firefly.className = 'firefly';
                         
+                        // Ближе к кнопкам
                         const angle = Math.random() * Math.PI * 2;
-                        const radius = 80 + Math.random() * 40;
+                        const radius = 40 + Math.random() * 60; // 40-100px radius
                         const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
                         const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
                         
                         firefly.style.left = startX + 'px';
                         firefly.style.top = startY + 'px';
                         
-                        const flyDistance = 60 + Math.random() * 80;
+                        // Больше движения
+                        const flyDistance = 80 + Math.random() * 120;
                         const flyAngle = Math.random() * Math.PI * 2;
                         const flyX = Math.cos(flyAngle) * flyDistance;
                         const flyY = Math.sin(flyAngle) * flyDistance;
@@ -744,9 +789,9 @@
                         firefly.style.setProperty('--fly-x', flyX + 'px');
                         firefly.style.setProperty('--fly-y', flyY + 'px');
                         
-                        const duration = 3 + Math.random() * 4;
-                        firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.5s ease-in-out infinite`;
-                        firefly.style.animationDelay = Math.random() * 2 + 's';
+                        const duration = 2 + Math.random() * 3; // Быстрее
+                        firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1s ease-in-out infinite`;
+                        firefly.style.animationDelay = Math.random() * 1 + 's';
                         
                         document.body.appendChild(firefly);
                         
@@ -754,7 +799,7 @@
                             if (firefly.parentNode) {
                                 firefly.parentNode.removeChild(firefly);
                             }
-                        }, (duration + 2) * 1000);
+                        }, (duration + 1) * 1000);
                     } catch (e) {
                         console.log('Firefly creation error:', e);
                     }
@@ -921,8 +966,8 @@
                 setInterval(createFloatingPixels, 10000);
                 createFloatingPixels();
                 
-                // Fireflies every 800ms
-                setInterval(createFireflies, 800);
+                // Fireflies every 400ms (чаще)
+                setInterval(createFireflies, 400);
                 createFireflies();
                 
                 // Random numbers every 2 seconds
