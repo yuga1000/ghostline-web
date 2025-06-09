@@ -108,8 +108,8 @@
         color: #00ff00;
         font-family: 'Press Start 2P', cursive;
         animation: matrix-rain 4s linear infinite;
-        opacity: 0.2;
-        font-size: 6px;
+        opacity: 0.15;
+        font-size: 4px;
     }
     
     .logo-container {
@@ -120,7 +120,7 @@
         background: #000000;
         border: 3px solid #00ff00;
         color: #ffffff;
-        padding: 10px 20px;
+        padding: 12px 24px;
         text-decoration: none;
         display: inline-block;
         transition: all 0.2s ease;
@@ -129,8 +129,8 @@
         font-family: 'Share Tech Mono', monospace;
         font-size: 14px;
         font-weight: 300;
-        letter-spacing: 1px;
-        box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        letter-spacing: 2px;
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
     }
     
     .console-button:hover {
@@ -282,16 +282,16 @@
         </div>
         
         <!-- Social Media Section -->
-        <div class="grid grid-cols-4 gap-3 w-full max-w-lg mb-20">
+        <div class="grid grid-cols-4 gap-2 w-full max-w-xs mb-20">
             <a href="#" class="social-button">
                 <!-- Instagram Icon -->
-                <svg class="social-icon" viewBox="0 0 30 30">
+                <svg class="social-icon" viewBox="0 0 24 24">
                     <g fill="#00ff00">
-                        <rect x="3" y="3" width="24" height="24"/>
-                        <rect x="6" y="6" width="18" height="18" fill="#000000"/>
-                        <rect x="9" y="9" width="12" height="12"/>
-                        <rect x="12" y="12" width="6" height="6" fill="#000000"/>
-                        <rect x="21" y="6" width="3" height="3"/>
+                        <rect x="2" y="2" width="20" height="20"/>
+                        <rect x="4" y="4" width="16" height="16" fill="#000000"/>
+                        <rect x="7" y="7" width="10" height="10"/>
+                        <rect x="9" y="9" width="6" height="6" fill="#000000"/>
+                        <rect x="17" y="5" width="2" height="2"/>
                     </g>
                 </svg>
                 <span class="social-text">INSTA</span>
@@ -299,13 +299,13 @@
             
             <a href="#" class="social-button">
                 <!-- TikTok Icon -->
-                <svg class="social-icon" viewBox="0 0 30 30">
+                <svg class="social-icon" viewBox="0 0 24 24">
                     <g fill="#00ff00">
-                        <rect x="9" y="3" width="6" height="18"/>
-                        <rect x="12" y="6" width="9" height="3"/>
-                        <rect x="15" y="9" width="6" height="3"/>
-                        <rect x="6" y="15" width="12" height="6"/>
-                        <rect x="9" y="21" width="6" height="6"/>
+                        <rect x="7" y="2" width="5" height="15"/>
+                        <rect x="9" y="5" width="7" height="2"/>
+                        <rect x="12" y="7" width="5" height="2"/>
+                        <rect x="5" y="12" width="10" height="5"/>
+                        <rect x="7" y="17" width="5" height="5"/>
                     </g>
                 </svg>
                 <span class="social-text">TIKTOK</span>
@@ -313,13 +313,13 @@
             
             <a href="#" class="social-button">
                 <!-- Telegram Icon -->
-                <svg class="social-icon" viewBox="0 0 30 30">
+                <svg class="social-icon" viewBox="0 0 24 24">
                     <g fill="#00ff00">
-                        <rect x="6" y="6" width="18" height="18"/>
-                        <rect x="9" y="9" width="12" height="12" fill="#000000"/>
-                        <rect x="12" y="12" width="6" height="3"/>
-                        <rect x="15" y="15" width="6" height="3"/>
-                        <rect x="9" y="15" width="3" height="3"/>
+                        <rect x="5" y="5" width="14" height="14"/>
+                        <rect x="7" y="7" width="10" height="10" fill="#000000"/>
+                        <rect x="10" y="10" width="5" height="2"/>
+                        <rect x="12" y="12" width="5" height="2"/>
+                        <rect x="7" y="12" width="2" height="2"/>
                     </g>
                 </svg>
                 <span class="social-text">TELEGRAM</span>
@@ -327,13 +327,13 @@
             
             <a href="#" class="social-button">
                 <!-- YouTube Icon -->
-                <svg class="social-icon" viewBox="0 0 30 30">
+                <svg class="social-icon" viewBox="0 0 24 24">
                     <g fill="#00ff00">
-                        <rect x="3" y="9" width="24" height="12"/>
-                        <rect x="6" y="6" width="18" height="3"/>
-                        <rect x="6" y="21" width="18" height="3"/>
-                        <rect x="12" y="12" width="3" height="6"/>
-                        <rect x="15" y="13.5" width="3" height="3"/>
+                        <rect x="2" y="7" width="20" height="10"/>
+                        <rect x="4" y="5" width="16" height="2"/>
+                        <rect x="4" y="17" width="16" height="2"/>
+                        <rect x="10" y="10" width="2" height="4"/>
+                        <rect x="12" y="11" width="2" height="2"/>
                     </g>
                 </svg>
                 <span class="social-text">YOUTUBE</span>
@@ -357,7 +357,7 @@
     // Pixel characters for background
     const pixelChars = ['░', '▒', '▓', '█', '◆', '◇', '♦', '♢', '▲', '▼', '◄', '►', '●', '○', '■', '□', '▪', '▫'];
     
-    // Matrix Rain Effect with pixel characters
+    // Matrix Rain Effect with pixel characters - more creative
     function createMatrixRain() {
         const container = document.getElementById('matrix-container');
         
@@ -366,9 +366,13 @@
             char.className = 'matrix-char';
             char.textContent = pixelChars[Math.floor(Math.random() * pixelChars.length)];
             char.style.left = Math.random() * 100 + '%';
-            char.style.fontSize = Math.random() * 8 + 8 + 'px';
-            char.style.animationDelay = Math.random() * 2 + 's';
-            char.style.animationDuration = Math.random() * 3 + 2 + 's';
+            char.style.fontSize = Math.random() * 4 + 4 + 'px';
+            char.style.animationDelay = Math.random() * 3 + 's';
+            char.style.animationDuration = Math.random() * 4 + 3 + 's';
+            
+            // Random colors for more creativity
+            const colors = ['#00ff00', '#00cc00', '#009900', '#00ff44', '#44ff44'];
+            char.style.color = colors[Math.floor(Math.random() * colors.length)];
             
             container.appendChild(char);
             
@@ -376,8 +380,8 @@
                 if (char.parentNode) {
                     char.parentNode.removeChild(char);
                 }
-            }, 5000);
-        }, 300);
+            }, 7000);
+        }, 400);
     }
     
     // Exploding pixel rain effect for buttons - ALL DIRECTIONS
@@ -453,13 +457,21 @@
         }, 200);
     }
     
-    // Add click effects to buttons
+    // Add click effects to buttons - FIXED
     document.getElementById('galleryBtn').addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent navigation to test effect
         createPixelExplosion(this);
+        setTimeout(() => {
+            window.location.href = 'gallery.html';
+        }, 300);
     });
     
     document.getElementById('streamBtn').addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent navigation to test effect
         createPixelExplosion(this);
+        setTimeout(() => {
+            window.location.href = 'stream.html';
+        }, 300);
     });
     
     // Initialize effects
