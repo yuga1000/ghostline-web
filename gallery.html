@@ -3,150 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTLINE: Learning Art with Robots</title>
+    <title>GHOSTLINE: Technology Infrastructure</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        * {
-            box-sizing: border-box;
-        }
         
-        html, body {
-            background: #000000 !important;
+        body {
+            background: #000000;
             color: #00ff00;
             font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         
         .slide-container {
-            width: 100%;
-            max-width: 1280px;
-            height: 100vh;
+            width: 1280px;
+            min-height: 720px;
             margin: 0 auto;
             position: relative;
-            background: #000000;
-            overflow: hidden;
+            background: radial-gradient(circle at 30% 80%, rgba(0, 255, 0, 0.08) 0%, rgba(0, 0, 0, 0.95) 60%);
         }
         
         .terminal-border {
             border: 2px solid #00ff00;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4), 
-                        0 0 6px rgba(0, 255, 0, 0.3),
-                        0 0 9px rgba(0, 255, 0, 0.2);
-            animation: borderPulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes borderPulse {
-            0%, 100% { 
-                border-color: #00ff00;
-                box-shadow: 0 0 3px rgba(0, 255, 0, 0.4), 
-                           0 0 6px rgba(0, 255, 0, 0.3),
-                           0 0 9px rgba(0, 255, 0, 0.2);
-            }
-            50% { 
-                border-color: #33ff33;
-                box-shadow: 0 0 5px rgba(0, 255, 0, 0.6), 
-                           0 0 10px rgba(0, 255, 0, 0.4),
-                           0 0 15px rgba(0, 255, 0, 0.3);
-            }
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
         }
         
         .glow-text {
-            text-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00, 0 0 6px #00ff00;
-            animation: pixelGlow 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
         }
         
-        @keyframes pixelGlow {
-            0% { 
-                text-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00, 0 0 6px #00ff00;
-                filter: brightness(1);
-            }
-            100% { 
-                text-shadow: 0 0 4px #00ff00, 0 0 8px #00ff00, 0 0 12px #00ff00, 0 0 16px #00ff00;
-                filter: brightness(1.2);
-            }
-        }
-        
-       .pixel-text {
-    font-family: 'Share Tech Mono', monospace;  /* ← Тонкий моноширинный */
-    image-rendering: pixelated;
-    color: #ffffff;
-    font-weight: 300;  /* ← Добавить для еще более тонкого */
-}
-        
-        .pixel-text-title {
+        .pixel-text {
             font-family: 'Press Start 2P', cursive;
-            color: #ffffff;
-            font-size: 48px;
-            letter-spacing: 4px;
-            text-shadow: 0 0 4px rgba(255, 255, 255, 0.8), 
-                         0 0 8px rgba(0, 255, 0, 0.6), 
-                         0 0 16px rgba(0, 255, 0, 0.4),
-                         0 0 24px rgba(0, 255, 0, 0.2);
-            text-transform: uppercase;
             image-rendering: pixelated;
-            animation: titlePulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes titlePulse {
-            0%, 100% { 
-                text-shadow: 0 0 4px rgba(255, 255, 255, 0.8), 
-                            0 0 8px rgba(0, 255, 0, 0.6), 
-                            0 0 16px rgba(0, 255, 0, 0.4),
-                            0 0 24px rgba(0, 255, 0, 0.2);
-            }
-            50% { 
-                text-shadow: 0 0 6px rgba(255, 255, 255, 1), 
-                            0 0 12px rgba(0, 255, 0, 0.8), 
-                            0 0 24px rgba(0, 255, 0, 0.6),
-                            0 0 36px rgba(0, 255, 0, 0.4);
-            }
-        }
-        
-        .pixel-text-sm {
-            font-family: 'Share Tech Mono', monospace;
-            color: #00ff00;
-            font-size: 12px;
-            letter-spacing: 1px;
-        }
-        
-        .pixel-text-xs {
-            font-family: 'Share Tech Mono', monospace;
-            color: #66ff66;
-            font-size: 10px;
-            text-shadow: 0 0 2px rgba(102, 255, 102, 0.8), 
-                         0 0 4px rgba(102, 255, 102, 0.6),
-                         0 0 6px rgba(102, 255, 102, 0.4);
-            animation: subtlePulse 4s ease-in-out infinite;
-        }
-        
-        @keyframes subtlePulse {
-            0%, 100% { 
-                text-shadow: 0 0 2px rgba(102, 255, 102, 0.8), 
-                            0 0 4px rgba(102, 255, 102, 0.6),
-                            0 0 6px rgba(102, 255, 102, 0.4);
-            }
-            50% { 
-                text-shadow: 0 0 3px rgba(102, 255, 102, 1), 
-                            0 0 6px rgba(102, 255, 102, 0.8),
-                            0 0 9px rgba(102, 255, 102, 0.6);
-            }
         }
         
         .scanlines {
-            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
-            background-size: 100% 4px;
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+            background-size: 100% 3px;
             animation: scanlines 0.1s linear infinite;
         }
         
         @keyframes scanlines {
             0% { background-position: 0 0; }
-            100% { background-position: 0 4px; }
+            100% { background-position: 0 3px; }
         }
         
         @keyframes blink {
@@ -155,837 +55,204 @@
         }
         
         .blink {
-            animation: blink 1s infinite;
+            animation: blink 1.4s infinite;
         }
         
-        /* Зеленые квадратные метеоры с шлейфом */
-        .matrix-char {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #00ff00;
-            animation: meteorFall 6s linear infinite;
-            opacity: 0.9;
-            box-shadow: 0 0 1px #00ff00, 
-                        0 0 2px #00ff00;
+        @keyframes data-flow {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
         }
         
-        .matrix-char::before {
-            content: '';
-            position: absolute;
-            width: 1px;
-            height: 8px;
-            background: linear-gradient(to bottom, #00ff00, transparent);
-            left: 0.5px;
-            top: -8px;
-            opacity: 0.6;
+        .data-flow {
+            animation: data-flow 3s ease-in-out infinite;
         }
         
-        @keyframes meteorFall {
-            0% { 
-                transform: translateY(-100vh) translateX(-40px) rotate(25deg); 
-                opacity: 0;
-            }
-            5% { opacity: 0.9; }
-            95% { opacity: 0.8; }
-            100% { 
-                transform: translateY(100vh) translateX(40px) rotate(25deg); 
-                opacity: 0;
-            }
+        .tech-node {
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.8);
         }
         
-        .logo-container {
-            background: #000000;
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 4px rgba(0, 255, 0, 0.8), 
-                        0 0 8px rgba(0, 255, 0, 0.6),
-                        0 0 12px rgba(0, 255, 0, 0.4);
-            animation: logoPixelGlow 2s ease-in-out infinite alternate;
+        .tech-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
         }
         
-        @keyframes logoPixelGlow {
-            0% { 
-                box-shadow: 0 0 4px rgba(0, 255, 0, 0.8), 
-                           0 0 8px rgba(0, 255, 0, 0.6),
-                           0 0 12px rgba(0, 255, 0, 0.4);
-                border-color: #00ff00;
-            }
-            100% { 
-                box-shadow: 0 0 6px rgba(0, 255, 0, 1), 
-                           0 0 12px rgba(0, 255, 0, 0.8),
-                           0 0 18px rgba(0, 255, 0, 0.6);
-                border-color: #44ff44;
-            }
+        @keyframes network-pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
         }
         
-        .enlarged-logo {
-            max-width: 100%;
-            max-height: 100%;
-            transform: scale(3.6);
-            transform-origin: center;
-            filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
+        .network-pulse {
+            animation: network-pulse 2s ease-in-out infinite;
         }
         
-        .console-button {
-            background: #000000;
-            border: 3px solid #00ff00;
-            color: #ffffff;
-            padding: 12px 24px;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            box-shadow: 0 0 4px rgba(0, 255, 0, 0.6), 
-                        0 0 8px rgba(0, 255, 0, 0.4),
-                        0 0 12px rgba(0, 255, 0, 0.2);
-            text-shadow: 0 0 2px #ffffff, 0 0 4px #ffffff;
-            animation: buttonGlow 2.5s ease-in-out infinite alternate;
+        .storage-rack {
+            background: linear-gradient(90deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 0, 0, 0.9) 50%, rgba(0, 255, 0, 0.1) 100%);
         }
         
-        @keyframes buttonGlow {
-            0% { 
-                box-shadow: 0 0 4px rgba(0, 255, 0, 0.6), 
-                           0 0 8px rgba(0, 255, 0, 0.4),
-                           0 0 12px rgba(0, 255, 0, 0.2);
-                border-color: #00ff00;
-            }
-            100% { 
-                box-shadow: 0 0 6px rgba(0, 255, 0, 0.8), 
-                           0 0 12px rgba(0, 255, 0, 0.6),
-                           0 0 18px rgba(0, 255, 0, 0.4);
-                border-color: #44ff44;
-            }
+        @keyframes connection-flow {
+            0% { stroke-dashoffset: 20; }
+            100% { stroke-dashoffset: 0; }
         }
         
-        .console-button:hover {
-            background: #001100;
-            color: #00ff00;
-            box-shadow: 0 0 8px rgba(0, 255, 0, 1), 
-                        0 0 16px rgba(0, 255, 0, 0.8),
-                        0 0 24px rgba(0, 255, 0, 0.6);
-            text-shadow: 0 0 3px #00ff00, 0 0 6px #00ff00;
-        }
-        
-        .console-button:active {
-            background: #002200;
-            transform: scale(0.95);
-        }
-        
-        .pixel-particle {
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: #00ff00;
-            pointer-events: none;
-            z-index: 1000;
-            box-shadow: 0 0 2px #00ff00;
-        }
-        
-        @keyframes pixelExplode {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--dx), var(--dy)) scale(0);
-                opacity: 0;
-            }
-        }
-        
-        /* Эффект взрыва светлячков вверх */
-        .firefly-spark {
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: #00ff00;
-            pointer-events: none;
-            z-index: 1002;
-            box-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00;
-        }
-        
-        @keyframes fireflySparkUp {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--dx), var(--dy)) scale(0.3);
-                opacity: 0;
-            }
-        }
-        
-        .social-icon {
-            width: 20px;
-            height: 20px;
-            background: #00ff00;
-            display: inline-block;
-            image-rendering: pixelated;
-        }
-        
-        .social-button {
-            background: #000000;
-            border: 1px solid #00ff00;
-            padding: 6px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            flex-direction: column;
-            gap: 4px;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
-            width: 60px;
-            height: 60px;
-        }
-        
-        .social-text {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 6px;
-            color: #00ff00;
-            font-weight: 300;
-            letter-spacing: 0.2px;
-        }
-        
-        .social-button:hover {
-            background: #001100;
-            transform: translateY(-2px);
-            box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
-        }
-        
-        /* Floating pixel elements */
-        .floating-pixels {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #00ff00;
-            opacity: 0.7;
-            pointer-events: none;
-            z-index: 997;
-            animation: pixelFloat 8s ease-in-out infinite;
-        }
-        
-        @keyframes pixelFloat {
-            0%, 100% {
-                transform: translateY(0px) translateX(0px);
-                opacity: 0.7;
-            }
-            25% {
-                transform: translateY(-20px) translateX(10px);
-                opacity: 1;
-            }
-            50% {
-                transform: translateY(-10px) translateX(-15px);
-                opacity: 0.8;
-            }
-            75% {
-                transform: translateY(-30px) translateX(5px);
-                opacity: 0.9;
-            }
-        }
-        
-        /* Зеленые квадратные светлячки */
-        .firefly {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #00ff00;
-            box-shadow: 0 0 2px #00ff00, 
-                        0 0 4px #00ff00,
-                        0 1px 0 rgba(0, 255, 0, 0.4),
-                        1px 0 0 rgba(0, 255, 0, 0.4),
-                        0 -1px 0 rgba(0, 255, 0, 0.4),
-                        -1px 0 0 rgba(0, 255, 0, 0.4);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 998;
-        }
-        
-        @keyframes fireflyFloat {
-            0% {
-                transform: translate(0, 0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--fly-x), var(--fly-y));
-                opacity: 0;
-            }
-        }
-        
-        /* Scrolling text horizon effect */
-        .scrolling-text {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .scroll-line {
-            position: absolute;
-            width: 200%;
-            white-space: nowrap;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 12px;
-            color: #00ff00;
-            opacity: 0.3;
-            animation: scrollHorizontal 10s linear infinite;
-        }
-        
-        @keyframes scrollHorizontal {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        
-        @keyframes fireflyGlow {
-            0%, 100% {
-                box-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00;
-                background: #00ff00;
-            }
-            50% {
-                box-shadow: 0 0 4px #00ff00, 0 0 8px #00ff00, 0 0 12px #44ff44;
-                background: #44ff44;
-            }
+        .connection-line {
+            stroke: #00ff00;
+            stroke-width: 2;
+            stroke-dasharray: 5,5;
+            animation: connection-flow 1s linear infinite;
         }
     </style>
 </head>
 <body>
     <div class="slide-container scanlines">
-        <!-- Matrix Rain Effect -->
-        <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
-
         <!-- Header Terminal Bar -->
-        <div class="terminal-border bg-black p-3 m-6 mb-8">
+        <div class="terminal-border bg-black p-2 m-4">
             <div class="flex justify-between items-center text-xs">
-                <div class="flex items-center space-x-4">
-                    <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
-                    <span class="text-green-400" id="randomNumbers">█████</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="blink">█</span>
-                    <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
-                </div>
+                <span class="glow-text">>>> TECH INFRASTRUCTURE: SYSTEM_OVERVIEW.EXE</span>
+                <span class="glow-text">GLOBAL NETWORK STATUS: ONLINE</span>
+                <span class="blink">█</span>
             </div>
         </div>
-
-        <!-- Main Layout with Sidebar -->
-        <div class="flex flex-col lg:flex-row p-4 h-full gap-6">
-            <!-- Main Content (Left) -->
-            <div class="w-full lg:w-3/4">
-                <div class="flex flex-col items-center justify-center px-4">
-                    
-                    <!-- Logo Section -->
-                    <div class="mb-8 relative">
-                        <div class="w-48 h-48 mx-auto mb-4 logo-container p-2 flex items-center justify-center overflow-hidden">
-                            <!-- Animated GIF as main logo - enlarged -->
-                            <img src="IMG_2135.gif" alt="GHOSTLINE Logo" class="enlarged-logo" 
-                                 style="image-rendering: pixelated;">
+        
+        <!-- Main Content -->
+        <div class="px-6 pb-4">
+            <div class="text-center mb-4">
+                <h2 class="text-2xl glow-text pixel-text" style="font-family: 'Orbitron', sans-serif;">
+                    GHOSTLINE ARCHITECTURE
+                </h2>
+                <div class="text-sm text-green-400 mt-1">DISTRIBUTED • BLOCKCHAIN • AI-DRIVEN</div>
+            </div>
+            
+            <!-- Technology Flow Diagram -->
+            <div class="grid grid-cols-4 gap-4 mb-4">
+                <div class="tech-node terminal-border p-3 text-center">
+                    <div class="text-2xl mb-2">🧠</div>
+                    <div class="text-xs text-green-400 mb-1">AI CORE</div>
+                    <div class="glow-text text-sm">NEURAL NET</div>
+                    <div class="text-xs text-green-300">ACTIVE</div>
+                </div>
+                
+                <div class="tech-node terminal-border p-3 text-center">
+                    <div class="text-2xl mb-2">🎨</div>
+                    <div class="text-xs text-green-400 mb-1">GENERATOR</div>
+                    <div class="glow-text text-sm">IMAGE AI</div>
+                    <div class="text-xs text-green-300 network-pulse">PROCESSING</div>
+                </div>
+                
+                <div class="tech-node terminal-border p-3 text-center">
+                    <div class="text-2xl mb-2">👤</div>
+                    <div class="text-xs text-green-400 mb-1">HUMAN</div>
+                    <div class="glow-text text-sm">CURATOR</div>
+                    <div class="text-xs text-green-300">CONNECTED</div>
+                </div>
+                
+                <div class="tech-node terminal-border p-3 text-center">
+                    <div class="text-2xl mb-2">🖼️</div>
+                    <div class="text-xs text-green-400 mb-1">OUTPUT</div>
+                    <div class="glow-text text-sm">CANVAS</div>
+                    <div class="text-xs text-green-300 blink">CREATING</div>
+                </div>
+            </div>
+            
+            <!-- Flow Connections -->
+            <div class="relative mb-6">
+                <svg width="100%" height="30" class="absolute top-0">
+                    <line x1="12%" y1="15" x2="25%" y2="15" class="connection-line"/>
+                    <line x1="37%" y1="15" x2="50%" y2="15" class="connection-line"/>
+                    <line x1="62%" y1="15" x2="75%" y2="15" class="connection-line"/>
+                    <line x1="87%" y1="15" x2="95%" y2="15" class="connection-line"/>
+                </svg>
+            </div>
+            
+            <!-- Storage & Distribution -->
+            <div class="grid grid-cols-2 gap-6">
+                <!-- Artifact Storage -->
+                <div class="terminal-border bg-black p-4">
+                    <div class="text-center mb-3">
+                        <div class="text-lg glow-text mb-2">ARTIFACT STORAGE</div>
+                        <div class="text-4xl mb-2">🏛️</div>
+                    </div>
+                    <div class="storage-rack p-2 terminal-border mb-2">
+                        <div class="grid grid-cols-3 gap-1 text-xs">
+                            <div class="bg-green-900 p-1 text-center">SLOT-1</div>
+                            <div class="bg-green-800 p-1 text-center">SLOT-2</div>
+                            <div class="bg-green-900 p-1 text-center">SLOT-3</div>
+                            <div class="bg-green-700 p-1 text-center">SLOT-4</div>
+                            <div class="bg-green-800 p-1 text-center">SLOT-5</div>
+                            <div class="bg-green-900 p-1 text-center">SLOT-6</div>
                         </div>
                     </div>
-                    
-                    <!-- Title Section -->
-                    <div class="text-center mb-8">
-                        <h1 class="pixel-text-title mb-6">
-                            GHOSTLINE
-                        </h1>
+                    <div class="text-xs text-center">
+                        <div class="text-green-400">CAPACITY: 147/500</div>
+                        <div class="glow-text">BLOCKCHAIN VERIFIED</div>
                     </div>
-                    
-                    <!-- Navigation Buttons -->
-                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
-                        <a href="gallery.html" class="console-button" id="galleryBtn">
-                            GALLERY
-                        </a>
-                        <a href="stream.html" class="console-button" id="streamBtn">
-                            STREAM
-                        </a>
+                </div>
+                
+                <!-- Global Network -->
+                <div class="terminal-border bg-black p-4">
+                    <div class="text-center mb-3">
+                        <div class="text-lg glow-text mb-2">GLOBAL NETWORK</div>
+                        <div class="text-4xl mb-2">🌐</div>
                     </div>
-                    
-                    <!-- Separator Line -->
-                    <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
-                    
-                    <!-- Social Media Section -->
-                    <div class="grid grid-cols-4 gap-3 w-full max-w-xs mb-8">
-                        <a href="#" class="social-button">
-                            <!-- Instagram Icon -->
-                            <svg class="social-icon" viewBox="0 0 20 20">
-                                <g fill="#00ff00">
-                                    <rect x="2" y="2" width="16" height="16"/>
-                                    <rect x="4" y="4" width="12" height="12" fill="#000000"/>
-                                    <rect x="6" y="6" width="8" height="8"/>
-                                    <rect x="8" y="8" width="4" height="4" fill="#000000"/>
-                                    <rect x="14" y="4" width="2" height="2"/>
-                                </g>
-                            </svg>
-                            <span class="social-text">INSTA</span>
-                        </a>
-                        
-                        <a href="#" class="social-button">
-                            <!-- TikTok Icon -->
-                            <svg class="social-icon" viewBox="0 0 20 20">
-                                <g fill="#00ff00">
-                                    <rect x="6" y="2" width="4" height="12"/>
-                                    <rect x="8" y="4" width="6" height="2"/>
-                                    <rect x="10" y="6" width="4" height="2"/>
-                                    <rect x="4" y="10" width="8" height="4"/>
-                                    <rect x="6" y="14" width="4" height="4"/>
-                                </g>
-                            </svg>
-                            <span class="social-text">TIKTOK</span>
-                        </a>
-                        
-                        <a href="#" class="social-button">
-                            <!-- Telegram Icon -->
-                            <svg class="social-icon" viewBox="0 0 20 20">
-                                <g fill="#00ff00">
-                                    <rect x="4" y="4" width="12" height="12"/>
-                                    <rect x="6" y="6" width="8" height="8" fill="#000000"/>
-                                    <rect x="8" y="8" width="4" height="2"/>
-                                    <rect x="10" y="10" width="4" height="2"/>
-                                    <rect x="6" y="10" width="2" height="2"/>
-                                </g>
-                            </svg>
-                            <span class="social-text">TELEGRAM</span>
-                        </a>
-                        
-                        <a href="#" class="social-button">
-                            <!-- YouTube Icon -->
-                            <svg class="social-icon" viewBox="0 0 20 20">
-                                <g fill="#00ff00">
-                                    <rect x="2" y="6" width="16" height="8"/>
-                                    <rect x="4" y="4" width="12" height="2"/>
-                                    <rect x="4" y="14" width="12" height="2"/>
-                                    <rect x="8" y="8" width="2" height="4"/>
-                                    <rect x="10" y="9" width="2" height="2"/>
-                                </g>
-                            </svg>
-                            <span class="social-text">YOUTUBE</span>
-                        </a>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-gray-900 p-2 terminal-border">
+                            <div class="text-green-400">NODES</div>
+                            <div class="glow-text">127</div>
+                        </div>
+                        <div class="bg-gray-900 p-2 terminal-border">
+                            <div class="text-green-400">UPTIME</div>
+                            <div class="glow-text">99.8%</div>
+                        </div>
+                        <div class="bg-gray-900 p-2 terminal-border">
+                            <div class="text-green-400">REGIONS</div>
+                            <div class="glow-text">12</div>
+                        </div>
+                        <div class="bg-gray-900 p-2 terminal-border">
+                            <div class="text-green-400">LATENCY</div>
+                            <div class="glow-text network-pulse">12ms</div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Right Sidebar -->
-            <div class="w-full lg:w-1/4 space-y-4">
-                
-                <!-- LEARNING ART WITH ROBOTS Title -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-text-sm text-green-500 text-center">LEARNING ART WITH ROBOTS</div>
-                </div>
-                
-                <!-- System Logs -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-text-sm text-green-500 text-xs mb-2">[SYSTEM_LOGS]</div>
-                    <div class="pixel-text-xs text-green-400 space-y-1 h-32 overflow-hidden" id="systemLogs">
-                        <div>> AI_CORE: Initializing...</div>
-                        <div>> VISUAL_PROC: Loading algorithms...</div>
-                        <div>> CREATIVITY_ENGINE: Activating...</div>
-                        <div>> ROBOT_ARTIST_01: Preparing canvas...</div>
-                        <div>> COLOR_MATRIX: Generating palettes...</div>
-                        <div>> LEARNING_SYSTEM: Analyzing databases...</div>
+            
+            <!-- Monetization Channels -->
+            <div class="terminal-border bg-black p-3 mt-4">
+                <div class="text-center">
+                    <div class="text-lg glow-text mb-2">REVENUE STREAMS</div>
+                    <div class="grid grid-cols-4 gap-3 text-sm">
+                        <div class="bg-gray-900 p-2 rounded">
+                            <div class="text-green-400 text-xs">CANVASES</div>
+                            <div class="glow-text">PHYSICAL</div>
+                        </div>
+                        <div class="bg-gray-900 p-2 rounded">
+                            <div class="text-green-400 text-xs">MERCH</div>
+                            <div class="glow-text">APPAREL</div>
+                        </div>
+                        <div class="bg-gray-900 p-2 rounded">
+                            <div class="text-green-400 text-xs">JEWELRY</div>
+                            <div class="glow-text">PREMIUM</div>
+                        </div>
+                        <div class="bg-gray-900 p-2 rounded">
+                            <div class="text-green-400 text-xs">SOCIAL</div>
+                            <div class="glow-text blink">LIVE</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Footer Command Line -->
-        <div class="absolute bottom-4 left-4 right-4" style="z-index: 5;">
+        <!-- Bottom Command Line -->
+        <div class="absolute bottom-4 left-4 right-4">
             <div class="terminal-border bg-black p-2">
-                <div class="text-sm pixel-text-sm">
+                <div class="text-sm">
                     <span class="text-green-400">root@ghostline:~$</span> 
-                    <span class="glow-text">initiate_art_sequence</span>
+                    <span class="glow-text">system_status --full-diagnostic</span>
                     <span class="blink ml-2">█</span>
                 </div>
             </div>
         </div>
-        
-        <!-- Scrolling Text Horizon -->
-        <div class="scrolling-text">
-            <div class="scroll-line" style="bottom: 120px; animation-delay: 0s; opacity: 0.2;">
-                "IT IS PROGRAMMED TO REPRODUCE ITSELF." ONE MUST CONSIDER THAT DNA IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF.
-            </div>
-            <div class="scroll-line" style="bottom: 100px; animation-delay: -2.5s; opacity: 0.25;">
-                COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM "MEMORIES," NOT ITS JUST CONSCIOUSNESS.
-            </div>
-            <div class="scroll-line" style="bottom: 80px; animation-delay: -5s; opacity: 0.3;">
-                AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT.
-            </div>
-        </div>
     </div>
-
-    <script>
-        // Безопасные функции без ошибок
-        function safeGetElement(id) {
-            try {
-                return document.getElementById(id);
-            } catch (e) {
-                return null;
-            }
-        }
-        
-        function safeQuerySelector(selector) {
-            try {
-                return document.querySelector(selector);
-            } catch (e) {
-                return null;
-            }
-        }
-        
-        // System logs
-        const logMessages = [
-            "> AI_CORE: Initializing neural networks...",
-            "> VISUAL_PROC: Loading pixel algorithms...", 
-            "> CREATIVITY_ENGINE: Activating imagination...",
-            "> ROBOT_ARTIST_01: Preparing digital canvas...",
-            "> COLOR_MATRIX: Generating palette variations...",
-            "> LEARNING_SYSTEM: Analyzing art databases..."
-        ];
-        
-        // Update system logs
-        function updateSystemLogs() {
-            const logsContainer = safeGetElement('systemLogs');
-            if (logsContainer) {
-                try {
-                    const shuffled = [...logMessages].sort(() => Math.random() - 0.5);
-                    logsContainer.innerHTML = shuffled.slice(0, 6).map(log => `<div>${log}</div>`).join('');
-                } catch (e) {
-                    console.log('Log update error:', e);
-                }
-            }
-        }
-        
-        // Create cosmic meteors - уменьшенная интенсивность в 4 раза
-        function createCosmicMeteors() {
-            const container = safeGetElement('matrix-container');
-            if (!container) return;
-            
-            setInterval(() => {
-                try {
-                    const meteor = document.createElement('div');
-                    meteor.className = 'matrix-char';
-                    meteor.style.left = Math.random() * 100 + '%';
-                    meteor.style.animationDelay = Math.random() * 4 + 's';
-                    meteor.style.animationDuration = Math.random() * 2 + 5 + 's';
-                    
-                    container.appendChild(meteor);
-                    
-                    setTimeout(() => {
-                        if (meteor.parentNode) {
-                            meteor.parentNode.removeChild(meteor);
-                        }
-                    }, 10000);
-                } catch (e) {
-                    console.log('Meteor creation error:', e);
-                }
-            }, 1600); // Было 400ms, стало 1600ms (в 4 раза реже)
-        }
-        
-        // Create firefly explosion effect - светлячки летят вверх
-        function createFireflyExplosion(button) {
-            if (!button) {
-                console.log('No button provided to createFireflyExplosion');
-                return;
-            }
-            
-            console.log('Creating firefly explosion for button:', button); // Для отладки
-            
-            try {
-                const rect = button.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                console.log('Button position:', centerX, centerY); // Для отладки
-                
-                // Создаем 20 светлячков, летящих вверх
-                for (let i = 0; i < 20; i++) {
-                    const firefly = document.createElement('div');
-                    firefly.className = 'firefly-spark';
-                    firefly.style.position = 'fixed';
-                    firefly.style.left = centerX + 'px';
-                    firefly.style.top = centerY + 'px';
-                    firefly.style.width = '3px';
-                    firefly.style.height = '3px';
-                    firefly.style.background = '#00ff00';
-                    firefly.style.boxShadow = '0 0 3px #00ff00, 0 0 6px #00ff00';
-                    firefly.style.pointerEvents = 'none';
-                    firefly.style.zIndex = '1002';
-                    
-                    // Светлячки летят преимущественно вверх
-                    const angle = -Math.PI/2 + (Math.random() - 0.5) * Math.PI/2; // Вверх с разбросом ±45°
-                    const distance = Math.random() * 150 + 100;
-                    const dx = Math.cos(angle) * distance * 0.4; // Меньше по горизонтали
-                    const dy = Math.sin(angle) * distance; // Больше вверх
-                    
-                    firefly.style.setProperty('--dx', dx + 'px');
-                    firefly.style.setProperty('--dy', dy + 'px');
-                    firefly.style.animation = `fireflySparkUp ${Math.random() * 1.5 + 1.2}s ease-out forwards`;
-                    firefly.style.animationDelay = Math.random() * 0.3 + 's';
-                    
-                    document.body.appendChild(firefly);
-                    
-                    setTimeout(() => {
-                        if (firefly.parentNode) {
-                            firefly.parentNode.removeChild(firefly);
-                        }
-                    }, 3000);
-                }
-                
-                console.log('Firefly explosion created successfully'); // Для отладки
-                
-            } catch (e) {
-                console.log('Firefly explosion error:', e);
-            }
-        }
-        
-        // Create fireflies around buttons - теперь зеленые квадратики
-        function createFireflies() {
-            const galleryBtn = safeGetElement('galleryBtn');
-            const streamBtn = safeGetElement('streamBtn');
-            const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
-            
-            buttons.forEach(button => {
-                if (Math.random() < 0.6) {
-                    try {
-                        const rect = button.getBoundingClientRect();
-                        const firefly = document.createElement('div');
-                        firefly.className = 'firefly';
-                        
-                        const angle = Math.random() * Math.PI * 2;
-                        const radius = 30 + Math.random() * 50;
-                        const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
-                        const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
-                        
-                        firefly.style.left = startX + 'px';
-                        firefly.style.top = startY + 'px';
-                        
-                        const flyDistance = 60 + Math.random() * 100;
-                        const flyAngle = Math.random() * Math.PI * 2;
-                        const flyX = Math.cos(flyAngle) * flyDistance;
-                        const flyY = Math.sin(flyAngle) * flyDistance;
-                        
-                        firefly.style.setProperty('--fly-x', flyX + 'px');
-                        firefly.style.setProperty('--fly-y', flyY + 'px');
-                        
-                        const duration = 2 + Math.random() * 3;
-                        firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.2s ease-in-out infinite`;
-                        firefly.style.animationDelay = Math.random() * 1 + 's';
-                        
-                        document.body.appendChild(firefly);
-                        
-                        setTimeout(() => {
-                            if (firefly.parentNode) {
-                                firefly.parentNode.removeChild(firefly);
-                            }
-                        }, (duration + 1) * 1000);
-                    } catch (e) {
-                        console.log('Firefly creation error:', e);
-                    }
-                }
-            });
-        }
-        
-        // Create floating pixels
-        function createFloatingPixels() {
-            try {
-                for (let i = 0; i < 4; i++) {
-                    const pixel = document.createElement('div');
-                    pixel.className = 'floating-pixels';
-                    
-                    pixel.style.left = Math.random() * window.innerWidth + 'px';
-                    pixel.style.top = Math.random() * window.innerHeight + 'px';
-                    pixel.style.animationDelay = Math.random() * 8 + 's';
-                    
-                    const colors = ['#00ff00', '#33ff33', '#66ff66', '#44ff44'];
-                    pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    
-                    document.body.appendChild(pixel);
-                    
-                    setTimeout(() => {
-                        if (pixel.parentNode) {
-                            pixel.parentNode.removeChild(pixel);
-                        }
-                    }, 8000 + Math.random() * 2000);
-                }
-            } catch (e) {
-                console.log('Floating pixels error:', e);
-            }
-        }
-        
-        // Random numbers generator
-        function updateRandomNumbers() {
-            const element = safeGetElement('randomNumbers');
-            if (element) {
-                try {
-                    let numbers = '';
-                    for (let i = 0; i < 5; i++) {
-                        numbers += Math.floor(Math.random() * 10);
-                    }
-                    element.textContent = numbers;
-                } catch (e) {
-                    console.log('Random numbers error:', e);
-                }
-            }
-        }
-        
-        // Add button click effects
-        function addButtonEffects() {
-            const galleryBtn = safeGetElement('galleryBtn');
-            const streamBtn = safeGetElement('streamBtn');
-            
-            if (galleryBtn) {
-                galleryBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Gallery button clicked!'); // Для отладки
-                    createFireflyExplosion(this);
-                    setTimeout(() => {
-                        window.location.href = 'gallery.html';
-                    }, 600);
-                });
-            }
-            
-            if (streamBtn) {
-                streamBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Stream button clicked!'); // Для отладки
-                    createFireflyExplosion(this);
-                    setTimeout(() => {
-                        window.location.href = 'stream.html';
-                    }, 600);
-                });
-            }
-            
-            // Social buttons
-            const socialButtons = document.querySelectorAll('.social-button');
-            socialButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Social button clicked!'); // Для отладки
-                    createFireflyExplosion(this);
-                });
-            });
-        }
-        
-        // Command changer
-        function changeCommand() {
-            const commands = [
-                'initiate_art_sequence',
-                'loading_neural_networks',
-                'processing_creativity_data',
-                'analyzing_color_patterns',
-                'generating_art_matrix'
-            ];
-            
-            const commandElement = safeQuerySelector('.glow-text');
-            if (commandElement) {
-                try {
-                    const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-                    commandElement.textContent = randomCommand;
-                } catch (e) {
-                    console.log('Command change error:', e);
-                }
-            }
-        }
-        
-        // Logo hover effects
-        function addLogoEffects() {
-            const logo = safeQuerySelector('.enlarged-logo');
-            if (logo) {
-                logo.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(4.0)';
-                    this.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
-                });
-                
-                logo.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scale(3.6)';
-                    this.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.4))';
-                });
-            }
-        }
-        
-        // Mouse trail effect
-        function addMouseTrail() {
-            document.addEventListener('mousemove', function(e) {
-                if (Math.random() < 0.05) {
-                    try {
-                        const particle = document.createElement('div');
-                        particle.className = 'pixel-particle';
-                        particle.style.left = e.clientX + 'px';
-                        particle.style.top = e.clientY + 'px';
-                        particle.style.width = '1px';
-                        particle.style.height = '1px';
-                        particle.style.background = '#00ff00';
-                        particle.style.opacity = '0.3';
-                        particle.style.animation = 'pixelExplode 0.8s ease-out forwards';
-                        
-                        const dx = (Math.random() - 0.5) * 15;
-                        const dy = (Math.random() - 0.5) * 15;
-                        particle.style.setProperty('--dx', dx + 'px');
-                        particle.style.setProperty('--dy', dy + 'px');
-                        
-                        document.body.appendChild(particle);
-                        
-                        setTimeout(() => {
-                            if (particle.parentNode) {
-                                particle.parentNode.removeChild(particle);
-                            }
-                        }, 800);
-                    } catch (e) {
-                        console.log('Mouse trail error:', e);
-                    }
-                }
-            });
-        }
-        
-        // Initialize everything when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // Start all effects
-                createCosmicMeteors();
-                
-                // Floating pixels every 10 seconds
-                setInterval(createFloatingPixels, 10000);
-                createFloatingPixels();
-                
-                // Fireflies every 600ms
-                setInterval(createFireflies, 600);
-                createFireflies();
-                
-                // Random numbers every 2 seconds
-                setInterval(updateRandomNumbers, 2000);
-                updateRandomNumbers();
-                
-                // System logs every 5 seconds
-                setInterval(updateSystemLogs, 5000);
-                updateSystemLogs();
-                
-                // Command change every 8 seconds
-                setInterval(changeCommand, 8000);
-                
-                // Add button effects
-                addButtonEffects();
-                
-                // Add logo effects
-                addLogoEffects();
-                
-                // Add mouse trail
-                addMouseTrail();
-                
-            } catch (e) {
-                console.log('Initialization error:', e);
-            }
-        });
-    </script>
 </body>
 </html>
