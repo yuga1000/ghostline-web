@@ -79,6 +79,21 @@
         position: relative;
         overflow: hidden;
     }
+        @keyframes codeRain {
+    0% { transform: translateY(-100%); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+.code-line {
+    position: absolute;
+    white-space: nowrap;
+    color: #00ff00;
+    font-size: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    animation: codeRain 6s linear infinite;
+    pointer-events: none;
+}
     
     /* Simple terminal button */
     .donate-button {
