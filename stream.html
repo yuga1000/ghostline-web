@@ -26,8 +26,7 @@
     }
     
     .scan-lines {
-        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
-        background-size: 100% 4px;
+        /* Убираем полоски полностью */
     }
     
     .terminal-border {
@@ -63,28 +62,13 @@
     }
     
     .video-feed {
-        background: 
-            repeating-linear-gradient(
-                0deg,
-                rgba(0, 255, 0, 0.1) 0px,
-                transparent 1px,
-                transparent 3px,
-                rgba(0, 255, 0, 0.1) 4px
-            ),
-            radial-gradient(circle at center, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
+        background: rgba(0, 0, 0, 0.8);
         position: relative;
         overflow: hidden;
     }
     
     .video-feed::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
-        animation: scanLine 3s linear infinite;
+        /* Убираем сканирующую линию */
     }
     
     @keyframes scanLine {
@@ -386,29 +370,14 @@
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-400 text-xs text-center" style="position: relative; z-index: 1;">
-                            <pre style="background: rgba(0,0,0,0.7); padding: 10px; font-family: 'Share Tech Mono', monospace;">
-```
+                        <div id="robot3-canvas" class="robot-canvas"></div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STATUS: Battery Charging</div>
+                        <div>ETA: 00:23:15</div>
+                    </div>
+                </div>
 
-╔══════════════════╗
-║                  ║
-║      [OFF]       ║
-║   ┌─────────┐    ║
-║   │ NO SIGNAL│    ║
-║   │ ░░░░░░░ │    ║
-║   │ ░░░░░░░ │    ║
-║   └─────────┘    ║
-╚══════════════════╝
-</pre>
-</div>
-</div>
-<div class="pixel-font text-green-600 text-xs">
-<div>STATUS: Battery Charging</div>
-<div>ETA: 00:23:15</div>
-</div>
-</div>
-
-```
                 <!-- Robot 04 -->
                 <div class="terminal-border bg-black bg-opacity-50 p-3">
                     <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
@@ -461,108 +430,72 @@
 </div>
 
 <script>
-    // ЖИВЫЕ ПИКСЕЛИ ДЛЯ РОБОТОВ - УПРОЩЕННАЯ ВЕРСИЯ
-    class RobotPixelArt {
-        constructor(containerId) {
-            this.container = document.getElementById(containerId);
-            if (!this.container) return;
-            
-            this.width = 20;  
-            this.height = 12; 
-            this.grid = [];
-            this.pixelSize = 8; // размер пикселя в px
-            this.initGrid();
-            this.createCanvas();
-            this.startEvolution();
+    // ПРОСТЫЕ ЛЕТАЮЩИЕ КВАДРАТИКИ КАК СВЕТЛЯЧКИ
+    function createFloatingSquares(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Создаем 15 квадратиков
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                createOneSquare(container);
+            }, i * 200); // Задержка между созданием
         }
         
-        initGrid() {
-            this.grid = Array(this.height).fill().map(() => 
-                Array(this.width).fill().map(() => Math.random() < 0.3 ? 1 : 0)
-            );
-        }
-        
-        createCanvas() {
-            this.container.innerHTML = '';
-            this.container.style.position = 'absolute';
-            this.container.style.width = '100%';
-            this.container.style.height = '100%';
-            this.container.style.top = '0';
-            this.container.style.left = '0';
-            
-            for (let y = 0; y < this.height; y++) {
-                for (let x = 0; x < this.width; x++) {
-                    const pixel = document.createElement('div');
-                    pixel.style.position = 'absolute';
-                    pixel.style.width = this.pixelSize + 'px';
-                    pixel.style.height = this.pixelSize + 'px';
-                    pixel.style.left = (x * this.pixelSize) + 'px';
-                    pixel.style.top = (y * this.pixelSize) + 'px';
-                    pixel.style.backgroundColor = this.grid[y][x] ? '#00ff00' : 'transparent';
-                    pixel.style.transition = 'background-color 0.5s ease';
-                    this.container.appendChild(pixel);
-                }
+        // Периодически добавляем новые
+        setInterval(() => {
+            if (container.children.length < 20) {
+                createOneSquare(container);
             }
+        }, 1000);
+    }
+    
+    function createOneSquare(container) {
+        const square = document.createElement('div');
+        
+        // Размер квадратика
+        const size = 4 + Math.random() * 6; // от 4px до 10px
+        
+        square.style.position = 'absolute';
+        square.style.width = size + 'px';
+        square.style.height = size + 'px';
+        square.style.backgroundColor = '#00ff00';
+        square.style.opacity = '0.7';
+        
+        // Случайная позиция
+        square.style.left = Math.random() * 100 + '%';
+        square.style.top = Math.random() * 100 + '%';
+        
+        // Анимация движения
+        square.style.transition = 'all 3s ease-in-out';
+        
+        container.appendChild(square);
+        
+        // Запускаем движение
+        function moveSquare() {
+            square.style.left = Math.random() * 100 + '%';
+            square.style.top = Math.random() * 100 + '%';
+            square.style.opacity = 0.3 + Math.random() * 0.7;
         }
         
-        evolve() {
-            const newGrid = Array(this.height).fill().map(() => Array(this.width).fill(0));
-            
-            for (let y = 0; y < this.height; y++) {
-                for (let x = 0; x < this.width; x++) {
-                    const neighbors = this.countNeighbors(x, y);
-                    
-                    if (this.grid[y][x] === 1) {
-                        newGrid[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
-                    } else {
-                        newGrid[y][x] = (neighbors === 3) ? 1 : 0;
+        // Двигаем каждые 3 секунды
+        const moveInterval = setInterval(moveSquare, 3000);
+        moveSquare(); // Первое движение
+        
+        // Удаляем через 20 секунд
+        setTimeout(() => {
+            clearInterval(moveInterval);
+            if (square.parentNode) {
+                square.style.opacity = '0';
+                setTimeout(() => {
+                    if (square.parentNode) {
+                        square.parentNode.removeChild(square);
                     }
-                }
+                }, 1000);
             }
-            
-            this.grid = newGrid;
-            this.updateVisual();
-        }
-        
-        countNeighbors(x, y) {
-            let count = 0;
-            for (let dy = -1; dy <= 1; dy++) {
-                for (let dx = -1; dx <= 1; dx++) {
-                    if (dx === 0 && dy === 0) continue;
-                    const nx = x + dx;
-                    const ny = y + dy;
-                    if (nx >= 0 && nx < this.width && ny >= 0 && ny < this.height) {
-                        count += this.grid[ny][nx];
-                    }
-                }
-            }
-            return count;
-        }
-        
-        updateVisual() {
-            const pixels = this.container.children;
-            for (let y = 0; y < this.height; y++) {
-                for (let x = 0; x < this.width; x++) {
-                    const index = y * this.width + x;
-                    const pixel = pixels[index];
-                    if (pixel) {
-                        pixel.style.backgroundColor = this.grid[y][x] ? '#00ff00' : 'transparent';
-                    }
-                }
-            }
-        }
-        
-        startEvolution() {
-            setInterval(() => {
-                this.evolve();
-                // Добавляем немного хаоса
-                if (Math.random() < 0.15) {
-                    const x = Math.floor(Math.random() * this.width);
-                    const y = Math.floor(Math.random() * this.height);
-                    this.grid[y][x] = Math.random() < 0.5 ? 1 : 0;
-                }
-            }, 1000);
-        }
+        }, 20000);
     }
 
     // Donation button effects
@@ -707,10 +640,13 @@ alert(socialAlert);
     
     // Initialize
     window.addEventListener('load', function() {
-        // Создаем живые пиксели для роботов
-        new RobotPixelArt('robot1-canvas');
-        new RobotPixelArt('robot2-canvas'); 
-        new RobotPixelArt('robot4-canvas');
+        console.log('Creating floating squares...');
+        
+        // Создаем летающие квадратики для всех роботов
+        createFloatingSquares('robot1-canvas');
+        createFloatingSquares('robot2-canvas'); 
+        createFloatingSquares('robot3-canvas'); // И для Ghost тоже!
+        createFloatingSquares('robot4-canvas');
         
         // Start floating pixels
         setInterval(createFloatingPixels, 2000);
