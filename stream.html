@@ -435,10 +435,14 @@ startCodeRain(robot1Container);
     const line = document.createElement("div");
     line.className = "code-line";
         line.style.color = Math.random() < 0.15 ? "#44ff88" : "#00ff00";
-line.style.fontFamily = Math.random() < 0.3
-    ? "'Press Start 2P', monospace"
-    : "'Share Tech Mono', monospace";
-        let raw = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+const pixelFonts = [
+    "'Share Tech Mono', monospace",
+    "'Press Start 2P', monospace",
+    "'Silkscreen', monospace",
+    "'VT323', monospace",
+    "'Pixelify Sans', sans-serif"
+];
+line.style.fontFamily = pixelFonts[Math.floor(Math.random() * pixelFonts.length)];
 // Превращаем в артефакт: 1–2 символа заменяются на глитч
 raw = raw.replace(/[A-Z]/g, c => (Math.random() < 0.1 ? '▒' : c));
 line.textContent = raw;
