@@ -82,43 +82,46 @@
             radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
     }
     
-    /* CSS АНИМИРОВАННЫЙ ШУМ */
+    /* CSS КВАДРАТНЫЙ ШУМ - КАЖДЫЙ ПИКСЕЛЬ НЕЗАВИСИМО */
     .robot-canvas {
         position: absolute;
         width: 100%;
         height: 100%;
         z-index: 1;
         background: 
-            radial-gradient(circle at 20% 20%, #00ff00 1px, transparent 1px),
-            radial-gradient(circle at 80% 20%, #00ff00 1px, transparent 1px),
-            radial-gradient(circle at 40% 80%, #00ff00 1px, transparent 1px),
-            radial-gradient(circle at 60% 40%, #00ff00 1px, transparent 1px);
-        background-size: 8px 8px, 12px 12px, 6px 6px, 10px 10px;
-        background-position: 0 0, 4px 4px, 2px 2px, 6px 6px;
-        animation: pixelNoise 0.2s infinite steps(4);
+            /* Слой 1 - квадратики */
+            repeating-linear-gradient(0deg, transparent 0px, transparent 2px, #00ff00 2px, #00ff00 4px),
+            repeating-linear-gradient(90deg, transparent 0px, transparent 2px, #00ff00 2px, #00ff00 4px),
+            /* Слой 2 - сдвинутые квадратики */
+            repeating-linear-gradient(0deg, transparent 1px, transparent 3px, #44ff44 3px, #44ff44 5px),
+            repeating-linear-gradient(90deg, transparent 1px, transparent 3px, #44ff44 3px, #44ff44 5px);
+        background-size: 8px 8px, 8px 8px, 6px 6px, 6px 6px;
+        animation: 
+            pixelMove1 0.3s infinite linear,
+            pixelMove2 0.4s infinite linear reverse,
+            pixelMove3 0.5s infinite linear,
+            pixelMove4 0.6s infinite linear reverse;
     }
     
-    @keyframes pixelNoise {
-        0% { 
-            background-position: 0 0, 4px 4px, 2px 2px, 6px 6px;
-            opacity: 0.8;
-        }
-        25% { 
-            background-position: 2px 1px, 6px 5px, 4px 3px, 8px 7px;
-            opacity: 0.6;
-        }
-        50% { 
-            background-position: 1px 3px, 5px 7px, 3px 1px, 7px 5px;
-            opacity: 0.9;
-        }
-        75% { 
-            background-position: 3px 2px, 7px 6px, 1px 4px, 5px 8px;
-            opacity: 0.7;
-        }
-        100% { 
-            background-position: 0 0, 4px 4px, 2px 2px, 6px 6px;
-            opacity: 0.8;
-        }
+    /* Разные анимации для каждого слоя */
+    @keyframes pixelMove1 {
+        0% { background-position: 0 0, 0 0, 2px 2px, 2px 2px; }
+        100% { background-position: 8px 8px, 8px 8px, 10px 10px, 10px 10px; }
+    }
+    
+    @keyframes pixelMove2 {
+        0% { background-position: 0 0, 0 0, 3px 1px, 1px 3px; }
+        100% { background-position: 6px 6px, 6px 6px, 9px 7px, 7px 9px; }
+    }
+    
+    @keyframes pixelMove3 {
+        0% { background-position: 1px 0, 0 1px, 0 0, 0 0; }
+        100% { background-position: 9px 8px, 8px 9px, 8px 8px, 8px 8px; }
+    }
+    
+    @keyframes pixelMove4 {
+        0% { background-position: 2px 1px, 1px 2px, 1px 1px, 1px 1px; }
+        100% { background-position: 10px 9px, 9px 10px, 9px 9px, 9px 9px; }
     }
     
     /* ПИКСЕЛЬНОЕ СВЕЧЕНИЕ ВМЕСТО РАЗМЫТОГО */
