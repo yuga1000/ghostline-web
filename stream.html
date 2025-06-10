@@ -78,46 +78,38 @@
             radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
     }
     
-    /* CSS КВАДРАТНЫЙ ШУМ - КАЖДЫЙ ПИКСЕЛЬ НЕЗАВИСИМО */
+    /* ИДЕАЛЬНЫЙ TV STATIC ШУМ С CODEPEN */
     .robot-canvas {
         position: absolute;
-        width: 90%;
-        height: 85%;
+        width: 100%;
+        height: 100%;
         z-index: 1;
-        background: 
-            /* Слой 1 - квадратики */
-            repeating-linear-gradient(0deg, transparent 0px, transparent 3px, #00ff00 2px, #00ff00 4px),
-            repeating-linear-gradient(90deg, transparent 0px, transparent 7px, #00ff00 2px, #00ff00 4px),
-            /* Слой 2 - сдвинутые квадратики */
-            repeating-linear-gradient(0deg, transparent 1px, transparent 3px, #44ff44 3px, #44ff44 5px),
-            repeating-linear-gradient(90deg, transparent 1px, transparent 3px, #44ff44 3px, #44ff44 5px);
-        background-size: 10px 8px, 8px 5px, 6px 6px, 6px 6px;
-        animation: 
-            pixelMove1 0.3s infinite linear,
-            pixelMove2 0.4s infinite linear reverse,
-            pixelMove3 0.5s infinite linear,
-            pixelMove4 0.6s infinite linear reverse;
+        overflow: hidden;
     }
     
-    /* Разные анимации для каждого слоя */
-    @keyframes pixelMove1 {
-        0% { background-position: 0 0, 0 0, 2px 2px, 2px 2px; }
-        100% { background-position: 8px 8px, 8px 8px, 10px 10px, 10px 10px; }
+    .robot-canvas::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('http://fariskassim.com/stage/codepenstuff/noise.png');
+        opacity: 0.8;
+        animation: grain 0.3s steps(8) infinite;
     }
     
-    @keyframes pixelMove2 {
-        0% { background-position: 0 0, 0 0, 3px 1px, 1px 3px; }
-        100% { background-position: 6px 6px, 6px 6px, 9px 7px, 7px 9px; }
-    }
-    
-    @keyframes pixelMove3 {
-        0% { background-position: 1px 0, 0 1px, 0 0, 0 0; }
-        100% { background-position: 9px 8px, 8px 9px, 8px 8px, 8px 8px; }
-    }
-    
-    @keyframes pixelMove4 {
-        0% { background-position: 2px 1px, 3px 2px, 1px 1px, 1px 1px; }
-        100% { background-position: 10px 6px, 9px 7px, 9px 9px, 9px 9px; }
+    @keyframes grain {
+        0%, 100% { transform: translate(0, 0); }
+        10% { transform: translate(-5%, -10%); }
+        20% { transform: translate(-15%, 5%); }
+        30% { transform: translate(7%, -25%); }
+        40% { transform: translate(21%, 25%); }
+        50% { transform: translate(-25%, 10%); }
+        60% { transform: translate(15%, 5%); }
+        70% { transform: translateY(15%); }
+        80% { transform: translate(25%, 35%); }
+        90% { transform: translate(-10%, 10%); }
     }
     
     /* ПИКСЕЛЬНОЕ СВЕЧЕНИЕ ВМЕСТО РАЗМЫТОГО */
