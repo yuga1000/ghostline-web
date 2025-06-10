@@ -431,6 +431,9 @@ startCodeRain(robot1Container);
     setInterval(() => {
     const line = document.createElement("div");
     line.className = "code-line";
+line.style.fontFamily = Math.random() < 0.3
+    ? "'Press Start 2P', monospace"
+    : "'Share Tech Mono', monospace";
         let raw = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
 // Превращаем в артефакт: 1–2 символа заменяются на глитч
 raw = raw.replace(/[A-Z]/g, c => (Math.random() < 0.1 ? '▒' : c));
