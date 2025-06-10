@@ -436,7 +436,7 @@ startCodeRain(robot1Container);
     // Координаты по "пиксельной сетке" — шаг 8px
     const step = 8;
     const maxCols = Math.floor(container.offsetWidth / step);
-    const maxRows = Math.floor(container.offsetHeight / step);
+    const maxRows = Math.floor(container.offsetHeight / step) - 1;
 
     const col = Math.floor(Math.random() * maxCols);
     const row = Math.floor(Math.random() * maxRows);
