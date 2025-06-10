@@ -1163,10 +1163,11 @@
     // Terminal loading simulation
     function startTerminalLoading() {
         const loadingMessages = [
-            { text: "Initializing neural networks...", delay: 50 },
-            { text: "Loading AI systems...", delay: 50 },
-            { text: "Activating creativity engines...", delay: 50 },
-            { text: "System ready. Welcome to GHOSTLINE.", delay: 100 }
+            { text: "Initializing neural networks...", delay: 15 },
+            { text: "Loading AI systems...", delay: 13 },
+            { text: "Activating creativity engines...", delay: 4 },
+            { text: "System ready. Welcome to GHOSTLINE.", delay: 5 },
+            { text: "What is life?.", delay: 5 }
         ];
 
         const terminalOutput = document.getElementById('terminal-output');
@@ -1197,7 +1198,7 @@
                     
                     callback();
                 }
-            }, 5); // Быстрая печать
+            }, 1.5); // Быстрая печать
         }
         
         function processNextMessage() {
