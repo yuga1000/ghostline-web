@@ -32,12 +32,20 @@
     
     .terminal-border {
         border: 2px solid #00FF00;
-        box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+        /* Пиксельное свечение вместо размытого */
+        box-shadow: 
+            0 0 0 1px #44ff44,
+            0 0 0 2px #22ff22,
+            0 0 0 3px #11ff11;
         transition: all 0.3s ease;
     }
     
     .terminal-border:hover {
-        box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
+        box-shadow: 
+            0 0 0 1px #66ff66,
+            0 0 0 2px #44ff44,
+            0 0 0 3px #22ff22,
+            0 0 0 4px #11ff11;
     }
     
     .glow-text {
@@ -96,8 +104,38 @@
         width: 100%;
         height: 100%;
         display: grid;
-        gap: 0;
+        gap: 1px;
         z-index: 1;
+        padding: 4px;
+    }
+    
+    /* ПИКСЕЛЬНОЕ СВЕЧЕНИЕ ВМЕСТО РАЗМЫТОГО */
+    .glow-text {
+        /* Убираем размытое свечение */
+        text-shadow: none;
+        /* Добавляем пиксельное свечение */
+        color: #00ff00;
+        position: relative;
+    }
+    
+    .glow-text::before {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: #44ff44;
+        z-index: -1;
+        transform: translate(1px, 1px);
+    }
+    
+    .glow-text::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: #88ff88;
+        z-index: -2;
+        transform: translate(2px, 2px);
     }
     
     /* DONATION BUTTON EFFECTS */
@@ -118,18 +156,27 @@
     
     @keyframes donatePulse {
         0%, 100% { 
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            box-shadow: 
+                0 0 0 1px #44ff44,
+                0 0 0 2px #22ff22;
             transform: scale(1);
         }
         50% { 
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            box-shadow: 
+                0 0 0 1px #66ff66,
+                0 0 0 2px #44ff44,
+                0 0 0 3px #22ff22;
             transform: scale(1.05);
         }
     }
     
     .donate-button:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
+        box-shadow: 
+            0 0 0 1px #88ff88,
+            0 0 0 2px #66ff66,
+            0 0 0 3px #44ff44,
+            0 0 0 4px #22ff22;
         animation: donatePulse 0.5s infinite;
     }
     
@@ -186,7 +233,10 @@
         height: 8px;
         background: #00FF00;
         margin-right: 5px;
-        box-shadow: 0 0 5px #00FF00;
+        /* Пиксельное свечение */
+        box-shadow: 
+            0 0 0 1px #44ff44,
+            0 0 0 2px #22ff22;
         animation: statusBlink 2s infinite;
     }
     
@@ -196,7 +246,9 @@
         height: 8px;
         background: #FFFF00;
         margin-right: 5px;
-        box-shadow: 0 0 5px #FFFF00;
+        box-shadow: 
+            0 0 0 1px #ffff44,
+            0 0 0 2px #ffff22;
     }
     
     @keyframes statusBlink {
@@ -380,16 +432,8 @@
             <!-- Support Message -->
             <div class="text-center mb-8">
                 <h3 class="pixel-font text-2xl font-bold mb-4">
-                    <span class="glow-text" style="color: #00ff00; text-shadow: 0 0 8px #00ff00;">SUPPORT THE PROJECT</span>
+                    <span style="color: #00ff00;">SUPPORT THE PROJECT</span>
                 </h3>
-                <div class="pixel-font text-sm text-green-400 mb-4">
-                    Help fund our AI robot artists<br>
-                    Every donation goes directly to:<br>
-                    • Robot maintenance & upgrades<br>
-                    • Art supplies & canvases<br>
-                    • Neural network training<br>
-                    • New experimental features
-                </div>
             </div>
 
             <!-- MEGA DONATION BUTTON -->
@@ -423,8 +467,8 @@
             this.container = document.getElementById(containerId);
             if (!this.container) return;
             
-            this.width = 40;
-            this.height = 25;
+            this.width = 25;  // Уменьшаем для крупных пикселей
+            this.height = 15; // Уменьшаем для крупных пикселей
             this.grid = [];
             this.initGrid();
             this.createCanvas();
@@ -446,6 +490,10 @@
                     const pixel = document.createElement('div');
                     pixel.style.backgroundColor = this.grid[y][x] ? '#00ff00' : 'transparent';
                     pixel.style.transition = 'background-color 0.4s ease';
+                    pixel.style.width = '100%';
+                    pixel.style.height = '100%';
+                    pixel.style.minHeight = '3px';
+                    pixel.style.minWidth = '3px';
                     this.container.appendChild(pixel);
                 }
             }
