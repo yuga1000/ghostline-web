@@ -431,6 +431,10 @@ startCodeRain(robot1Container);
     setInterval(() => {
     const line = document.createElement("div");
     line.className = "code-line";
+        let raw = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+// Превращаем в артефакт: 1–2 символа заменяются на глитч
+raw = raw.replace(/[A-Z]/g, c => (Math.random() < 0.1 ? '▒' : c));
+line.textContent = raw;
     line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
 
     // Координаты по "пиксельной сетке" — шаг 8px
