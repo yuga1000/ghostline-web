@@ -82,12 +82,43 @@
             radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
     }
     
-    /* ROBOT CANVAS - убираем лишние стили */
+    /* CSS АНИМИРОВАННЫЙ ШУМ */
     .robot-canvas {
         position: absolute;
         width: 100%;
         height: 100%;
         z-index: 1;
+        background: 
+            radial-gradient(circle at 20% 20%, #00ff00 1px, transparent 1px),
+            radial-gradient(circle at 80% 20%, #00ff00 1px, transparent 1px),
+            radial-gradient(circle at 40% 80%, #00ff00 1px, transparent 1px),
+            radial-gradient(circle at 60% 40%, #00ff00 1px, transparent 1px);
+        background-size: 8px 8px, 12px 12px, 6px 6px, 10px 10px;
+        background-position: 0 0, 4px 4px, 2px 2px, 6px 6px;
+        animation: pixelNoise 0.2s infinite steps(4);
+    }
+    
+    @keyframes pixelNoise {
+        0% { 
+            background-position: 0 0, 4px 4px, 2px 2px, 6px 6px;
+            opacity: 0.8;
+        }
+        25% { 
+            background-position: 2px 1px, 6px 5px, 4px 3px, 8px 7px;
+            opacity: 0.6;
+        }
+        50% { 
+            background-position: 1px 3px, 5px 7px, 3px 1px, 7px 5px;
+            opacity: 0.9;
+        }
+        75% { 
+            background-position: 3px 2px, 7px 6px, 1px 4px, 5px 8px;
+            opacity: 0.7;
+        }
+        100% { 
+            background-position: 0 0, 4px 4px, 2px 2px, 6px 6px;
+            opacity: 0.8;
+        }
     }
     
     /* ПИКСЕЛЬНОЕ СВЕЧЕНИЕ ВМЕСТО РАЗМЫТОГО */
@@ -612,32 +643,11 @@ alert(socialAlert);
         }
     }
     
-    // Initialize
+    // Initialize - УБИРАЕМ ВЕСЬ JAVASCRIPT ШУМ
     window.addEventListener('load', function() {
-        console.log('🎮 GHOSTLINE LOADING...');
+        console.log('🎮 CSS Noise activated!');
         
-        // Создаем простой шум с задержками
-        setTimeout(() => {
-            console.log('Creating noise 1...');
-            createSimpleNoise('robot1-canvas');
-        }, 1000);
-        
-        setTimeout(() => {
-            console.log('Creating noise 2...');
-            createSimpleNoise('robot2-canvas');
-        }, 1500);
-        
-        setTimeout(() => {
-            console.log('Creating noise 3...');
-            createSimpleNoise('robot3-canvas');
-        }, 2000);
-        
-        setTimeout(() => {
-            console.log('Creating noise 4...');
-            createSimpleNoise('robot4-canvas');
-        }, 2500);
-        
-        // Start floating pixels
+        // Start floating pixels only
         setInterval(createFloatingPixels, 2000);
         
         // Update stats
