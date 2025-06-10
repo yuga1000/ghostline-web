@@ -475,68 +475,43 @@
 </div>
 
 <script>
-    // СОЗДАНИЕ МНОЖЕСТВА СВЕТЛЯЧКОВ В ОКОШКАХ
+    // БЫСТРЫЙ ФИКС - ПРОСТЫЕ СВЕТЛЯЧКИ БЕЗ КЛАССОВ
     function createManyFireflies(containerId) {
         const container = document.getElementById(containerId);
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        // Создаем 25 светлячков разного размера
-        for (let i = 0; i < 25; i++) {
-            setTimeout(() => {
-                createOneFirefly(container);
-            }, i * 100); // Задержка между созданием
+        if (!container) {
+            console.log('❌ Container not found:', containerId);
+            return;
         }
         
-        // Периодически добавляем новых
-        setInterval(() => {
-            if (container.children.length < 30) {
-                createOneFirefly(container);
-            }
-        }, 800);
-    }
-    
-    function createOneFirefly(container) {
-        const firefly = document.createElement('div');
-        firefly.className = 'firefly';
+        console.log('✅ Creating fireflies for:', containerId);
+        container.innerHTML = '';
         
-        // Случайный размер
-        const size = Math.random() * 4 + 2; // от 2px до 6px
-        firefly.style.width = size + 'px';
-        firefly.style.height = size + 'px';
-        
-        // Начальная позиция
-        firefly.style.left = Math.random() * 100 + '%';
-        firefly.style.top = Math.random() * 100 + '%';
-        
-        // Два разных направления движения
-        const flyX1 = (Math.random() - 0.5) * 150;
-        const flyY1 = (Math.random() - 0.5) * 100;
-        const flyX2 = (Math.random() - 0.5) * 200;
-        const flyY2 = (Math.random() - 0.5) * 150;
-        
-        firefly.style.setProperty('--fly-x', flyX1 + 'px');
-        firefly.style.setProperty('--fly-y', flyY1 + 'px');
-        firefly.style.setProperty('--fly-x2', flyX2 + 'px');
-        firefly.style.setProperty('--fly-y2', flyY2 + 'px');
-        
-        // Случайная задержка анимации
-        firefly.style.animationDelay = Math.random() * 3 + 's';
-        
-        container.appendChild(firefly);
-        
-        // Удаляем через 10-15 секунд
-        setTimeout(() => {
-            if (firefly.parentNode) {
-                firefly.style.opacity = '0';
-                setTimeout(() => {
-                    if (firefly.parentNode) {
-                        firefly.parentNode.removeChild(firefly);
-                    }
-                }, 1000);
-            }
-        }, 10000 + Math.random() * 5000);
+        // Создаем 20 простых светлячков
+        for (let i = 0; i < 20; i++) {
+            const firefly = document.createElement('div');
+            
+            // Прямые стили без классов
+            firefly.style.cssText = `
+                position: absolute;
+                width: ${3 + Math.random() * 4}px;
+                height: ${3 + Math.random() * 4}px;
+                background: #00ff00;
+                left: ${Math.random() * 100}%;
+                top: ${Math.random() * 100}%;
+                opacity: ${0.5 + Math.random() * 0.5};
+                box-shadow: 0 0 3px #00ff00;
+                z-index: 10;
+            `;
+            
+            container.appendChild(firefly);
+            
+            // Простая анимация
+            setInterval(() => {
+                firefly.style.left = Math.random() * 100 + '%';
+                firefly.style.top = Math.random() * 100 + '%';
+                firefly.style.opacity = 0.3 + Math.random() * 0.7;
+            }, 2000 + Math.random() * 3000);
+        }
     }
 
     // Donation button effects
