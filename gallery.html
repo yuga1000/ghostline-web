@@ -186,10 +186,169 @@
             50% { opacity: 0.5; }
         }
         
+        /* Custom pixel art styles */
+        .pixel-art {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .pixel-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        /* Pixel art patterns for gallery items */
+        .pixel-pattern {
+            position: absolute;
+            background: #00ff00;
+        }
+        
+        /* Simple pixel painting icon */
+        .pixel-painting {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            margin: 20px auto;
+        }
+        
+        .pixel-painting .frame {
+            position: absolute;
+            border: 4px solid #00ff00;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .pixel-painting .canvas {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: 10px;
+            left: 10px;
+            background: #001100;
+        }
+        
+        .pixel-painting .brush {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            top: 20px;
+            left: 20px;
+            animation: brushMove 3s infinite;
+        }
+        
+        @keyframes brushMove {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(10px, 5px); }
+            50% { transform: translate(5px, 15px); }
+            75% { transform: translate(15px, 10px); }
+        }
+        
+        /* Coin animation - pixel 3D isometric effect */
+        .coin-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 4px;
+            position: relative;
+        }
+        
+        .coin-placeholder {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            position: relative;
+            animation: coinSpin 3s linear infinite;
+            transform-style: preserve-3d;
+        }
+        
+        /* Multiple layers for isometric effect */
+        .coin-placeholder::before,
+        .coin-placeholder::after,
+        .coin-layer-1,
+        .coin-layer-2,
+        .coin-layer-3 {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            left: 2px;
+            top: 2px;
+            background: #00ff00;
+            image-rendering: pixelated;
+        }
+        
+        /* Base layer */
+        .coin-placeholder::before {
+            background: #00ff00;
+            z-index: 5;
+            box-shadow: 
+                0 0 0 1px #00ff00,
+                1px 1px 0 1px #00cc00,
+                2px 2px 0 1px #00aa00,
+                3px 3px 0 1px #008800;
+        }
+        
+        /* Layer 1 - offset */
+        .coin-layer-1 {
+            transform: translate(-1px, -1px);
+            background: #44ff44;
+            z-index: 4;
+        }
+        
+        /* Layer 2 - more offset */
+        .coin-layer-2 {
+            transform: translate(-2px, -2px);
+            background: #00dd00;
+            z-index: 3;
+        }
+        
+        /* Layer 3 - maximum offset */
+        .coin-layer-3 {
+            transform: translate(-3px, -3px);
+            background: #00bb00;
+            z-index: 2;
+        }
+        
+        /* Back layer */
+        .coin-placeholder::after {
+            transform: translate(-4px, -4px);
+            background: #008800;
+            z-index: 1;
+        }
+        
+        @keyframes coinSpin {
+            0% { 
+                transform: rotateY(0deg) scale(1, 1);
+            }
+            25% { 
+                transform: rotateY(90deg) scale(0.2, 1);
+                filter: brightness(0.7);
+            }
+            50% { 
+                transform: rotateY(180deg) scale(1, 1);
+                filter: brightness(1);
+            }
+            75% { 
+                transform: rotateY(270deg) scale(0.2, 1);
+                filter: brightness(0.7);
+            }
+            100% { 
+                transform: rotateY(360deg) scale(1, 1);
+            }
+        }
+        
         /* Donate button */
         .donate-console {
             position: fixed;
-            bottom: 30px;
+            bottom: 80px;
             right: 30px;
             background: #000000;
             border: 3px solid #00ff00;
@@ -198,11 +357,29 @@
             transition: all 0.3s ease;
             z-index: 1000;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: subtleFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
         
         .donate-console:hover {
             transform: scale(1.05);
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+            animation: none;
+        }
+        
+        /* Button click effect */
+        @keyframes donateClick {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+        
+        .donate-console.clicked {
+            animation: donateClick 0.3s ease-out;
         }
         
         /* Firefly effect */
@@ -451,11 +628,18 @@
                 ? galleryItems 
                 : galleryItems.filter(item => item.category === currentCategory);
             
-            grid.innerHTML = filtered.map(item => `
+            grid.innerHTML = filtered.map((item, index) => {
+                // Generate different pixel art for each item
+                const pixelArt = generatePixelArt(index);
+                
+                return `
                 <div class="gallery-card terminal-border bg-black p-3" onclick="inquireArtwork('${item.id}')">
                     <div class="relative">
-                        <div class="h-48 flex items-center justify-center text-6xl bg-gray-900">
-                            ${item.image ? `<img src="${item.image}" alt="${item.id}" class="w-full h-full object-cover">` : item.preview}
+                        <div class="h-48 flex items-center justify-center bg-gray-900">
+                            ${item.image 
+                                ? `<img src="${item.image}" alt="${item.id}" class="pixel-art">` 
+                                : pixelArt
+                            }
                         </div>
                         <div class="${item.status === 'available' ? 'status-available' : 'status-sold'}"></div>
                         <div class="card-overlay">
@@ -466,12 +650,71 @@
                     <div class="mt-3">
                         <p class="text-xs text-green-600">${item.date}</p>
                         <div class="price-display flex items-center gap-2 mt-2">
-                            <span>Ξ</span>
+                            <span class="coin-icon">
+                                <img src="ghostline-coin.gif" alt="coin" class="pixel-art" 
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                                <span class="coin-placeholder" style="display:none;">
+                                    <span class="coin-layer-1"></span>
+                                    <span class="coin-layer-2"></span>
+                                    <span class="coin-layer-3"></span>
+                                </span>
+                            </span>
                             <span class="price-mystery" id="price-${item.id}"></span>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
+        }
+        
+        // Generate pixel art for gallery items
+        function generatePixelArt(index) {
+            const artTypes = [
+                // Simple painting with brush
+                `<div class="pixel-painting">
+                    <div class="frame"></div>
+                    <div class="canvas">
+                        <div class="brush"></div>
+                    </div>
+                </div>`,
+                
+                // Abstract pixel pattern
+                `<div class="pixel-icon">
+                    <div class="pixel-pattern" style="width: 20px; height: 20px; top: 10px; left: 10px;"></div>
+                    <div class="pixel-pattern" style="width: 20px; height: 20px; top: 10px; right: 10px;"></div>
+                    <div class="pixel-pattern" style="width: 20px; height: 20px; bottom: 10px; left: 10px;"></div>
+                    <div class="pixel-pattern" style="width: 20px; height: 20px; bottom: 10px; right: 10px;"></div>
+                    <div class="pixel-pattern" style="width: 30px; height: 30px; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);"></div>
+                </div>`,
+                
+                // Pixel robot artist
+                `<div class="pixel-icon">
+                    <div style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                        <div style="position: relative;">
+                            <div class="pixel-pattern" style="width: 40px; height: 30px; position: relative;"></div>
+                            <div class="pixel-pattern" style="width: 10px; height: 10px; position: absolute; top: 5px; left: 8px; background: #000;"></div>
+                            <div class="pixel-pattern" style="width: 10px; height: 10px; position: absolute; top: 5px; right: 8px; background: #000;"></div>
+                            <div class="pixel-pattern" style="width: 20px; height: 5px; position: absolute; bottom: 5px; left: 10px; background: #000;"></div>
+                        </div>
+                    </div>
+                </div>`,
+                
+                // Geometric pattern
+                `<div class="pixel-icon">
+                    <div style="position: absolute; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 15px;">
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%; background: #001100;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                        <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>`
+            ];
+            
+            return artTypes[index % artTypes.length];
         }
         
         // Generate random price display with pixel shapes
@@ -492,6 +735,57 @@
             
             html += '</span>';
             return html;
+        }
+        
+        // Enhanced donate button click
+        function showDonateModal() {
+            const btn = document.getElementById('donateBtn');
+            btn.classList.add('clicked');
+            
+            // Create explosion of pixels
+            createDonateExplosion();
+            
+            setTimeout(() => {
+                btn.classList.remove('clicked');
+                document.getElementById('donateModal').style.display = 'flex';
+            }, 300);
+        }
+        
+        // Create explosion effect on donate click
+        function createDonateExplosion() {
+            const btn = document.getElementById('donateBtn');
+            const rect = btn.getBoundingClientRect();
+            
+            for(let i = 0; i < 12; i++) {
+                const pixel = document.createElement('div');
+                pixel.style.position = 'fixed';
+                pixel.style.width = '4px';
+                pixel.style.height = '4px';
+                pixel.style.background = '#00ff00';
+                pixel.style.left = (rect.left + rect.width/2) + 'px';
+                pixel.style.top = (rect.top + rect.height/2) + 'px';
+                pixel.style.pointerEvents = 'none';
+                pixel.style.zIndex = '2000';
+                
+                const angle = (i / 12) * Math.PI * 2;
+                const distance = 100 + Math.random() * 50;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                pixel.style.transition = 'all 0.8s ease-out';
+                pixel.style.opacity = '1';
+                
+                document.body.appendChild(pixel);
+                
+                setTimeout(() => {
+                    pixel.style.transform = `translate(${x}px, ${y}px) scale(0)`;
+                    pixel.style.opacity = '0';
+                }, 10);
+                
+                setTimeout(() => {
+                    pixel.remove();
+                }, 800);
+            }
         }
         
         // Animate prices individually
@@ -534,15 +828,19 @@
                         const charIndex = Math.floor(Math.random() * priceElement.children.length);
                         const oldChar = priceElement.children[charIndex];
                         
-                        // Replace with new pixel character
-                        const newChar = generatePixelChar();
-                        const temp = document.createElement('div');
-                        temp.innerHTML = newChar;
-                        
-                        oldChar.style.opacity = '0';
-                        setTimeout(() => {
-                            priceElement.replaceChild(temp.firstChild, oldChar);
-                        }, 150);
+                        if (oldChar) {
+                            // Replace with new pixel character
+                            const newChar = generatePixelChar();
+                            const temp = document.createElement('div');
+                            temp.innerHTML = newChar;
+                            
+                            oldChar.style.opacity = '0';
+                            setTimeout(() => {
+                                if (oldChar.parentNode) {
+                                    priceElement.replaceChild(temp.firstChild, oldChar);
+                                }
+                            }, 150);
+                        }
                     }
                 }
             }, 300); // Update every 300ms
@@ -556,9 +854,13 @@
             document.querySelectorAll('.category-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
             renderGallery();
+            // Re-animate prices after render
+            setTimeout(animatePrices, 100);
         }
         
         // Firefly effect for donate button
