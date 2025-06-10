@@ -78,7 +78,7 @@
             radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
     }
     
-    /* ИДЕАЛЬНЫЙ TV STATIC ШУМ С CODEPEN */
+    /* МНОГО СВЕТЛЯЧКОВ ВМЕСТО ШУМА */
     .robot-canvas {
         position: absolute;
         width: 100%;
@@ -87,29 +87,54 @@
         overflow: hidden;
     }
     
-    .robot-canvas::before {
-        content: '';
+    /* Светлячки - разные размеры и цвета */
+    .firefly {
         position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: url('http://fariskassim.com/stage/codepenstuff/noise.png');
-        opacity: 0.8;
-        animation: grain 0.3s steps(8) infinite;
+        background: #00ff00;
+        border-radius: 0; /* квадратные */
+        opacity: 0;
+        pointer-events: none;
+        box-shadow: 0 0 3px #00ff00;
+        animation: fireflyFloat 4s ease-in-out infinite;
     }
     
-    @keyframes grain {
-        0%, 100% { transform: translate(0, 0); }
-        10% { transform: translate(-5%, -10%); }
-        20% { transform: translate(-15%, 5%); }
-        30% { transform: translate(7%, -25%); }
-        40% { transform: translate(21%, 25%); }
-        50% { transform: translate(-25%, 10%); }
-        60% { transform: translate(15%, 5%); }
-        70% { transform: translateY(15%); }
-        80% { transform: translate(25%, 35%); }
-        90% { transform: translate(-10%, 10%); }
+    .firefly:nth-child(odd) {
+        background: #44ff44;
+        animation-duration: 3s;
+        box-shadow: 0 0 2px #44ff44;
+    }
+    
+    .firefly:nth-child(3n) {
+        background: #66ff66;
+        animation-duration: 5s;
+        box-shadow: 0 0 4px #66ff66;
+    }
+    
+    .firefly:nth-child(5n) {
+        background: #88ff88;
+        animation-duration: 2.5s;
+        box-shadow: 0 0 1px #88ff88;
+    }
+    
+    @keyframes fireflyFloat {
+        0% {
+            opacity: 0;
+            transform: translate(0, 0) scale(1);
+        }
+        10% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.8;
+            transform: translate(var(--fly-x), var(--fly-y)) scale(1.2);
+        }
+        90% {
+            opacity: 0.6;
+        }
+        100% {
+            opacity: 0;
+            transform: translate(var(--fly-x2), var(--fly-y2)) scale(0.5);
+        }
     }
     
     /* ПИКСЕЛЬНОЕ СВЕЧЕНИЕ ВМЕСТО РАЗМЫТОГО */
@@ -141,11 +166,11 @@
         transform: translate(2px, 2px);
     }
     
-    /* КНОПКА ДОНАТ КАК НА ГЛАВНОЙ СТРАНИЦЕ */
+    /* ОБЪЕМНАЯ КНОПКА ДОНАТ */
     .donate-button {
         position: relative;
-        background: #000000;
-        border: 3px solid #00FF00;
+        background: linear-gradient(145deg, #001100, #000000, #001100);
+        border: 2px solid #00FF00;
         color: #ffffff;
         font-weight: bold;
         font-size: 18px;
@@ -154,28 +179,34 @@
         transition: all 0.3s ease;
         overflow: hidden;
         font-family: 'Share Tech Mono', monospace;
-        /* Убираем мигание */
+        /* Объемность */
         box-shadow: 
-            0 0 4px rgba(0, 255, 0, 0.6), 
-            0 0 8px rgba(0, 255, 0, 0.4),
-            0 0 12px rgba(0, 255, 0, 0.2);
-        text-shadow: 0 0 2px #ffffff, 0 0 4px #ffffff;
+            inset 0 1px 0 rgba(0, 255, 0, 0.3),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+            0 2px 4px rgba(0, 0, 0, 0.5),
+            0 0 8px rgba(0, 255, 0, 0.3);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     }
     
     .donate-button:hover {
-        background: #001100;
+        background: linear-gradient(145deg, #002200, #001100, #002200);
         color: #00ff00;
-        transform: scale(1.05);
+        transform: translateY(-2px);
         box-shadow: 
-            0 0 8px rgba(0, 255, 0, 1), 
-            0 0 16px rgba(0, 255, 0, 0.8),
-            0 0 24px rgba(0, 255, 0, 0.6);
-        text-shadow: 0 0 3px #00ff00, 0 0 6px #00ff00;
+            inset 0 1px 0 rgba(0, 255, 0, 0.5),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.9),
+            0 4px 8px rgba(0, 0, 0, 0.7),
+            0 0 16px rgba(0, 255, 0, 0.6);
+        text-shadow: 0 0 4px #00ff00;
     }
     
     .donate-button:active {
-        background: #002200;
-        transform: scale(0.95);
+        background: linear-gradient(145deg, #000000, #001100, #000000);
+        transform: translateY(0px);
+        box-shadow: 
+            inset 0 2px 4px rgba(0, 0, 0, 0.8),
+            0 1px 2px rgba(0, 0, 0, 0.3),
+            0 0 4px rgba(0, 255, 0, 0.2);
     }
     
     .donate-button:active {
@@ -444,54 +475,68 @@
 </div>
 
 <script>
-    // СВЕТЛЯЧКИ ДЛЯ КНОПКИ ДОНАТА
-    function createDonateFireflies() {
-        const button = document.getElementById('donateBtn');
-        if (!button) return;
+    // СОЗДАНИЕ МНОЖЕСТВА СВЕТЛЯЧКОВ В ОКОШКАХ
+    function createManyFireflies(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
         
-        const rect = button.getBoundingClientRect();
+        container.innerHTML = '';
         
-        // Создаем светлячка
+        // Создаем 25 светлячков разного размера
+        for (let i = 0; i < 25; i++) {
+            setTimeout(() => {
+                createOneFirefly(container);
+            }, i * 100); // Задержка между созданием
+        }
+        
+        // Периодически добавляем новых
+        setInterval(() => {
+            if (container.children.length < 30) {
+                createOneFirefly(container);
+            }
+        }, 800);
+    }
+    
+    function createOneFirefly(container) {
         const firefly = document.createElement('div');
-        firefly.style.position = 'fixed';
-        firefly.style.width = '3px';
-        firefly.style.height = '3px';
-        firefly.style.background = '#00ff00';
-        firefly.style.pointerEvents = 'none';
-        firefly.style.zIndex = '999';
-        firefly.style.opacity = '0';
-        firefly.style.boxShadow = '0 0 3px #00ff00';
+        firefly.className = 'firefly';
         
-        // Позиция вокруг кнопки
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 30 + Math.random() * 50;
+        // Случайный размер
+        const size = Math.random() * 4 + 2; // от 2px до 6px
+        firefly.style.width = size + 'px';
+        firefly.style.height = size + 'px';
         
-        firefly.style.left = (rect.left + rect.width/2 + Math.cos(angle) * distance) + 'px';
-        firefly.style.top = (rect.top + rect.height/2 + Math.sin(angle) * distance) + 'px';
+        // Начальная позиция
+        firefly.style.left = Math.random() * 100 + '%';
+        firefly.style.top = Math.random() * 100 + '%';
         
-        // Движение вверх
-        const flyX = (Math.random() - 0.5) * 200;
-        const flyY = -100 - Math.random() * 100;
+        // Два разных направления движения
+        const flyX1 = (Math.random() - 0.5) * 150;
+        const flyY1 = (Math.random() - 0.5) * 100;
+        const flyX2 = (Math.random() - 0.5) * 200;
+        const flyY2 = (Math.random() - 0.5) * 150;
         
-        firefly.style.transition = 'all 3s ease-out';
+        firefly.style.setProperty('--fly-x', flyX1 + 'px');
+        firefly.style.setProperty('--fly-y', flyY1 + 'px');
+        firefly.style.setProperty('--fly-x2', flyX2 + 'px');
+        firefly.style.setProperty('--fly-y2', flyY2 + 'px');
         
-        document.body.appendChild(firefly);
+        // Случайная задержка анимации
+        firefly.style.animationDelay = Math.random() * 3 + 's';
         
-        // Запускаем анимацию
-        setTimeout(() => {
-            firefly.style.opacity = '1';
-            firefly.style.transform = `translate(${flyX}px, ${flyY}px)`;
-        }, 10);
+        container.appendChild(firefly);
         
-        setTimeout(() => {
-            firefly.style.opacity = '0';
-        }, 2500);
-        
+        // Удаляем через 10-15 секунд
         setTimeout(() => {
             if (firefly.parentNode) {
-                firefly.parentNode.removeChild(firefly);
+                firefly.style.opacity = '0';
+                setTimeout(() => {
+                    if (firefly.parentNode) {
+                        firefly.parentNode.removeChild(firefly);
+                    }
+                }, 1000);
             }
-        }, 3000);
+        }, 10000 + Math.random() * 5000);
     }
 
     // Donation button effects
@@ -634,15 +679,18 @@ alert(socialAlert);
         }
     }
     
-    // Initialize - УБИРАЕМ ВЕСЬ JAVASCRIPT ШУМ
+    // Initialize
     window.addEventListener('load', function() {
-        console.log('🎮 CSS Noise activated!');
+        console.log('🎮 Creating fireflies instead of noise...');
         
-        // Start floating pixels only
+        // Создаем светлячков для всех роботов
+        setTimeout(() => createManyFireflies('robot1-canvas'), 500);
+        setTimeout(() => createManyFireflies('robot2-canvas'), 700); 
+        setTimeout(() => createManyFireflies('robot3-canvas'), 900);
+        setTimeout(() => createManyFireflies('robot4-canvas'), 1100);
+        
+        // Start floating pixels for donate button
         setInterval(createFloatingPixels, 2000);
-        
-        // СВЕТЛЯЧКИ ДЛЯ КНОПКИ ДОНАТА
-        setInterval(createDonateFireflies, 800);
         
         // Update stats
         setInterval(updateStats, 5000);
