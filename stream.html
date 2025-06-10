@@ -1,4 +1,16 @@
-<!DOCTYPE html>
+/* ROBOT WORKING ANIMATION */
+@keyframes robotWork {
+0%, 100% { transform: translate(0, 0); }
+25% { transform: translate(2px, -1px); }
+50% { transform: translate(-1px, 2px); }
+75% { transform: translate(1px, 1px); }
+}
+
+```
+    .robot-active {
+        animation: robotWork 2s infinite;
+    }<!DOCTYPE html>
+```
 
 <html lang="en">
 <head>
@@ -264,16 +276,91 @@
         }
     }
     
-    /* ROBOT WORKING ANIMATION */
-    @keyframes robotWork {
-        0%, 100% { transform: translate(0, 0); }
-        25% { transform: translate(2px, -1px); }
-        50% { transform: translate(-1px, 2px); }
-        75% { transform: translate(1px, 1px); }
+    /* PIXEL NOISE ANIMATION */
+    .pixel-noise {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        opacity: 0.8;
     }
     
-    .robot-active {
-        animation: robotWork 2s infinite;
+    .noise-frame {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                #00ff00 0px,
+                #00ff00 2px,
+                #000000 2px,
+                #000000 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                #00ff00 0px,
+                #00ff00 2px,
+                #000000 2px,
+                #000000 4px
+            );
+        background-size: 4px 4px;
+        animation: noiseAnimation 0.3s steps(3) infinite;
+    }
+    
+    @keyframes noiseAnimation {
+        0% {
+            transform: translate(0, 0);
+            filter: contrast(100%);
+        }
+        33% {
+            transform: translate(-2px, 2px);
+            filter: contrast(150%);
+        }
+        66% {
+            transform: translate(2px, -2px);
+            filter: contrast(80%);
+        }
+        100% {
+            transform: translate(0, 0);
+            filter: contrast(100%);
+        }
+    }
+    
+    /* Pixel grid overlay */
+    .noise-pixels {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: 4px 4px;
+        animation: pixelShift 0.2s steps(3) infinite;
+    }
+    
+    .noise-pixels::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle, #00ff00 1px, transparent 1px),
+            radial-gradient(circle, #00ff00 1px, transparent 1px);
+        background-size: 4px 4px;
+        background-position: 0 0, 2px 2px;
+        opacity: 0.5;
+        animation: pixelFlicker 0.15s steps(2) infinite;
+    }
+    
+    @keyframes pixelShift {
+        0% { opacity: 0.3; }
+        33% { opacity: 0.6; }
+        66% { opacity: 0.4; }
+        100% { opacity: 0.3; }
+    }
+    
+    @keyframes pixelFlicker {
+        0% { transform: scale(1); }
+        50% { transform: scale(-1, 1); }
+        100% { transform: scale(1); }
     }
     
     /* STATUS INDICATORS - SQUARE PIXELS */
@@ -445,14 +532,18 @@
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-600 text-xs text-center">
-                            <pre>
+                        <div class="pixel-noise">
+                            <div class="noise-frame"></div>
+                            <div class="noise-pixels"></div>
+                        </div>
+                        <div class="pixel-font text-green-400 text-xs text-center" style="position: relative; z-index: 1;">
+                            <pre style="background: rgba(0,0,0,0.7); padding: 10px;">
 ╔══════════════════╗
 ║                  ║
-║      🤖💤        ║
+║      [OFF]       ║
 ║   ┌─────────┐    ║
+║   │ NO SIGNAL│    ║
 ║   │ ░░░░░░░ │    ║
-║   │ ░░░░░░░ │ 🎨 ║
 ║   │ ░░░░░░░ │    ║
 ║   └─────────┘    ║
 ╚══════════════════╝
@@ -515,7 +606,7 @@
             <!-- MEGA DONATION BUTTON -->
             <div class="relative mb-8" id="donateContainer">
                 <button class="donate-button pixel-font" onclick="donate()" id="donateBtn">
-                    <span class="pixel-donut"></span> DONATE ETH <span class="pixel-donut"></span>
+                    DONATE
                 </button>
                 
                 <!-- Floating pixels container -->
