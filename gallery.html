@@ -1,54 +1,65 @@
-<!DOCTYPE html>
+/* ROBOT WORKING ANIMATION */
+@keyframes robotWork {
+0%, 100% { transform: translate(0, 0); }
+25% { transform: translate(2px, -1px); }
+50% { transform: translate(-1px, 2px); }
+75% { transform: translate(1px, 1px); }
+}
+
+```
+    .robot-active {
+        animation: robotWork 2s infinite;
+    }<!DOCTYPE html>
+```
 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTLINE - Gallery</title>
+    <title>GHOSTLINE - Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
 
 ```
-    html {
-        background: #000000;
-        height: 100%;
-    }
-    
     body {
         background: #000000;
-        color: #00ff00;
-        font-family: 'Share Tech Mono', monospace;
-        overflow-x: hidden;
         margin: 0;
         padding: 0;
-        min-height: 100%;
+    }
+    
+    .pixel-font {
+        font-family: 'Share Tech Mono', monospace;
+    }
+    
+    .retro-font {
+        font-family: 'Orbitron', monospace;
+    }
+    
+    .scan-lines {
+        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+        background-size: 100% 4px;
     }
     
     .terminal-border {
-        border: 2px solid #00ff00;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        border: 2px solid #00FF00;
+        /* removed border-radius */
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .terminal-border:hover {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
     }
     
     .glow-text {
-        text-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
+        text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
     }
     
-    .pixel-text {
-        font-family: 'Press Start 2P', cursive;
-        image-rendering: pixelated;
-    }
-    
-    .scanlines {
-        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
-        background-size: 100% 3px;
-        animation: scanlines 0.1s linear infinite;
-    }
-    
-    @keyframes scanlines {
-        0% { background-position: 0 0; }
-        100% { background-position: 0 3px; }
+    .typing::after {
+        content: '█';
+        animation: blink 1s infinite;
     }
     
     @keyframes blink {
@@ -56,933 +67,756 @@
         51%, 100% { opacity: 0; }
     }
     
-    .blink {
-        animation: blink 1.4s infinite;
+    .video-feed {
+        background: 
+            repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.1) 0px,
+                transparent 1px,
+                transparent 3px,
+                rgba(0, 255, 0, 0.1) 4px
+            ),
+            radial-gradient(circle at center, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
+        position: relative;
+        overflow: hidden;
     }
     
-    /* Navigation styles */
+    .video-feed::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+        animation: scanLine 3s linear infinite;
+    }
+    
+    @keyframes scanLine {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+    
+    .matrix-bg {
+        background: 
+            radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
+    }
+    
+    /* PIXEL DONUT */
+    .pixel-donut {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        position: relative;
+        margin: 0 8px;
+        image-rendering: pixelated;
+    }
+    
+    .pixel-donut::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: 
+            /* Outer donut */
+            linear-gradient(to right, transparent 4px, #8B4513 4px 20px, transparent 20px),
+            linear-gradient(to bottom, transparent 4px, #8B4513 4px 20px, transparent 20px);
+        background-size: 24px 24px;
+        background-position: 0 0;
+    }
+    
+    .pixel-donut::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        box-shadow:
+            /* Brown donut body */
+            4px 2px 0 #8B4513,
+            6px 2px 0 #8B4513,
+            8px 2px 0 #8B4513,
+            10px 2px 0 #8B4513,
+            12px 2px 0 #8B4513,
+            14px 2px 0 #8B4513,
+            16px 2px 0 #8B4513,
+            18px 2px 0 #8B4513,
+            20px 4px 0 #8B4513,
+            20px 6px 0 #8B4513,
+            20px 8px 0 #8B4513,
+            20px 10px 0 #8B4513,
+            20px 12px 0 #8B4513,
+            20px 14px 0 #8B4513,
+            20px 16px 0 #8B4513,
+            18px 20px 0 #8B4513,
+            16px 20px 0 #8B4513,
+            14px 20px 0 #8B4513,
+            12px 20px 0 #8B4513,
+            10px 20px 0 #8B4513,
+            8px 20px 0 #8B4513,
+            6px 20px 0 #8B4513,
+            4px 20px 0 #8B4513,
+            2px 18px 0 #8B4513,
+            2px 16px 0 #8B4513,
+            2px 14px 0 #8B4513,
+            2px 12px 0 #8B4513,
+            2px 10px 0 #8B4513,
+            2px 8px 0 #8B4513,
+            2px 6px 0 #8B4513,
+            2px 4px 0 #8B4513,
+            /* Pink frosting */
+            6px 4px 0 #FF69B4,
+            8px 4px 0 #FF69B4,
+            10px 4px 0 #FF69B4,
+            12px 4px 0 #FF69B4,
+            14px 4px 0 #FF69B4,
+            16px 4px 0 #FF69B4,
+            6px 6px 0 #FF69B4,
+            8px 6px 0 #FF69B4,
+            14px 6px 0 #FF69B4,
+            16px 6px 0 #FF69B4,
+            /* Sprinkles */
+            7px 5px 0 #00FF00,
+            13px 5px 0 #FFFF00,
+            9px 7px 0 #00FFFF,
+            15px 7px 0 #FF0000,
+            /* Center hole */
+            10px 10px 0 #000000,
+            12px 10px 0 #000000,
+            10px 12px 0 #000000,
+            12px 12px 0 #000000;
+    }
+    
+    @keyframes donutSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .pixel-donut:hover {
+        animation: donutSpin 1s linear infinite;
+    }
+    
+    /* DONATION BUTTON EFFECTS */
+    .donate-button {
+        position: relative;
+        background: linear-gradient(45deg, #00FF00, #00CC00, #00FF00);
+        border: 3px solid #00FF00;
+        color: #000;
+        font-weight: bold;
+        font-size: 18px;
+        padding: 15px 30px;
+        /* removed border-radius */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        animation: donatePulse 2s infinite;
+    }
+    
+    @keyframes donatePulse {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            transform: scale(1);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
+            transform: scale(1.05);
+        }
+    }
+    
+    .donate-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 50px rgba(0, 255, 0, 1);
+        animation: donatePulse 0.5s infinite;
+    }
+    
+    .donate-button:active {
+        transform: scale(0.95);
+    }
+    
+    /* FLOATING PIXELS FROM BUTTON */
+    .floating-pixel {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #00FF00;
+        pointer-events: none;
+        animation: floatAway 3s linear infinite;
+    }
+    
+    @keyframes floatAway {
+        0% {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(var(--random-x), var(--random-y)) scale(0);
+        }
+    }
+    
+    /* EXPLOSION EFFECT */
+    .explosion-pixel {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #00FF00;
+        pointer-events: none;
+        animation: explode 1s ease-out forwards;
+    }
+    
+    @keyframes explode {
+        0% {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(var(--explode-x), var(--explode-y)) scale(0) rotate(360deg);
+        }
+    }
+    
+    /* PIXEL NOISE ANIMATION */
+    .pixel-noise {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        opacity: 0.8;
+    }
+    
+    .noise-frame {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            repeating-linear-gradient(
+                0deg,
+                #00ff00 0px,
+                #00ff00 2px,
+                #000000 2px,
+                #000000 4px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                #00ff00 0px,
+                #00ff00 2px,
+                #000000 2px,
+                #000000 4px
+            );
+        background-size: 4px 4px;
+        animation: noiseAnimation 0.3s steps(3) infinite;
+    }
+    
+    @keyframes noiseAnimation {
+        0% {
+            transform: translate(0, 0);
+            filter: contrast(100%);
+        }
+        33% {
+            transform: translate(-2px, 2px);
+            filter: contrast(150%);
+        }
+        66% {
+            transform: translate(2px, -2px);
+            filter: contrast(80%);
+        }
+        100% {
+            transform: translate(0, 0);
+            filter: contrast(100%);
+        }
+    }
+    
+    /* Pixel grid overlay */
+    .noise-pixels {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: 4px 4px;
+        animation: pixelShift 0.2s steps(3) infinite;
+    }
+    
+    .noise-pixels::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle, #00ff00 1px, transparent 1px),
+            radial-gradient(circle, #00ff00 1px, transparent 1px);
+        background-size: 4px 4px;
+        background-position: 0 0, 2px 2px;
+        opacity: 0.5;
+        animation: pixelFlicker 0.15s steps(2) infinite;
+    }
+    
+    @keyframes pixelShift {
+        0% { opacity: 0.3; }
+        33% { opacity: 0.6; }
+        66% { opacity: 0.4; }
+        100% { opacity: 0.3; }
+    }
+    
+    @keyframes pixelFlicker {
+        0% { transform: scale(1); }
+        50% { transform: scale(-1, 1); }
+        100% { transform: scale(1); }
+    }
+    
+    /* STATUS INDICATORS - SQUARE PIXELS */
+    .status-online {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #00FF00;
+        /* removed border-radius */
+        margin-right: 5px;
+        box-shadow: 0 0 10px #00FF00;
+        animation: statusBlink 2s infinite;
+    }
+    
+    .status-standby {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #FFFF00;
+        /* removed border-radius */
+        margin-right: 5px;
+        box-shadow: 0 0 10px #FFFF00;
+    }
+    
+    @keyframes statusBlink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+    }
+    
+    /* MOBILE ADAPTATIONS */
+    @media (max-width: 768px) {
+        .main-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .video-grid {
+            grid-template-columns: 1fr 1fr !important;
+        }
+        
+        .donate-button {
+            font-size: 16px;
+            padding: 12px 24px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .video-grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        .donate-button {
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        
+        .video-feed {
+            height: 120px !important;
+        }
+    }
+    
     .nav-link {
         transition: all 0.3s ease;
         text-decoration: none;
         cursor: pointer;
-        color: #00ff00;
     }
     
     .nav-link:hover {
-        text-shadow: 0 0 10px #00ff00;
-    }
-    
-    .nav-active {
-        color: #ffffff;
-        text-shadow: 0 0 10px #00ff00;
-    }
-    
-    /* Category tabs */
-    .category-tab {
-        padding: 8px 16px;
-        border: 1px solid #00ff00;
-        background: #000000;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 12px;
-    }
-    
-    .category-tab:hover {
-        background: #001100;
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-    }
-    
-    .category-tab.active {
-        background: #00ff00;
-        color: #000000;
-    }
-    
-    /* Gallery card styles */
-    .gallery-card {
-        position: relative;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .gallery-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3);
-    }
-    
-    .gallery-card:hover .card-overlay {
-        opacity: 1;
-    }
-    
-    .card-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    /* Status indicators */
-    .status-available {
-        width: 12px;
-        height: 12px;
-        background: #00ff00;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        box-shadow: 0 0 10px #00ff00;
-    }
-    
-    .status-sold {
-        width: 12px;
-        height: 12px;
-        background: #ff0000;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        box-shadow: 0 0 10px #ff0000;
-    }
-    
-    /* Price display */
-    .price-display {
-        font-family: 'Share Tech Mono', monospace;
-        color: #00ff00;
-        font-size: 14px;
-    }
-    
-    .price-char {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        margin: 0 1px;
-        position: relative;
-        vertical-align: middle;
-    }
-    
-    .pixel-shape {
-        position: absolute;
-        background: #00ff00;
-        transition: all 0.3s ease;
-    }
-    
-    /* Pixel patterns */
-    .pattern-square .pixel-shape { width: 6px; height: 6px; top: 1px; left: 1px; }
-    
-    .pattern-cross .pixel-shape:nth-child(1) { width: 2px; height: 6px; top: 1px; left: 3px; }
-    .pattern-cross .pixel-shape:nth-child(2) { width: 6px; height: 2px; top: 3px; left: 1px; }
-    
-    .pattern-diamond .pixel-shape:nth-child(1) { width: 2px; height: 2px; top: 0; left: 3px; }
-    .pattern-diamond .pixel-shape:nth-child(2) { width: 2px; height: 2px; top: 2px; left: 1px; }
-    .pattern-diamond .pixel-shape:nth-child(3) { width: 2px; height: 2px; top: 2px; left: 5px; }
-    .pattern-diamond .pixel-shape:nth-child(4) { width: 2px; height: 2px; top: 4px; left: 3px; }
-    
-    .pattern-dot .pixel-shape { width: 2px; height: 2px; top: 3px; left: 3px; }
-    
-    .pattern-line .pixel-shape { width: 6px; height: 2px; top: 3px; left: 1px; }
-    
-    @keyframes priceFlicker {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-    
-    /* Custom pixel art styles */
-    .pixel-art {
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-    
-    .pixel-icon {
-        width: 80px;
-        height: 80px;
-        position: relative;
-        margin: 0 auto;
-    }
-    
-    /* Pixel art patterns for gallery items */
-    .pixel-pattern {
-        position: absolute;
-        background: #00ff00;
-    }
-    
-    /* Simple pixel painting icon */
-    .pixel-painting {
-        width: 60px;
-        height: 60px;
-        position: relative;
-        margin: 20px auto;
-    }
-    
-    .pixel-painting .frame {
-        position: absolute;
-        border: 4px solid #00ff00;
-        width: 100%;
-        height: 100%;
-    }
-    
-    .pixel-painting .canvas {
-        position: absolute;
-        width: 40px;
-        height: 40px;
-        top: 10px;
-        left: 10px;
-        background: #001100;
-    }
-    
-    .pixel-painting .brush {
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        background: #00ff00;
-        top: 20px;
-        left: 20px;
-        animation: brushMove 3s infinite;
-    }
-    
-    @keyframes brushMove {
-        0%, 100% { transform: translate(0, 0); }
-        25% { transform: translate(10px, 5px); }
-        50% { transform: translate(5px, 15px); }
-        75% { transform: translate(15px, 10px); }
-    }
-    
-    /* Coin animation - pixel 3D isometric effect */
-    .coin-icon {
-        width: 16px;
-        height: 16px;
-        display: inline-block;
-        vertical-align: middle;
-        margin-right: 4px;
-        position: relative;
-    }
-    
-    .coin-placeholder {
-        width: 16px;
-        height: 16px;
-        display: inline-block;
-        position: relative;
-        animation: coinSpin 3s linear infinite;
-        transform-style: preserve-3d;
-    }
-    
-    /* Multiple layers for isometric effect */
-    .coin-placeholder::before,
-    .coin-placeholder::after,
-    .coin-layer-1,
-    .coin-layer-2,
-    .coin-layer-3 {
-        content: '';
-        position: absolute;
-        width: 12px;
-        height: 12px;
-        left: 2px;
-        top: 2px;
-        background: #00ff00;
-        image-rendering: pixelated;
-    }
-    
-    /* Base layer */
-    .coin-placeholder::before {
-        background: #00ff00;
-        z-index: 5;
-        box-shadow: 
-            0 0 0 1px #00ff00,
-            1px 1px 0 1px #00cc00,
-            2px 2px 0 1px #00aa00,
-            3px 3px 0 1px #008800;
-    }
-    
-    /* Layer 1 - offset */
-    .coin-layer-1 {
-        transform: translate(-1px, -1px);
-        background: #44ff44;
-        z-index: 4;
-    }
-    
-    /* Layer 2 - more offset */
-    .coin-layer-2 {
-        transform: translate(-2px, -2px);
-        background: #00dd00;
-        z-index: 3;
-    }
-    
-    /* Layer 3 - maximum offset */
-    .coin-layer-3 {
-        transform: translate(-3px, -3px);
-        background: #00bb00;
-        z-index: 2;
-    }
-    
-    /* Back layer */
-    .coin-placeholder::after {
-        transform: translate(-4px, -4px);
-        background: #008800;
-        z-index: 1;
-    }
-    
-    @keyframes coinSpin {
-        0% { 
-            transform: rotateY(0deg) scale(1, 1);
-        }
-        25% { 
-            transform: rotateY(90deg) scale(0.2, 1);
-            filter: brightness(0.7);
-        }
-        50% { 
-            transform: rotateY(180deg) scale(1, 1);
-            filter: brightness(1);
-        }
-        75% { 
-            transform: rotateY(270deg) scale(0.2, 1);
-            filter: brightness(0.7);
-        }
-        100% { 
-            transform: rotateY(360deg) scale(1, 1);
-        }
-    }
-    
-    /* Donate button */
-    .donate-console {
-        position: fixed;
-        bottom: 80px;
-        right: 30px;
-        background: #000000;
-        border: 3px solid #00ff00;
-        padding: 15px 40px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        z-index: 1000;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-        animation: subtleFloat 4s ease-in-out infinite;
-    }
-    
-    @keyframes subtleFloat {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    .donate-console:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
-        animation: none;
-    }
-    
-    /* Button click effect */
-    @keyframes donateClick {
-        0% { transform: scale(1); }
-        50% { transform: scale(0.95); }
-        100% { transform: scale(1); }
-    }
-    
-    .donate-console.clicked {
-        animation: donateClick 0.3s ease-out;
-    }
-    
-    /* Firefly effect */
-    .firefly {
-        position: fixed;
-        width: 3px;
-        height: 3px;
-        background: #00ff00;
-        pointer-events: none;
-        z-index: 999;
-        opacity: 0;
-        box-shadow: 0 0 3px #00ff00;
-    }
-    
-    @keyframes fireflyFloat {
-        0% {
-            opacity: 0;
-            transform: translate(0, 0);
-        }
-        10% {
-            opacity: 1;
-        }
-        90% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-            transform: translate(var(--fly-x), var(--fly-y));
-        }
-    }
-    
-    /* Live indicator */
-    .live-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 5px 10px;
-        background: rgba(0, 255, 0, 0.1);
-        border: 1px solid #00ff00;
-        font-size: 11px;
-    }
-    
-    .live-dot {
-        width: 6px;
-        height: 6px;
-        background: #00ff00;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.5; transform: scale(1.5); }
-    }
-    
-    /* Learning log */
-    .learning-log {
-        position: fixed;
-        right: 20px;
-        top: 100px;
-        width: 250px;
-        max-height: 200px;
-        overflow-y: auto;
-        background: rgba(0, 0, 0, 0.9);
-        border: 1px solid #00ff00;
-        padding: 10px;
-        font-size: 10px;
-        opacity: 0.8;
-    }
-    
-    .learning-log::-webkit-scrollbar {
-        width: 4px;
-    }
-    
-    .learning-log::-webkit-scrollbar-track {
-        background: #001100;
-    }
-    
-    .learning-log::-webkit-scrollbar-thumb {
-        background: #00ff00;
-    }
-    
-    /* Modal styles */
-    .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .modal-content {
-        background: #000000;
-        border: 2px solid #00ff00;
-        padding: 30px;
-        max-width: 400px;
-        text-align: center;
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
-    }
-    
-    /* Mobile styles */
-    @media (max-width: 768px) {
-        .gallery-grid {
-            grid-template-columns: 1fr !important;
-        }
-        
-        .learning-log {
-            display: none;
-        }
-        
-        .category-tabs {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .donate-console {
-            bottom: 20px;
-            padding: 12px 30px;
-            font-size: 14px;
-        }
+        color: #00FF00;
+        text-shadow: 0 0 10px #00FF00;
     }
 </style>
 ```
 
 </head>
-<body class="scanlines" style="background-color: #000000;">
-    <!-- Header Navigation -->
-    <div class="terminal-border bg-black p-2 m-4" style="background-color: #000000;">
-        <div class="flex justify-between items-center text-xs">
-            <div class="text-green-500 text-lg font-bold glow-text">GHOSTLINE</div>
-            <div class="flex gap-4">
-                <a href="index.html" class="nav-link">[HOME]</a>
-                <span class="nav-link nav-active">[GALLERY]</span>
-                <a href="stream.html" class="nav-link">[STREAM]</a>
-                <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
-            </div>
-            <div class="live-indicator">
-                <span class="live-dot"></span>
-                <span id="liveStatus">3 IN PROGRESS</span>
-            </div>
-        </div>
-    </div>
+<body class="bg-black text-green-400 overflow-hidden">
+    <div class="w-full min-h-screen scan-lines matrix-bg">
 
 ```
-<!-- Main Content -->
-<div class="container mx-auto px-4 pb-24">
-    <!-- Title -->
-    <div class="text-center mb-8">
-        <h1 class="pixel-text text-3xl glow-text mb-2">GHOSTLINE GALLERY</h1>
-        <p class="text-sm text-green-400">AI-Generated Art Collection</p>
-    </div>
-    
-    <!-- Category Tabs -->
-    <div class="flex justify-center mb-8 category-tabs">
-        <div class="flex gap-2 flex-wrap">
-            <button class="category-tab active" onclick="filterCategory('latest')">LATEST</button>
-            <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
-            <button class="category-tab" onclick="filterCategory('rare')">RARE</button>
-            <button class="category-tab" onclick="filterCategory('unusual')">UNUSUAL</button>
-            <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
+    <!-- Header Navigation -->
+    <div class="terminal-border bg-black bg-opacity-70 mx-4 mt-2 px-6 py-2 pixel-font">
+        <div class="flex justify-between items-center">
+            <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
+            <div class="text-green-600 text-sm">
+                <a href="index.html" class="nav-link mr-4">[HOME]</a>
+                <span class="text-green-400 mr-4">[LIVE STREAM]</span>
+                <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
+                <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
+            </div>
+            <div class="text-green-500 text-xs">
+                <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
+            </div>
         </div>
     </div>
-    
-    <!-- Gallery Grid -->
-    <div class="gallery-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6" id="galleryGrid">
-        <!-- Gallery items will be dynamically generated -->
-    </div>
-    
-    <!-- Support Section (between rows) -->
-    <div class="text-center my-12 text-sm text-green-600">
-        Support GHOSTLINE experiments → <span class="glow-text cursor-pointer" onclick="scrollToDonate()">[DONATE]</span>
-    </div>
-</div>
 
-<!-- Learning Log -->
-<div class="learning-log" id="learningLog">
-    <div class="text-green-500 mb-2 text-xs">[GHOSTLINE LEARNING LOG]</div>
-    <div id="logContent" class="text-green-400">
-        <!-- Log entries will be added here -->
-    </div>
-</div>
+    <div class="flex p-4 h-full main-grid">
+        <!-- Live Video Feeds -->
+        <div class="w-2/3 mr-4">
+            <!-- Title -->
+            <div class="text-center mb-4">
+                <h2 class="retro-font text-3xl font-bold text-green-400 glow-text">
+                    LIVE ROBOT ARTISTS
+                </h2>
+                <div class="pixel-font text-green-600 text-sm">
+                    Watch AI learn to create art in real-time
+                </div>
+            </div>
+            
+            <!-- Video Grid -->
+            <div class="grid grid-cols-2 gap-4 video-grid">
+                
+                <!-- Robot 01 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_01 - "YUGA"]</span>
+                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center robot-active">
+                            <pre>
+╔══════════════════╗
+║      🤖          ║
+║         🎨       ║
+║   ┌─────────┐    ║
+║   │░░▓▓██▓░░│    ║
+║   │▓██░░░██▓│    ║
+║   │░▓████▓░░│    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STYLE: Abstract Expressionism</div>
+                        <div class="typing">BRUSH PRESSURE: 73%</div>
+                    </div>
+                </div>
 
-<!-- Donate Button with Fireflies -->
-<button class="donate-console" id="donateBtn" onclick="showDonateModal()">
-    <span class="glow-text">SUPPORT PROJECT</span>
-</button>
+                <!-- Robot 02 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_02 - "MIKA"]</span>
+                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 0.5s;">
+                            <pre>
+╔══════════════════╗
+║         🤖       ║
+║   🎨             ║
+║   ┌─────────┐    ║
+║   │██▓░░▓██│    ║
+║   │░░███░░░│    ║
+║   │▓██░▓██▓│    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STYLE: Digital Minimalism</div>
+                        <div class="typing">COLOR MIX: Blue + White</div>
+                    </div>
+                </div>
 
-<!-- Inquiry Modal -->
-<div class="modal" id="inquiryModal">
-    <div class="modal-content">
-        <h3 class="pixel-text text-lg glow-text mb-4">ACQUIRE THIS PIECE</h3>
-        <div class="terminal-border p-4 mb-4 bg-black">
-            <p class="text-sm mb-2">TO INQUIRE ABOUT THIS ARTWORK:</p>
-            <p class="text-xs text-green-400 mb-3">Send email to:</p>
-            <p class="text-xs glow-text mb-3" id="secretEmail">[LOADING...]</p>
-            <p class="text-xs text-green-600">Include: <span id="artworkId"></span> + Your offer</p>
+                <!-- Robot 03 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_03 - "GHOST"]</span>
+                        <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-noise">
+                            <div class="noise-frame"></div>
+                            <div class="noise-pixels"></div>
+                        </div>
+                        <div class="pixel-font text-green-400 text-xs text-center" style="position: relative; z-index: 1;">
+                            <pre style="background: rgba(0,0,0,0.7); padding: 10px;">
+╔══════════════════╗
+║                  ║
+║      [OFF]       ║
+║   ┌─────────┐    ║
+║   │ NO SIGNAL│    ║
+║   │ ░░░░░░░ │    ║
+║   │ ░░░░░░░ │    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STATUS: Battery Charging</div>
+                        <div>ETA: 00:23:15</div>
+                    </div>
+                </div>
+
+                <!-- Robot 04 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_04 - "LINE"]</span>
+                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 1s;">
+                            <pre>
+╔══════════════════╗
+║    🤖            ║
+║              🎨  ║
+║   ┌─────────┐    ║
+║   │▓▓▓██▓▓▓│    ║
+║   │██▓▓▓██▓│    ║
+║   │▓██░▓░██│    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STYLE: Geometric Patterns</div>
+                        <div class="typing">PATTERN: SPIRAL_09</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button class="category-tab" onclick="closeModal()">CLOSE</button>
-    </div>
-</div>
 
-<!-- Donate Modal -->
-<div class="modal" id="donateModal">
-    <div class="modal-content">
-        <h3 class="pixel-text text-lg glow-text mb-4">SUPPORT GHOSTLINE</h3>
-        <div class="terminal-border p-4 mb-4 bg-black">
-            <p class="text-sm mb-3">ETHEREUM ADDRESS:</p>
-            <p class="text-xs glow-text break-all mb-3">0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d</p>
-            <button class="category-tab mb-2" onclick="copyAddress()">COPY ADDRESS</button>
+        <!-- Donation Panel -->
+        <div class="w-1/3 flex flex-col items-center justify-center">
+            
+            <!-- Support Message -->
+            <div class="text-center mb-8">
+                <h3 class="retro-font text-2xl font-bold text-green-400 glow-text mb-4">
+                    SUPPORT THE ARTISTS
+                </h3>
+                <div class="pixel-font text-green-600 text-sm leading-relaxed">
+                    Help fund our AI robot artists<br/>
+                    Every donation goes directly to:<br/>
+                    • Robot maintenance & upgrades<br/>
+                    • Art supplies & canvases<br/>
+                    • Neural network training<br/>
+                    • New experimental features
+                </div>
+            </div>
+
+            <!-- MEGA DONATION BUTTON -->
+            <div class="relative mb-8" id="donateContainer">
+                <button class="donate-button pixel-font" onclick="donate()" id="donateBtn">
+                    DONATE
+                </button>
+                
+                <!-- Floating pixels container -->
+                <div id="pixelContainer" class="absolute inset-0 pointer-events-none"></div>
+            </div>
+
+            <!-- MetaMask Address -->
+            <div class="terminal-border bg-black bg-opacity-50 p-4 w-full">
+                <div class="pixel-font text-green-500 text-xs mb-2 text-center">
+                    [ETHEREUM ADDRESS]
+                </div>
+                <div class="pixel-font text-green-400 text-xs text-center break-all leading-relaxed">
+                    0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+                </div>
+                <div class="text-center mt-3">
+                    <button class="pixel-font text-green-600 text-xs border border-green-600 px-3 py-1 hover:bg-green-600 hover:text-black transition-all" onclick="copyAddress()">
+                        COPY ADDRESS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Stats -->
+            <div class="terminal-border bg-black bg-opacity-50 p-3 w-full mt-4">
+                <div class="pixel-font text-green-500 text-xs mb-2 text-center">
+                    [LIVE STATS]
+                </div>
+                <div class="pixel-font text-green-400 text-xs text-center space-y-1">
+                    <div>VIEWERS: <span id="viewerCount">1,247</span></div>
+                    <div>PAINTINGS TODAY: <span id="paintingsToday">23</span></div>
+                    <div>TOTAL BRUSHSTROKES: <span id="totalStrokes">847,293</span></div>
+                    <div class="typing">AI LEARNING: ACTIVE</div>
+                </div>
+            </div>
         </div>
-        <p class="text-xs text-green-600 mb-4">Your support helps robots learn art!</p>
-        <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
     </div>
 </div>
 
 <script>
-    // Gallery data - expandable array
-    const galleryItems = [
-        { id: 'GH-001', category: 'latest', status: 'available', date: '2025-01-18', preview: '🎨', image: null },
-        { id: 'GH-002', category: 'latest', status: 'sold', date: '2025-01-17', preview: '🖼️', image: null },
-        { id: 'GH-003', category: 'series', status: 'available', date: '2025-01-16', preview: '🎭', image: null },
-        { id: 'GH-004', category: 'rare', status: 'sold', date: '2025-01-15', preview: '💎', image: null },
-        { id: 'GH-005', category: 'unusual', status: 'available', date: '2025-01-14', preview: '🌀', image: null },
-        { id: 'GH-006', category: 'collabs', status: 'available', date: '2025-01-13', preview: '🤝', image: null },
-        { id: 'GH-007', category: 'latest', status: 'available', date: '2025-01-12', preview: '🎨', image: null },
-        { id: 'GH-008', category: 'series', status: 'sold', date: '2025-01-11', preview: '🖼️', image: null },
-        // Add new items here:
-        // { id: 'GH-009', category: 'latest', status: 'available', date: '2025-01-19', preview: '🎨', image: 'path/to/image.jpg' },
-    ];
-    
-    // Current filter
-    let currentCategory = 'latest';
-    
-    // Initialize gallery
-    function initGallery() {
-        renderGallery();
-        startPriceAnimation();
-        startFireflies();
-        startLearningLog();
-        updateLiveStatus();
-    }
-    
-    // Render gallery items
-    function renderGallery() {
-        const grid = document.getElementById('galleryGrid');
-        const filtered = currentCategory === 'all' 
-            ? galleryItems 
-            : galleryItems.filter(item => item.category === currentCategory);
-        
-        grid.innerHTML = filtered.map((item, index) => {
-            // Generate different pixel art for each item
-            const pixelArt = generatePixelArt(index);
-            
-            return `
-            <div class="gallery-card terminal-border bg-black p-3" onclick="inquireArtwork('${item.id}')">
-                <div class="relative">
-                    <div class="h-48 flex items-center justify-center bg-gray-900">
-                        ${item.image 
-                            ? `<img src="${item.image}" alt="${item.id}" class="pixel-art">` 
-                            : pixelArt
-                        }
-                    </div>
-                    <div class="${item.status === 'available' ? 'status-available' : 'status-sold'}"></div>
-                    <div class="card-overlay">
-                        <p class="text-sm glow-text mb-2">ID: ${item.id}</p>
-                        <button class="category-tab">INQUIRE</button>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <p class="text-xs text-green-600">${item.date}</p>
-                    <div class="price-display flex items-center gap-2 mt-2">
-                        <span class="coin-icon">
-                            <img src="ghostcoin.gif" alt="coin" style="width: 16px; height: 16px; image-rendering: pixelated; display: inline-block;">
-                        </span>
-                        <span class="price-mystery" id="price-${item.id}"></span>
-                    </div>
-                </div>
-            </div>
-        `}).join('');
-    }
-    
-    // Generate pixel art for gallery items
-    function generatePixelArt(index) {
-        const artTypes = [
-            // Simple painting with brush
-            `<div class="pixel-painting">
-                <div class="frame"></div>
-                <div class="canvas">
-                    <div class="brush"></div>
-                </div>
-            </div>`,
-            
-            // Abstract pixel pattern
-            `<div class="pixel-icon">
-                <div class="pixel-pattern" style="width: 20px; height: 20px; top: 10px; left: 10px;"></div>
-                <div class="pixel-pattern" style="width: 20px; height: 20px; top: 10px; right: 10px;"></div>
-                <div class="pixel-pattern" style="width: 20px; height: 20px; bottom: 10px; left: 10px;"></div>
-                <div class="pixel-pattern" style="width: 20px; height: 20px; bottom: 10px; right: 10px;"></div>
-                <div class="pixel-pattern" style="width: 30px; height: 30px; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);"></div>
-            </div>`,
-            
-            // Pixel robot artist
-            `<div class="pixel-icon">
-                <div style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                    <div style="position: relative;">
-                        <div class="pixel-pattern" style="width: 40px; height: 30px; position: relative;"></div>
-                        <div class="pixel-pattern" style="width: 10px; height: 10px; position: absolute; top: 5px; left: 8px; background: #000;"></div>
-                        <div class="pixel-pattern" style="width: 10px; height: 10px; position: absolute; top: 5px; right: 8px; background: #000;"></div>
-                        <div class="pixel-pattern" style="width: 20px; height: 5px; position: absolute; bottom: 5px; left: 10px; background: #000;"></div>
-                    </div>
-                </div>
-            </div>`,
-            
-            // Geometric pattern
-            `<div class="pixel-icon">
-                <div style="position: absolute; width: 100%; height: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; padding: 15px;">
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%; background: #001100;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                    <div class="pixel-pattern" style="width: 100%; height: 100%;"></div>
-                </div>
-            </div>`
-        ];
-        
-        return artTypes[index % artTypes.length];
-    }
-    
-    // Generate random price display with pixel shapes
-    function generatePixelChar() {
-        const patterns = ['square', 'cross', 'diamond', 'dot', 'line'];
-        const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-        
-        let html = `<span class="price-char pattern-${pattern}">`;
-        
-        switch(pattern) {
-            case 'cross':
-            case 'diamond':
-                html += '<div class="pixel-shape"></div><div class="pixel-shape"></div><div class="pixel-shape"></div><div class="pixel-shape"></div>';
-                break;
-            default:
-                html += '<div class="pixel-shape"></div>';
-        }
-        
-        html += '</span>';
-        return html;
-    }
-    
-    // Enhanced donate button click
-    function showDonateModal() {
-        const btn = document.getElementById('donateBtn');
-        btn.classList.add('clicked');
-        
-        // Create explosion of pixels
-        createDonateExplosion();
-        
-        setTimeout(() => {
-            btn.classList.remove('clicked');
-            document.getElementById('donateModal').style.display = 'flex';
-        }, 300);
-    }
-    
-    // Create explosion effect on donate click
-    function createDonateExplosion() {
-        const btn = document.getElementById('donateBtn');
-        const rect = btn.getBoundingClientRect();
-        
-        for(let i = 0; i < 12; i++) {
-            const pixel = document.createElement('div');
-            pixel.style.position = 'fixed';
-            pixel.style.width = '4px';
-            pixel.style.height = '4px';
-            pixel.style.background = '#00ff00';
-            pixel.style.left = (rect.left + rect.width/2) + 'px';
-            pixel.style.top = (rect.top + rect.height/2) + 'px';
-            pixel.style.pointerEvents = 'none';
-            pixel.style.zIndex = '2000';
-            
-            const angle = (i / 12) * Math.PI * 2;
-            const distance = 100 + Math.random() * 50;
-            const x = Math.cos(angle) * distance;
-            const y = Math.sin(angle) * distance;
-            
-            pixel.style.transition = 'all 0.8s ease-out';
-            pixel.style.opacity = '1';
-            
-            document.body.appendChild(pixel);
-            
-            setTimeout(() => {
-                pixel.style.transform = `translate(${x}px, ${y}px) scale(0)`;
-                pixel.style.opacity = '0';
-            }, 10);
-            
-            setTimeout(() => {
-                pixel.remove();
-            }, 800);
-        }
-    }
-    
-    // Animate prices individually
-    function animatePrices() {
-        const filtered = currentCategory === 'all' 
-            ? galleryItems 
-            : galleryItems.filter(item => item.category === currentCategory);
-        
-        filtered.forEach(item => {
-            const priceElement = document.getElementById(`price-${item.id}`);
-            if (priceElement) {
-                // Generate 5 pixel characters
-                let priceHtml = '';
-                for(let i = 0; i < 5; i++) {
-                    priceHtml += generatePixelChar();
-                }
-                priceElement.innerHTML = priceHtml;
-            }
-        });
-    }
-    
-    // Random individual character updates
-    function startPriceAnimation() {
-        // Initial render
-        setTimeout(animatePrices, 100);
-        
-        // Random updates
-        setInterval(() => {
-            const filtered = currentCategory === 'all' 
-                ? galleryItems 
-                : galleryItems.filter(item => item.category === currentCategory);
-            
-            if (filtered.length > 0) {
-                // Pick random item
-                const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
-                const priceElement = document.getElementById(`price-${randomItem.id}`);
-                
-                if (priceElement && priceElement.children.length > 0) {
-                    // Pick random character position
-                    const charIndex = Math.floor(Math.random() * priceElement.children.length);
-                    const oldChar = priceElement.children[charIndex];
-                    
-                    if (oldChar) {
-                        // Replace with new pixel character
-                        const newChar = generatePixelChar();
-                        const temp = document.createElement('div');
-                        temp.innerHTML = newChar;
-                        
-                        oldChar.style.opacity = '0';
-                        setTimeout(() => {
-                            if (oldChar.parentNode) {
-                                priceElement.replaceChild(temp.firstChild, oldChar);
-                            }
-                        }, 150);
-                    }
-                }
-            }
-        }, 300); // Update every 300ms
-    }
-    
-    // Filter by category
-    function filterCategory(category) {
-        currentCategory = category;
-        
-        // Update active tab
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        if (event && event.target) {
-            event.target.classList.add('active');
-        }
-        
-        renderGallery();
-        // Re-animate prices after render
-        setTimeout(animatePrices, 100);
-    }
-    
-    // Firefly effect for donate button
-    function startFireflies() {
+    // Donation button effects
+    function createFloatingPixels() {
+        const container = document.getElementById('pixelContainer');
         const button = document.getElementById('donateBtn');
         
-        setInterval(() => {
-            const firefly = document.createElement('div');
-            firefly.className = 'firefly';
+        for(let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                const pixel = document.createElement('div');
+                pixel.className = 'floating-pixel';
+                
+                const randomX = (Math.random() - 0.5) * 200 + 'px';
+                const randomY = (Math.random() - 0.5) * 200 + 'px';
+                
+                pixel.style.setProperty('--random-x', randomX);
+                pixel.style.setProperty('--random-y', randomY);
+                
+                // Random position around button
+                pixel.style.left = Math.random() * 100 + '%';
+                pixel.style.top = Math.random() * 100 + '%';
+                
+                container.appendChild(pixel);
+                
+                setTimeout(() => {
+                    if(pixel.parentNode) {
+                        pixel.parentNode.removeChild(pixel);
+                    }
+                }, 3000);
+            }, i * 500);
+        }
+    }
+    
+    // Explosion effect
+    function createExplosion() {
+        const container = document.getElementById('pixelContainer');
+        
+        for(let i = 0; i < 20; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'explosion-pixel';
             
-            // Position around button
-            const rect = button.getBoundingClientRect();
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 30 + Math.random() * 50;
+            const angle = (i / 20) * 360;
+            const distance = 100 + Math.random() * 100;
+            const radians = angle * Math.PI / 180;
             
-            firefly.style.left = (rect.left + rect.width/2 + Math.cos(angle) * distance) + 'px';
-            firefly.style.top = (rect.top + rect.height/2 + Math.sin(angle) * distance) + 'px';
+            const explodeX = Math.cos(radians) * distance + 'px';
+            const explodeY = Math.sin(radians) * distance + 'px';
             
-            // Movement
-            const flyX = (Math.random() - 0.5) * 200;
-            const flyY = -100 - Math.random() * 100;
+            pixel.style.setProperty('--explode-x', explodeX);
+            pixel.style.setProperty('--explode-y', explodeY);
             
-            firefly.style.setProperty('--fly-x', flyX + 'px');
-            firefly.style.setProperty('--fly-y', flyY + 'px');
-            firefly.style.animation = 'fireflyFloat 3s ease-out forwards';
+            pixel.style.left = '50%';
+            pixel.style.top = '50%';
+            pixel.style.backgroundColor = `hsl(${120 + Math.random() * 60}, 100%, 50%)`;
             
-            document.body.appendChild(firefly);
+            container.appendChild(pixel);
             
             setTimeout(() => {
-                firefly.remove();
-            }, 3000);
-        }, 800);
+                if(pixel.parentNode) {
+                    pixel.parentNode.removeChild(pixel);
+                }
+            }, 1000);
+        }
     }
     
-    // Learning log updates
-    function startLearningLog() {
-        const logMessages = [
-            'Learned: Cross-hatching technique #47',
-            'Discovered: New color mixing ratio',
-            'Pattern recognition: Spiral forms',
-            'Style update: Abstract expressionism v2.3',
-            'Neural pathway: Enhanced depth perception',
-            'Algorithm improvement: Brush stroke efficiency +12%'
-        ];
+    // Donation function
+    function donate() {
+        createExplosion();
         
-        const logContent = document.getElementById('logContent');
+        // Try to open MetaMask
+        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
         
-        setInterval(() => {
-            const message = logMessages[Math.floor(Math.random() * logMessages.length)];
-            const entry = document.createElement('div');
-            entry.className = 'mb-1 text-xs';
-            entry.textContent = `> ${message}`;
-            
-            logContent.insertBefore(entry, logContent.firstChild);
-            
-            // Keep only last 10 entries
-            while(logContent.children.length > 10) {
-                logContent.removeChild(logContent.lastChild);
-            }
-        }, 5000);
+        if(typeof window.ethereum !== 'undefined') {
+            // MetaMask is installed
+            window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    to: address,
+                    from: window.ethereum.selectedAddress,
+                    value: '0x38D7EA4C68000' // 0.001 ETH in hex
+                }]
+            }).catch(console.error);
+        } else {
+            // MetaMask not installed
+            alert(`MetaMask not detected!\n\nPlease send ETH to:\n${address}\n\nOr install MetaMask extension first.`);
+        }
+        
+        console.log('🍩 DONATION ATTEMPT - Thank you for supporting robot artists!');
     }
     
-    // Update live status
-    function updateLiveStatus() {
-        setInterval(() => {
-            const count = Math.floor(Math.random() * 5) + 1;
-            document.getElementById('liveStatus').textContent = `${count} IN PROGRESS`;
-        }, 10000);
-    }
-    
-    // Inquiry functions
-    function inquireArtwork(artworkId) {
-        document.getElementById('artworkId').textContent = `Artwork ID: ${artworkId}`;
-        document.getElementById('secretEmail').textContent = generateSecretEmail();
-        document.getElementById('inquiryModal').style.display = 'flex';
-    }
-    
-    function generateSecretEmail() {
-        // Generate encoded email
-        const parts = ['ghost', 'line', 'art', '@', 'proton', 'mail', '.com'];
-        return parts.join('');
-    }
-    
-    // Modal functions
-    function closeModal() {
-        document.getElementById('inquiryModal').style.display = 'none';
-    }
-    
-    function showDonateModal() {
-        document.getElementById('donateModal').style.display = 'flex';
-    }
-    
-    function closeDonateModal() {
-        document.getElementById('donateModal').style.display = 'none';
-    }
-    
-    // Copy address
+    // Copy address function
     function copyAddress() {
         const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
         navigator.clipboard.writeText(address).then(() => {
-            alert('Address copied!');
+            alert('✅ Address copied to clipboard!');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = address;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('✅ Address copied to clipboard!');
         });
     }
     
-    // Show social
+    // Show social links
     function showSocial() {
-        alert(`GHOSTLINE SOCIAL:\n\nInstagram: @____yuga______\nTikTok: @ghostline207\nTelegram: @yuga_art`);
+        const socialAlert = `
+```
+
+🎭 GHOSTLINE SOCIAL CHANNELS 🎭
+═══════════════════════════════
+
+📱 Instagram: https://www.instagram.com/****yuga****__
+🎵 TikTok: www.tiktok.com/@ghostline207  
+💬 Telegram: https://t.me/yuga_art
+
+💰 SUPPORT THE PROJECT:
+🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+`;
+
+```
+        alert(socialAlert);
     }
     
-    // Scroll to donate
-    function scrollToDonate() {
-        document.getElementById('donateBtn').scrollIntoView({ behavior: 'smooth' });
+    // Update live stats
+    function updateStats() {
+        const viewers = document.getElementById('viewerCount');
+        const paintings = document.getElementById('paintingsToday');
+        const strokes = document.getElementById('totalStrokes');
+        
+        // Random fluctuations
+        viewers.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString();
+        paintings.textContent = (20 + Math.floor(Math.random() * 10));
+        
+        const currentStrokes = parseInt(strokes.textContent.replace(/,/g, ''));
+        strokes.textContent = (currentStrokes + Math.floor(Math.random() * 50)).toLocaleString();
     }
     
-    // Initialize on load
-    window.addEventListener('load', initGallery);
+    // Initialize
+    window.addEventListener('load', function() {
+        // Start floating pixels
+        setInterval(createFloatingPixels, 2000);
+        
+        // Update stats
+        setInterval(updateStats, 5000);
+        
+        console.log(`
+        ╔═══════════════════════════════════════╗
+        ║         GHOSTLINE LIVE STREAM         ║
+        ║        ROBOT ARTISTS AT WORK          ║
+        ╠═══════════════════════════════════════╣
+        ║ Support our AI artists with ETH!      ║
+        ║ Address: 0x6971Cc1DB72c179aA624EB... ║
+        ╚═══════════════════════════════════════╝
+        `);
+    });
     
-    // Close modals on outside click
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        switch(e.key.toLowerCase()) {
+            case 'd':
+                donate();
+                break;
+            case 'c':
+                copyAddress();
+                break;
+            case 's':
+                showSocial();
+                break;
         }
-    }
+    });
 </script>
 ```
 
