@@ -8,15 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap');
+        body {
+            background: #000000;
+            margin: 0;
+            padding: 0;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+        }
 
 ```
-    body {
-        background: #000000;
-        margin: 0;
-        padding: 0;
-    }
-    
     .pixel-font {
         font-family: 'Share Tech Mono', monospace;
     }
@@ -25,26 +25,18 @@
         font-family: 'Press Start 2P', cursive;
     }
     
-    .scan-lines {
-        /* Убираем полоски полностью */
-    }
-    
     .terminal-border {
-        border: 1px solid #00FF00;
-        /* Тонкое пиксельное свечение */
-        box-shadow: 
-            0 0 0 1px #22ff22;
+        border: 2px solid #00FF00;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
         transition: all 0.3s ease;
     }
     
     .terminal-border:hover {
-        box-shadow: 
-            0 0 0 1px #44ff44,
-            0 0 0 2px #22ff22;
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
     }
     
     .glow-text {
-        text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00;
+        text-shadow: 0 0 8px #00FF00, 0 0 16px #00FF00;
     }
     
     .typing::after {
@@ -57,215 +49,185 @@
         51%, 100% { opacity: 0; }
     }
     
-    .video-feed {
-        background: rgba(0, 0, 0, 0.8);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .video-feed::before {
-        /* Убираем сканирующую линию */
-    }
-    
-    @keyframes scanLine {
-        0% { left: -100%; }
-        100% { left: 100%; }
-    }
-    
-    .matrix-bg {
-        background: 
-            radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
-    }
-    
-    /* МНОГО СВЕТЛЯЧКОВ ВМЕСТО ШУМА */
-    .robot-canvas {
+    /* TV STATIC NOISE */
+    .tv-static {
         position: absolute;
         width: 100%;
         height: 100%;
-        z-index: 1;
+        overflow: hidden;
+        background: #000;
+    }
+    
+    .tv-static::before {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: -100%;
+        width: 300%;
+        height: 300%;
+        background-image: 
+            repeating-radial-gradient(circle at 17% 32%, white, black 3px),
+            repeating-radial-gradient(circle at 42% 77%, white, black 4px),
+            repeating-radial-gradient(circle at 71% 14%, white, black 5px),
+            repeating-radial-gradient(circle at 89% 53%, white, black 4px);
+        background-size: 4px 4px;
+        opacity: 0.1;
+        animation: staticNoise 0.2s steps(5) infinite;
+        mix-blend-mode: screen;
+    }
+    
+    @keyframes staticNoise {
+        0% { transform: translate(0, 0); }
+        20% { transform: translate(-5%, -5%); }
+        40% { transform: translate(5%, -5%); }
+        60% { transform: translate(-5%, 5%); }
+        80% { transform: translate(5%, 5%); }
+        100% { transform: translate(0, 0); }
+    }
+    
+    /* Additional noise layer */
+    .tv-static::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: 
+            repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0) 0,
+                rgba(0, 255, 0, 0.03) 1px,
+                rgba(0, 255, 0, 0) 2px,
+                rgba(0, 255, 0, 0) 3px
+            );
+        animation: staticLines 0.1s linear infinite;
+    }
+    
+    @keyframes staticLines {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(3px); }
+    }
+    
+    .video-feed {
+        background: #000000;
+        position: relative;
         overflow: hidden;
     }
     
-    /* Светлячки - разные размеры и цвета */
-    .firefly {
-        position: absolute;
-        background: #00ff00;
-        border-radius: 0; /* квадратные */
-        opacity: 0;
-        pointer-events: none;
-        box-shadow: 0 0 3px #00ff00;
-        animation: fireflyFloat 4s ease-in-out infinite;
-    }
-    
-    .firefly:nth-child(odd) {
-        background: #44ff44;
-        animation-duration: 3s;
-        box-shadow: 0 0 2px #44ff44;
-    }
-    
-    .firefly:nth-child(3n) {
-        background: #66ff66;
-        animation-duration: 5s;
-        box-shadow: 0 0 4px #66ff66;
-    }
-    
-    .firefly:nth-child(5n) {
-        background: #88ff88;
-        animation-duration: 2.5s;
-        box-shadow: 0 0 1px #88ff88;
-    }
-    
-    @keyframes fireflyFloat {
-        0% {
-            opacity: 0;
-            transform: translate(0, 0) scale(1);
-        }
-        10% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.8;
-            transform: translate(var(--fly-x), var(--fly-y)) scale(1.2);
-        }
-        90% {
-            opacity: 0.6;
-        }
-        100% {
-            opacity: 0;
-            transform: translate(var(--fly-x2), var(--fly-y2)) scale(0.5);
-        }
-    }
-    
-    /* ПИКСЕЛЬНОЕ СВЕЧЕНИЕ ВМЕСТО РАЗМЫТОГО */
-    .glow-text {
-        /* Убираем размытое свечение */
-        text-shadow: none;
-        /* Добавляем пиксельное свечение */
-        color: #00ff00;
-        position: relative;
-    }
-    
-    .glow-text::before {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: #44ff44;
-        z-index: -1;
-        transform: translate(1px, 1px);
-    }
-    
-    .glow-text::after {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: #88ff88;
-        z-index: -2;
-        transform: translate(2px, 2px);
-    }
-    
-    /* ОБЪЕМНАЯ КНОПКА ДОНАТ */
+    /* ОБЪЕМНАЯ АНИМИРОВАННАЯ КНОПКА */
     .donate-button {
         position: relative;
-        background: linear-gradient(145deg, #001100, #000000, #001100);
-        border: 2px solid #00FF00;
-        color: #ffffff;
+        background: #000000;
+        border: 3px solid #00FF00;
+        color: #00FF00;
         font-weight: bold;
-        font-size: 18px;
-        padding: 15px 30px;
+        font-size: 20px;
+        padding: 20px 50px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        font-family: 'Press Start 2P', cursive;
+        text-transform: uppercase;
         overflow: hidden;
-        font-family: 'Share Tech Mono', monospace;
-        /* Объемность */
+        transition: all 0.3s ease;
+        /* 3D effect */
         box-shadow: 
-            inset 0 1px 0 rgba(0, 255, 0, 0.3),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.8),
-            0 2px 4px rgba(0, 0, 0, 0.5),
-            0 0 8px rgba(0, 255, 0, 0.3);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+            inset -4px -4px 0px 0px #003300,
+            inset 4px 4px 0px 0px #00FF00,
+            0 0 20px rgba(0, 255, 0, 0.5);
+    }
+    
+    .donate-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.4), transparent);
+        transition: left 0.5s;
+    }
+    
+    .donate-button:hover::before {
+        left: 100%;
     }
     
     .donate-button:hover {
-        background: linear-gradient(145deg, #002200, #001100, #002200);
-        color: #00ff00;
+        background: #001100;
         transform: translateY(-2px);
+        color: #FFFFFF;
+        text-shadow: 0 0 10px #00FF00;
         box-shadow: 
-            inset 0 1px 0 rgba(0, 255, 0, 0.5),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.9),
-            0 4px 8px rgba(0, 0, 0, 0.7),
-            0 0 16px rgba(0, 255, 0, 0.6);
-        text-shadow: 0 0 4px #00ff00;
+            inset -4px -4px 0px 0px #004400,
+            inset 4px 4px 0px 0px #44FF44,
+            0 0 30px rgba(0, 255, 0, 0.8),
+            0 5px 20px rgba(0, 0, 0, 0.5);
     }
     
     .donate-button:active {
-        background: linear-gradient(145deg, #000000, #001100, #000000);
-        transform: translateY(0px);
+        transform: translateY(0);
         box-shadow: 
-            inset 0 2px 4px rgba(0, 0, 0, 0.8),
-            0 1px 2px rgba(0, 0, 0, 0.3),
-            0 0 4px rgba(0, 255, 0, 0.2);
+            inset -2px -2px 0px 0px #002200,
+            inset 2px 2px 0px 0px #00FF00,
+            0 0 10px rgba(0, 255, 0, 0.3);
     }
     
-    .donate-button:active {
-        transform: scale(0.95);
+    /* Анимация пульсации для привлечения внимания */
+    @keyframes buttonPulse {
+        0%, 100% { 
+            box-shadow: 
+                inset -4px -4px 0px 0px #003300,
+                inset 4px 4px 0px 0px #00FF00,
+                0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        50% { 
+            box-shadow: 
+                inset -4px -4px 0px 0px #003300,
+                inset 4px 4px 0px 0px #00FF00,
+                0 0 40px rgba(0, 255, 0, 0.8);
+        }
     }
     
-    /* FLOATING PIXELS FROM BUTTON */
-    .floating-pixel {
-        position: absolute;
-        width: 4px;
-        height: 4px;
+    .donate-button {
+        animation: buttonPulse 2s ease-in-out infinite;
+    }
+    
+    .donate-button:hover {
+        animation: none;
+    }
+    
+    /* Светлячки от кнопки */
+    .button-firefly {
+        position: fixed;
+        width: 3px;
+        height: 3px;
         background: #00FF00;
         pointer-events: none;
-        animation: floatAway 3s linear infinite;
+        z-index: 1000;
+        box-shadow: 0 0 6px #00FF00;
+        opacity: 0;
     }
     
-    @keyframes floatAway {
+    @keyframes fireflyFromButton {
         0% {
+            opacity: 0;
+            transform: translate(0, 0) scale(0);
+        }
+        10% {
             opacity: 1;
-            transform: translate(0, 0) scale(1);
+            transform: translate(0, -10px) scale(1);
         }
         100% {
             opacity: 0;
-            transform: translate(var(--random-x), var(--random-y)) scale(0);
+            transform: translate(var(--end-x), var(--end-y)) scale(0);
         }
     }
     
-    /* EXPLOSION EFFECT */
-    .explosion-pixel {
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        background: #00FF00;
-        pointer-events: none;
-        animation: explode 1s ease-out forwards;
-    }
-    
-    @keyframes explode {
-        0% {
-            opacity: 1;
-            transform: translate(0, 0) scale(1);
-        }
-        100% {
-            opacity: 0;
-            transform: translate(var(--explode-x), var(--explode-y)) scale(0) rotate(360deg);
-        }
-    }
-    
-    /* STATUS INDICATORS - SQUARE PIXELS */
+    /* STATUS INDICATORS */
     .status-online {
         display: inline-block;
         width: 8px;
         height: 8px;
         background: #00FF00;
         margin-right: 5px;
-        /* Пиксельное свечение */
-        box-shadow: 
-            0 0 0 1px #44ff44,
-            0 0 0 2px #22ff22;
+        box-shadow: 0 0 10px #00FF00;
         animation: statusBlink 2s infinite;
     }
     
@@ -275,9 +237,7 @@
         height: 8px;
         background: #FFFF00;
         margin-right: 5px;
-        box-shadow: 
-            0 0 0 1px #ffff44,
-            0 0 0 2px #ffff22;
+        box-shadow: 0 0 10px #FFFF00;
     }
     
     @keyframes statusBlink {
@@ -285,89 +245,66 @@
         51%, 100% { opacity: 0.3; }
     }
     
-    /* ROBOT WORKING ANIMATION */
-    @keyframes robotWork {
-        0%, 100% { transform: translate(0, 0); }
-        25% { transform: translate(2px, -1px); }
-        50% { transform: translate(-1px, 2px); }
-        75% { transform: translate(1px, 1px); }
-    }
-    
-    .robot-active {
-        animation: robotWork 2s infinite;
-    }
-    
-    /* MOBILE ADAPTATIONS */
-    @media (max-width: 768px) {
-        .main-grid {
-            grid-template-columns: 1fr !important;
-        }
-        
-        .video-grid {
-            grid-template-columns: 1fr 1fr !important;
-        }
-        
-        .donate-button {
-            font-size: 16px;
-            padding: 12px 24px;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .video-grid {
-            grid-template-columns: 1fr !important;
-        }
-        
-        .donate-button {
-            font-size: 14px;
-            padding: 10px 20px;
-        }
-        
-        .video-feed {
-            height: 120px !important;
-        }
-    }
-    
     .nav-link {
         transition: all 0.3s ease;
         text-decoration: none;
         cursor: pointer;
+        color: #00ff00;
     }
     
     .nav-link:hover {
-        color: #00FF00;
-        text-shadow: 0 0 5px #00FF00;
+        text-shadow: 0 0 10px #00FF00;
+    }
+    
+    /* Mobile adaptations */
+    @media (max-width: 768px) {
+        .main-grid {
+            flex-direction: column;
+        }
+        
+        .video-section {
+            width: 100% !important;
+        }
+        
+        .donate-section {
+            width: 100% !important;
+            margin-top: 2rem;
+        }
+        
+        .video-grid {
+            grid-template-columns: 1fr !important;
+        }
     }
 </style>
 ```
 
 </head>
-<body class="bg-black text-green-400 overflow-hidden">
-    <div class="w-full min-h-screen scan-lines matrix-bg">
+<body>
+    <div class="w-full min-h-screen">
 
 ```
     <!-- Header Navigation -->
-    <div class="terminal-border bg-black bg-opacity-70 mx-4 mt-2 px-6 py-2 pixel-font">
+    <div class="terminal-border bg-black mx-4 mt-2 px-6 py-2">
         <div class="flex justify-between items-center">
             <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
-            <div class="text-green-600 text-sm">
+            <div class="text-sm">
                 <a href="index.html" class="nav-link mr-4">[HOME]</a>
                 <span class="text-green-400 mr-4">[LIVE STREAM]</span>
                 <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
-                <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
+                <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
             </div>
-            <div class="text-green-500 text-xs pixel-font">
+            <div class="text-xs">
                 <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
             </div>
         </div>
     </div>
 
-    <div class="flex p-4 h-full main-grid gap-6">
+    <div class="flex p-4 main-grid">
         <!-- Live Video Feeds -->
-        <div class="w-2/3">
+        <div class="video-section w-2/3 pr-4">
             <!-- Title -->
             <div class="text-center mb-6">
-                <h2 class="retro-font text-3xl font-bold text-green-400 glow-text">
+                <h2 class="retro-font text-2xl text-green-400 glow-text">
                     LIVE ROBOT ARTISTS
                 </h2>
                 <div class="pixel-font text-green-600 text-sm">
@@ -376,63 +313,68 @@
             </div>
             
             <!-- Video Grid -->
-            <div class="grid grid-cols-2 gap-3 video-grid">
+            <div class="grid grid-cols-2 gap-4 video-grid">
                 
                 <!-- Robot 01 -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                <div class="terminal-border bg-black p-3">
+                    <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_01 - "YUGA"]</span>
-                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                        <span><span class="status-online"></span>LIVE</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div id="robot1-canvas" class="robot-canvas"></div>
+                    <div class="video-feed h-40 terminal-border relative">
+                        <div class="tv-static"></div>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs">
+                    <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Abstract Expressionism</div>
                         <div class="typing">BRUSH PRESSURE: 73%</div>
                     </div>
                 </div>
 
                 <!-- Robot 02 -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                <div class="terminal-border bg-black p-3">
+                    <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_02 - "MIKA"]</span>
-                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                        <span><span class="status-online"></span>LIVE</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div id="robot2-canvas" class="robot-canvas"></div>
+                    <div class="video-feed h-40 terminal-border relative">
+                        <div class="tv-static"></div>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs">
+                    <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Digital Minimalism</div>
                         <div class="typing">COLOR MIX: Blue + White</div>
                     </div>
                 </div>
 
                 <!-- Robot 03 -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                <div class="terminal-border bg-black p-3">
+                    <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_03 - "GHOST"]</span>
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div id="robot3-canvas" class="robot-canvas"></div>
+                    <div class="video-feed h-40 terminal-border relative">
+                        <div class="tv-static"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-green-400 text-xs bg-black bg-opacity-70 px-3 py-1 terminal-border">
+                                NO SIGNAL
+                            </div>
+                        </div>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs">
+                    <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STATUS: Battery Charging</div>
                         <div>ETA: 00:23:15</div>
                     </div>
                 </div>
 
                 <!-- Robot 04 -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3">
-                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                <div class="terminal-border bg-black p-3">
+                    <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_04 - "LINE"]</span>
-                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                        <span><span class="status-online"></span>LIVE</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div id="robot4-canvas" class="robot-canvas"></div>
+                    <div class="video-feed h-40 terminal-border relative">
+                        <div class="tv-static"></div>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs">
+                    <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Geometric Patterns</div>
                         <div class="typing">PATTERN: SPIRAL_09</div>
                     </div>
@@ -441,147 +383,70 @@
         </div>
 
         <!-- Donation Panel -->
-        <div class="w-1/3 flex flex-col items-center justify-center">
+        <div class="donate-section w-1/3 flex flex-col items-center justify-center">
             
             <!-- Support Message -->
             <div class="text-center mb-8">
-                <h3 class="pixel-font text-2xl font-bold mb-4">
-                    <span style="color: #00ff00;">SUPPORT THE PROJECT</span>
+                <h3 class="retro-font text-xl mb-4">
+                    <span style="color: #00ff00;">SUPPORT</span>
+                    <span style="color: #9400D3; text-shadow: 0 0 10px #9400D3;">PROJECT</span>
                 </h3>
             </div>
 
             <!-- MEGA DONATION BUTTON -->
-            <div class="relative mb-8" id="donateContainer">
-                <button class="donate-button pixel-font" onclick="donate()" id="donateBtn">
+            <div class="relative mb-8">
+                <button class="donate-button" onclick="donate()" id="donateBtn">
                     DONATE
                 </button>
-                
-                <!-- Floating pixels container -->
-                <div id="pixelContainer" class="absolute inset-0 pointer-events-none"></div>
-            </div>
-            
-            <!-- Live Stats -->
-            <div class="terminal-border bg-black bg-opacity-60 p-4 w-full max-w-xs">
-                <div class="pixel-font text-green-500 text-xs mb-3 text-center">[LIVE STATS]</div>
-                <div class="pixel-font text-green-400 space-y-1 text-xs">
-                    <div>VIEWERS: <span id="viewerCount">1,247</span></div>
-                    <div>PAINTINGS TODAY: <span id="paintingsToday">23</span></div>
-                    <div>TOTAL BRUSHSTROKES: <span id="totalStrokes">847,293</span></div>
-                    <div>AI LEARNING: <span class="text-green-300">ACTIVE</span></div>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // БЫСТРЫЙ ФИКС - ПРОСТЫЕ СВЕТЛЯЧКИ БЕЗ КЛАССОВ
-    function createManyFireflies(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            console.log('❌ Container not found:', containerId);
-            return;
-        }
-        
-        console.log('✅ Creating fireflies for:', containerId);
-        container.innerHTML = '';
-        
-        // Создаем 20 простых светлячков
-        for (let i = 0; i < 20; i++) {
-            const firefly = document.createElement('div');
-            
-            // Прямые стили без классов
-            firefly.style.cssText = `
-                position: absolute;
-                width: ${3 + Math.random() * 4}px;
-                height: ${3 + Math.random() * 4}px;
-                background: #00ff00;
-                left: ${Math.random() * 100}%;
-                top: ${Math.random() * 100}%;
-                opacity: ${0.5 + Math.random() * 0.5};
-                box-shadow: 0 0 3px #00ff00;
-                z-index: 10;
-            `;
-            
-            container.appendChild(firefly);
-            
-            // Простая анимация
-            setInterval(() => {
-                firefly.style.left = Math.random() * 100 + '%';
-                firefly.style.top = Math.random() * 100 + '%';
-                firefly.style.opacity = 0.3 + Math.random() * 0.7;
-            }, 2000 + Math.random() * 3000);
-        }
-    }
-
-    // Donation button effects
-    function createFloatingPixels() {
-        const container = document.getElementById('pixelContainer');
+    // Create fireflies from button
+    function createButtonFireflies() {
         const button = document.getElementById('donateBtn');
+        const rect = button.getBoundingClientRect();
         
-        for(let i = 0; i < 3; i++) {
+        for(let i = 0; i < 8; i++) {
             setTimeout(() => {
-                const pixel = document.createElement('div');
-                pixel.className = 'floating-pixel';
+                const firefly = document.createElement('div');
+                firefly.className = 'button-firefly';
                 
-                const randomX = (Math.random() - 0.5) * 200 + 'px';
-                const randomY = (Math.random() - 0.5) * 200 + 'px';
+                // Start position - around button
+                const angle = (i / 8) * Math.PI * 2;
+                const startRadius = 30;
+                const startX = rect.left + rect.width/2 + Math.cos(angle) * startRadius;
+                const startY = rect.top + rect.height/2 + Math.sin(angle) * startRadius;
                 
-                pixel.style.setProperty('--random-x', randomX);
-                pixel.style.setProperty('--random-y', randomY);
+                firefly.style.left = startX + 'px';
+                firefly.style.top = startY + 'px';
                 
-                // Random position around button
-                pixel.style.left = Math.random() * 100 + '%';
-                pixel.style.top = Math.random() * 100 + '%';
+                // End position - random spread
+                const endRadius = 100 + Math.random() * 150;
+                const endAngle = angle + (Math.random() - 0.5) * Math.PI/2;
+                const endX = Math.cos(endAngle) * endRadius;
+                const endY = Math.sin(endAngle) * endRadius - 50; // Bias upward
                 
-                container.appendChild(pixel);
+                firefly.style.setProperty('--end-x', endX + 'px');
+                firefly.style.setProperty('--end-y', endY + 'px');
+                firefly.style.animation = 'fireflyFromButton 3s ease-out forwards';
                 
-                setTimeout(() => {
-                    if(pixel.parentNode) {
-                        pixel.parentNode.removeChild(pixel);
-                    }
-                }, 3000);
-            }, i * 500);
-        }
-    }
-    
-    // Explosion effect
-    function createExplosion() {
-        const container = document.getElementById('pixelContainer');
-        
-        for(let i = 0; i < 20; i++) {
-            const pixel = document.createElement('div');
-            pixel.className = 'explosion-pixel';
-            
-            const angle = (i / 20) * 360;
-            const distance = 100 + Math.random() * 100;
-            const radians = angle * Math.PI / 180;
-            
-            const explodeX = Math.cos(radians) * distance + 'px';
-            const explodeY = Math.sin(radians) * distance + 'px';
-            
-            pixel.style.setProperty('--explode-x', explodeX);
-            pixel.style.setProperty('--explode-y', explodeY);
-            
-            pixel.style.left = '50%';
-            pixel.style.top = '50%';
-            pixel.style.backgroundColor = `hsl(${120 + Math.random() * 60}, 100%, 50%)`;
-            
-            container.appendChild(pixel);
-            
-            setTimeout(() => {
-                if(pixel.parentNode) {
-                    pixel.parentNode.removeChild(pixel);
-                }
-            }, 1000);
+                document.body.appendChild(firefly);
+                
+                setTimeout(() => firefly.remove(), 3000);
+            }, i * 100);
         }
     }
     
     // Donation function
     function donate() {
-        createExplosion();
+        console.log('💰 Donate button clicked!');
         
-        // Try to open MetaMask
+        // Visual feedback
+        createButtonFireflies();
+        
         const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
         
         if(typeof window.ethereum !== 'undefined') {
@@ -589,111 +454,28 @@
             window.ethereum.request({
                 method: 'eth_sendTransaction',
                 params: [{
-                    to: '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a',
+                    to: address,
                     from: window.ethereum.selectedAddress,
-                    value: '0x38D7EA4C68000' // 0.001 ETH in hex
+                    value: '0x2386F26FC10000' // 0.01 ETH
                 }]
             }).catch(console.error);
         } else {
-            // MetaMask not installed
-            alert(`MetaMask not detected!\n\nPlease send ETH to:\n0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a\n\nOr install MetaMask extension first.`);
+            // Show address for manual transfer
+            alert(`Please send ETH to:\n\n${address}\n\nOr install MetaMask extension for easier donations!`);
         }
-        
-        console.log('🤖 DONATION ATTEMPT - Thank you for supporting robot artists!');
-    }
-    
-    // Copy address function
-    function copyAddress() {
-        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
-        navigator.clipboard.writeText(address).then(() => {
-            alert('✅ Address copied to clipboard!');
-        }).catch(() => {
-            // Fallback for older browsers
-            const textArea = document.createElement('textarea');
-            textArea.value = address;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            alert('✅ Address copied to clipboard!');
-        });
     }
     
     // Show social links
     function showSocial() {
-        const socialAlert = `
-```
-
-🎭 GHOSTLINE SOCIAL CHANNELS 🎭
-═══════════════════════════════
-
-📱 Instagram: https://www.instagram.com/****yuga****__
-🎵 TikTok: www.tiktok.com/@ghostline207  
-💬 Telegram: https://t.me/yuga_art
-
-💰 SUPPORT THE PROJECT:
-🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
-`;
-alert(socialAlert);
-}
-
-```
-    // Update live stats
-    function updateStats() {
-        const viewers = document.getElementById('viewerCount');
-        const paintings = document.getElementById('paintingsToday');
-        const strokes = document.getElementById('totalStrokes');
-        
-        if (viewers && paintings && strokes) {
-            // Random fluctuations
-            viewers.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString();
-            paintings.textContent = (20 + Math.floor(Math.random() * 10));
-            
-            const currentStrokes = parseInt(strokes.textContent.replace(/,/g, ''));
-            strokes.textContent = (currentStrokes + Math.floor(Math.random() * 50)).toLocaleString();
-        }
+        alert(`GHOSTLINE SOCIAL:\n\nInstagram: @____yuga______\nTikTok: @ghostline207\nTelegram: @yuga_art`);
     }
     
     // Initialize
     window.addEventListener('load', function() {
-        console.log('🎮 Creating fireflies instead of noise...');
+        console.log('🎨 GHOSTLINE Stream initialized!');
         
-        // Создаем светлячков для всех роботов
-        setTimeout(() => createManyFireflies('robot1-canvas'), 500);
-        setTimeout(() => createManyFireflies('robot2-canvas'), 700); 
-        setTimeout(() => createManyFireflies('robot3-canvas'), 900);
-        setTimeout(() => createManyFireflies('robot4-canvas'), 1100);
-        
-        // Start floating pixels for donate button
-        setInterval(createFloatingPixels, 2000);
-        
-        // Update stats
-        setInterval(updateStats, 5000);
-        
-        console.log(`
-        ╔═══════════════════════════════════════╗
-        ║         GHOSTLINE LIVE STREAM         ║
-        ║        ROBOT ARTISTS AT WORK          ║
-        ╠═══════════════════════════════════════╣
-        ║ Support our AI artists with ETH!      ║
-        ║ Address: 0x6971Cc1DB72c179aA624EB... ║
-        ╚═══════════════════════════════════════╝
-        `);
-    });
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        switch(e.key.toLowerCase()) {
-            case 'd':
-                donate();
-                break;
-            case 'c':
-                copyAddress();
-                break;
-            case 's':
-                showSocial();
-                break;
-        }
+        // Start button fireflies periodically
+        setInterval(createButtonFireflies, 8000);
     });
 </script>
 ```
