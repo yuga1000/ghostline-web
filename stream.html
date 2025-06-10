@@ -427,47 +427,49 @@
 </div>
 
 <script>
-    // ПИКСЕЛЬНЫЙ TV STATIC ШУМ как в гифке
-    function createTVStatic(containerId) {
+    // СУПЕР ПРОСТОЙ ШУМ - ДОЛЖЕН РАБОТАТЬ 100%
+    function createSimpleNoise(containerId) {
         const container = document.getElementById(containerId);
-        if (!container) return;
-        
-        container.innerHTML = '';
-        container.style.position = 'relative';
-        container.style.overflow = 'hidden';
-        
-        const pixelSize = 4; // размер одного пикселя
-        const cols = Math.floor(container.offsetWidth / pixelSize) || 80;
-        const rows = Math.floor(container.offsetHeight / pixelSize) || 30;
-        
-        console.log(`Creating ${cols}x${rows} static for ${containerId}`);
-        
-        // Создаем сетку пикселей
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                const pixel = document.createElement('div');
-                pixel.style.position = 'absolute';
-                pixel.style.width = pixelSize + 'px';
-                pixel.style.height = pixelSize + 'px';
-                pixel.style.left = (x * pixelSize) + 'px';
-                pixel.style.top = (y * pixelSize) + 'px';
-                pixel.style.backgroundColor = Math.random() < 0.5 ? '#00ff00' : '#000000';
-                pixel.style.opacity = Math.random() * 0.8 + 0.2;
-                container.appendChild(pixel);
-            }
+        if (!container) {
+            console.log('❌ Container not found:', containerId);
+            return;
         }
         
-        // Анимация шума - постоянно меняем пиксели
-        setInterval(() => {
-            const pixels = container.children;
-            for (let i = 0; i < pixels.length; i++) {
-                if (Math.random() < 0.3) { // 30% шанс измениться
-                    const colors = ['#00ff00', '#000000', '#44ff44', '#002200'];
-                    pixels[i].style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    pixels[i].style.opacity = Math.random() * 0.8 + 0.2;
-                }
+        console.log('✅ Creating noise for:', containerId);
+        
+        // Очищаем и подготавливаем контейнер
+        container.innerHTML = '<div style="color: #00ff00; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 999;">LOADING...</div>';
+        
+        setTimeout(() => {
+            container.innerHTML = ''; // Убираем LOADING
+            
+            // Создаем 200 точек шума
+            for (let i = 0; i < 200; i++) {
+                const dot = document.createElement('div');
+                dot.style.cssText = `
+                    position: absolute;
+                    width: 3px;
+                    height: 3px;
+                    background: #00ff00;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                `;
+                container.appendChild(dot);
             }
-        }, 100); // Быстрая анимация каждые 100ms
+            
+            console.log('✅ Created', container.children.length, 'noise dots');
+            
+            // Анимация - меняем цвет точек
+            setInterval(() => {
+                const dots = container.children;
+                for (let i = 0; i < dots.length; i++) {
+                    if (Math.random() < 0.2) {
+                        dots[i].style.background = Math.random() < 0.5 ? '#00ff00' : '#000000';
+                    }
+                }
+            }, 150);
+            
+        }, 500); // Задержка для инициализации
     }
 
     // Donation button effects
@@ -612,13 +614,28 @@ alert(socialAlert);
     
     // Initialize
     window.addEventListener('load', function() {
-        console.log('Creating TV static noise...');
+        console.log('🎮 GHOSTLINE LOADING...');
         
-        // Создаем TV static шум для всех роботов
-        setTimeout(() => createTVStatic('robot1-canvas'), 100);
-        setTimeout(() => createTVStatic('robot2-canvas'), 200); 
-        setTimeout(() => createTVStatic('robot3-canvas'), 300);
-        setTimeout(() => createTVStatic('robot4-canvas'), 400);
+        // Создаем простой шум с задержками
+        setTimeout(() => {
+            console.log('Creating noise 1...');
+            createSimpleNoise('robot1-canvas');
+        }, 1000);
+        
+        setTimeout(() => {
+            console.log('Creating noise 2...');
+            createSimpleNoise('robot2-canvas');
+        }, 1500);
+        
+        setTimeout(() => {
+            console.log('Creating noise 3...');
+            createSimpleNoise('robot3-canvas');
+        }, 2000);
+        
+        setTimeout(() => {
+            console.log('Creating noise 4...');
+            createSimpleNoise('robot4-canvas');
+        }, 2500);
         
         // Start floating pixels
         setInterval(createFloatingPixels, 2000);
