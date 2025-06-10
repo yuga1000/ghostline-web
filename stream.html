@@ -431,6 +431,7 @@ startCodeRain(robot1Container);
     setInterval(() => {
     const line = document.createElement("div");
     line.className = "code-line";
+        line.style.color = Math.random() < 0.15 ? "#44ff88" : "#00ff00";
 line.style.fontFamily = Math.random() < 0.3
     ? "'Press Start 2P', monospace"
     : "'Share Tech Mono', monospace";
