@@ -429,21 +429,28 @@ startCodeRain(robot1Container);
     ];
 
     setInterval(() => {
-        const line = document.createElement("div");
-        line.className = "code-line";
-        line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-        
-        line.style.left = Math.floor(Math.random() * 5) * 20 + "%"; // Столбцы по 20%
-line.style.top = "0px";
-line.style.animationDuration = (10 + Math.random() * 5) + "s"; // Медленнее
-line.style.opacity = 0.5 + Math.random() * 0.5; // Добавим прозрачность
+    const line = document.createElement("div");
+    line.className = "code-line";
+    line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
 
-        container.appendChild(line);
-        
-        setTimeout(() => {
-            container.removeChild(line);
-        }, 8000);
-    }, 100);
+    // Координаты по "пиксельной сетке" — шаг 8px
+    const step = 8;
+    const maxCols = Math.floor(container.offsetWidth / step);
+    const maxRows = Math.floor(container.offsetHeight / step);
+
+    const col = Math.floor(Math.random() * maxCols);
+    const row = Math.floor(Math.random() * maxRows);
+
+    line.style.left = col * step + "px";
+    line.style.top = row * step + "px";
+    line.style.opacity = 0.7;
+
+    container.appendChild(line);
+
+    setTimeout(() => {
+        container.removeChild(line);
+    }, 1200 + Math.random() * 400); // живут ~1.5 сек
+}, 180);
 }
 </script>
 ```
