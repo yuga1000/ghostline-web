@@ -411,7 +411,39 @@
     // Initialize
     window.addEventListener('load', function() {
         console.log('🎨 GHOSTLINE Stream initialized!');
+        const robot1Container = document.querySelectorAll('.video-feed')[0];
+startCodeRain(robot1Container);
     });
+    function startCodeRain(container) {
+    const codeSnippets = [
+        "SIG:TRACE.YUGA::READY",
+        "BRUSH[0x23]::LOAD OK",
+        "MEM.PULSE::Δ+0.07",
+        ">> THINKING [.........]",
+        "CONTOUR_LOCKED = TRUE",
+        "EXP.TIME::4.73s",
+        "— — — — — — — — —",
+        "TOH_SIGNAL: HOLD",
+        "SENSOR[03]: STABLE",
+        "PATH::CALC[SPIRAL]"
+    ];
+
+    setInterval(() => {
+        const line = document.createElement("div");
+        line.className = "code-line";
+        line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+        
+        line.style.left = Math.random() * 80 + "%";
+        line.style.top = "-10px";
+        line.style.animationDuration = (5 + Math.random() * 3) + "s";
+
+        container.appendChild(line);
+        
+        setTimeout(() => {
+            container.removeChild(line);
+        }, 8000);
+    }, 300);
+}
 </script>
 ```
 
