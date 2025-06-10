@@ -461,15 +461,16 @@
 </div>
 
 <script>
-    // ЖИВЫЕ ПИКСЕЛИ ДЛЯ РОБОТОВ
+    // ЖИВЫЕ ПИКСЕЛИ ДЛЯ РОБОТОВ - УПРОЩЕННАЯ ВЕРСИЯ
     class RobotPixelArt {
         constructor(containerId) {
             this.container = document.getElementById(containerId);
             if (!this.container) return;
             
-            this.width = 25;  // Уменьшаем для крупных пикселей
-            this.height = 15; // Уменьшаем для крупных пикселей
+            this.width = 20;  
+            this.height = 12; 
             this.grid = [];
+            this.pixelSize = 8; // размер пикселя в px
             this.initGrid();
             this.createCanvas();
             this.startEvolution();
@@ -477,23 +478,28 @@
         
         initGrid() {
             this.grid = Array(this.height).fill().map(() => 
-                Array(this.width).fill().map(() => Math.random() < 0.25 ? 1 : 0)
+                Array(this.width).fill().map(() => Math.random() < 0.3 ? 1 : 0)
             );
         }
         
         createCanvas() {
-            this.container.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`;
-            this.container.style.gridTemplateRows = `repeat(${this.height}, 1fr)`;
+            this.container.innerHTML = '';
+            this.container.style.position = 'absolute';
+            this.container.style.width = '100%';
+            this.container.style.height = '100%';
+            this.container.style.top = '0';
+            this.container.style.left = '0';
             
             for (let y = 0; y < this.height; y++) {
                 for (let x = 0; x < this.width; x++) {
                     const pixel = document.createElement('div');
+                    pixel.style.position = 'absolute';
+                    pixel.style.width = this.pixelSize + 'px';
+                    pixel.style.height = this.pixelSize + 'px';
+                    pixel.style.left = (x * this.pixelSize) + 'px';
+                    pixel.style.top = (y * this.pixelSize) + 'px';
                     pixel.style.backgroundColor = this.grid[y][x] ? '#00ff00' : 'transparent';
-                    pixel.style.transition = 'background-color 0.4s ease';
-                    pixel.style.width = '100%';
-                    pixel.style.height = '100%';
-                    pixel.style.minHeight = '3px';
-                    pixel.style.minWidth = '3px';
+                    pixel.style.transition = 'background-color 0.5s ease';
                     this.container.appendChild(pixel);
                 }
             }
@@ -550,12 +556,12 @@
             setInterval(() => {
                 this.evolve();
                 // Добавляем немного хаоса
-                if (Math.random() < 0.1) {
+                if (Math.random() < 0.15) {
                     const x = Math.floor(Math.random() * this.width);
                     const y = Math.floor(Math.random() * this.height);
                     this.grid[y][x] = Math.random() < 0.5 ? 1 : 0;
                 }
-            }, 1200);
+            }, 1000);
         }
     }
 
