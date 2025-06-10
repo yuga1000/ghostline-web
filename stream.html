@@ -478,18 +478,9 @@
                         <span class="text-green-400"><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-400 text-xs text-center robot-active">
-                            <pre>
-╔══════════════════╗
-║      🤖          ║
-║         🎨       ║
-║   ┌─────────┐    ║
-║   │░░▓▓██▓░░│    ║
-║   │▓██░░░██▓│    ║
-║   │░▓████▓░░│    ║
-║   └─────────┘    ║
-╚══════════════════╝
-                            </pre>
+                        <div class="pixel-noise">
+                            <div class="noise-frame"></div>
+                            <div class="noise-pixels"></div>
                         </div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs">
@@ -505,18 +496,9 @@
                         <span class="text-green-400"><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 0.5s;">
-                            <pre>
-╔══════════════════╗
-║         🤖       ║
-║   🎨             ║
-║   ┌─────────┐    ║
-║   │██▓░░▓██│    ║
-║   │░░███░░░│    ║
-║   │▓██░▓██▓│    ║
-║   └─────────┘    ║
-╚══════════════════╝
-                            </pre>
+                        <div class="pixel-noise">
+                            <div class="noise-frame"></div>
+                            <div class="noise-pixels"></div>
                         </div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs">
@@ -563,18 +545,9 @@
                         <span class="text-green-400"><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 1s;">
-                            <pre>
-╔══════════════════╗
-║    🤖            ║
-║              🎨  ║
-║   ┌─────────┐    ║
-║   │▓▓▓██▓▓▓│    ║
-║   │██▓▓▓██▓│    ║
-║   │▓██░▓░██│    ║
-║   └─────────┘    ║
-╚══════════════════╝
-                            </pre>
+                        <div class="pixel-noise">
+                            <div class="noise-frame"></div>
+                            <div class="noise-pixels"></div>
                         </div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs">
@@ -590,10 +563,10 @@
             
             <!-- Support Message -->
             <div class="text-center mb-8">
-                <h3 class="retro-font text-2xl font-bold text-green-400 glow-text mb-4">
-                    SUPPORT THE ARTISTS
+                <h3 class="retro-font text-2xl font-bold glow-text mb-4" style="color: #9400D3; text-shadow: 0 0 10px #9400D3, 0 0 20px #9400D3;">
+                    SUPPORT THE PROJECT
                 </h3>
-                <div class="pixel-font text-green-600 text-sm leading-relaxed">
+                <div class="pixel-font text-sm leading-relaxed" style="color: #9400D3;">
                     Help fund our AI robot artists<br/>
                     Every donation goes directly to:<br/>
                     • Robot maintenance & upgrades<br/>
@@ -611,34 +584,6 @@
                 
                 <!-- Floating pixels container -->
                 <div id="pixelContainer" class="absolute inset-0 pointer-events-none"></div>
-            </div>
-
-            <!-- MetaMask Address -->
-            <div class="terminal-border bg-black bg-opacity-50 p-4 w-full">
-                <div class="pixel-font text-green-500 text-xs mb-2 text-center">
-                    [ETHEREUM ADDRESS]
-                </div>
-                <div class="pixel-font text-green-400 text-xs text-center break-all leading-relaxed">
-                    0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
-                </div>
-                <div class="text-center mt-3">
-                    <button class="pixel-font text-green-600 text-xs border border-green-600 px-3 py-1 hover:bg-green-600 hover:text-black transition-all" onclick="copyAddress()">
-                        COPY ADDRESS
-                    </button>
-                </div>
-            </div>
-
-            <!-- Live Stats -->
-            <div class="terminal-border bg-black bg-opacity-50 p-3 w-full mt-4">
-                <div class="pixel-font text-green-500 text-xs mb-2 text-center">
-                    [LIVE STATS]
-                </div>
-                <div class="pixel-font text-green-400 text-xs text-center space-y-1">
-                    <div>VIEWERS: <span id="viewerCount">1,247</span></div>
-                    <div>PAINTINGS TODAY: <span id="paintingsToday">23</span></div>
-                    <div>TOTAL BRUSHSTROKES: <span id="totalStrokes">847,293</span></div>
-                    <div class="typing">AI LEARNING: ACTIVE</div>
-                </div>
             </div>
         </div>
     </div>
