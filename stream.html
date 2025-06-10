@@ -28,20 +28,10 @@
     .terminal-border {
         border: 2px solid #00FF00;
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        transition: all 0.3s ease;
-    }
-    
-    .terminal-border:hover {
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
     }
     
     .glow-text {
-        text-shadow: 0 0 8px #00FF00, 0 0 16px #00FF00;
-    }
-    
-    .typing::after {
-        content: '█';
-        animation: blink 1s infinite;
+        text-shadow: 0 0 8px #00FF00;
     }
     
     @keyframes blink {
@@ -49,62 +39,39 @@
         51%, 100% { opacity: 0; }
     }
     
-    /* TV STATIC NOISE */
-    .tv-static {
+    .typing::after {
+        content: '█';
+        animation: blink 1s infinite;
+    }
+    
+    /* Simple pixel noise */
+    .pixel-noise {
         position: absolute;
         width: 100%;
         height: 100%;
-        overflow: hidden;
         background: #000;
+        overflow: hidden;
     }
     
-    .tv-static::before {
+    .pixel-noise::before {
         content: '';
         position: absolute;
-        top: -100%;
-        left: -100%;
-        width: 300%;
-        height: 300%;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
         background-image: 
-            repeating-radial-gradient(circle at 17% 32%, white, black 3px),
-            repeating-radial-gradient(circle at 42% 77%, white, black 4px),
-            repeating-radial-gradient(circle at 71% 14%, white, black 5px),
-            repeating-radial-gradient(circle at 89% 53%, white, black 4px);
-        background-size: 4px 4px;
+            radial-gradient(circle, #00ff00 1px, transparent 1px),
+            radial-gradient(circle, #00ff00 1px, transparent 1px);
+        background-size: 20px 20px, 30px 30px;
+        background-position: 0 0, 15px 15px;
         opacity: 0.1;
-        animation: staticNoise 0.2s steps(5) infinite;
-        mix-blend-mode: screen;
+        animation: noiseMove 8s linear infinite;
     }
     
-    @keyframes staticNoise {
+    @keyframes noiseMove {
         0% { transform: translate(0, 0); }
-        20% { transform: translate(-5%, -5%); }
-        40% { transform: translate(5%, -5%); }
-        60% { transform: translate(-5%, 5%); }
-        80% { transform: translate(5%, 5%); }
-        100% { transform: translate(0, 0); }
-    }
-    
-    /* Additional noise layer */
-    .tv-static::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: 
-            repeating-linear-gradient(
-                0deg,
-                rgba(0, 255, 0, 0) 0,
-                rgba(0, 255, 0, 0.03) 1px,
-                rgba(0, 255, 0, 0) 2px,
-                rgba(0, 255, 0, 0) 3px
-            );
-        animation: staticLines 0.1s linear infinite;
-    }
-    
-    @keyframes staticLines {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(3px); }
+        100% { transform: translate(30px, 30px); }
     }
     
     .video-feed {
@@ -113,114 +80,68 @@
         overflow: hidden;
     }
     
-    /* ОБЪЕМНАЯ АНИМИРОВАННАЯ КНОПКА */
+    /* Simple terminal button */
     .donate-button {
-        position: relative;
         background: #000000;
-        border: 3px solid #00FF00;
+        border: 2px solid #00FF00;
         color: #00FF00;
-        font-weight: bold;
-        font-size: 20px;
-        padding: 20px 50px;
+        font-size: 16px;
+        padding: 12px 24px;
         cursor: pointer;
-        font-family: 'Press Start 2P', cursive;
-        text-transform: uppercase;
+        font-family: 'Share Tech Mono', monospace;
+        transition: all 0.2s ease;
+        position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
-        /* 3D effect */
-        box-shadow: 
-            inset -4px -4px 0px 0px #003300,
-            inset 4px 4px 0px 0px #00FF00,
-            0 0 20px rgba(0, 255, 0, 0.5);
-    }
-    
-    .donate-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.4), transparent);
-        transition: left 0.5s;
-    }
-    
-    .donate-button:hover::before {
-        left: 100%;
     }
     
     .donate-button:hover {
         background: #001100;
-        transform: translateY(-2px);
-        color: #FFFFFF;
-        text-shadow: 0 0 10px #00FF00;
-        box-shadow: 
-            inset -4px -4px 0px 0px #004400,
-            inset 4px 4px 0px 0px #44FF44,
-            0 0 30px rgba(0, 255, 0, 0.8),
-            0 5px 20px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
     }
     
     .donate-button:active {
-        transform: translateY(0);
-        box-shadow: 
-            inset -2px -2px 0px 0px #002200,
-            inset 2px 2px 0px 0px #00FF00,
-            0 0 10px rgba(0, 255, 0, 0.3);
+        transform: scale(0.98);
     }
     
-    /* Анимация пульсации для привлечения внимания */
-    @keyframes buttonPulse {
-        0%, 100% { 
-            box-shadow: 
-                inset -4px -4px 0px 0px #003300,
-                inset 4px 4px 0px 0px #00FF00,
-                0 0 20px rgba(0, 255, 0, 0.5);
-        }
-        50% { 
-            box-shadow: 
-                inset -4px -4px 0px 0px #003300,
-                inset 4px 4px 0px 0px #00FF00,
-                0 0 40px rgba(0, 255, 0, 0.8);
-        }
-    }
-    
-    .donate-button {
-        animation: buttonPulse 2s ease-in-out infinite;
-    }
-    
-    .donate-button:hover {
-        animation: none;
-    }
-    
-    /* Светлячки от кнопки */
-    .button-firefly {
+    /* Terminal modal */
+    .terminal-modal {
+        display: none;
         position: fixed;
-        width: 3px;
-        height: 3px;
-        background: #00FF00;
-        pointer-events: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
         z-index: 1000;
-        box-shadow: 0 0 6px #00FF00;
-        opacity: 0;
+        justify-content: center;
+        align-items: center;
     }
     
-    @keyframes fireflyFromButton {
-        0% {
-            opacity: 0;
-            transform: translate(0, 0) scale(0);
-        }
-        10% {
-            opacity: 1;
-            transform: translate(0, -10px) scale(1);
-        }
-        100% {
-            opacity: 0;
-            transform: translate(var(--end-x), var(--end-y)) scale(0);
-        }
+    .modal-content {
+        background: #000000;
+        border: 2px solid #00FF00;
+        padding: 30px;
+        max-width: 500px;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
     }
     
-    /* STATUS INDICATORS */
+    .copy-button {
+        background: #000000;
+        border: 1px solid #00FF00;
+        color: #00FF00;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-family: 'Share Tech Mono', monospace;
+        margin-top: 10px;
+        transition: all 0.2s ease;
+    }
+    
+    .copy-button:hover {
+        background: #001100;
+    }
+    
+    /* Status indicators */
     .status-online {
         display: inline-block;
         width: 8px;
@@ -246,17 +167,17 @@
     }
     
     .nav-link {
-        transition: all 0.3s ease;
+        color: #00ff00;
         text-decoration: none;
         cursor: pointer;
-        color: #00ff00;
+        transition: all 0.2s ease;
     }
     
     .nav-link:hover {
         text-shadow: 0 0 10px #00FF00;
     }
     
-    /* Mobile adaptations */
+    /* Mobile */
     @media (max-width: 768px) {
         .main-grid {
             flex-direction: column;
@@ -322,7 +243,7 @@
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative">
-                        <div class="tv-static"></div>
+                        <div class="pixel-noise"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Abstract Expressionism</div>
@@ -337,7 +258,7 @@
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative">
-                        <div class="tv-static"></div>
+                        <div class="pixel-noise"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Digital Minimalism</div>
@@ -352,7 +273,7 @@
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative">
-                        <div class="tv-static"></div>
+                        <div class="pixel-noise"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="text-green-400 text-xs bg-black bg-opacity-70 px-3 py-1 terminal-border">
                                 NO SIGNAL
@@ -372,7 +293,7 @@
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative">
-                        <div class="tv-static"></div>
+                        <div class="pixel-noise"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Geometric Patterns</div>
@@ -387,15 +308,14 @@
             
             <!-- Support Message -->
             <div class="text-center mb-8">
-                <h3 class="retro-font text-xl mb-4">
-                    <span style="color: #00ff00;">SUPPORT</span>
-                    <span style="color: #9400D3; text-shadow: 0 0 10px #9400D3;">PROJECT</span>
+                <h3 class="pixel-font text-xl mb-4">
+                    <span style="color: #00ff00;">SUPPORT PROJECT</span>
                 </h3>
             </div>
 
-            <!-- MEGA DONATION BUTTON -->
+            <!-- DONATION BUTTON -->
             <div class="relative mb-8">
-                <button class="donate-button" onclick="donate()" id="donateBtn">
+                <button class="donate-button" onclick="showDonateModal()" id="donateBtn">
                     DONATE
                 </button>
             </div>
@@ -403,6 +323,93 @@
     </div>
 </div>
 
+<!-- Donation Modal -->
+<div class="terminal-modal" id="donateModal">
+    <div class="modal-content">
+        <h3 class="pixel-font text-lg mb-4 text-green-400">DONATION INFO</h3>
+        
+        <div class="terminal-border bg-black p-4 mb-4">
+            <p class="text-sm mb-2">METAMASK ADDRESS</p>
+            <p class="text-xs mb-2 text-green-400">Network: Ethereum Mainnet</p>
+            <p class="text-xs text-green-500 break-all mb-3" id="ethAddress">
+                0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+            </p>
+            <button class="copy-button" onclick="copyAddress()">COPY ADDRESS</button>
+        </div>
+        
+        <p class="text-xs text-green-600 mb-4">
+            Send ETH to support robot artists!<br>
+            Make sure you're on Ethereum Mainnet
+        </p>
+        
+        <button class="copy-button" onclick="closeDonateModal()">CLOSE</button>
+    </div>
+</div>
+
+<script>
+    // Show donation modal
+    function showDonateModal() {
+        document.getElementById('donateModal').style.display = 'flex';
+    }
+    
+    // Close modal
+    function closeDonateModal() {
+        document.getElementById('donateModal').style.display = 'none';
+    }
+    
+    // Copy address
+    function copyAddress() {
+        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
+        navigator.clipboard.writeText(address).then(() => {
+            // Change button text temporarily
+            event.target.textContent = 'COPIED!';
+            setTimeout(() => {
+                event.target.textContent = 'COPY ADDRESS';
+            }, 2000);
+        }).catch(() => {
+            // Fallback
+            const textArea = document.createElement('textarea');
+            textArea.value = address;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            event.target.textContent = 'COPIED!';
+            setTimeout(() => {
+                event.target.textContent = 'COPY ADDRESS';
+            }, 2000);
+        });
+    }
+    
+    // Show social
+    function showSocial() {
+        alert(`GHOSTLINE SOCIAL:\n\nInstagram: @____yuga______\nTikTok: @ghostline207\nTelegram: @yuga_art`);
+    }
+    
+    // Close modal on outside click
+    window.onclick = function(event) {
+        if (event.target.classList.contains('terminal-modal')) {
+            event.target.style.display = 'none';
+        }
+    }
+    
+    // Initialize
+    window.addEventListener('load', function() {
+        console.log('🎨 GHOSTLINE Stream initialized!');
+    });
+</script>
+```
+
+</body>
+</html><button class="donate-button" onclick="donate()" id="donateBtn">
+                        DONATE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+```
 <script>
     // Create fireflies from button
     function createButtonFireflies() {
