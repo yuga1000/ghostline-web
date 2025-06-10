@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,499 +9,570 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-        
-        .pixel-font {
-            font-family: 'Share Tech Mono', monospace;
+
+```
+    body {
+        background: #000000;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .pixel-font {
+        font-family: 'Share Tech Mono', monospace;
+    }
+    
+    .retro-font {
+        font-family: 'Orbitron', monospace;
+    }
+    
+    .scan-lines {
+        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+        background-size: 100% 4px;
+    }
+    
+    .terminal-border {
+        border: 2px solid #00FF00;
+        /* removed border-radius */
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .terminal-border:hover {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+    }
+    
+    .glow-text {
+        text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
+    }
+    
+    .typing::after {
+        content: '█';
+        animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+    }
+    
+    .video-feed {
+        background: 
+            repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.1) 0px,
+                transparent 1px,
+                transparent 3px,
+                rgba(0, 255, 0, 0.1) 4px
+            ),
+            radial-gradient(circle at center, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .video-feed::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+        animation: scanLine 3s linear infinite;
+    }
+    
+    @keyframes scanLine {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+    
+    .matrix-bg {
+        background: 
+            radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
+    }
+    
+    /* PIXEL DONUT */
+    .pixel-donut {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        position: relative;
+        margin: 0 8px;
+        image-rendering: pixelated;
+    }
+    
+    .pixel-donut::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: 
+            /* Outer donut */
+            linear-gradient(to right, transparent 4px, #8B4513 4px 20px, transparent 20px),
+            linear-gradient(to bottom, transparent 4px, #8B4513 4px 20px, transparent 20px);
+        background-size: 24px 24px;
+        background-position: 0 0;
+    }
+    
+    .pixel-donut::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        box-shadow:
+            /* Brown donut body */
+            4px 2px 0 #8B4513,
+            6px 2px 0 #8B4513,
+            8px 2px 0 #8B4513,
+            10px 2px 0 #8B4513,
+            12px 2px 0 #8B4513,
+            14px 2px 0 #8B4513,
+            16px 2px 0 #8B4513,
+            18px 2px 0 #8B4513,
+            20px 4px 0 #8B4513,
+            20px 6px 0 #8B4513,
+            20px 8px 0 #8B4513,
+            20px 10px 0 #8B4513,
+            20px 12px 0 #8B4513,
+            20px 14px 0 #8B4513,
+            20px 16px 0 #8B4513,
+            18px 20px 0 #8B4513,
+            16px 20px 0 #8B4513,
+            14px 20px 0 #8B4513,
+            12px 20px 0 #8B4513,
+            10px 20px 0 #8B4513,
+            8px 20px 0 #8B4513,
+            6px 20px 0 #8B4513,
+            4px 20px 0 #8B4513,
+            2px 18px 0 #8B4513,
+            2px 16px 0 #8B4513,
+            2px 14px 0 #8B4513,
+            2px 12px 0 #8B4513,
+            2px 10px 0 #8B4513,
+            2px 8px 0 #8B4513,
+            2px 6px 0 #8B4513,
+            2px 4px 0 #8B4513,
+            /* Pink frosting */
+            6px 4px 0 #FF69B4,
+            8px 4px 0 #FF69B4,
+            10px 4px 0 #FF69B4,
+            12px 4px 0 #FF69B4,
+            14px 4px 0 #FF69B4,
+            16px 4px 0 #FF69B4,
+            6px 6px 0 #FF69B4,
+            8px 6px 0 #FF69B4,
+            14px 6px 0 #FF69B4,
+            16px 6px 0 #FF69B4,
+            /* Sprinkles */
+            7px 5px 0 #00FF00,
+            13px 5px 0 #FFFF00,
+            9px 7px 0 #00FFFF,
+            15px 7px 0 #FF0000,
+            /* Center hole */
+            10px 10px 0 #000000,
+            12px 10px 0 #000000,
+            10px 12px 0 #000000,
+            12px 12px 0 #000000;
+    }
+    
+    @keyframes donutSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .pixel-donut:hover {
+        animation: donutSpin 1s linear infinite;
+    }
+    
+    /* DONATION BUTTON EFFECTS */
+    .donate-button {
+        position: relative;
+        background: linear-gradient(45deg, #00FF00, #00CC00, #00FF00);
+        border: 3px solid #00FF00;
+        color: #000;
+        font-weight: bold;
+        font-size: 18px;
+        padding: 15px 30px;
+        /* removed border-radius */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        animation: donatePulse 2s infinite;
+    }
+    
+    @keyframes donatePulse {
+        0%, 100% { 
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            transform: scale(1);
+        }
+        50% { 
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
+            transform: scale(1.05);
+        }
+    }
+    
+    .donate-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 50px rgba(0, 255, 0, 1);
+        animation: donatePulse 0.5s infinite;
+    }
+    
+    .donate-button:active {
+        transform: scale(0.95);
+    }
+    
+    /* FLOATING PIXELS FROM BUTTON */
+    .floating-pixel {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #00FF00;
+        pointer-events: none;
+        animation: floatAway 3s linear infinite;
+    }
+    
+    @keyframes floatAway {
+        0% {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(var(--random-x), var(--random-y)) scale(0);
+        }
+    }
+    
+    /* EXPLOSION EFFECT */
+    .explosion-pixel {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #00FF00;
+        pointer-events: none;
+        animation: explode 1s ease-out forwards;
+    }
+    
+    @keyframes explode {
+        0% {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(var(--explode-x), var(--explode-y)) scale(0) rotate(360deg);
+        }
+    }
+    
+    /* ROBOT WORKING ANIMATION */
+    @keyframes robotWork {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(2px, -1px); }
+        50% { transform: translate(-1px, 2px); }
+        75% { transform: translate(1px, 1px); }
+    }
+    
+    .robot-active {
+        animation: robotWork 2s infinite;
+    }
+    
+    /* STATUS INDICATORS - SQUARE PIXELS */
+    .status-online {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #00FF00;
+        /* removed border-radius */
+        margin-right: 5px;
+        box-shadow: 0 0 10px #00FF00;
+        animation: statusBlink 2s infinite;
+    }
+    
+    .status-standby {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #FFFF00;
+        /* removed border-radius */
+        margin-right: 5px;
+        box-shadow: 0 0 10px #FFFF00;
+    }
+    
+    @keyframes statusBlink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+    }
+    
+    /* MOBILE ADAPTATIONS */
+    @media (max-width: 768px) {
+        .main-grid {
+            grid-template-columns: 1fr !important;
         }
         
-        .retro-font {
-            font-family: 'Orbitron', monospace;
+        .video-grid {
+            grid-template-columns: 1fr 1fr !important;
         }
         
-        .scan-lines {
-            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
-            background-size: 100% 4px;
+        .donate-button {
+            font-size: 16px;
+            padding: 12px 24px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .video-grid {
+            grid-template-columns: 1fr !important;
         }
         
-        .terminal-border {
-            border: 2px solid #00FF00;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .terminal-border:hover {
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
-        }
-        
-        .glow-text {
-            text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
-        }
-        
-        .typing::after {
-            content: '█';
-            animation: blink 1s infinite;
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+        .donate-button {
+            font-size: 14px;
+            padding: 10px 20px;
         }
         
         .video-feed {
-            background: 
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 255, 0, 0.1) 0px,
-                    transparent 1px,
-                    transparent 3px,
-                    rgba(0, 255, 0, 0.1) 4px
-                ),
-                radial-gradient(circle at center, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
-            position: relative;
-            overflow: hidden;
+            height: 120px !important;
         }
-        
-        .video-feed::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
-            animation: scanLine 3s linear infinite;
-        }
-        
-        @keyframes scanLine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        .matrix-bg {
-            background: 
-                radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
-        }
-        
-        /* DONATION BUTTON EFFECTS */
-        .donate-button {
-            position: relative;
-            background: linear-gradient(45deg, #00FF00, #00CC00, #00FF00);
-            border: 3px solid #00FF00;
-            color: #000;
-            font-weight: bold;
-            font-size: 18px;
-            padding: 15px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            animation: donatePulse 2s infinite;
-        }
-        
-        @keyframes donatePulse {
-            0%, 100% { 
-                box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-                transform: scale(1);
-            }
-            50% { 
-                box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
-                transform: scale(1.05);
-            }
-        }
-        
-        .donate-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 50px rgba(0, 255, 0, 1);
-            animation: donatePulse 0.5s infinite;
-        }
-        
-        .donate-button:active {
-            transform: scale(0.95);
-        }
-        
-        /* FLOATING PIXELS FROM BUTTON */
-        .floating-pixel {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #00FF00;
-            pointer-events: none;
-            animation: floatAway 3s linear infinite;
-        }
-        
-        @keyframes floatAway {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--random-x), var(--random-y)) scale(0);
-            }
-        }
-        
-        /* EXPLOSION EFFECT */
-        .explosion-pixel {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #00FF00;
-            pointer-events: none;
-            animation: explode 1s ease-out forwards;
-        }
-        
-        @keyframes explode {
-            0% {
-                opacity: 1;
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--explode-x), var(--explode-y)) scale(0) rotate(360deg);
-            }
-        }
-        
-        /* ROBOT WORKING ANIMATION */
-        @keyframes robotWork {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(2px, -1px); }
-            50% { transform: translate(-1px, 2px); }
-            75% { transform: translate(1px, 1px); }
-        }
-        
-        .robot-active {
-            animation: robotWork 2s infinite;
-        }
-        
-        /* STATUS INDICATORS */
-        .status-online {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #00FF00;
-            border-radius: 50%;
-            margin-right: 5px;
-            box-shadow: 0 0 10px #00FF00;
-            animation: statusBlink 2s infinite;
-        }
-        
-        .status-standby {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #FFFF00;
-            border-radius: 50%;
-            margin-right: 5px;
-            box-shadow: 0 0 10px #FFFF00;
-        }
-        
-        @keyframes statusBlink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
-        }
-        
-        /* MOBILE ADAPTATIONS */
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .video-grid {
-                grid-template-columns: 1fr 1fr !important;
-            }
-            
-            .donate-button {
-                font-size: 16px;
-                padding: 12px 24px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .video-grid {
-                grid-template-columns: 1fr !important;
-            }
-            
-            .donate-button {
-                font-size: 14px;
-                padding: 10px 20px;
-            }
-            
-            .video-feed {
-                height: 120px !important;
-            }
-        }
-        
-        .nav-link {
-            transition: all 0.3s ease;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .nav-link:hover {
-            color: #00FF00;
-            text-shadow: 0 0 10px #00FF00;
-        }
-    </style>
+    }
+    
+    .nav-link {
+        transition: all 0.3s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .nav-link:hover {
+        color: #00FF00;
+        text-shadow: 0 0 10px #00FF00;
+    }
+</style>
+```
+
 </head>
 <body class="bg-black text-green-400 overflow-hidden">
     <div class="w-full min-h-screen scan-lines matrix-bg">
-        
-        <!-- Header Navigation -->
-        <div class="terminal-border bg-black bg-opacity-70 mx-4 mt-2 px-6 py-2 pixel-font">
-            <div class="flex justify-between items-center">
-                <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
-                <div class="text-green-600 text-sm">
-                    <a href="index.html" class="nav-link mr-4">[HOME]</a>
-                    <span class="text-green-400 mr-4">[LIVE STREAM]</span>
-                    <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
-                    <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
-                </div>
-                <div class="text-green-500 text-xs">
-                    <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
-                </div>
+
+```
+    <!-- Header Navigation -->
+    <div class="terminal-border bg-black bg-opacity-70 mx-4 mt-2 px-6 py-2 pixel-font">
+        <div class="flex justify-between items-center">
+            <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
+            <div class="text-green-600 text-sm">
+                <a href="index.html" class="nav-link mr-4">[HOME]</a>
+                <span class="text-green-400 mr-4">[LIVE STREAM]</span>
+                <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
+                <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
             </div>
-        </div>
-
-        <div class="flex p-4 h-full main-grid">
-            <!-- Live Video Feeds -->
-            <div class="w-2/3 mr-4">
-                <!-- Title -->
-                <div class="text-center mb-4">
-                    <h2 class="retro-font text-3xl font-bold text-green-400 glow-text">
-                        LIVE ROBOT ARTISTS
-                    </h2>
-                    <div class="pixel-font text-green-600 text-sm">
-                        Watch AI learn to create art in real-time
-                    </div>
-                </div>
-                
-                <!-- Video Grid -->
-                <div class="grid grid-cols-2 gap-4 video-grid">
-                    
-                    <!-- Robot 01 -->
-                    <div class="terminal-border bg-black bg-opacity-50 p-3">
-                        <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
-                            <span>[ROBOT_01 - "YUGA"]</span>
-                            <span class="text-green-400"><span class="status-online"></span>LIVE</span>
-                        </div>
-                        <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                            <div class="pixel-font text-green-400 text-xs text-center robot-active">
-                                <pre>
-    ╔══════════════════╗
-    ║      🤖          ║
-    ║         🎨       ║
-    ║   ┌─────────┐    ║
-    ║   │░░▓▓██▓░░│    ║
-    ║   │▓██░░░██▓│    ║
-    ║   │░▓████▓░░│    ║
-    ║   └─────────┘    ║
-    ╚══════════════════╝
-                                </pre>
-                            </div>
-                        </div>
-                        <div class="pixel-font text-green-600 text-xs">
-                            <div>STYLE: Abstract Expressionism</div>
-                            <div class="typing">BRUSH PRESSURE: 73%</div>
-                        </div>
-                    </div>
-
-                    <!-- Robot 02 -->
-                    <div class="terminal-border bg-black bg-opacity-50 p-3">
-                        <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
-                            <span>[ROBOT_02 - "MIKA"]</span>
-                            <span class="text-green-400"><span class="status-online"></span>LIVE</span>
-                        </div>
-                        <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                            <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 0.5s;">
-                                <pre>
-    ╔══════════════════╗
-    ║         🤖       ║
-    ║   🎨             ║
-    ║   ┌─────────┐    ║
-    ║   │██▓░░▓██│    ║
-    ║   │░░███░░░│    ║
-    ║   │▓██░▓██▓│    ║
-    ║   └─────────┘    ║
-    ╚══════════════════╝
-                                </pre>
-                            </div>
-                        </div>
-                        <div class="pixel-font text-green-600 text-xs">
-                            <div>STYLE: Digital Minimalism</div>
-                            <div class="typing">COLOR MIX: Blue + White</div>
-                        </div>
-                    </div>
-
-                    <!-- Robot 03 -->
-                    <div class="terminal-border bg-black bg-opacity-50 p-3">
-                        <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
-                            <span>[ROBOT_03 - "GHOST"]</span>
-                            <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
-                        </div>
-                        <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                            <div class="pixel-font text-green-600 text-xs text-center">
-                                <pre>
-    ╔══════════════════╗
-    ║                  ║
-    ║      🤖💤        ║
-    ║   ┌─────────┐    ║
-    ║   │ ░░░░░░░ │    ║
-    ║   │ ░░░░░░░ │ 🎨 ║
-    ║   │ ░░░░░░░ │    ║
-    ║   └─────────┘    ║
-    ╚══════════════════╝
-                                </pre>
-                            </div>
-                        </div>
-                        <div class="pixel-font text-green-600 text-xs">
-                            <div>STATUS: Battery Charging</div>
-                            <div>ETA: 00:23:15</div>
-                        </div>
-                    </div>
-
-                    <!-- Robot 04 -->
-                    <div class="terminal-border bg-black bg-opacity-50 p-3">
-                        <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
-                            <span>[ROBOT_04 - "LINE"]</span>
-                            <span class="text-green-400"><span class="status-online"></span>LIVE</span>
-                        </div>
-                        <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                            <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 1s;">
-                                <pre>
-    ╔══════════════════╗
-    ║    🤖            ║
-    ║              🎨  ║
-    ║   ┌─────────┐    ║
-    ║   │▓▓▓██▓▓▓│    ║
-    ║   │██▓▓▓██▓│    ║
-    ║   │▓██░▓░██│    ║
-    ║   └─────────┘    ║
-    ╚══════════════════╝
-                                </pre>
-                            </div>
-                        </div>
-                        <div class="pixel-font text-green-600 text-xs">
-                            <div>STYLE: Geometric Patterns</div>
-                            <div class="typing">PATTERN: SPIRAL_09</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Donation Panel -->
-            <div class="w-1/3 flex flex-col items-center justify-center">
-                
-                <!-- Support Message -->
-                <div class="text-center mb-8">
-                    <h3 class="retro-font text-2xl font-bold text-green-400 glow-text mb-4">
-                        SUPPORT THE ARTISTS
-                    </h3>
-                    <div class="pixel-font text-green-600 text-sm leading-relaxed">
-                        Help fund our AI robot artists<br/>
-                        Every donation goes directly to:<br/>
-                        • Robot maintenance & upgrades<br/>
-                        • Art supplies & canvases<br/>
-                        • Neural network training<br/>
-                        • New experimental features
-                    </div>
-                </div>
-
-                <!-- MEGA DONATION BUTTON -->
-                <div class="relative mb-8" id="donateContainer">
-                    <button class="donate-button pixel-font" onclick="donate()" id="donateBtn">
-                        🍩 DONATE ETH 🍩
-                    </button>
-                    
-                    <!-- Floating pixels container -->
-                    <div id="pixelContainer" class="absolute inset-0 pointer-events-none"></div>
-                </div>
-
-                <!-- MetaMask Address -->
-                <div class="terminal-border bg-black bg-opacity-50 p-4 w-full">
-                    <div class="pixel-font text-green-500 text-xs mb-2 text-center">
-                        [ETHEREUM ADDRESS]
-                    </div>
-                    <div class="pixel-font text-green-400 text-xs text-center break-all leading-relaxed">
-                        0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
-                    </div>
-                    <div class="text-center mt-3">
-                        <button class="pixel-font text-green-600 text-xs border border-green-600 px-3 py-1 hover:bg-green-600 hover:text-black transition-all" onclick="copyAddress()">
-                            COPY ADDRESS
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Live Stats -->
-                <div class="terminal-border bg-black bg-opacity-50 p-3 w-full mt-4">
-                    <div class="pixel-font text-green-500 text-xs mb-2 text-center">
-                        [LIVE STATS]
-                    </div>
-                    <div class="pixel-font text-green-400 text-xs text-center space-y-1">
-                        <div>VIEWERS: <span id="viewerCount">1,247</span></div>
-                        <div>PAINTINGS TODAY: <span id="paintingsToday">23</span></div>
-                        <div>TOTAL BRUSHSTROKES: <span id="totalStrokes">847,293</span></div>
-                        <div class="typing">AI LEARNING: ACTIVE</div>
-                    </div>
-                </div>
+            <div class="text-green-500 text-xs">
+                <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
             </div>
         </div>
     </div>
 
-    <script>
-        // Donation button effects
-        function createFloatingPixels() {
-            const container = document.getElementById('pixelContainer');
-            const button = document.getElementById('donateBtn');
+    <div class="flex p-4 h-full main-grid">
+        <!-- Live Video Feeds -->
+        <div class="w-2/3 mr-4">
+            <!-- Title -->
+            <div class="text-center mb-4">
+                <h2 class="retro-font text-3xl font-bold text-green-400 glow-text">
+                    LIVE ROBOT ARTISTS
+                </h2>
+                <div class="pixel-font text-green-600 text-sm">
+                    Watch AI learn to create art in real-time
+                </div>
+            </div>
             
-            for(let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    const pixel = document.createElement('div');
-                    pixel.className = 'floating-pixel';
-                    
-                    const randomX = (Math.random() - 0.5) * 200 + 'px';
-                    const randomY = (Math.random() - 0.5) * 200 + 'px';
-                    
-                    pixel.style.setProperty('--random-x', randomX);
-                    pixel.style.setProperty('--random-y', randomY);
-                    
-                    // Random position around button
-                    pixel.style.left = Math.random() * 100 + '%';
-                    pixel.style.top = Math.random() * 100 + '%';
-                    
-                    container.appendChild(pixel);
-                    
-                    setTimeout(() => {
-                        if(pixel.parentNode) {
-                            pixel.parentNode.removeChild(pixel);
-                        }
-                    }, 3000);
-                }, i * 500);
-            }
-        }
+            <!-- Video Grid -->
+            <div class="grid grid-cols-2 gap-4 video-grid">
+                
+                <!-- Robot 01 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_01 - "YUGA"]</span>
+                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center robot-active">
+                            <pre>
+╔══════════════════╗
+║      🤖          ║
+║         🎨       ║
+║   ┌─────────┐    ║
+║   │░░▓▓██▓░░│    ║
+║   │▓██░░░██▓│    ║
+║   │░▓████▓░░│    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STYLE: Abstract Expressionism</div>
+                        <div class="typing">BRUSH PRESSURE: 73%</div>
+                    </div>
+                </div>
+
+                <!-- Robot 02 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_02 - "MIKA"]</span>
+                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 0.5s;">
+                            <pre>
+╔══════════════════╗
+║         🤖       ║
+║   🎨             ║
+║   ┌─────────┐    ║
+║   │██▓░░▓██│    ║
+║   │░░███░░░│    ║
+║   │▓██░▓██▓│    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STYLE: Digital Minimalism</div>
+                        <div class="typing">COLOR MIX: Blue + White</div>
+                    </div>
+                </div>
+
+                <!-- Robot 03 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_03 - "GHOST"]</span>
+                        <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-600 text-xs text-center">
+                            <pre>
+╔══════════════════╗
+║                  ║
+║      🤖💤        ║
+║   ┌─────────┐    ║
+║   │ ░░░░░░░ │    ║
+║   │ ░░░░░░░ │ 🎨 ║
+║   │ ░░░░░░░ │    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STATUS: Battery Charging</div>
+                        <div>ETA: 00:23:15</div>
+                    </div>
+                </div>
+
+                <!-- Robot 04 -->
+                <div class="terminal-border bg-black bg-opacity-50 p-3">
+                    <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
+                        <span>[ROBOT_04 - "LINE"]</span>
+                        <span class="text-green-400"><span class="status-online"></span>LIVE</span>
+                    </div>
+                    <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
+                        <div class="pixel-font text-green-400 text-xs text-center robot-active" style="animation-delay: 1s;">
+                            <pre>
+╔══════════════════╗
+║    🤖            ║
+║              🎨  ║
+║   ┌─────────┐    ║
+║   │▓▓▓██▓▓▓│    ║
+║   │██▓▓▓██▓│    ║
+║   │▓██░▓░██│    ║
+║   └─────────┘    ║
+╚══════════════════╝
+                            </pre>
+                        </div>
+                    </div>
+                    <div class="pixel-font text-green-600 text-xs">
+                        <div>STYLE: Geometric Patterns</div>
+                        <div class="typing">PATTERN: SPIRAL_09</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Donation Panel -->
+        <div class="w-1/3 flex flex-col items-center justify-center">
+            
+            <!-- Support Message -->
+            <div class="text-center mb-8">
+                <h3 class="retro-font text-2xl font-bold text-green-400 glow-text mb-4">
+                    SUPPORT THE ARTISTS
+                </h3>
+                <div class="pixel-font text-green-600 text-sm leading-relaxed">
+                    Help fund our AI robot artists<br/>
+                    Every donation goes directly to:<br/>
+                    • Robot maintenance & upgrades<br/>
+                    • Art supplies & canvases<br/>
+                    • Neural network training<br/>
+                    • New experimental features
+                </div>
+            </div>
+
+            <!-- MEGA DONATION BUTTON -->
+            <div class="relative mb-8" id="donateContainer">
+                <button class="donate-button pixel-font" onclick="donate()" id="donateBtn">
+                    <span class="pixel-donut"></span> DONATE ETH <span class="pixel-donut"></span>
+                </button>
+                
+                <!-- Floating pixels container -->
+                <div id="pixelContainer" class="absolute inset-0 pointer-events-none"></div>
+            </div>
+
+            <!-- MetaMask Address -->
+            <div class="terminal-border bg-black bg-opacity-50 p-4 w-full">
+                <div class="pixel-font text-green-500 text-xs mb-2 text-center">
+                    [ETHEREUM ADDRESS]
+                </div>
+                <div class="pixel-font text-green-400 text-xs text-center break-all leading-relaxed">
+                    0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+                </div>
+                <div class="text-center mt-3">
+                    <button class="pixel-font text-green-600 text-xs border border-green-600 px-3 py-1 hover:bg-green-600 hover:text-black transition-all" onclick="copyAddress()">
+                        COPY ADDRESS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Stats -->
+            <div class="terminal-border bg-black bg-opacity-50 p-3 w-full mt-4">
+                <div class="pixel-font text-green-500 text-xs mb-2 text-center">
+                    [LIVE STATS]
+                </div>
+                <div class="pixel-font text-green-400 text-xs text-center space-y-1">
+                    <div>VIEWERS: <span id="viewerCount">1,247</span></div>
+                    <div>PAINTINGS TODAY: <span id="paintingsToday">23</span></div>
+                    <div>TOTAL BRUSHSTROKES: <span id="totalStrokes">847,293</span></div>
+                    <div class="typing">AI LEARNING: ACTIVE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Donation button effects
+    function createFloatingPixels() {
+        const container = document.getElementById('pixelContainer');
+        const button = document.getElementById('donateBtn');
         
-        // Explosion effect
-        function createExplosion() {
-            const container = document.getElementById('pixelContainer');
-            
-            for(let i = 0; i < 20; i++) {
+        for(let i = 0; i < 3; i++) {
+            setTimeout(() => {
                 const pixel = document.createElement('div');
-                pixel.className = 'explosion-pixel';
+                pixel.className = 'floating-pixel';
                 
-                const angle = (i / 20) * 360;
-                const distance = 100 + Math.random() * 100;
-                const radians = angle * Math.PI / 180;
+                const randomX = (Math.random() - 0.5) * 200 + 'px';
+                const randomY = (Math.random() - 0.5) * 200 + 'px';
                 
-                const explodeX = Math.cos(radians) * distance + 'px';
-                const explodeY = Math.sin(radians) * distance + 'px';
+                pixel.style.setProperty('--random-x', randomX);
+                pixel.style.setProperty('--random-y', randomY);
                 
-                pixel.style.setProperty('--explode-x', explodeX);
-                pixel.style.setProperty('--explode-y', explodeY);
-                
-                pixel.style.left = '50%';
-                pixel.style.top = '50%';
-                pixel.style.backgroundColor = `hsl(${120 + Math.random() * 60}, 100%, 50%)`;
+                // Random position around button
+                pixel.style.left = Math.random() * 100 + '%';
+                pixel.style.top = Math.random() * 100 + '%';
                 
                 container.appendChild(pixel);
                 
@@ -508,116 +580,154 @@
                     if(pixel.parentNode) {
                         pixel.parentNode.removeChild(pixel);
                     }
-                }, 1000);
-            }
+                }, 3000);
+            }, i * 500);
+        }
+    }
+    
+    // Explosion effect
+    function createExplosion() {
+        const container = document.getElementById('pixelContainer');
+        
+        for(let i = 0; i < 20; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'explosion-pixel';
+            
+            const angle = (i / 20) * 360;
+            const distance = 100 + Math.random() * 100;
+            const radians = angle * Math.PI / 180;
+            
+            const explodeX = Math.cos(radians) * distance + 'px';
+            const explodeY = Math.sin(radians) * distance + 'px';
+            
+            pixel.style.setProperty('--explode-x', explodeX);
+            pixel.style.setProperty('--explode-y', explodeY);
+            
+            pixel.style.left = '50%';
+            pixel.style.top = '50%';
+            pixel.style.backgroundColor = `hsl(${120 + Math.random() * 60}, 100%, 50%)`;
+            
+            container.appendChild(pixel);
+            
+            setTimeout(() => {
+                if(pixel.parentNode) {
+                    pixel.parentNode.removeChild(pixel);
+                }
+            }, 1000);
+        }
+    }
+    
+    // Donation function
+    function donate() {
+        createExplosion();
+        
+        // Try to open MetaMask
+        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
+        
+        if(typeof window.ethereum !== 'undefined') {
+            // MetaMask is installed
+            window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    to: address,
+                    from: window.ethereum.selectedAddress,
+                    value: '0x38D7EA4C68000' // 0.001 ETH in hex
+                }]
+            }).catch(console.error);
+        } else {
+            // MetaMask not installed
+            alert(`MetaMask not detected!\n\nPlease send ETH to:\n${address}\n\nOr install MetaMask extension first.`);
         }
         
-        // Donation function
-        function donate() {
-            createExplosion();
-            
-            // Try to open MetaMask
-            const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
-            
-            if(typeof window.ethereum !== 'undefined') {
-                // MetaMask is installed
-                window.ethereum.request({
-                    method: 'eth_sendTransaction',
-                    params: [{
-                        to: address,
-                        from: window.ethereum.selectedAddress,
-                        value: '0x38D7EA4C68000' // 0.001 ETH in hex
-                    }]
-                }).catch(console.error);
-            } else {
-                // MetaMask not installed
-                alert(`MetaMask not detected!\n\nPlease send ETH to:\n${address}\n\nOr install MetaMask extension first.`);
-            }
-            
-            console.log('🍩 DONATION ATTEMPT - Thank you for supporting robot artists!');
-        }
-        
-        // Copy address function
-        function copyAddress() {
-            const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
-            navigator.clipboard.writeText(address).then(() => {
-                alert('✅ Address copied to clipboard!');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = address;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                alert('✅ Address copied to clipboard!');
-            });
-        }
-        
-        // Show social links
-        function showSocial() {
-            const socialAlert = `
+        console.log('🍩 DONATION ATTEMPT - Thank you for supporting robot artists!');
+    }
+    
+    // Copy address function
+    function copyAddress() {
+        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
+        navigator.clipboard.writeText(address).then(() => {
+            alert('✅ Address copied to clipboard!');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = address;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('✅ Address copied to clipboard!');
+        });
+    }
+    
+    // Show social links
+    function showSocial() {
+        const socialAlert = `
+```
+
 🎭 GHOSTLINE SOCIAL CHANNELS 🎭
 ═══════════════════════════════
 
-📱 Instagram: https://www.instagram.com/____yuga______
+📱 Instagram: https://www.instagram.com/****yuga****__
 🎵 TikTok: www.tiktok.com/@ghostline207  
 💬 Telegram: https://t.me/yuga_art
 
 💰 SUPPORT THE PROJECT:
 🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
-            `;
-            
-            alert(socialAlert);
+`;
+
+```
+        alert(socialAlert);
+    }
+    
+    // Update live stats
+    function updateStats() {
+        const viewers = document.getElementById('viewerCount');
+        const paintings = document.getElementById('paintingsToday');
+        const strokes = document.getElementById('totalStrokes');
+        
+        // Random fluctuations
+        viewers.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString();
+        paintings.textContent = (20 + Math.floor(Math.random() * 10));
+        
+        const currentStrokes = parseInt(strokes.textContent.replace(/,/g, ''));
+        strokes.textContent = (currentStrokes + Math.floor(Math.random() * 50)).toLocaleString();
+    }
+    
+    // Initialize
+    window.addEventListener('load', function() {
+        // Start floating pixels
+        setInterval(createFloatingPixels, 2000);
+        
+        // Update stats
+        setInterval(updateStats, 5000);
+        
+        console.log(`
+        ╔═══════════════════════════════════════╗
+        ║         GHOSTLINE LIVE STREAM         ║
+        ║        ROBOT ARTISTS AT WORK          ║
+        ╠═══════════════════════════════════════╣
+        ║ Support our AI artists with ETH!      ║
+        ║ Address: 0x6971Cc1DB72c179aA624EB... ║
+        ╚═══════════════════════════════════════╝
+        `);
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        switch(e.key.toLowerCase()) {
+            case 'd':
+                donate();
+                break;
+            case 'c':
+                copyAddress();
+                break;
+            case 's':
+                showSocial();
+                break;
         }
-        
-        // Update live stats
-        function updateStats() {
-            const viewers = document.getElementById('viewerCount');
-            const paintings = document.getElementById('paintingsToday');
-            const strokes = document.getElementById('totalStrokes');
-            
-            // Random fluctuations
-            viewers.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString();
-            paintings.textContent = (20 + Math.floor(Math.random() * 10));
-            
-            const currentStrokes = parseInt(strokes.textContent.replace(',', ''));
-            strokes.textContent = (currentStrokes + Math.floor(Math.random() * 50)).toLocaleString();
-        }
-        
-        // Initialize
-        window.addEventListener('load', function() {
-            // Start floating pixels
-            setInterval(createFloatingPixels, 2000);
-            
-            // Update stats
-            setInterval(updateStats, 5000);
-            
-            console.log(`
-            ╔═══════════════════════════════════════╗
-            ║         GHOSTLINE LIVE STREAM         ║
-            ║        ROBOT ARTISTS AT WORK          ║
-            ╠═══════════════════════════════════════╣
-            ║ Support our AI artists with ETH!      ║
-            ║ Address: 0x6971Cc1DB72c179aA624EB... ║
-            ╚═══════════════════════════════════════╝
-            `);
-        });
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            switch(e.key.toLowerCase()) {
-                case 'd':
-                    donate();
-                    break;
-                case 'c':
-                    copyAddress();
-                    break;
-                case 's':
-                    showSocial();
-                    break;
-            }
-        });
-    </script>
+    });
+</script>
+```
+
 </body>
 </html>
