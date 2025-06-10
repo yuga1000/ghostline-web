@@ -1,16 +1,4 @@
-/* ROBOT WORKING ANIMATION */
-@keyframes robotWork {
-0%, 100% { transform: translate(0, 0); }
-25% { transform: translate(2px, -1px); }
-50% { transform: translate(-1px, 2px); }
-75% { transform: translate(1px, 1px); }
-}
-
-```
-    .robot-active {
-        animation: robotWork 2s infinite;
-    }<!DOCTYPE html>
-```
+<!DOCTYPE html>
 
 <html lang="en">
 <head>
@@ -18,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHOSTLINE - Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap');
 
 ```
     body {
@@ -34,7 +22,7 @@
     }
     
     .retro-font {
-        font-family: 'Orbitron', monospace;
+        font-family: 'Press Start 2P', cursive;
     }
     
     .scan-lines {
@@ -44,17 +32,16 @@
     
     .terminal-border {
         border: 2px solid #00FF00;
-        /* removed border-radius */
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
         transition: all 0.3s ease;
     }
     
     .terminal-border:hover {
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.6);
+        box-shadow: 0 0 12px rgba(0, 255, 0, 0.4);
     }
     
     .glow-text {
-        text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00;
+        text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00;
     }
     
     .typing::after {
@@ -103,98 +90,14 @@
             radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
     }
     
-    /* PIXEL DONUT */
-    .pixel-donut {
-        display: inline-block;
-        width: 24px;
-        height: 24px;
-        position: relative;
-        margin: 0 8px;
-        image-rendering: pixelated;
-    }
-    
-    .pixel-donut::before {
-        content: '';
+    /* ROBOT CANVAS - ЖИВЫЕ ПИКСЕЛИ */
+    .robot-canvas {
         position: absolute;
         width: 100%;
         height: 100%;
-        background: 
-            /* Outer donut */
-            linear-gradient(to right, transparent 4px, #8B4513 4px 20px, transparent 20px),
-            linear-gradient(to bottom, transparent 4px, #8B4513 4px 20px, transparent 20px);
-        background-size: 24px 24px;
-        background-position: 0 0;
-    }
-    
-    .pixel-donut::after {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-color: transparent;
-        box-shadow:
-            /* Brown donut body */
-            4px 2px 0 #8B4513,
-            6px 2px 0 #8B4513,
-            8px 2px 0 #8B4513,
-            10px 2px 0 #8B4513,
-            12px 2px 0 #8B4513,
-            14px 2px 0 #8B4513,
-            16px 2px 0 #8B4513,
-            18px 2px 0 #8B4513,
-            20px 4px 0 #8B4513,
-            20px 6px 0 #8B4513,
-            20px 8px 0 #8B4513,
-            20px 10px 0 #8B4513,
-            20px 12px 0 #8B4513,
-            20px 14px 0 #8B4513,
-            20px 16px 0 #8B4513,
-            18px 20px 0 #8B4513,
-            16px 20px 0 #8B4513,
-            14px 20px 0 #8B4513,
-            12px 20px 0 #8B4513,
-            10px 20px 0 #8B4513,
-            8px 20px 0 #8B4513,
-            6px 20px 0 #8B4513,
-            4px 20px 0 #8B4513,
-            2px 18px 0 #8B4513,
-            2px 16px 0 #8B4513,
-            2px 14px 0 #8B4513,
-            2px 12px 0 #8B4513,
-            2px 10px 0 #8B4513,
-            2px 8px 0 #8B4513,
-            2px 6px 0 #8B4513,
-            2px 4px 0 #8B4513,
-            /* Pink frosting */
-            6px 4px 0 #FF69B4,
-            8px 4px 0 #FF69B4,
-            10px 4px 0 #FF69B4,
-            12px 4px 0 #FF69B4,
-            14px 4px 0 #FF69B4,
-            16px 4px 0 #FF69B4,
-            6px 6px 0 #FF69B4,
-            8px 6px 0 #FF69B4,
-            14px 6px 0 #FF69B4,
-            16px 6px 0 #FF69B4,
-            /* Sprinkles */
-            7px 5px 0 #00FF00,
-            13px 5px 0 #FFFF00,
-            9px 7px 0 #00FFFF,
-            15px 7px 0 #FF0000,
-            /* Center hole */
-            10px 10px 0 #000000,
-            12px 10px 0 #000000,
-            10px 12px 0 #000000,
-            12px 12px 0 #000000;
-    }
-    
-    @keyframes donutSpin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .pixel-donut:hover {
-        animation: donutSpin 1s linear infinite;
+        display: grid;
+        gap: 0;
+        z-index: 1;
     }
     
     /* DONATION BUTTON EFFECTS */
@@ -206,27 +109,27 @@
         font-weight: bold;
         font-size: 18px;
         padding: 15px 30px;
-        /* removed border-radius */
         cursor: pointer;
         transition: all 0.3s ease;
         overflow: hidden;
         animation: donatePulse 2s infinite;
+        font-family: 'Share Tech Mono', monospace;
     }
     
     @keyframes donatePulse {
         0%, 100% { 
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
             transform: scale(1);
         }
         50% { 
-            box-shadow: 0 0 40px rgba(0, 255, 0, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
             transform: scale(1.05);
         }
     }
     
     .donate-button:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 50px rgba(0, 255, 0, 1);
+        box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
         animation: donatePulse 0.5s infinite;
     }
     
@@ -276,80 +179,14 @@
         }
     }
     
-    /* PIXEL NOISE ANIMATION - SOFTER VERSION */
-    .pixel-noise {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        opacity: 0.6;
-        background: #000000;
-    }
-    
-    .noise-frame {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-image: radial-gradient(circle, #00ff00 1px, transparent 1px);
-        background-size: 8px 8px;
-        animation: noiseAnimation 0.5s steps(3) infinite;
-    }
-    
-    @keyframes noiseAnimation {
-        0% {
-            transform: translate(0, 0);
-            opacity: 0.3;
-        }
-        33% {
-            transform: translate(-4px, 4px);
-            opacity: 0.4;
-        }
-        66% {
-            transform: translate(4px, -4px);
-            opacity: 0.35;
-        }
-        100% {
-            transform: translate(0, 0);
-            opacity: 0.3;
-        }
-    }
-    
-    /* Scattered pixels for static */
-    .noise-pixels {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0.2;
-    }
-    
-    .noise-pixels::before {
-        content: '';
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: 
-            radial-gradient(circle, #00ff00 1px, transparent 1px),
-            radial-gradient(circle, #00ff00 1px, transparent 1px);
-        background-size: 15px 15px, 25px 25px;
-        background-position: 0 0, 10px 10px;
-        animation: pixelFlicker 0.8s steps(2) infinite;
-    }
-    
-    @keyframes pixelFlicker {
-        0% { opacity: 0.2; }
-        50% { opacity: 0.15; }
-        100% { opacity: 0.2; }
-    }
-    
     /* STATUS INDICATORS - SQUARE PIXELS */
     .status-online {
         display: inline-block;
         width: 8px;
         height: 8px;
         background: #00FF00;
-        /* removed border-radius */
         margin-right: 5px;
-        box-shadow: 0 0 10px #00FF00;
+        box-shadow: 0 0 5px #00FF00;
         animation: statusBlink 2s infinite;
     }
     
@@ -358,14 +195,25 @@
         width: 8px;
         height: 8px;
         background: #FFFF00;
-        /* removed border-radius */
         margin-right: 5px;
-        box-shadow: 0 0 10px #FFFF00;
+        box-shadow: 0 0 5px #FFFF00;
     }
     
     @keyframes statusBlink {
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.3; }
+    }
+    
+    /* ROBOT WORKING ANIMATION */
+    @keyframes robotWork {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(2px, -1px); }
+        50% { transform: translate(-1px, 2px); }
+        75% { transform: translate(1px, 1px); }
+    }
+    
+    .robot-active {
+        animation: robotWork 2s infinite;
     }
     
     /* MOBILE ADAPTATIONS */
@@ -407,7 +255,7 @@
     
     .nav-link:hover {
         color: #00FF00;
-        text-shadow: 0 0 10px #00FF00;
+        text-shadow: 0 0 5px #00FF00;
     }
 </style>
 ```
@@ -427,7 +275,7 @@
                 <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
                 <div class="nav-link inline" onclick="showSocial()">[SOCIAL]</div>
             </div>
-            <div class="text-green-500 text-xs">
+            <div class="text-green-500 text-xs pixel-font">
                 <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
             </div>
         </div>
@@ -456,10 +304,7 @@
                         <span class="text-green-400"><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-noise">
-                            <div class="noise-frame"></div>
-                            <div class="noise-pixels"></div>
-                        </div>
+                        <div id="robot1-canvas" class="robot-canvas"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs">
                         <div>STYLE: Abstract Expressionism</div>
@@ -474,10 +319,7 @@
                         <span class="text-green-400"><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-noise">
-                            <div class="noise-frame"></div>
-                            <div class="noise-pixels"></div>
-                        </div>
+                        <div id="robot2-canvas" class="robot-canvas"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs">
                         <div>STYLE: Digital Minimalism</div>
@@ -492,12 +334,10 @@
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-noise">
-                            <div class="noise-frame"></div>
-                            <div class="noise-pixels"></div>
-                        </div>
                         <div class="pixel-font text-green-400 text-xs text-center" style="position: relative; z-index: 1;">
-                            <pre style="background: rgba(0,0,0,0.7); padding: 10px;">
+                            <pre style="background: rgba(0,0,0,0.7); padding: 10px; font-family: 'Share Tech Mono', monospace;">
+```
+
 ╔══════════════════╗
 ║                  ║
 ║      [OFF]       ║
@@ -507,15 +347,16 @@
 ║   │ ░░░░░░░ │    ║
 ║   └─────────┘    ║
 ╚══════════════════╝
-                            </pre>
-                        </div>
-                    </div>
-                    <div class="pixel-font text-green-600 text-xs">
-                        <div>STATUS: Battery Charging</div>
-                        <div>ETA: 00:23:15</div>
-                    </div>
-                </div>
+</pre>
+</div>
+</div>
+<div class="pixel-font text-green-600 text-xs">
+<div>STATUS: Battery Charging</div>
+<div>ETA: 00:23:15</div>
+</div>
+</div>
 
+```
                 <!-- Robot 04 -->
                 <div class="terminal-border bg-black bg-opacity-50 p-3">
                     <div class="pixel-font text-green-500 text-xs mb-2 flex justify-between">
@@ -523,10 +364,7 @@
                         <span class="text-green-400"><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border flex items-center justify-center mb-2">
-                        <div class="pixel-noise">
-                            <div class="noise-frame"></div>
-                            <div class="noise-pixels"></div>
-                        </div>
+                        <div id="robot4-canvas" class="robot-canvas"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs">
                         <div>STYLE: Geometric Patterns</div>
@@ -542,9 +380,16 @@
             <!-- Support Message -->
             <div class="text-center mb-8">
                 <h3 class="pixel-font text-2xl font-bold mb-4">
-                    <span class="glow-text" style="color: #00ff00; text-shadow: 0 0 10px #00ff00;">SUPPORT</span>
-                    <span class="glow-text" style="color: #9400D3; text-shadow: 0 0 10px #9400D3;">PROJECT</span>
+                    <span class="glow-text" style="color: #00ff00; text-shadow: 0 0 8px #00ff00;">SUPPORT THE PROJECT</span>
                 </h3>
+                <div class="pixel-font text-sm text-green-400 mb-4">
+                    Help fund our AI robot artists<br>
+                    Every donation goes directly to:<br>
+                    • Robot maintenance & upgrades<br>
+                    • Art supplies & canvases<br>
+                    • Neural network training<br>
+                    • New experimental features
+                </div>
             </div>
 
             <!-- MEGA DONATION BUTTON -->
@@ -556,11 +401,116 @@
                 <!-- Floating pixels container -->
                 <div id="pixelContainer" class="absolute inset-0 pointer-events-none"></div>
             </div>
+            
+            <!-- Live Stats -->
+            <div class="terminal-border bg-black bg-opacity-60 p-4 w-full max-w-xs">
+                <div class="pixel-font text-green-500 text-xs mb-3 text-center">[LIVE STATS]</div>
+                <div class="pixel-font text-green-400 space-y-1 text-xs">
+                    <div>VIEWERS: <span id="viewerCount">1,247</span></div>
+                    <div>PAINTINGS TODAY: <span id="paintingsToday">23</span></div>
+                    <div>TOTAL BRUSHSTROKES: <span id="totalStrokes">847,293</span></div>
+                    <div>AI LEARNING: <span class="text-green-300">ACTIVE</span></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    // ЖИВЫЕ ПИКСЕЛИ ДЛЯ РОБОТОВ
+    class RobotPixelArt {
+        constructor(containerId) {
+            this.container = document.getElementById(containerId);
+            if (!this.container) return;
+            
+            this.width = 40;
+            this.height = 25;
+            this.grid = [];
+            this.initGrid();
+            this.createCanvas();
+            this.startEvolution();
+        }
+        
+        initGrid() {
+            this.grid = Array(this.height).fill().map(() => 
+                Array(this.width).fill().map(() => Math.random() < 0.25 ? 1 : 0)
+            );
+        }
+        
+        createCanvas() {
+            this.container.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`;
+            this.container.style.gridTemplateRows = `repeat(${this.height}, 1fr)`;
+            
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    const pixel = document.createElement('div');
+                    pixel.style.backgroundColor = this.grid[y][x] ? '#00ff00' : 'transparent';
+                    pixel.style.transition = 'background-color 0.4s ease';
+                    this.container.appendChild(pixel);
+                }
+            }
+        }
+        
+        evolve() {
+            const newGrid = Array(this.height).fill().map(() => Array(this.width).fill(0));
+            
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    const neighbors = this.countNeighbors(x, y);
+                    
+                    if (this.grid[y][x] === 1) {
+                        newGrid[y][x] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+                    } else {
+                        newGrid[y][x] = (neighbors === 3) ? 1 : 0;
+                    }
+                }
+            }
+            
+            this.grid = newGrid;
+            this.updateVisual();
+        }
+        
+        countNeighbors(x, y) {
+            let count = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                    if (dx === 0 && dy === 0) continue;
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx >= 0 && nx < this.width && ny >= 0 && ny < this.height) {
+                        count += this.grid[ny][nx];
+                    }
+                }
+            }
+            return count;
+        }
+        
+        updateVisual() {
+            const pixels = this.container.children;
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    const index = y * this.width + x;
+                    const pixel = pixels[index];
+                    if (pixel) {
+                        pixel.style.backgroundColor = this.grid[y][x] ? '#00ff00' : 'transparent';
+                    }
+                }
+            }
+        }
+        
+        startEvolution() {
+            setInterval(() => {
+                this.evolve();
+                // Добавляем немного хаоса
+                if (Math.random() < 0.1) {
+                    const x = Math.floor(Math.random() * this.width);
+                    const y = Math.floor(Math.random() * this.height);
+                    this.grid[y][x] = Math.random() < 0.5 ? 1 : 0;
+                }
+            }, 1200);
+        }
+    }
+
     // Donation button effects
     function createFloatingPixels() {
         const container = document.getElementById('pixelContainer');
@@ -646,7 +596,7 @@
             alert(`MetaMask not detected!\n\nPlease send ETH to:\n${address}\n\nOr install MetaMask extension first.`);
         }
         
-        console.log('🍩 DONATION ATTEMPT - Thank you for supporting robot artists!');
+        console.log('🤖 DONATION ATTEMPT - Thank you for supporting robot artists!');
     }
     
     // Copy address function
@@ -681,27 +631,33 @@
 💰 SUPPORT THE PROJECT:
 🏦 MetaMask: 0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
 `;
+alert(socialAlert);
+}
 
 ```
-        alert(socialAlert);
-    }
-    
     // Update live stats
     function updateStats() {
         const viewers = document.getElementById('viewerCount');
         const paintings = document.getElementById('paintingsToday');
         const strokes = document.getElementById('totalStrokes');
         
-        // Random fluctuations
-        viewers.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString();
-        paintings.textContent = (20 + Math.floor(Math.random() * 10));
-        
-        const currentStrokes = parseInt(strokes.textContent.replace(/,/g, ''));
-        strokes.textContent = (currentStrokes + Math.floor(Math.random() * 50)).toLocaleString();
+        if (viewers && paintings && strokes) {
+            // Random fluctuations
+            viewers.textContent = (1200 + Math.floor(Math.random() * 100)).toLocaleString();
+            paintings.textContent = (20 + Math.floor(Math.random() * 10));
+            
+            const currentStrokes = parseInt(strokes.textContent.replace(/,/g, ''));
+            strokes.textContent = (currentStrokes + Math.floor(Math.random() * 50)).toLocaleString();
+        }
     }
     
     // Initialize
     window.addEventListener('load', function() {
+        // Создаем живые пиксели для роботов
+        new RobotPixelArt('robot1-canvas');
+        new RobotPixelArt('robot2-canvas'); 
+        new RobotPixelArt('robot4-canvas');
+        
         // Start floating pixels
         setInterval(createFloatingPixels, 2000);
         
