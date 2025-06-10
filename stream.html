@@ -276,64 +276,50 @@
         }
     }
     
-    /* PIXEL NOISE ANIMATION */
+    /* PIXEL NOISE ANIMATION - SOFTER VERSION */
     .pixel-noise {
         position: absolute;
         width: 100%;
         height: 100%;
         overflow: hidden;
-        opacity: 0.8;
+        opacity: 0.6;
+        background: #000000;
     }
     
     .noise-frame {
         position: absolute;
         width: 100%;
         height: 100%;
-        background-image: 
-            repeating-linear-gradient(
-                0deg,
-                #00ff00 0px,
-                #00ff00 2px,
-                #000000 2px,
-                #000000 4px
-            ),
-            repeating-linear-gradient(
-                90deg,
-                #00ff00 0px,
-                #00ff00 2px,
-                #000000 2px,
-                #000000 4px
-            );
-        background-size: 4px 4px;
-        animation: noiseAnimation 0.3s steps(3) infinite;
+        background-image: radial-gradient(circle, #00ff00 1px, transparent 1px);
+        background-size: 8px 8px;
+        animation: noiseAnimation 0.5s steps(3) infinite;
     }
     
     @keyframes noiseAnimation {
         0% {
             transform: translate(0, 0);
-            filter: contrast(100%);
+            opacity: 0.3;
         }
         33% {
-            transform: translate(-2px, 2px);
-            filter: contrast(150%);
+            transform: translate(-4px, 4px);
+            opacity: 0.4;
         }
         66% {
-            transform: translate(2px, -2px);
-            filter: contrast(80%);
+            transform: translate(4px, -4px);
+            opacity: 0.35;
         }
         100% {
             transform: translate(0, 0);
-            filter: contrast(100%);
+            opacity: 0.3;
         }
     }
     
-    /* Pixel grid overlay */
+    /* Scattered pixels for static */
     .noise-pixels {
         position: absolute;
         width: 100%;
         height: 100%;
-        background-size: 4px 4px;
-        animation: pixelShift 0.2s steps(3) infinite;
+        opacity: 0.2;
     }
     
     .noise-pixels::before {
@@ -344,23 +330,15 @@
         background: 
             radial-gradient(circle, #00ff00 1px, transparent 1px),
             radial-gradient(circle, #00ff00 1px, transparent 1px);
-        background-size: 4px 4px;
-        background-position: 0 0, 2px 2px;
-        opacity: 0.5;
-        animation: pixelFlicker 0.15s steps(2) infinite;
-    }
-    
-    @keyframes pixelShift {
-        0% { opacity: 0.3; }
-        33% { opacity: 0.6; }
-        66% { opacity: 0.4; }
-        100% { opacity: 0.3; }
+        background-size: 15px 15px, 25px 25px;
+        background-position: 0 0, 10px 10px;
+        animation: pixelFlicker 0.8s steps(2) infinite;
     }
     
     @keyframes pixelFlicker {
-        0% { transform: scale(1); }
-        50% { transform: scale(-1, 1); }
-        100% { transform: scale(1); }
+        0% { opacity: 0.2; }
+        50% { opacity: 0.15; }
+        100% { opacity: 0.2; }
     }
     
     /* STATUS INDICATORS - SQUARE PIXELS */
@@ -563,17 +541,10 @@
             
             <!-- Support Message -->
             <div class="text-center mb-8">
-                <h3 class="retro-font text-2xl font-bold glow-text mb-4" style="color: #9400D3; text-shadow: 0 0 10px #9400D3, 0 0 20px #9400D3;">
-                    SUPPORT THE PROJECT
+                <h3 class="pixel-font text-2xl font-bold mb-4">
+                    <span class="glow-text" style="color: #00ff00; text-shadow: 0 0 10px #00ff00;">SUPPORT</span>
+                    <span class="glow-text" style="color: #9400D3; text-shadow: 0 0 10px #9400D3;">PROJECT</span>
                 </h3>
-                <div class="pixel-font text-sm leading-relaxed" style="color: #9400D3;">
-                    Help fund our AI robot artists<br/>
-                    Every donation goes directly to:<br/>
-                    • Robot maintenance & upgrades<br/>
-                    • Art supplies & canvases<br/>
-                    • Neural network training<br/>
-                    • New experimental features
-                </div>
             </div>
 
             <!-- MEGA DONATION BUTTON -->
