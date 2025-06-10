@@ -9,11 +9,19 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
+        html {
+            background: #000000;
+            height: 100%;
+        }
+        
         body {
             background: #000000;
             color: #00ff00;
             font-family: 'Share Tech Mono', monospace;
             overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
         }
         
         .terminal-border {
@@ -143,21 +151,46 @@
             font-size: 14px;
         }
         
+        .price-char {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 1px;
+            position: relative;
+            vertical-align: middle;
+        }
+        
+        .pixel-shape {
+            position: absolute;
+            background: #00ff00;
+            transition: all 0.3s ease;
+        }
+        
+        /* Pixel patterns */
+        .pattern-square .pixel-shape { width: 6px; height: 6px; top: 1px; left: 1px; }
+        
+        .pattern-cross .pixel-shape:nth-child(1) { width: 2px; height: 6px; top: 1px; left: 3px; }
+        .pattern-cross .pixel-shape:nth-child(2) { width: 6px; height: 2px; top: 3px; left: 1px; }
+        
+        .pattern-diamond .pixel-shape:nth-child(1) { width: 2px; height: 2px; top: 0; left: 3px; }
+        .pattern-diamond .pixel-shape:nth-child(2) { width: 2px; height: 2px; top: 2px; left: 1px; }
+        .pattern-diamond .pixel-shape:nth-child(3) { width: 2px; height: 2px; top: 2px; left: 5px; }
+        .pattern-diamond .pixel-shape:nth-child(4) { width: 2px; height: 2px; top: 4px; left: 3px; }
+        
+        .pattern-dot .pixel-shape { width: 2px; height: 2px; top: 3px; left: 3px; }
+        
+        .pattern-line .pixel-shape { width: 6px; height: 2px; top: 3px; left: 1px; }
+        
         @keyframes priceFlicker {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
-        }
-        
-        .price-mystery {
-            animation: priceFlicker 2s infinite;
         }
         
         /* Donate button */
         .donate-console {
             position: fixed;
             bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+            right: 30px;
             background: #000000;
             border: 3px solid #00ff00;
             padding: 15px 40px;
@@ -168,20 +201,20 @@
         }
         
         .donate-console:hover {
-            transform: translateX(-50%) scale(1.05);
+            transform: scale(1.05);
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
         }
         
         /* Firefly effect */
         .firefly {
             position: fixed;
-            width: 9px;
-            height: 9px;
+            width: 3px;
+            height: 3px;
             background: #00ff00;
             pointer-events: none;
             z-index: 999;
             opacity: 0;
-            box-shadow: 0 0 6px #00ff00;
+            box-shadow: 0 0 3px #00ff00;
         }
         
         @keyframes fireflyFloat {
@@ -295,9 +328,9 @@
         }
     </style>
 </head>
-<body class="scanlines">
+<body class="scanlines" style="background-color: #000000;">
     <!-- Header Navigation -->
-    <div class="terminal-border bg-black p-2 m-4">
+    <div class="terminal-border bg-black p-2 m-4" style="background-color: #000000;">
         <div class="flex justify-between items-center text-xs">
             <div class="text-green-500 text-lg font-bold glow-text">GHOSTLINE</div>
             <div class="flex gap-4">
@@ -385,16 +418,18 @@
     </div>
 
     <script>
-        // Gallery data
+        // Gallery data - expandable array
         const galleryItems = [
-            { id: 'GH-001', category: 'latest', status: 'available', date: '2025-01-18', preview: '🎨' },
-            { id: 'GH-002', category: 'latest', status: 'sold', date: '2025-01-17', preview: '🖼️' },
-            { id: 'GH-003', category: 'series', status: 'available', date: '2025-01-16', preview: '🎭' },
-            { id: 'GH-004', category: 'rare', status: 'sold', date: '2025-01-15', preview: '💎' },
-            { id: 'GH-005', category: 'unusual', status: 'available', date: '2025-01-14', preview: '🌀' },
-            { id: 'GH-006', category: 'collabs', status: 'available', date: '2025-01-13', preview: '🤝' },
-            { id: 'GH-007', category: 'latest', status: 'available', date: '2025-01-12', preview: '🎨' },
-            { id: 'GH-008', category: 'series', status: 'sold', date: '2025-01-11', preview: '🖼️' },
+            { id: 'GH-001', category: 'latest', status: 'available', date: '2025-01-18', preview: '🎨', image: null },
+            { id: 'GH-002', category: 'latest', status: 'sold', date: '2025-01-17', preview: '🖼️', image: null },
+            { id: 'GH-003', category: 'series', status: 'available', date: '2025-01-16', preview: '🎭', image: null },
+            { id: 'GH-004', category: 'rare', status: 'sold', date: '2025-01-15', preview: '💎', image: null },
+            { id: 'GH-005', category: 'unusual', status: 'available', date: '2025-01-14', preview: '🌀', image: null },
+            { id: 'GH-006', category: 'collabs', status: 'available', date: '2025-01-13', preview: '🤝', image: null },
+            { id: 'GH-007', category: 'latest', status: 'available', date: '2025-01-12', preview: '🎨', image: null },
+            { id: 'GH-008', category: 'series', status: 'sold', date: '2025-01-11', preview: '🖼️', image: null },
+            // Add new items here:
+            // { id: 'GH-009', category: 'latest', status: 'available', date: '2025-01-19', preview: '🎨', image: 'path/to/image.jpg' },
         ];
         
         // Current filter
@@ -403,6 +438,7 @@
         // Initialize gallery
         function initGallery() {
             renderGallery();
+            startPriceAnimation();
             startFireflies();
             startLearningLog();
             updateLiveStatus();
@@ -419,7 +455,7 @@
                 <div class="gallery-card terminal-border bg-black p-3" onclick="inquireArtwork('${item.id}')">
                     <div class="relative">
                         <div class="h-48 flex items-center justify-center text-6xl bg-gray-900">
-                            ${item.preview}
+                            ${item.image ? `<img src="${item.image}" alt="${item.id}" class="w-full h-full object-cover">` : item.preview}
                         </div>
                         <div class="${item.status === 'available' ? 'status-available' : 'status-sold'}"></div>
                         <div class="card-overlay">
@@ -431,21 +467,85 @@
                         <p class="text-xs text-green-600">${item.date}</p>
                         <div class="price-display flex items-center gap-2 mt-2">
                             <span>Ξ</span>
-                            <span class="price-mystery">${generateRandomPrice()}</span>
+                            <span class="price-mystery" id="price-${item.id}"></span>
                         </div>
                     </div>
                 </div>
             `).join('');
         }
         
-        // Generate random price display
-        function generateRandomPrice() {
-            const chars = '?*.#@%';
-            let price = '';
-            for(let i = 0; i < 5; i++) {
-                price += chars[Math.floor(Math.random() * chars.length)];
+        // Generate random price display with pixel shapes
+        function generatePixelChar() {
+            const patterns = ['square', 'cross', 'diamond', 'dot', 'line'];
+            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            
+            let html = `<span class="price-char pattern-${pattern}">`;
+            
+            switch(pattern) {
+                case 'cross':
+                case 'diamond':
+                    html += '<div class="pixel-shape"></div><div class="pixel-shape"></div><div class="pixel-shape"></div><div class="pixel-shape"></div>';
+                    break;
+                default:
+                    html += '<div class="pixel-shape"></div>';
             }
-            return price;
+            
+            html += '</span>';
+            return html;
+        }
+        
+        // Animate prices individually
+        function animatePrices() {
+            const filtered = currentCategory === 'all' 
+                ? galleryItems 
+                : galleryItems.filter(item => item.category === currentCategory);
+            
+            filtered.forEach(item => {
+                const priceElement = document.getElementById(`price-${item.id}`);
+                if (priceElement) {
+                    // Generate 5 pixel characters
+                    let priceHtml = '';
+                    for(let i = 0; i < 5; i++) {
+                        priceHtml += generatePixelChar();
+                    }
+                    priceElement.innerHTML = priceHtml;
+                }
+            });
+        }
+        
+        // Random individual character updates
+        function startPriceAnimation() {
+            // Initial render
+            setTimeout(animatePrices, 100);
+            
+            // Random updates
+            setInterval(() => {
+                const filtered = currentCategory === 'all' 
+                    ? galleryItems 
+                    : galleryItems.filter(item => item.category === currentCategory);
+                
+                if (filtered.length > 0) {
+                    // Pick random item
+                    const randomItem = filtered[Math.floor(Math.random() * filtered.length)];
+                    const priceElement = document.getElementById(`price-${randomItem.id}`);
+                    
+                    if (priceElement && priceElement.children.length > 0) {
+                        // Pick random character position
+                        const charIndex = Math.floor(Math.random() * priceElement.children.length);
+                        const oldChar = priceElement.children[charIndex];
+                        
+                        // Replace with new pixel character
+                        const newChar = generatePixelChar();
+                        const temp = document.createElement('div');
+                        temp.innerHTML = newChar;
+                        
+                        oldChar.style.opacity = '0';
+                        setTimeout(() => {
+                            priceElement.replaceChild(temp.firstChild, oldChar);
+                        }, 150);
+                    }
+                }
+            }, 300); // Update every 300ms
         }
         
         // Filter by category
