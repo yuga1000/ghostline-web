@@ -7,9 +7,6 @@
     <title>GHOSTLINE - Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             background: #000000;
@@ -47,34 +44,16 @@
         animation: blink 1s infinite;
     }
     
-    /* Simple pixel noise */
-    .pixel-noise {
+    /* Noise mask for video feeds */
+    .noise-mask {
         position: absolute;
         width: 100%;
         height: 100%;
-        background: #000;
-        overflow: hidden;
-    }
-    
-    .pixel-noise::before {
-        content: '';
-        position: absolute;
-        width: 200%;
-        height: 200%;
-        top: -50%;
-        left: -50%;
-        background-image: 
-            radial-gradient(circle, #00ff00 1px, transparent 1px),
-            radial-gradient(circle, #00ff00 1px, transparent 1px);
-        background-size: 20px 20px, 30px 30px;
-        background-position: 0 0, 15px 15px;
-        opacity: 0.1;
-        animation: noiseMove 8s linear infinite;
-    }
-    
-    @keyframes noiseMove {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(30px, 30px); }
+        background: url('plate_noisemask.GIF') repeat;
+        background-size: cover;
+        opacity: 0.8;
+        mix-blend-mode: screen;
+        pointer-events: none;
     }
     
     .video-feed {
@@ -82,21 +61,24 @@
         position: relative;
         overflow: hidden;
     }
-        @keyframes codeRain {
-    0% { transform: translateY(-100%); opacity: 0; }
-    10% { opacity: 1; }
-    100% { transform: translateY(100%); opacity: 0; }
-}
+    
+    /* Code rain effect */
+    @keyframes codeRain {
+        0% { transform: translateY(-100%); opacity: 0; }
+        10% { opacity: 1; }
+        100% { transform: translateY(100%); opacity: 0; }
+    }
 
-.code-line {
-    position: absolute;
-    white-space: nowrap;
-    color: #00ff00;
-    font-size: 12px;
-    font-family: 'Share Tech Mono', monospace;
-    animation: codeRain 6s linear infinite;
-    pointer-events: none;
-}
+    .code-line {
+        position: absolute;
+        white-space: nowrap;
+        color: #00ff00;
+        font-size: 10px;
+        font-family: 'Press Start 2P', monospace;
+        animation: codeRain 6s linear infinite;
+        pointer-events: none;
+        opacity: 0.3;
+    }
     
     /* Simple terminal button */
     .donate-button {
@@ -260,8 +242,8 @@
                         <span>[ROBOT_01 - "YUGA"]</span>
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative">
-                        <div class="pixel-noise"></div>
+                    <div class="video-feed h-40 terminal-border relative" id="robot1-feed">
+                        <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Abstract Expressionism</div>
@@ -275,8 +257,8 @@
                         <span>[ROBOT_02 - "MIKA"]</span>
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative">
-                        <div class="pixel-noise"></div>
+                    <div class="video-feed h-40 terminal-border relative" id="robot2-feed">
+                        <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Digital Minimalism</div>
@@ -291,7 +273,7 @@
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative">
-                        <div class="pixel-noise"></div>
+                        <div class="noise-mask"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="text-green-400 text-xs bg-black bg-opacity-70 px-3 py-1 terminal-border">
                                 NO SIGNAL
@@ -310,8 +292,8 @@
                         <span>[ROBOT_04 - "LINE"]</span>
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative">
-                        <div class="pixel-noise"></div>
+                    <div class="video-feed h-40 terminal-border relative" id="robot4-feed">
+                        <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Geometric Patterns</div>
@@ -365,6 +347,37 @@
 </div>
 
 <script>
+    // Code rain for robot feeds
+    function startCodeRain(container) {
+        const codeSnippets = [
+            "INIT::OK",
+            "BRUSH[73%]",
+            "COLOR::MIX",
+            "PATTERN::09",
+            "STATUS::ON",
+            "CALC::PATH",
+            "DRAW::TRUE",
+            "AI::LEARN"
+        ];
+
+        setInterval(() => {
+            const line = document.createElement('div');
+            line.className = 'code-line';
+            line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+            line.style.left = Math.random() * 90 + '%';
+            line.style.animationDelay = Math.random() * 2 + 's';
+            line.style.fontSize = (8 + Math.floor(Math.random() * 4)) + 'px';
+            
+            container.appendChild(line);
+            
+            setTimeout(() => {
+                if (line.parentNode) {
+                    line.remove();
+                }
+            }, 6000);
+        }, 800);
+    }
+    
     // Show donation modal
     function showDonateModal() {
         document.getElementById('donateModal').style.display = 'flex';
@@ -379,7 +392,6 @@
     function copyAddress() {
         const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
         navigator.clipboard.writeText(address).then(() => {
-            // Change button text temporarily
             event.target.textContent = 'COPIED!';
             setTimeout(() => {
                 event.target.textContent = 'COPY ADDRESS';
@@ -414,139 +426,11 @@
     // Initialize
     window.addEventListener('load', function() {
         console.log('🎨 GHOSTLINE Stream initialized!');
-        const robot1Container = document.querySelectorAll('.video-feed')[0];
-startCodeRain(robot1Container);
-    });
-    function startCodeRain(container) {
-    const codeSnippets = [
-        "SIG:TRACE.YUGA::READY",
-        "BRUSH[0x23]::LOAD OK",
-        "MEM.PULSE::Δ+0.07",
-        ">> THINKING [.........]",
-        "CONTOUR_LOCKED = TRUE",
-        "EXP.TIME::4.73s",
-        "— — — — — — — — —",
-        "TOH_SIGNAL: HOLD",
-        "SENSOR[03]: STABLE",
-        "PATH::CALC[SPIRAL]"
-    ];
-
-    setInterval(() => {
-    const line = document.createElement("div");
-    line.className = "code-line";
-
-    const pixelFonts = [
-        "'Share Tech Mono', monospace",
-        "'Press Start 2P', monospace",
-        "'Silkscreen', monospace",
-        "'VT323', monospace",
-        "'Pixelify Sans', sans-serif"
-    ];
-    line.style.fontFamily = pixelFonts[Math.floor(Math.random() * pixelFonts.length)];
-
-    line.style.color = Math.random() < 0.15 ? "#44ff88" : "#00ff00";
-    line.style.fontSize = (10 + Math.floor(Math.random() * 4)) + "px";
-
-    let raw = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-    raw = raw.replace(/[A-Z]/g, c => (Math.random() < 0.1 ? '▒' : c));
-    line.textContent = raw;
-
- 
-
-    // Координаты по "пиксельной сетке" — шаг 8px
-    const step = 8;
-    const maxCols = Math.floor(container.offsetWidth / step);
-    const maxRows = Math.floor(container.offsetHeight / step) - 1;
-
-    const col = Math.floor(Math.random() * maxCols);
-    const row = Math.floor(Math.random() * maxRows);
-
-    line.style.left = col * step + "px";
-    line.style.top = row * step + "px";
-    line.style.opacity = 0.7;
-
-    container.appendChild(line);
-
-    setTimeout(() => {
-        container.removeChild(line);
-    }, 1200 + Math.random() * 400); // живут ~1.5 сек
-}, 180);
-}
-</script>
-```
-
-    // Create fireflies from button
-    function createButtonFireflies() {
-        const button = document.getElementById('donateBtn');
-        const rect = button.getBoundingClientRect();
         
-        for(let i = 0; i < 8; i++) {
-            setTimeout(() => {
-                const firefly = document.createElement('div');
-                firefly.className = 'button-firefly';
-                
-                // Start position - around button
-                const angle = (i / 8) * Math.PI * 2;
-                const startRadius = 30;
-                const startX = rect.left + rect.width/2 + Math.cos(angle) * startRadius;
-                const startY = rect.top + rect.height/2 + Math.sin(angle) * startRadius;
-                
-                firefly.style.left = startX + 'px';
-                firefly.style.top = startY + 'px';
-                
-                // End position - random spread
-                const endRadius = 100 + Math.random() * 150;
-                const endAngle = angle + (Math.random() - 0.5) * Math.PI/2;
-                const endX = Math.cos(endAngle) * endRadius;
-                const endY = Math.sin(endAngle) * endRadius - 50; // Bias upward
-                
-                firefly.style.setProperty('--end-x', endX + 'px');
-                firefly.style.setProperty('--end-y', endY + 'px');
-                firefly.style.animation = 'fireflyFromButton 3s ease-out forwards';
-                
-                document.body.appendChild(firefly);
-                
-                setTimeout(() => firefly.remove(), 3000);
-            }, i * 100);
-        }
-    }
-    
-    // Donation function
-    function donate() {
-        console.log('💰 Donate button clicked!');
-        
-        // Visual feedback
-        createButtonFireflies();
-        
-        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
-        
-        if(typeof window.ethereum !== 'undefined') {
-            // MetaMask is installed
-            window.ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [{
-                    to: address,
-                    from: window.ethereum.selectedAddress,
-                    value: '0x2386F26FC10000' // 0.01 ETH
-                }]
-            }).catch(console.error);
-        } else {
-            // Show address for manual transfer
-            alert(`Please send ETH to:\n\n${address}\n\nOr install MetaMask extension for easier donations!`);
-        }
-    }
-    
-    // Show social links
-    function showSocial() {
-        alert(`GHOSTLINE SOCIAL:\n\nInstagram: @____yuga______\nTikTok: @ghostline207\nTelegram: @yuga_art`);
-    }
-    
-    // Initialize
-    window.addEventListener('load', function() {
-        console.log('🎨 GHOSTLINE Stream initialized!');
-        
-        // Start button fireflies periodically
-        setInterval(createButtonFireflies, 8000);
+        // Start code rain for active robots
+        startCodeRain(document.getElementById('robot1-feed'));
+        startCodeRain(document.getElementById('robot2-feed'));
+        startCodeRain(document.getElementById('robot4-feed'));
     });
 </script>
 ```
