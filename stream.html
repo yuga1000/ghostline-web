@@ -119,12 +119,12 @@
     
     .line-vertical {
         width: 2px;
-        animation: lineGrowVertical 0.5s ease-out forwards;
+        animation: lineGrowVertical 0.2s ease-out forwards;
     }
     
     .line-horizontal {
         height: 2px;
-        animation: lineGrowHorizontal 0.5s ease-out forwards;
+        animation: lineGrowHorizontal 0.2s ease-out forwards;
     }
     
     @keyframes lineGrowVertical {
@@ -504,9 +504,9 @@
         // Создаем ломаную линию по этапам
         const segments = [
             { direction: 'up', length: 80 },       // Вверх
-            { direction: 'right', length: 150 },   // Вправо  
+            { direction: 'left', length: 70 },   // Вправо  
             { direction: 'up', length: 60 },       // Снова вверх
-            { direction: 'right', length: 100 },   // Еще вправо
+            { direction: 'left', length: 45 },   // Еще вправо
             { direction: 'up', length: 40 }        // Финальный вверх
         ];
         
