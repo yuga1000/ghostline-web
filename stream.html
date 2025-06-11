@@ -56,29 +56,23 @@
         pointer-events: none;
     }
     
-    /* Different animation delays for desync */
-    .noise-mask-1 {
-        animation: noiseShift 4s linear infinite;
+    /* Camera feed when connected */
+    .camera-feed {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
     }
     
-    .noise-mask-2 {
-        animation: noiseShift 5s linear infinite;
-        animation-delay: 1s;
+    .video-feed {
+        background: #000000;
+        position: relative;
+        overflow: hidden;
     }
     
-    .noise-mask-3 {
-        animation: noiseShift 3.5s linear infinite;
-        animation-delay: 0.5s;
-    }
-    
-    .noise-mask-4 {
-        animation: noiseShift 4.5s linear infinite;
-        animation-delay: 1.5s;
-    }
-    
-    @keyframes noiseShift {
-        0% { background-position: 0% 0%; }
-        100% { background-position: 100% 100%; }
+    .video-feed.has-camera .noise-mask {
+        display: none;
     }
     
     .video-feed {
@@ -155,25 +149,25 @@
             2px 2px 0 0 #006600;
     }
     
-    /* Fireflies from button */
-    .firefly {
+    /* Fireflies/sparks from button */
+    .spark {
         position: fixed;
         width: 3px;
         height: 3px;
         background: #00FF00;
         pointer-events: none;
         z-index: 1000;
-        box-shadow: 0 0 3px #00FF00;
+        box-shadow: 0 0 6px #00FF00;
     }
     
-    @keyframes fireflyFloat {
+    @keyframes sparkUp {
         0% {
             opacity: 1;
-            transform: translate(0, 0) scale(1);
+            transform: translateY(0) scale(1);
         }
         100% {
             opacity: 0;
-            transform: translate(var(--dx), var(--dy)) scale(0);
+            transform: translateY(-150px) translateX(var(--drift)) scale(0);
         }
     }
     
@@ -317,7 +311,8 @@
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot1-feed">
-                        <div class="noise-mask noise-mask-1"></div>
+                        <div class="noise-mask"></div>
+                        <!-- Camera feed will be inserted here when available -->
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Abstract Expressionism</div>
@@ -332,7 +327,7 @@
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot2-feed">
-                        <div class="noise-mask noise-mask-2"></div>
+                        <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Digital Minimalism</div>
@@ -346,8 +341,8 @@
                         <span>[ROBOT_03 - "GHOST"]</span>
                         <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative">
-                        <div class="noise-mask noise-mask-3"></div>
+                    <div class="video-feed h-40 terminal-border relative" id="robot3-feed">
+                        <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STATUS: Battery Charging</div>
@@ -362,7 +357,7 @@
                         <span><span class="status-online"></span>LIVE</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot4-feed">
-                        <div class="noise-mask noise-mask-4"></div>
+                        <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Geometric Patterns</div>
@@ -447,44 +442,76 @@
         }, 800);
     }
     
-    // Create fireflies on button click
-    function createFireflies() {
+    // Create sparks flying up on button click
+    function createSparks() {
         const button = document.getElementById('donateBtn');
         const rect = button.getBoundingClientRect();
         
-        for(let i = 0; i < 12; i++) {
+        for(let i = 0; i < 15; i++) {
             setTimeout(() => {
-                const firefly = document.createElement('div');
-                firefly.className = 'firefly';
+                const spark = document.createElement('div');
+                spark.className = 'spark';
                 
-                // Start from button center
-                const startX = rect.left + rect.width/2;
+                // Random position along button width
+                const startX = rect.left + Math.random() * rect.width;
                 const startY = rect.top + rect.height/2;
                 
-                firefly.style.left = startX + 'px';
-                firefly.style.top = startY + 'px';
+                spark.style.left = startX + 'px';
+                spark.style.top = startY + 'px';
                 
-                // Random end position
-                const angle = (i / 12) * Math.PI * 2;
-                const distance = 100 + Math.random() * 100;
-                const dx = Math.cos(angle) * distance;
-                const dy = Math.sin(angle) * distance - 50; // Bias upward
+                // Random drift left or right
+                const drift = (Math.random() - 0.5) * 50;
+                spark.style.setProperty('--drift', drift + 'px');
                 
-                firefly.style.setProperty('--dx', dx + 'px');
-                firefly.style.setProperty('--dy', dy + 'px');
-                firefly.style.animation = 'fireflyFloat 2s ease-out forwards';
+                // Random spark color variation
+                const colors = ['#00FF00', '#44FF44', '#66FF66', '#00FF88'];
+                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
                 
-                document.body.appendChild(firefly);
+                spark.style.animation = 'sparkUp 1.5s ease-out forwards';
                 
-                setTimeout(() => firefly.remove(), 2000);
-            }, i * 50);
+                document.body.appendChild(spark);
+                
+                setTimeout(() => spark.remove(), 1500);
+            }, i * 30);
         }
     }
     
     // Show donation modal
     function showDonateModal() {
-        createFireflies();
+        createSparks();
         document.getElementById('donateModal').style.display = 'flex';
+    }
+    
+    // Simulate camera feed connection
+    function connectCamera(robotId, imageUrl) {
+        const feed = document.getElementById(robotId);
+        if (feed) {
+            const img = document.createElement('img');
+            img.className = 'camera-feed';
+            img.src = imageUrl;
+            img.onerror = function() {
+                // If image fails to load, remove it and show noise
+                this.remove();
+                feed.classList.remove('has-camera');
+            };
+            img.onload = function() {
+                // Image loaded successfully
+                feed.classList.add('has-camera');
+            };
+            feed.appendChild(img);
+        }
+    }
+    
+    // Disconnect camera (show noise again)
+    function disconnectCamera(robotId) {
+        const feed = document.getElementById(robotId);
+        if (feed) {
+            const camera = feed.querySelector('.camera-feed');
+            if (camera) {
+                camera.remove();
+            }
+            feed.classList.remove('has-camera');
+        }
     }
     
     // Close modal
@@ -530,7 +557,13 @@
     // Initialize
     window.addEventListener('load', function() {
         console.log('🎨 GHOSTLINE Stream initialized!');
-        // Code rain disabled for now - will be replaced with camera feeds
+        
+        // Example of how to connect camera feeds:
+        // connectCamera('robot1-feed', 'camera1.jpg');
+        // connectCamera('robot2-feed', 'camera2.jpg');
+        
+        // To disconnect and show noise again:
+        // disconnectCamera('robot1-feed');
     });
 </script>
 ```
