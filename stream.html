@@ -26,12 +26,13 @@
     }
     
     .terminal-border {
-        border: 2px solid #00FF00;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        border: 1px solid #00FF00;
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
     }
     
     .glow-text {
-        text-shadow: 0 0 8px #00FF00;
+        /* Убираем свечение */
+        color: #00ff00;
     }
     
     @keyframes blink {
@@ -56,47 +57,10 @@
         pointer-events: none;
     }
     
-    /* Camera feed when connected */
-    .camera-feed {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: 1;
-    }
-    
     .video-feed {
         background: #000000;
         position: relative;
         overflow: hidden;
-    }
-    
-    .video-feed.has-camera .noise-mask {
-        display: none;
-    }
-    
-    .video-feed {
-        background: #000000;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    /* Code rain effect */
-    @keyframes codeRain {
-        0% { transform: translateY(-100%); opacity: 0; }
-        10% { opacity: 1; }
-        100% { transform: translateY(100%); opacity: 0; }
-    }
-
-    .code-line {
-        position: absolute;
-        white-space: nowrap;
-        color: #00ff00;
-        font-size: 10px;
-        font-family: 'Press Start 2P', monospace;
-        animation: codeRain 6s linear infinite;
-        pointer-events: none;
-        opacity: 0.3;
     }
     
     /* Isometric pixel button */
@@ -112,15 +76,10 @@
         position: relative;
         /* Isometric 3D effect */
         box-shadow: 
-            /* Top edge */
             0 -3px 0 0 #00FF00,
-            /* Right edge */
             3px 0 0 0 #00FF00,
-            /* Bottom edge */
             0 3px 0 0 #008800,
-            /* Left edge */
             -3px 0 0 0 #00CC00,
-            /* Isometric depth */
             3px 3px 0 0 #006600,
             4px 4px 0 0 #005500,
             5px 5px 0 0 #004400;
@@ -136,7 +95,7 @@
             5px 5px 0 0 #008800,
             6px 6px 0 0 #006600,
             7px 7px 0 0 #005500,
-            0 0 20px rgba(0, 255, 0, 0.5);
+            0 0 20px rgba(0, 255, 0, 0.3);
     }
     
     .donate-button:active {
@@ -149,7 +108,34 @@
             2px 2px 0 0 #006600;
     }
     
-    /* Fireflies/sparks from button */
+    /* ТЕРМИНАЛЬНЫЕ ЛИНИИ ОТ КНОПКИ */
+    .terminal-line {
+        position: absolute;
+        background: #00ff00;
+        z-index: 999;
+        opacity: 0;
+        animation: lineGrow 0.8s ease-out forwards;
+    }
+    
+    @keyframes lineGrow {
+        0% { 
+            width: 0; 
+            height: 2px; 
+            opacity: 1; 
+        }
+        50% { 
+            width: var(--line-length); 
+            height: 2px; 
+            opacity: 1; 
+        }
+        100% { 
+            width: var(--line-length); 
+            height: 2px; 
+            opacity: 0.8; 
+        }
+    }
+    
+    /* Sparks from button */
     .spark {
         position: fixed;
         width: 3px;
@@ -180,9 +166,15 @@
         width: 100%;
         height: 100%;
         background: rgba(0, 0, 0, 0.9);
-        z-index: 1000;
+        z-index: 2000;
         justify-content: center;
         align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .terminal-modal.show {
+        opacity: 1;
     }
     
     .modal-content {
@@ -192,6 +184,12 @@
         max-width: 500px;
         text-align: center;
         box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+    }
+    
+    .terminal-modal.show .modal-content {
+        transform: scale(1);
     }
     
     .copy-button {
@@ -209,13 +207,18 @@
         background: #001100;
     }
     
-    /* Status indicators */
+    /* Status indicators - OFF по умолчанию */
     .status-online {
         display: inline-block;
         width: 8px;
         height: 8px;
-        background: #00FF00;
+        background: #333333;
         margin-right: 5px;
+        box-shadow: 0 0 3px #333333;
+    }
+    
+    .status-online.active {
+        background: #00FF00;
         box-shadow: 0 0 10px #00FF00;
         animation: statusBlink 2s infinite;
     }
@@ -224,8 +227,13 @@
         display: inline-block;
         width: 8px;
         height: 8px;
-        background: #FFFF00;
+        background: #333333;
         margin-right: 5px;
+        box-shadow: 0 0 3px #333333;
+    }
+    
+    .status-standby.charging {
+        background: #FFFF00;
         box-shadow: 0 0 10px #FFFF00;
     }
     
@@ -242,26 +250,56 @@
     }
     
     .nav-link:hover {
-        text-shadow: 0 0 10px #00FF00;
+        color: #44ff44;
+    }
+    
+    /* УЛУЧШЕННАЯ КОМПОЗИЦИЯ */
+    .main-container {
+        display: flex;
+        gap: 2rem;
+        padding: 1.5rem;
+        min-height: calc(100vh - 100px);
+    }
+    
+    .video-section {
+        flex: 2;
+    }
+    
+    .donate-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+    
+    .video-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .robot-card {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1rem;
     }
     
     /* Mobile */
     @media (max-width: 768px) {
-        .main-grid {
+        .main-container {
             flex-direction: column;
-        }
-        
-        .video-section {
-            width: 100% !important;
-        }
-        
-        .donate-section {
-            width: 100% !important;
-            margin-top: 2rem;
+            gap: 1rem;
+            padding: 1rem;
         }
         
         .video-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .donate-section {
+            padding: 1rem;
         }
     }
 </style>
@@ -270,30 +308,29 @@
 </head>
 <body>
     <div class="w-full min-h-screen">
-
-```
-    <!-- Header Navigation -->
-    <div class="terminal-border bg-black mx-4 mt-2 px-6 py-2">
-        <div class="flex justify-between items-center">
-            <div class="text-green-500 text-lg retro-font font-bold glow-text">GHOSTLINE</div>
-            <div class="text-sm">
-                <a href="index.html" class="nav-link mr-4">[HOME]</a>
-                <span class="text-green-400 mr-4">[LIVE STREAM]</span>
-                <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
-                <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
-            </div>
-            <div class="text-xs">
-                <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
+        <!-- Header Navigation -->
+        <div class="terminal-border bg-black mx-4 mt-2 px-6 py-2">
+            <div class="flex justify-between items-center">
+                <div class="text-green-500 text-lg retro-font font-bold">GHOSTLINE</div>
+                <div class="text-sm">
+                    <a href="index.html" class="nav-link mr-4">[HOME]</a>
+                    <span class="text-green-400 mr-4">[LIVE STREAM]</span>
+                    <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
+                    <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
+                </div>
+                <div class="text-xs">
+                    <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="flex p-4 main-grid">
+```
+    <div class="main-container">
         <!-- Live Video Feeds -->
-        <div class="video-section w-2/3 pr-4">
+        <div class="video-section">
             <!-- Title -->
             <div class="text-center mb-6">
-                <h2 class="retro-font text-2xl text-green-400 glow-text">
+                <h2 class="retro-font text-2xl text-green-400 mb-2">
                     LIVE ROBOT ARTISTS
                 </h2>
                 <div class="pixel-font text-green-600 text-sm">
@@ -302,44 +339,42 @@
             </div>
             
             <!-- Video Grid -->
-            <div class="grid grid-cols-2 gap-4 video-grid">
-                
+            <div class="video-grid">
                 <!-- Robot 01 -->
-                <div class="terminal-border bg-black p-3">
+                <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_01 - "YUGA"]</span>
-                        <span><span class="status-online"></span>LIVE</span>
+                        <span><span class="status-online" id="status1"></span>OFF</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot1-feed">
                         <div class="noise-mask"></div>
-                        <!-- Camera feed will be inserted here when available -->
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Abstract Expressionism</div>
-                        <div class="typing">BRUSH PRESSURE: 73%</div>
+                        <div>STATUS: Standby</div>
                     </div>
                 </div>
 
                 <!-- Robot 02 -->
-                <div class="terminal-border bg-black p-3">
+                <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_02 - "MIKA"]</span>
-                        <span><span class="status-online"></span>LIVE</span>
+                        <span><span class="status-online" id="status2"></span>OFF</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot2-feed">
                         <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Digital Minimalism</div>
-                        <div class="typing">COLOR MIX: Blue + White</div>
+                        <div>STATUS: Standby</div>
                     </div>
                 </div>
 
                 <!-- Robot 03 -->
-                <div class="terminal-border bg-black p-3">
+                <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_03 - "GHOST"]</span>
-                        <span class="text-yellow-400"><span class="status-standby"></span>CHARGING</span>
+                        <span class="text-yellow-400"><span class="status-standby charging" id="status3"></span>CHARGING</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot3-feed">
                         <div class="noise-mask"></div>
@@ -351,36 +386,35 @@
                 </div>
 
                 <!-- Robot 04 -->
-                <div class="terminal-border bg-black p-3">
+                <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[ROBOT_04 - "LINE"]</span>
-                        <span><span class="status-online"></span>LIVE</span>
+                        <span><span class="status-online" id="status4"></span>OFF</span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="robot4-feed">
                         <div class="noise-mask"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STYLE: Geometric Patterns</div>
-                        <div class="typing">PATTERN: SPIRAL_09</div>
+                        <div>STATUS: Standby</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Donation Panel -->
-        <div class="donate-section w-1/3 flex flex-col items-center justify-center">
-            
+        <div class="donate-section">
             <!-- Support Message -->
             <div class="text-center mb-8">
                 <h3 class="pixel-font text-xl mb-4">
-                    <span style="color: #00ff00;">SUPPORT PROJECT</span>
+                    <span style="color: #00ff00;">SUPPORT THE PROJECT</span>
                 </h3>
             </div>
 
-            <!-- DONATION BUTTON -->
+            <!-- SUPPORT BUTTON -->
             <div class="relative mb-8">
-                <button class="donate-button" onclick="showDonateModal()" id="donateBtn">
-                    DONATE
+                <button class="donate-button" onclick="activateTerminal()" id="donateBtn">
+                    SUPPORT
                 </button>
             </div>
         </div>
@@ -412,21 +446,24 @@
         <button class="copy-button" onclick="closeSocialModal()">CLOSE</button>
     </div>
 </div>
+
+<!-- Donate Modal -->
+<div class="terminal-modal" id="donateModal">
     <div class="modal-content">
-        <h3 class="pixel-font text-lg mb-4 text-green-400">DONATION INFO</h3>
+        <h3 class="pixel-font text-lg mb-4 text-green-400">SUPPORT GHOSTLINE</h3>
         
         <div class="terminal-border bg-black p-4 mb-4">
-            <p class="text-sm mb-2">METAMASK ADDRESS</p>
+            <p class="text-sm mb-2">ETHEREUM ADDRESS</p>
             <p class="text-xs mb-2 text-green-400">Network: Ethereum Mainnet</p>
             <p class="text-xs text-green-500 break-all mb-3" id="ethAddress">
-                0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d
+                0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a
             </p>
             <button class="copy-button" onclick="copyAddress()">COPY ADDRESS</button>
         </div>
         
         <p class="text-xs text-green-600 mb-4">
             Send ETH to support robot artists!<br>
-            Make sure you're on Ethereum Mainnet
+            Your support helps AI learn to create art
         </p>
         
         <button class="copy-button" onclick="closeDonateModal()">CLOSE</button>
@@ -434,35 +471,49 @@
 </div>
 
 <script>
-    // Code rain for robot feeds
-    function startCodeRain(container) {
-        const codeSnippets = [
-            "INIT::OK",
-            "BRUSH[73%]",
-            "COLOR::MIX",
-            "PATTERN::09",
-            "STATUS::ON",
-            "CALC::PATH",
-            "DRAW::TRUE",
-            "AI::LEARN"
-        ];
-
-        setInterval(() => {
-            const line = document.createElement('div');
-            line.className = 'code-line';
-            line.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-            line.style.left = Math.random() * 90 + '%';
-            line.style.animationDelay = Math.random() * 2 + 's';
-            line.style.fontSize = (8 + Math.floor(Math.random() * 4)) + 'px';
-            
-            container.appendChild(line);
-            
+    // ТЕРМИНАЛЬНЫЕ ЛИНИИ ОТ КНОПКИ
+    function activateTerminal() {
+        createSparks();
+        createTerminalLines();
+        
+        // Показываем модальное окно через 1 секунду
+        setTimeout(() => {
+            showDonateModal();
+        }, 1000);
+    }
+    
+    function createTerminalLines() {
+        const button = document.getElementById('donateBtn');
+        const rect = button.getBoundingClientRect();
+        
+        // Создаем 6 линий в разные стороны
+        const angles = [0, 45, 90, 135, 180, 225];
+        
+        angles.forEach((angle, index) => {
             setTimeout(() => {
-                if (line.parentNode) {
-                    line.remove();
-                }
-            }, 6000);
-        }, 800);
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                
+                const length = 50 + Math.random() * 100;
+                const radian = angle * Math.PI / 180;
+                
+                line.style.position = 'fixed';
+                line.style.left = (rect.left + rect.width/2) + 'px';
+                line.style.top = (rect.top + rect.height/2) + 'px';
+                line.style.transformOrigin = '0 50%';
+                line.style.transform = `rotate(${angle}deg)`;
+                line.style.setProperty('--line-length', length + 'px');
+                
+                document.body.appendChild(line);
+                
+                // Удаляем линию через 2 секунды
+                setTimeout(() => {
+                    if (line.parentNode) {
+                        line.remove();
+                    }
+                }, 2000);
+            }, index * 100);
+        });
     }
     
     // Create sparks flying up on button click
@@ -475,18 +526,15 @@
                 const spark = document.createElement('div');
                 spark.className = 'spark';
                 
-                // Random position along button width
                 const startX = rect.left + Math.random() * rect.width;
                 const startY = rect.top + rect.height/2;
                 
                 spark.style.left = startX + 'px';
                 spark.style.top = startY + 'px';
                 
-                // Random drift left or right
                 const drift = (Math.random() - 0.5) * 50;
                 spark.style.setProperty('--drift', drift + 'px');
                 
-                // Random spark color variation
                 const colors = ['#00FF00', '#44FF44', '#66FF66', '#00FF88'];
                 spark.style.background = colors[Math.floor(Math.random() * colors.length)];
                 
@@ -501,57 +549,27 @@
     
     // Show donation modal
     function showDonateModal() {
-        createSparks();
-        document.getElementById('donateModal').style.display = 'flex';
-    }
-    
-    // Simulate camera feed connection
-    function connectCamera(robotId, imageUrl) {
-        const feed = document.getElementById(robotId);
-        if (feed) {
-            const img = document.createElement('img');
-            img.className = 'camera-feed';
-            img.src = imageUrl;
-            img.onerror = function() {
-                // If image fails to load, remove it and show noise
-                this.remove();
-                feed.classList.remove('has-camera');
-            };
-            img.onload = function() {
-                // Image loaded successfully
-                feed.classList.add('has-camera');
-            };
-            feed.appendChild(img);
-        }
-    }
-    
-    // Disconnect camera (show noise again)
-    function disconnectCamera(robotId) {
-        const feed = document.getElementById(robotId);
-        if (feed) {
-            const camera = feed.querySelector('.camera-feed');
-            if (camera) {
-                camera.remove();
-            }
-            feed.classList.remove('has-camera');
-        }
+        const modal = document.getElementById('donateModal');
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
     }
     
     // Close modal
     function closeDonateModal() {
-        document.getElementById('donateModal').style.display = 'none';
+        const modal = document.getElementById('donateModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
     }
     
     // Copy address
     function copyAddress() {
-        const address = '0x6971Cc1DB72c179aA624EB23F16c2bC89b0A017d';
+        const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
         navigator.clipboard.writeText(address).then(() => {
             event.target.textContent = 'COPIED!';
             setTimeout(() => {
                 event.target.textContent = 'COPY ADDRESS';
             }, 2000);
         }).catch(() => {
-            // Fallback
             const textArea = document.createElement('textarea');
             textArea.value = address;
             document.body.appendChild(textArea);
@@ -567,18 +585,74 @@
     
     // Show social
     function showSocial() {
-        document.getElementById('socialModal').style.display = 'flex';
+        const modal = document.getElementById('socialModal');
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
     }
     
     // Close social modal
     function closeSocialModal() {
-        document.getElementById('socialModal').style.display = 'none';
+        const modal = document.getElementById('socialModal');
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 300);
+    }
+    
+    // УПРАВЛЕНИЕ КАМЕРАМИ И СТАТУСАМИ
+    function connectCamera(robotId, imageUrl) {
+        const feed = document.getElementById(robotId);
+        const statusId = robotId.replace('-feed', '').replace('robot', 'status');
+        const status = document.getElementById(statusId);
+        const statusText = status.parentElement;
+        
+        if (feed && status) {
+            // Добавляем изображение камеры
+            const img = document.createElement('img');
+            img.className = 'camera-feed';
+            img.src = imageUrl;
+            img.style.cssText = `
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: 2;
+            `;
+            
+            img.onload = function() {
+                feed.appendChild(img);
+                feed.querySelector('.noise-mask').style.display = 'none';
+                
+                // Активируем статус
+                status.classList.add('active');
+                statusText.innerHTML = statusText.innerHTML.replace('OFF', 'LIVE');
+            };
+            
+            img.onerror = function() {
+                this.remove();
+            };
+        }
+    }
+    
+    function disconnectCamera(robotId) {
+        const feed = document.getElementById(robotId);
+        const statusId = robotId.replace('-feed', '').replace('robot', 'status');
+        const status = document.getElementById(statusId);
+        const statusText = status.parentElement;
+        
+        if (feed && status) {
+            const camera = feed.querySelector('img');
+            if (camera) camera.remove();
+            
+            feed.querySelector('.noise-mask').style.display = 'block';
+            status.classList.remove('active');
+            statusText.innerHTML = statusText.innerHTML.replace('LIVE', 'OFF');
+        }
     }
     
     // Close modal on outside click
     window.onclick = function(event) {
         if (event.target.classList.contains('terminal-modal')) {
-            event.target.style.display = 'none';
+            event.target.classList.remove('show');
+            setTimeout(() => event.target.style.display = 'none', 300);
         }
     }
     
@@ -586,11 +660,11 @@
     window.addEventListener('load', function() {
         console.log('🎨 GHOSTLINE Stream initialized!');
         
-        // Example of how to connect camera feeds:
+        // Пример подключения камер:
         // connectCamera('robot1-feed', 'camera1.jpg');
         // connectCamera('robot2-feed', 'camera2.jpg');
         
-        // To disconnect and show noise again:
+        // Для отключения:
         // disconnectCamera('robot1-feed');
     });
 </script>
