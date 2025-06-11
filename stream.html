@@ -522,61 +522,93 @@
     }
     
     function createLinesFromPoint(startX, startY, pointIndex) {
-        // Разные направления для каждой точки
-        const directions = [
-            [{ dir: 'up', len: 80 }, { dir: 'right', len: 120 }, { dir: 'up', len: 50 }],
-            [{ dir: 'up', len: 60 }, { dir: 'left', len: 100 }, { dir: 'up', len: 40 }],
-            [{ dir: 'up', len: 100 }, { dir: 'right', len: 80 }],
-            [{ dir: 'down', len: 70 }, { dir: 'right', len: 90 }],
-            [{ dir: 'up', len: 90 }, { dir: 'left', len: 70 }],
-            [{ dir: 'up', len: 110 }, { dir: 'right', len: 60 }]
-        ];
+        // Начинаем рекурсивное ветвление
+        growBranch(startX, startY, 'up', 0, pointIndex);
+    }
+    
+    // РЕКУРСИВНЫЕ ВЕТКИ КАК РАСТЕНИЕ
+    function growBranch(x, y, direction, level, seed) {
+        if (level > 3) return; // Максимум 3 уровня ветвления
         
-        const segments = directions[pointIndex] || [{ dir: 'up', len: 80 }];
-        let currentX = startX;
-        let currentY = startY;
+        const length = 60 - (level * 15); // Каждый уровень короче
+        let newX = x;
+        let newY = y;
         
-        segments.forEach((segment, segIndex) => {
+        // Создаем основную линию
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+        
+        if (direction === 'up') {
+            line.classList.add('line-vertical');
+            line.style.left = x + 'px';
+            line.style.top = (y - length) + 'px';
+            line.style.setProperty('--line-height', length + 'px');
+            newY = y - length;
+        } else if (direction === 'down') {
+            line.classList.add('line-vertical');
+            line.style.left = x + 'px';
+            line.style.top = y + 'px';
+            line.style.setProperty('--line-height', length + 'px');
+            newY = y + length;
+        } else if (direction === 'right') {
+            line.classList.add('line-horizontal');
+            line.style.left = x + 'px';
+            line.style.top = y + 'px';
+            line.style.setProperty('--line-width', length + 'px');
+            newX = x + length;
+        } else if (direction === 'left') {
+            line.classList.add('line-horizontal');
+            line.style.left = (x - length) + 'px';
+            line.style.top = y + 'px';
+            line.style.setProperty('--line-width', length + 'px');
+            newX = x - length;
+        }
+        
+        // Задержка для уровня ветвления
+        setTimeout(() => {
+            document.body.appendChild(line);
+            
+            // Удаляем через 3 секунды
             setTimeout(() => {
-                const line = document.createElement('div');
-                line.className = 'terminal-line';
+                if (line.parentNode) line.remove();
+            }, 3000);
+            
+            // ВЕТВЛЕНИЕ! Создаем 2-3 новые ветки
+            if (level < 3) {
+                const branches = getBranchDirections(direction, level, seed);
                 
-                if (segment.dir === 'up') {
-                    line.classList.add('line-vertical');
-                    line.style.left = currentX + 'px';
-                    line.style.top = (currentY - segment.len) + 'px';
-                    line.style.setProperty('--line-height', segment.len + 'px');
-                    currentY -= segment.len;
-                } else if (segment.dir === 'down') {
-                    line.classList.add('line-vertical');
-                    line.style.left = currentX + 'px';
-                    line.style.top = currentY + 'px';
-                    line.style.setProperty('--line-height', segment.len + 'px');
-                    currentY += segment.len;
-                } else if (segment.dir === 'right') {
-                    line.classList.add('line-horizontal');
-                    line.style.left = currentX + 'px';
-                    line.style.top = currentY + 'px';
-                    line.style.setProperty('--line-width', segment.len + 'px');
-                    currentX += segment.len;
-                } else if (segment.dir === 'left') {
-                    line.classList.add('line-horizontal');
-                    line.style.left = (currentX - segment.len) + 'px';
-                    line.style.top = currentY + 'px';
-                    line.style.setProperty('--line-width', segment.len + 'px');
-                    currentX -= segment.len;
-                }
-                
-                document.body.appendChild(line);
-                
-                // Удаляем через 2 секунды
-                setTimeout(() => {
-                    if (line.parentNode) {
-                        line.remove();
-                    }
-                }, 2000);
-            }, segIndex * 50); // Очень быстрые сегменты
-        });
+                branches.forEach((branchDir, i) => {
+                    setTimeout(() => {
+                        growBranch(newX, newY, branchDir, level + 1, seed + i);
+                    }, 150 + (i * 100)); // Задержка между ветками
+                });
+            }
+        }, level * 100); // Каждый уровень с задержкой
+    }
+    
+    // ЛОГИКА ВЕТВЛЕНИЯ
+    function getBranchDirections(currentDir, level, seed) {
+        const random = (seed + level) % 4; // Псевдослучайность
+        
+        if (currentDir === 'up') {
+            if (level === 0) return ['up', 'right', 'left'];
+            if (level === 1) return random < 2 ? ['up', 'right'] : ['up', 'left'];
+            return ['up'];
+        } else if (currentDir === 'right') {
+            if (level === 0) return ['right', 'up', 'down'];
+            if (level === 1) return random < 2 ? ['right', 'up'] : ['right', 'down'];
+            return ['right'];
+        } else if (currentDir === 'left') {
+            if (level === 0) return ['left', 'up', 'down'];
+            if (level === 1) return random < 2 ? ['left', 'up'] : ['left', 'down'];
+            return ['left'];
+        } else if (currentDir === 'down') {
+            if (level === 0) return ['down', 'right', 'left'];
+            if (level === 1) return random < 2 ? ['down', 'right'] : ['down', 'left'];
+            return ['down'];
+        }
+        
+        return ['up']; // fallback
     }
     
     // Create sparks flying up on button click
