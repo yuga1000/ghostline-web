@@ -387,8 +387,31 @@
     </div>
 </div>
 
-<!-- Donation Modal -->
-<div class="terminal-modal" id="donateModal">
+<!-- Social Modal -->
+<div class="terminal-modal" id="socialModal">
+    <div class="modal-content">
+        <h3 class="pixel-font text-lg mb-4 text-green-400">[GHOSTLINE SOCIAL]</h3>
+        
+        <div class="terminal-border bg-black p-4 mb-4">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">Instagram:</span>
+                    <a href="https://www.instagram.com/____yuga______" target="_blank" class="nav-link text-xs">@____yuga______</a>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">TikTok:</span>
+                    <a href="https://www.tiktok.com/@ghostline207" target="_blank" class="nav-link text-xs">@ghostline207</a>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm">Telegram:</span>
+                    <a href="https://t.me/yuga_art" target="_blank" class="nav-link text-xs">@yuga_art</a>
+                </div>
+            </div>
+        </div>
+        
+        <button class="copy-button" onclick="closeSocialModal()">CLOSE</button>
+    </div>
+</div>
     <div class="modal-content">
         <h3 class="pixel-font text-lg mb-4 text-green-400">DONATION INFO</h3>
         
@@ -544,7 +567,12 @@
     
     // Show social
     function showSocial() {
-        alert(`GHOSTLINE SOCIAL:\n\nInstagram: @____yuga______\nTikTok: @ghostline207\nTelegram: @yuga_art`);
+        document.getElementById('socialModal').style.display = 'flex';
+    }
+    
+    // Close social modal
+    function closeSocialModal() {
+        document.getElementById('socialModal').style.display = 'none';
     }
     
     // Close modal on outside click
