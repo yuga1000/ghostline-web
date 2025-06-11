@@ -117,16 +117,6 @@
         box-shadow: 0 0 3px #00ff00;
     }
     
-    .line-vertical {
-        width: 2px;
-        animation: lineGrowVertical 0.2s ease-out forwards;
-    }
-    
-    .line-horizontal {
-        height: 2px;
-        animation: lineGrowHorizontal 0.2s ease-out forwards;
-    }
-    
     @keyframes lineGrowVertical {
         0% { 
             height: 0; 
@@ -147,6 +137,16 @@
             width: var(--line-width); 
             opacity: 0.8; 
         }
+    }
+    
+    .line-vertical {
+        width: 2px;
+        animation: lineGrowVertical 0.3s ease-out forwards;
+    }
+    
+    .line-horizontal {
+        height: 2px;
+        animation: lineGrowHorizontal 0.3s ease-out forwards;
     }
     
     /* Sparks from button */
@@ -497,52 +497,85 @@
         const button = document.getElementById('donateBtn');
         const rect = button.getBoundingClientRect();
         
-        // Стартовая точка - центр кнопки
-        let currentX = rect.left + rect.width / 2;
-        let currentY = rect.top + rect.height / 2;
-        
-        // Создаем ломаную линию по этапам
-        const segments = [
-            { direction: 'up', length: 80 },       // Вверх
-            { direction: 'left', length: 70 },   // Вправо  
-            { direction: 'up', length: 60 },       // Снова вверх
-            { direction: 'left', length: 45 },   // Еще вправо
-            { direction: 'up', length: 40 }        // Финальный вверх
+        // БЫСТРАЯ АНИМАЦИЯ - множество линий из разных точек кнопки
+        const startPoints = [
+            { x: rect.left, y: rect.top + rect.height/2 },           // Левый край
+            { x: rect.right, y: rect.top + rect.height/2 },          // Правый край  
+            { x: rect.left + rect.width/2, y: rect.top },            // Верх центр
+            { x: rect.left + rect.width/2, y: rect.bottom },         // Низ центр
+            { x: rect.left + rect.width*0.25, y: rect.top },         // Верх лево
+            { x: rect.left + rect.width*0.75, y: rect.top },         // Верх право
         ];
         
-        segments.forEach((segment, index) => {
+        // Все линии появляются ОДНОВРЕМЕННО
+        startPoints.forEach((point, index) => {
+            setTimeout(() => {
+                // Каждая точка создает 2-3 линии в разные стороны
+                createLinesFromPoint(point.x, point.y, index);
+            }, index * 30); // Очень быстро друг за другом
+        });
+        
+        // Плашка появляется быстро
+        setTimeout(() => {
+            showDonateModal();
+        }, 400);
+    }
+    
+    function createLinesFromPoint(startX, startY, pointIndex) {
+        // Разные направления для каждой точки
+        const directions = [
+            [{ dir: 'up', len: 80 }, { dir: 'right', len: 120 }, { dir: 'up', len: 50 }],
+            [{ dir: 'up', len: 60 }, { dir: 'left', len: 100 }, { dir: 'up', len: 40 }],
+            [{ dir: 'up', len: 100 }, { dir: 'right', len: 80 }],
+            [{ dir: 'down', len: 70 }, { dir: 'right', len: 90 }],
+            [{ dir: 'up', len: 90 }, { dir: 'left', len: 70 }],
+            [{ dir: 'up', len: 110 }, { dir: 'right', len: 60 }]
+        ];
+        
+        const segments = directions[pointIndex] || [{ dir: 'up', len: 80 }];
+        let currentX = startX;
+        let currentY = startY;
+        
+        segments.forEach((segment, segIndex) => {
             setTimeout(() => {
                 const line = document.createElement('div');
-                line.className = `terminal-line ${segment.direction === 'up' ? 'line-vertical' : 'line-horizontal'}`;
+                line.className = 'terminal-line';
                 
-                line.style.left = currentX + 'px';
-                line.style.top = currentY + 'px';
-                
-                if (segment.direction === 'up') {
-                    line.style.setProperty('--line-height', segment.length + 'px');
-                    line.style.top = (currentY - segment.length) + 'px'; // Линия растет вверх
-                    currentY -= segment.length; // Обновляем позицию
-                } else {
-                    line.style.setProperty('--line-width', segment.length + 'px');
-                    currentX += segment.length; // Обновляем позицию
+                if (segment.dir === 'up') {
+                    line.classList.add('line-vertical');
+                    line.style.left = currentX + 'px';
+                    line.style.top = (currentY - segment.len) + 'px';
+                    line.style.setProperty('--line-height', segment.len + 'px');
+                    currentY -= segment.len;
+                } else if (segment.dir === 'down') {
+                    line.classList.add('line-vertical');
+                    line.style.left = currentX + 'px';
+                    line.style.top = currentY + 'px';
+                    line.style.setProperty('--line-height', segment.len + 'px');
+                    currentY += segment.len;
+                } else if (segment.dir === 'right') {
+                    line.classList.add('line-horizontal');
+                    line.style.left = currentX + 'px';
+                    line.style.top = currentY + 'px';
+                    line.style.setProperty('--line-width', segment.len + 'px');
+                    currentX += segment.len;
+                } else if (segment.dir === 'left') {
+                    line.classList.add('line-horizontal');
+                    line.style.left = (currentX - segment.len) + 'px';
+                    line.style.top = currentY + 'px';
+                    line.style.setProperty('--line-width', segment.len + 'px');
+                    currentX -= segment.len;
                 }
                 
                 document.body.appendChild(line);
                 
-                // Удаляем линию через 3 секунды
+                // Удаляем через 2 секунды
                 setTimeout(() => {
                     if (line.parentNode) {
                         line.remove();
                     }
-                }, 3000);
-                
-                // На последнем сегменте показываем модальное окно
-                if (index === segments.length - 1) {
-                    setTimeout(() => {
-                        showDonateModal();
-                    }, 600);
-                }
-            }, index * 600); // Задержка между сегментами
+                }, 2000);
+            }, segIndex * 50); // Очень быстрые сегменты
         });
     }
     
