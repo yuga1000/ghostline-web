@@ -108,29 +108,43 @@
             2px 2px 0 0 #006600;
     }
     
-    /* ТЕРМИНАЛЬНЫЕ ЛИНИИ ОТ КНОПКИ */
+    /* ЛОМАНАЯ ТЕРМИНАЛЬНАЯ ЛИНИЯ */
     .terminal-line {
-        position: absolute;
+        position: fixed;
         background: #00ff00;
         z-index: 999;
         opacity: 0;
-        animation: lineGrow 0.8s ease-out forwards;
+        box-shadow: 0 0 3px #00ff00;
     }
     
-    @keyframes lineGrow {
+    .line-vertical {
+        width: 2px;
+        animation: lineGrowVertical 0.5s ease-out forwards;
+    }
+    
+    .line-horizontal {
+        height: 2px;
+        animation: lineGrowHorizontal 0.5s ease-out forwards;
+    }
+    
+    @keyframes lineGrowVertical {
         0% { 
-            width: 0; 
-            height: 2px; 
-            opacity: 1; 
-        }
-        50% { 
-            width: var(--line-length); 
-            height: 2px; 
+            height: 0; 
             opacity: 1; 
         }
         100% { 
-            width: var(--line-length); 
-            height: 2px; 
+            height: var(--line-height); 
+            opacity: 0.8; 
+        }
+    }
+    
+    @keyframes lineGrowHorizontal {
+        0% { 
+            width: 0; 
+            opacity: 1; 
+        }
+        100% { 
+            width: var(--line-width); 
             opacity: 0.8; 
         }
     }
@@ -476,43 +490,59 @@
         createSparks();
         createTerminalLines();
         
-        // Показываем модальное окно через 1 секунду
-        setTimeout(() => {
-            showDonateModal();
-        }, 1000);
+        // Модальное окно покажется автоматически в конце анимации линий
     }
     
     function createTerminalLines() {
         const button = document.getElementById('donateBtn');
         const rect = button.getBoundingClientRect();
         
-        // Создаем 6 линий в разные стороны
-        const angles = [0, 45, 90, 135, 180, 225];
+        // Стартовая точка - центр кнопки
+        let currentX = rect.left + rect.width / 2;
+        let currentY = rect.top + rect.height / 2;
         
-        angles.forEach((angle, index) => {
+        // Создаем ломаную линию по этапам
+        const segments = [
+            { direction: 'up', length: 80 },       // Вверх
+            { direction: 'right', length: 150 },   // Вправо  
+            { direction: 'up', length: 60 },       // Снова вверх
+            { direction: 'right', length: 100 },   // Еще вправо
+            { direction: 'up', length: 40 }        // Финальный вверх
+        ];
+        
+        segments.forEach((segment, index) => {
             setTimeout(() => {
                 const line = document.createElement('div');
-                line.className = 'terminal-line';
+                line.className = `terminal-line ${segment.direction === 'up' ? 'line-vertical' : 'line-horizontal'}`;
                 
-                const length = 50 + Math.random() * 100;
-                const radian = angle * Math.PI / 180;
+                line.style.left = currentX + 'px';
+                line.style.top = currentY + 'px';
                 
-                line.style.position = 'fixed';
-                line.style.left = (rect.left + rect.width/2) + 'px';
-                line.style.top = (rect.top + rect.height/2) + 'px';
-                line.style.transformOrigin = '0 50%';
-                line.style.transform = `rotate(${angle}deg)`;
-                line.style.setProperty('--line-length', length + 'px');
+                if (segment.direction === 'up') {
+                    line.style.setProperty('--line-height', segment.length + 'px');
+                    line.style.top = (currentY - segment.length) + 'px'; // Линия растет вверх
+                    currentY -= segment.length; // Обновляем позицию
+                } else {
+                    line.style.setProperty('--line-width', segment.length + 'px');
+                    currentX += segment.length; // Обновляем позицию
+                }
                 
                 document.body.appendChild(line);
                 
-                // Удаляем линию через 2 секунды
+                // Удаляем линию через 3 секунды
                 setTimeout(() => {
                     if (line.parentNode) {
                         line.remove();
                     }
-                }, 2000);
-            }, index * 100);
+                }, 3000);
+                
+                // На последнем сегменте показываем модальное окно
+                if (index === segments.length - 1) {
+                    setTimeout(() => {
+                        showDonateModal();
+                    }, 600);
+                }
+            }, index * 600); // Задержка между сегментами
         });
     }
     
