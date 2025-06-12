@@ -273,7 +273,7 @@
         height: 2px;
         background: #00ff00;
         pointer-events: none;
-        z-index: 1000;
+        z-index: 10000;
         box-shadow: 0 0 2px #00ff00;
     }
 
@@ -589,6 +589,21 @@
         }
     }
 
+    /* SOCIAL container position */
+    #socialContainer {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9998;
+    }
+
+    @media (max-width: 640px) {
+        #socialContainer {
+            bottom: 10px;
+            right: 10px;
+        }
+    }
+
     /* SOCIAL button styling */
     #socialToggle {
         position: relative;
@@ -734,7 +749,7 @@
         overflow-y: auto;
         opacity: 0;
         transition: opacity 0.5s ease-out;
-        z-index: 1000;
+        z-index: 10000;
     }
 
     @media (max-width: 640px) {
@@ -865,26 +880,6 @@
             </div>
         </div>
 
-        <!-- Right Sidebar -->
-        <div class="w-full lg:w-1/4 space-y-4">
-
-            <!-- Bottom info: label and SOCIAL button -->
-            <div class="terminal-border bg-black bg-opacity-50 p-3 space-y-2" id="bottomInfo">
-                <div class="flex items-center justify-between">
-                    <div class="pixel-text-sm text-green-500 text-right flex-1">LEARNING ART WITH ROBOTS</div>
-                    <div class="pxl-frame ml-2">
-                        <div class="glow-3"></div>
-                        <button id="socialToggle">SOCIAL</button>
-                        <div id="socialPanel">
-                          <a href="https://instagram.com" target="_blank">Instagram</a>
-                          <a href="https://tiktok.com" target="_blank">TikTok</a>
-                          <a href="https://t.me/" target="_blank">Telegram</a>
-                          <a href="https://youtube.com" target="_blank">YouTube</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Floating System Logs -->
         <div class="terminal-border bg-black bg-opacity-50 p-3 space-y-2" id="systemLogsContainer">
@@ -899,7 +894,19 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- SOCIAL Button Container -->
+    <div id="socialContainer" class="pxl-frame">
+        <div class="glow-3"></div>
+        <button id="socialToggle">SOCIAL</button>
+        <div id="socialPanel">
+          <a href="https://instagram.com" target="_blank">Instagram</a>
+          <a href="https://tiktok.com" target="_blank">TikTok</a>
+          <a href="https://t.me/" target="_blank">Telegram</a>
+          <a href="https://youtube.com" target="_blank">YouTube</a>
+        </div>
+    </div>
+
     <!-- Footer Command Line -->
     <div class="absolute bottom-4 left-4 right-4" style="z-index: 5;">
         <div class="terminal-border bg-black p-2">
