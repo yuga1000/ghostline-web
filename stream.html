@@ -349,73 +349,6 @@
         }
     }
 
-    /* SOCIAL button styling */
-    #socialToggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 999;
-        background-color: black;
-        color: orange;
-        font-family: monospace;
-        font-weight: bold;
-        padding: 10px 16px;
-        border: 2px dashed orange;
-        text-shadow: 0 0 3px orange;
-        box-shadow:
-          0 0 2px orange,
-          0 0 5px orange,
-          0 0 10px #ffaa00,
-          0 0 20px #ffaa00;
-        cursor: pointer;
-        animation: pixelPulse 1.8s infinite alternate;
-    }
-
-    @keyframes pixelPulse {
-        0% {
-          box-shadow:
-            0 0 1px orange,
-            0 0 4px orange,
-            0 0 8px #ffaa00,
-            0 0 16px #ffaa00;
-        }
-        100% {
-          box-shadow:
-            0 0 2px orange,
-            0 0 6px orange,
-            0 0 12px #ffaa00,
-            0 0 24px #ffaa00;
-        }
-    }
-
-    /* SOCIAL panel styling */
-    #socialPanel {
-        display: none;
-        position: fixed;
-        bottom: 70px;
-        right: 20px;
-        background-color: black;
-        border: 1px solid orange;
-        padding: 12px;
-        z-index: 998;
-        opacity: 0;
-        transform: scale(0.95);
-        transition: all 0.4s ease;
-    }
-
-    #socialPanel.visible {
-        display: block;
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    #socialPanel a {
-        display: block;
-        color: orange;
-        font-family: monospace;
-        text-decoration: none;
-        margin-bottom: 8px;
-    }
 </style>
 ```
 
@@ -430,7 +363,6 @@
                     <a href="index.html" class="nav-link mr-4">[HOME]</a>
                     <span class="text-green-400 mr-4">[LIVE STREAM]</span>
                     <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
-                    <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
                 </div>
                 <div class="text-xs live-status">
                     <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
@@ -535,33 +467,6 @@
     </div>
 </div>
 
-<!-- Social Modal -->
-<div class="terminal-modal" id="socialModal">
-    <div class="modal-content">
-        <h3 class="pixel-font text-lg mb-4 text-green-400">[GHOSTLINE SOCIAL]</h3>
-        
-        <div class="terminal-border bg-black p-4 mb-4">
-            <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-sm">Instagram:</span>
-                    <a href="https://www.instagram.com/____yuga______" target="_blank" class="nav-link text-xs">@____yuga______</a>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-sm">TikTok:</span>
-                    <a href="https://www.tiktok.com/@ghostline207" target="_blank" class="nav-link text-xs">@ghostline207</a>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-sm">Telegram:</span>
-                    <a href="https://t.me/yuga_art" target="_blank" class="nav-link text-xs">@yuga_art</a>
-                </div>
-            </div>
-        </div>
-        
-        <button class="copy-button" onclick="closeSocialModal()">CLOSE</button>
-    </div>
-</div>
-
-<!-- Donate Modal -->
 <div class="terminal-modal" id="donateModal">
     <div class="terminal-animated">
         <div class="modal-content">
@@ -743,106 +648,7 @@
         });
     }
     
-    // Show social
-    function showSocial() {
-        const modal = document.getElementById('socialModal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('show'), 10);
-    }
-    
-    // Close social modal
-    function closeSocialModal() {
-        const modal = document.getElementById('socialModal');
-        modal.classList.remove('show');
-        setTimeout(() => modal.style.display = 'none', 300);
-    }
-    
-    // УПРАВЛЕНИЕ КАМЕРАМИ И СТАТУСАМИ
-    function connectCamera(robotId, imageUrl) {
-        const feed = document.getElementById(robotId);
-        const statusId = robotId.replace('-feed', '').replace('robot', 'status');
-        const status = document.getElementById(statusId);
-        const statusText = status.parentElement;
-        
-        if (feed && status) {
-            // Добавляем изображение камеры
-            const img = document.createElement('img');
-            img.className = 'camera-feed';
-            img.src = imageUrl;
-            img.style.cssText = `
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                z-index: 2;
-            `;
-            
-            img.onload = function() {
-                feed.appendChild(img);
-                feed.querySelector('.noise-mask').style.display = 'none';
-                
-                // Активируем статус
-                status.classList.add('active');
-                statusText.innerHTML = statusText.innerHTML.replace('OFF', 'LIVE');
-            };
-            
-            img.onerror = function() {
-                this.remove();
-            };
-        }
-    }
-    
-    function disconnectCamera(robotId) {
-        const feed = document.getElementById(robotId);
-        const statusId = robotId.replace('-feed', '').replace('robot', 'status');
-        const status = document.getElementById(statusId);
-        const statusText = status.parentElement;
-        
-        if (feed && status) {
-            const camera = feed.querySelector('img');
-            if (camera) camera.remove();
-            
-            feed.querySelector('.noise-mask').style.display = 'block';
-            status.classList.remove('active');
-            statusText.innerHTML = statusText.innerHTML.replace('LIVE', 'OFF');
-        }
-    }
-    
-    // Close modal on outside click
-    window.onclick = function(event) {
-        if (event.target.classList.contains('terminal-modal')) {
-            event.target.classList.remove('show');
-            setTimeout(() => event.target.style.display = 'none', 300);
-        }
-    }
-    
-    // Initialize
-    window.addEventListener('load', function() {
-        console.log('🎨 GHOSTLINE Stream initialized!');
-        
-        // Пример подключения камер:
-        // connectCamera('robot1-feed', 'camera1.jpg');
-        // connectCamera('robot2-feed', 'camera2.jpg');
-        
-        // Для отключения:
-        // disconnectCamera('robot1-feed');
-    });
-</script>
-<button id="socialToggle">SOCIAL</button>
-<div id="socialPanel">
-  <a href="https://instagram.com" target="_blank">Instagram</a>
-  <a href="https://tiktok.com" target="_blank">TikTok</a>
-  <a href="https://t.me/" target="_blank">Telegram</a>
-  <a href="https://youtube.com" target="_blank">YouTube</a>
-</div>
-<script>
-  const toggle = document.getElementById("socialToggle");
-  const panel = document.getElementById("socialPanel");
-  toggle.addEventListener("click", () => {
-    panel.classList.toggle("visible");
-  });
 </script>
 ```
-
 </body>
 </html>

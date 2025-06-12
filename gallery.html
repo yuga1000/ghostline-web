@@ -432,73 +432,6 @@
         }
     }
 
-    /* SOCIAL button styling */
-    #socialToggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 999;
-        background-color: black;
-        color: orange;
-        font-family: monospace;
-        font-weight: bold;
-        padding: 10px 16px;
-        border: 2px dashed orange;
-        text-shadow: 0 0 3px orange;
-        box-shadow:
-          0 0 2px orange,
-          0 0 5px orange,
-          0 0 10px #ffaa00,
-          0 0 20px #ffaa00;
-        cursor: pointer;
-        animation: pixelPulse 1.8s infinite alternate;
-    }
-
-    @keyframes pixelPulse {
-        0% {
-          box-shadow:
-            0 0 1px orange,
-            0 0 4px orange,
-            0 0 8px #ffaa00,
-            0 0 16px #ffaa00;
-        }
-        100% {
-          box-shadow:
-            0 0 2px orange,
-            0 0 6px orange,
-            0 0 12px #ffaa00,
-            0 0 24px #ffaa00;
-        }
-    }
-
-    /* SOCIAL panel styling */
-    #socialPanel {
-        display: none;
-        position: fixed;
-        bottom: 70px;
-        right: 20px;
-        background-color: black;
-        border: 1px solid orange;
-        padding: 12px;
-        z-index: 998;
-        opacity: 0;
-        transform: scale(0.95);
-        transition: all 0.4s ease;
-    }
-
-    #socialPanel.visible {
-        display: block;
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    #socialPanel a {
-        display: block;
-        color: orange;
-        font-family: monospace;
-        text-decoration: none;
-        margin-bottom: 8px;
-    }
 </style>
 
 </head>
@@ -514,7 +447,6 @@
             <a href="index.html" class="nav-link">[HOME]</a>
             <span class="nav-link nav-active">[GALLERY]</span>
             <a href="stream.html" class="nav-link">[STREAM]</a>
-            <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
         </div>
         <div class="live-indicator">
             <span class="live-dot"></span>
@@ -882,11 +814,6 @@
         });
     }
 
-    // Show social
-    function showSocial() {
-        alert(`GHOSTLINE SOCIAL:\n\nInstagram: @____yuga______\nTikTok: @ghostline207\nTelegram: @yuga_art`);
-    }
-
     // Scroll to donate
     function scrollToDonate() {
         document.getElementById('donateBtn').scrollIntoView({ behavior: 'smooth' });
@@ -1053,20 +980,6 @@
             console.error('Error checking for updates:', error);
         }
     }, 1000); // Check every second
-</script>
-<button id="socialToggle">SOCIAL</button>
-<div id="socialPanel">
-  <a href="https://instagram.com" target="_blank">Instagram</a>
-  <a href="https://tiktok.com" target="_blank">TikTok</a>
-  <a href="https://t.me/" target="_blank">Telegram</a>
-  <a href="https://youtube.com" target="_blank">YouTube</a>
-</div>
-<script>
-  const toggle = document.getElementById("socialToggle");
-  const panel = document.getElementById("socialPanel");
-  toggle.addEventListener("click", () => {
-    panel.classList.toggle("visible");
-  });
 </script>
 
 </body>
