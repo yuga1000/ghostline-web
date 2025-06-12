@@ -631,21 +631,36 @@
         right: 20px;
         z-index: 999;
         background-color: black;
-        border: 2px dashed orange;
         color: orange;
         font-family: monospace;
         font-weight: bold;
-        padding: 10px 15px;
-        text-shadow: 0 0 5px orange;
-        box-shadow: 0 0 10px orange;
+        padding: 10px 16px;
+        border: 2px dashed orange;
+        text-shadow: 0 0 3px orange;
+        box-shadow:
+          0 0 2px orange,
+          0 0 5px orange,
+          0 0 10px #ffaa00,
+          0 0 20px #ffaa00;
         cursor: pointer;
-        animation: pulse 2s infinite;
+        animation: pixelPulse 1.8s infinite alternate;
     }
 
-    @keyframes pulse {
-        0% { box-shadow: 0 0 10px orange; }
-        50% { box-shadow: 0 0 20px orange; }
-        100% { box-shadow: 0 0 10px orange; }
+    @keyframes pixelPulse {
+        0% {
+          box-shadow:
+            0 0 1px orange,
+            0 0 4px orange,
+            0 0 8px #ffaa00,
+            0 0 16px #ffaa00;
+        }
+        100% {
+          box-shadow:
+            0 0 2px orange,
+            0 0 6px orange,
+            0 0 12px #ffaa00,
+            0 0 24px #ffaa00;
+        }
     }
 
     /* SOCIAL panel styling */
