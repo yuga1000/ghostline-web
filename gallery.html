@@ -260,7 +260,14 @@
     .admin-link:hover {
         opacity: 1;
     }
-    
+
+    .ascii-emoji {
+        font-family: monospace;
+        font-size: 1.2em;
+        color: #00ff00;
+        opacity: 0.75;
+    }
+
     /* Modal styles */
     .modal {
         display: none;
@@ -298,9 +305,9 @@
             font-size: 14px;
         }
         
-        .admin-link {
-            display: none;
-        }
+    .admin-link {
+        display: none;
+    }
     }
 </style>
 ```
@@ -346,7 +353,7 @@
             <button class="category-tab" onclick="filterCategory('unusual')">UNUSUAL</button>
             <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
             <span class="text-green-600 mx-2">|</span>
-            <button class="category-tab" onclick="forceRefresh()" title="Refresh gallery">🔄</button>
+            <button class="category-tab" onclick="forceRefresh()" title="Refresh gallery"><span class="ascii-emoji">(⟁)</span></button>
         </div>
     </div>
     
