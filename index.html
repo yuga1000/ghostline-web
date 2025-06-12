@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTLINE:  Art $## &  Robots</title>
+    <title>GHOSTLINE: Learning Art with Robots</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
     <style>
@@ -458,6 +458,24 @@
             background: #44ff44;
         }
     }
+
+    /* Secret admin access - special glow when clicked */
+    .secret-activated {
+        animation: secretGlow 0.3s ease-out;
+    }
+
+    @keyframes secretGlow {
+        0% { 
+            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
+        }
+        50% { 
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 
+                       0 0 25px rgba(0, 255, 0, 0.9);
+        }
+        100% { 
+            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
+        }
+    }
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {
@@ -789,9 +807,9 @@
                 <div class="pixel-text-sm text-green-500 text-center">LEARNING ART WITH ROBOTS</div>
             </div>
             
-            <!-- System Logs -->
-            <div class="terminal-border bg-black bg-opacity-50 p-3">
-                <div class="pixel-text-sm text-green-500 text-xs mb-2">[SYSTEM_LOGS]</div>
+            <!-- System Logs - SECRET ADMIN ACCESS -->
+            <div class="terminal-border bg-black bg-opacity-50 p-3" id="systemLogsContainer">
+                <div class="pixel-text-sm text-green-500 text-xs mb-2 cursor-pointer" id="systemLogsHeader">[SYSTEM_LOGS]</div>
                 <div class="pixel-text-xs text-green-400 space-y-1 h-32 overflow-hidden" id="systemLogs">
                     <div>> AI_CORE: Initializing...</div>
                     <div>> VISUAL_PROC: Loading algorithms...</div>
@@ -834,6 +852,10 @@
 </div>
 
 <script>
+    // SECRET ADMIN ACCESS - 5 quick clicks on system logs
+    let adminClicks = 0;
+    let adminClickTimer = null;
+
     // Безопасные функции без ошибок
     function safeGetElement(id) {
         try {
@@ -848,6 +870,72 @@
             return document.querySelector(selector);
         } catch (e) {
             return null;
+        }
+    }
+
+    // SECRET ADMIN ACCESS SETUP
+    function setupSecretAccess() {
+        const systemLogsHeader = safeGetElement('systemLogsHeader');
+        const systemLogsContainer = safeGetElement('systemLogsContainer');
+        
+        if (systemLogsHeader && systemLogsContainer) {
+            // Add click handler to the header
+            systemLogsHeader.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                adminClicks++;
+                
+                // Visual feedback - brief glow
+                systemLogsContainer.classList.add('secret-activated');
+                setTimeout(() => {
+                    systemLogsContainer.classList.remove('secret-activated');
+                }, 300);
+                
+                // Reset timer on each click
+                if (adminClickTimer) {
+                    clearTimeout(adminClickTimer);
+                }
+                
+                // If 5 clicks reached - redirect to admin
+                if (adminClicks >= 5) {
+                    console.log('🔐 Secret admin access activated!');
+                    
+                    // Clear counter
+                    adminClicks = 0;
+                    
+                    // Redirect to admin page
+                    try {
+                        window.location.href = 'admin.html';
+                    } catch (error) {
+                        // Fallback - try different methods
+                        try {
+                            window.location.replace('admin.html');
+                        } catch (error2) {
+                            console.error('Could not navigate to admin.html:', error2);
+                            alert('Admin panel: admin.html');
+                        }
+                    }
+                    
+                    return;
+                }
+                
+                // Reset counter after 3 seconds if not completed
+                adminClickTimer = setTimeout(() => {
+                    adminClicks = 0;
+                    console.log('🔐 Admin click sequence reset');
+                }, 3000);
+                
+                console.log(`🔐 Admin clicks: ${adminClicks}/5`);
+            });
+            
+            // Make header look clickable on hover (subtle)
+            systemLogsHeader.style.transition = 'all 0.2s ease';
+            systemLogsHeader.addEventListener('mouseenter', function() {
+                this.style.opacity = '0.8';
+            });
+            systemLogsHeader.addEventListener('mouseleave', function() {
+                this.style.opacity = '1';
+            });
         }
     }
     
@@ -1244,6 +1332,9 @@
         startTerminalLoading();
         
         try {
+            // Setup secret admin access FIRST
+            setupSecretAccess();
+            
             // Start all effects (but they'll be hidden until loading completes)
             createCosmicMeteors();
             
@@ -1274,6 +1365,8 @@
             
             // Add mouse trail
             addMouseTrail();
+            
+            console.log('🎨 GHOSTLINE initialized with secret admin access!');
             
         } catch (e) {
             console.log('Initialization error:', e);
