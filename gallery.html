@@ -10,7 +10,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-```
     html {
         background: #000000;
         height: 100%;
@@ -292,32 +291,45 @@
     @media (max-width: 768px) {
         .gallery-grid {
             grid-template-columns: 1fr !important;
+            gap: 1rem;
         }
-        
+
         .category-tabs {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-        
+        .category-tabs > div {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .category-tab {
+            padding: 4px 8px;
+            font-size: 10px;
+            margin-right: 4px;
+        }
+
+        .gallery-card {
+            padding: 8px;
+        }
+
         .donate-console {
             bottom: 20px;
             padding: 12px 30px;
             font-size: 14px;
         }
-        
-    .admin-link {
-        display: none;
-    }
+
+        .admin-link {
+            display: none;
+        }
     }
 </style>
-```
 
 </head>
 <body class="scanlines" style="background-color: #000000;">
     <!-- Admin Link (hidden) -->
     <a href="admin.html" class="admin-link">[ADMIN]</a>
 
-```
 <!-- Header Navigation -->
 <div class="terminal-border bg-black p-2 m-4" style="background-color: #000000;">
     <div class="flex justify-between items-center text-xs">
@@ -735,7 +747,6 @@
         }
     }, 1000); // Check every second
 </script>
-```
 
 </body>
 </html>
