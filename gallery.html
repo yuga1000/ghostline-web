@@ -145,6 +145,16 @@
         right: 10px;
         box-shadow: 0 0 10px #ff0000;
     }
+
+    .status-ghost {
+        width: 12px;
+        height: 12px;
+        background: #888888;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        box-shadow: 0 0 10px #888888;
+    }
     
     /* Price display */
     .price-display {
@@ -486,7 +496,7 @@
                                </div>`
                         }
                     </div>
-                    <div class="${item.status === 'available' ? 'status-available' : 'status-sold'}"></div>
+                    <div class="${item.status === 'available' ? 'status-available' : item.status === 'sold' ? 'status-sold' : 'status-ghost'}"></div>
                     <div class="card-overlay">
                         <p class="text-sm glow-text mb-2">${item.title || 'Untitled'}</p>
                         <p class="text-xs mb-2">ID: ${item.id}</p>
@@ -496,7 +506,7 @@
                 <div class="mt-3">
                     <p class="text-xs text-green-600">${formatDate(item.creationDate)}</p>
                     <div class="price-display flex items-center gap-2 mt-2">
-                        <span class="text-xs">💎</span>
+                        <img src="ghostcoin.gif" alt="coin" style="width: 16px; height: 16px; image-rendering: pixelated;">
                         <span class="text-sm">${item.price ? item.price + ' ETH' : 'Contact for price'}</span>
                     </div>
                 </div>
@@ -513,7 +523,7 @@
         
         document.getElementById('detailTitle').textContent = artwork.title || 'Untitled';
         document.getElementById('detailId').textContent = artwork.id;
-        document.getElementById('detailStatus').textContent = artwork.status === 'available' ? 'Available' : 'Sold';
+        document.getElementById('detailStatus').textContent = artwork.status === 'available' ? 'Available' : artwork.status === 'sold' ? 'Sold' : 'Ghost';
         document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : 'Contact for price';
         document.getElementById('detailDescription').textContent = artwork.description || 'No description available.';
         document.getElementById('detailDimensions').textContent = artwork.dimensions || 'Not specified';
@@ -599,7 +609,16 @@
     // Update live status
     function updateLiveStatus() {
         const availableCount = galleryItems.filter(item => item.status === 'available').length;
-        document.getElementById('liveStatus').textContent = `${availableCount} AVAILABLE`;
+        const soldCount = galleryItems.filter(item => item.status === 'sold').length; 
+        const ghostCount = galleryItems.filter(item => item.status === 'ghost').length;
+        
+        if (availableCount > 0) {
+            document.getElementById('liveStatus').textContent = `${availableCount} AVAILABLE`;
+        } else if (soldCount > 0 || ghostCount > 0) {
+            document.getElementById('liveStatus').textContent = `${galleryItems.length} TOTAL`;
+        } else {
+            document.getElementById('liveStatus').textContent = `0 ITEMS`;
+        }
     }
 
     // Inquiry functions
