@@ -276,6 +276,28 @@
         .donate-section {
             padding: 1rem;
         }
+
+        /* Header adjustments for small screens */
+        .header-wrapper {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .nav-menu a,
+        .nav-menu span {
+            margin: 4px 0;
+        }
+
+        .live-status {
+            margin-top: 4px;
+        }
     }
 </style>
 ```
@@ -285,15 +307,15 @@
     <div class="w-full min-h-screen">
         <!-- Header Navigation -->
         <div class="terminal-border bg-black mx-4 mt-2 px-6 py-2">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center header-wrapper">
                 <div class="text-green-500 text-lg retro-font font-bold">GHOSTLINE</div>
-                <div class="text-sm">
+                <div class="text-sm nav-menu">
                     <a href="index.html" class="nav-link mr-4">[HOME]</a>
                     <span class="text-green-400 mr-4">[LIVE STREAM]</span>
                     <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
                     <span class="nav-link cursor-pointer" onclick="showSocial()">[SOCIAL]</span>
                 </div>
-                <div class="text-xs">
+                <div class="text-xs live-status">
                     <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
                 </div>
             </div>
