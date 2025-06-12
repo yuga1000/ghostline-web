@@ -10,7 +10,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-```
     * {
         box-sizing: border-box;
     }
@@ -282,6 +281,8 @@
         position: fixed;
         width: 2px;
         height: 2px;
+        background: #FFA500;
+        box-shadow: 0 0 2px #FFA500;
         pointer-events: none;
         z-index: 1001;
         opacity: 0.8;
@@ -332,43 +333,6 @@
         }
     }
     
-    .social-icon {
-        width: 20px;
-        height: 20px;
-        background: #00ff00;
-        display: inline-block;
-        image-rendering: pixelated;
-    }
-    
-    .social-button {
-        background: #000000;
-        border: 1px solid #00ff00;
-        padding: 6px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        flex-direction: column;
-        gap: 4px;
-        box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
-        width: 60px;
-        height: 60px;
-    }
-    
-    .social-text {
-        font-family: 'Share Tech Mono', monospace;
-        font-size: 6px;
-        color: #00ff00;
-        font-weight: 300;
-        letter-spacing: 0.2px;
-    }
-    
-    .social-button:hover {
-        background: #001100;
-        transform: translateY(-2px);
-        box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
-    }
     
     /* Floating pixel elements */
     .floating-pixels {
@@ -520,15 +484,6 @@
             height: 10rem;
         }
         
-        .social-button {
-            width: 55px;
-            height: 55px;
-            touch-action: manipulation;
-        }
-        
-        .social-text {
-            font-size: 5px;
-        }
         
         .terminal-border {
             margin: 0.75rem;
@@ -609,11 +564,6 @@
         
         .h-48 {
             height: 8rem;
-        }
-        
-        .social-button {
-            width: 50px;
-            height: 50px;
         }
         
         .grid-cols-4 {
@@ -736,7 +686,6 @@
         100% { transform: scale(1); opacity: 1; }
     }
 </style>
-```
 
 </head>
 <body>
@@ -749,7 +698,6 @@
         // }
     </script>
 
-```
 <!-- Экран загрузки -->
 <div id="terminal-loading" style="
     position: fixed;
@@ -1221,15 +1169,6 @@
             });
         }
         
-        // Social buttons
-        const socialButtons = document.querySelectorAll('.social-button');
-        socialButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Social button clicked!');
-                createButtonFireflies(this);
-            });
-        });
     }
     
     // Command changer - исправлена ошибка
@@ -1318,7 +1257,8 @@
             const size = Math.random() < 0.5 ? 1 : 2;
             particle.style.width = size + 'px';
             particle.style.height = size + 'px';
-            particle.style.background = Math.random() < 0.5 ? '#00ff00' : '#FFA500';
+            particle.style.background = '#FFA500';
+            particle.style.boxShadow = '0 0 2px #FFA500';
             particle.style.left = rect.left + Math.random() * rect.width + 'px';
             particle.style.top = rect.top + 'px';
             const dy = -(20 + Math.random() * 20);
@@ -1470,7 +1410,6 @@
     setTimeout(() => toggle.classList.remove("terminal-activate"), 500);
   });
 </script>
-```
 
 </body>
 </html>
