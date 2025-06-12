@@ -350,7 +350,7 @@
             <button class="category-tab" onclick="filterCategory('latest')">LATEST</button>
             <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
             <button class="category-tab" onclick="filterCategory('rare')">RARE</button>
-            <button class="category-tab" onclick="filterCategory('unusual')">UNUSUAL</button>
+            <button class="category-tab" onclick="filterCategory('ghost')">GHOST</button>
             <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
             <span class="text-green-600 mx-2">|</span>
             <button class="category-tab" onclick="forceRefresh()" title="Refresh gallery"><span class="ascii-emoji">(⟁)</span></button>
@@ -443,6 +443,7 @@
             <p class="text-sm mb-2">TO INQUIRE ABOUT THIS ARTWORK:</p>
             <p class="text-xs text-green-400 mb-3">Send email to:</p>
             <p class="text-xs glow-text mb-3" id="secretEmail">ghostlineart@protonmail.com</p>
+            <a id="mailtoButton" href="#" target="_blank" rel="noopener noreferrer" class="bg-green-500 text-black px-4 py-2 rounded hover:bg-green-400 transition">WRITE EMAIL</a>
             <p class="text-xs text-green-600">Include: <span id="artworkId"></span> + Your offer</p>
         </div>
         <button class="category-tab" onclick="closeModal()">CLOSE</button>
@@ -497,10 +498,11 @@
             console.error('Error loading fresh data:', error);
         }
         
-        const filtered = currentCategory === 'all' 
-            ? galleryItems 
-            : galleryItems.filter(item => item.category === currentCategory);
-        
+        const filtered = currentCategory === "all"
+            ? galleryItems
+            : currentCategory === "ghost"
+                ? galleryItems.filter(item => item.status === "lost" || item.status === "ghosted" || item.status === "ghost")
+                : galleryItems.filter(item => item.category === currentCategory);
         if (filtered.length === 0) {
             grid.innerHTML = '';
             emptyState.classList.remove('hidden');
@@ -654,8 +656,10 @@
     // Inquiry functions
     function inquireArtwork() {
         if (currentArtwork) {
-            document.getElementById('artworkId').textContent = `Artwork ID: ${currentArtwork.id}`;
-            document.getElementById('inquiryModal').style.display = 'flex';
+            document.getElementById("artworkId").textContent = `Artwork ID: ${currentArtwork.id}`;
+            const mailto = `mailto:ghostlineart@protonmail.com?subject=Artwork Inquiry: ${currentArtwork.id}&body=Hello, I would like to inquire about the artwork with ID ${currentArtwork.id}. My offer: `;
+            document.getElementById("mailtoButton").href = mailto;
+            document.getElementById("inquiryModal").style.display = "flex";
             closeDetailModal();
         }
     }
