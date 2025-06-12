@@ -1373,6 +1373,20 @@
         }
     });
 </script>
+<button id="socialToggle" style="position:fixed;bottom:20px;right:20px;z-index:999;background:black;color:#00ff00;border:1px solid #00ff00;padding:10px;font-family:monospace;cursor:pointer;">SOCIAL</button>
+<div id="socialPanel" style="display:none;position:fixed;bottom:70px;right:20px;background:black;border:1px solid #00ff00;padding:10px;z-index:998;">
+  <a href="https://instagram.com" target="_blank" style="display:block;color:#00ff00;text-decoration:none;margin-bottom:8px;">Instagram</a>
+  <a href="https://tiktok.com" target="_blank" style="display:block;color:#00ff00;text-decoration:none;margin-bottom:8px;">TikTok</a>
+  <a href="https://t.me/..." target="_blank" style="display:block;color:#00ff00;text-decoration:none;margin-bottom:8px;">Telegram</a>
+  <a href="https://youtube.com" target="_blank" style="display:block;color:#00ff00;text-decoration:none;">YouTube</a>
+</div>
+<script>
+  const toggle = document.getElementById("socialToggle");
+  const panel = document.getElementById("socialPanel");
+  toggle.addEventListener("click", () => {
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+  });
+</script>
 ```
 
 </body>
