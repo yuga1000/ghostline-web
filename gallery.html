@@ -327,6 +327,55 @@
         text-align: center;
         box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
     }
+
+    /* Animated donate modal */
+    #donateModal .terminal-animated {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    #donateModal .terminal-animated::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+        height: 2px;
+        width: 0;
+        background: #00ff00;
+        box-shadow: 0 0 6px #00ff00;
+    }
+
+    #donateModal.line-start .terminal-animated::before {
+        animation: lineGrow 0.4s forwards;
+    }
+
+    @keyframes lineGrow {
+        to { width: 100%; }
+    }
+
+    #donateModal .modal-content {
+        transform: scaleY(0);
+        transform-origin: top;
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    #donateModal.show .modal-content {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+        #donateModal .modal-content {
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+        }
+    }
     
     /* Mobile styles */
     @media (max-width: 768px) {
@@ -521,7 +570,8 @@
 
 <!-- Donate Modal -->
 <div class="modal" id="donateModal">
-    <div class="modal-content">
+    <div class="terminal-animated">
+        <div class="modal-content">
         <h3 class="pixel-text text-lg glow-text mb-4">SUPPORT GHOSTLINE</h3>
         <div class="terminal-border p-4 mb-4 bg-black">
             <p class="text-sm mb-3">ETHEREUM ADDRESS:</p>
@@ -530,6 +580,7 @@
         </div>
         <p class="text-xs text-green-600 mb-4">Your support helps robots learn art!</p>
         <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
+        </div>
     </div>
 </div>
 
@@ -741,11 +792,18 @@
     }
 
     function showDonateModal() {
-        document.getElementById('donateModal').style.display = 'flex';
+        const modal = document.getElementById('donateModal');
+        modal.style.display = 'flex';
+        modal.classList.add('line-start');
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 500);
     }
 
     function closeDonateModal() {
-        document.getElementById('donateModal').style.display = 'none';
+        const modal = document.getElementById('donateModal');
+        modal.classList.remove('show', 'line-start');
+        modal.style.display = 'none';
     }
 
     // Copy address
