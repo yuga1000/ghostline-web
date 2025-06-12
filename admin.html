@@ -198,6 +198,59 @@
             margin: 0.5rem;
         }
     }
+
+    /* SOCIAL button styling */
+    #socialToggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: black;
+        border: 2px dashed orange;
+        color: orange;
+        font-family: monospace;
+        font-weight: bold;
+        padding: 10px 15px;
+        text-shadow: 0 0 5px orange;
+        box-shadow: 0 0 10px orange;
+        cursor: pointer;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 10px orange; }
+        50% { box-shadow: 0 0 20px orange; }
+        100% { box-shadow: 0 0 10px orange; }
+    }
+
+    /* SOCIAL panel styling */
+    #socialPanel {
+        display: none;
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        background-color: black;
+        border: 1px solid orange;
+        padding: 12px;
+        z-index: 998;
+        opacity: 0;
+        transform: scale(0.95);
+        transition: all 0.4s ease;
+    }
+
+    #socialPanel.visible {
+        display: block;
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    #socialPanel a {
+        display: block;
+        color: orange;
+        font-family: monospace;
+        text-decoration: none;
+        margin-bottom: 8px;
+    }
 </style>
 ```
 
@@ -741,18 +794,18 @@
         }
     });
 </script>
-<button id="socialToggle" style="position:fixed;bottom:20px;right:20px;z-index:999;background:black;color:#00ff00;border:1px solid #00ff00;padding:10px;font-family:monospace;cursor:pointer;">SOCIAL</button>
-<div id="socialPanel" style="display:none;position:fixed;bottom:70px;right:20px;background:black;border:1px solid #00ff00;padding:10px;z-index:998;">
-  <a href="https://instagram.com" target="_blank" style="display:block;color:#00ff00;text-decoration:none;margin-bottom:8px;">Instagram</a>
-  <a href="https://tiktok.com" target="_blank" style="display:block;color:#00ff00;text-decoration:none;margin-bottom:8px;">TikTok</a>
-  <a href="https://t.me/..." target="_blank" style="display:block;color:#00ff00;text-decoration:none;margin-bottom:8px;">Telegram</a>
-  <a href="https://youtube.com" target="_blank" style="display:block;color:#00ff00;text-decoration:none;">YouTube</a>
+<button id="socialToggle">SOCIAL</button>
+<div id="socialPanel">
+  <a href="https://instagram.com" target="_blank">Instagram</a>
+  <a href="https://tiktok.com" target="_blank">TikTok</a>
+  <a href="https://t.me/" target="_blank">Telegram</a>
+  <a href="https://youtube.com" target="_blank">YouTube</a>
 </div>
 <script>
   const toggle = document.getElementById("socialToggle");
   const panel = document.getElementById("socialPanel");
   toggle.addEventListener("click", () => {
-    panel.style.display = panel.style.display === "none" ? "block" : "none";
+    panel.classList.toggle("visible");
   });
 </script>
 ```
