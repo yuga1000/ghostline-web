@@ -277,7 +277,7 @@
         box-shadow: 0 0 2px #00ff00;
     }
 
-    .social-pixel {
+    .social-spark {
         position: fixed;
         width: 2px;
         height: 2px;
@@ -285,13 +285,13 @@
         box-shadow: 0 0 2px #FFA500;
         pointer-events: none;
         z-index: 1001;
-        opacity: 0.8;
-        animation: socialRise 2s linear forwards;
+        opacity: 0.9;
+        animation: sparkBurst 1.2s ease-out forwards;
     }
 
-    @keyframes socialRise {
-        0% { transform: translateY(0); opacity: 0.8; }
-        100% { transform: translateY(var(--dy)); opacity: 0; }
+    @keyframes sparkBurst {
+        0% { transform: translate(0,0); opacity: 1; }
+        100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
     }
     
     @keyframes pixelExplode {
@@ -602,29 +602,24 @@
         padding: 10px 16px;
         border: 2px dashed #FFA500;
         text-shadow: 0 0 1px #FFA500, 0 0 2px #FFA500;
-        box-shadow:
-          0 0 2px #FFA500,
-          0 0 6px #FFA500,
-          0 0 12px #ffb347,
-          0 0 24px #ffb347;
         cursor: pointer;
-        animation: pixelPulse 1.8s infinite alternate;
+        animation: socialGlow 2s ease-in-out infinite;
     }
 
-    @keyframes pixelPulse {
-        0% {
+    @keyframes socialGlow {
+        0%, 100% {
           box-shadow:
             0 0 2px #FFA500,
-            0 0 4px #FFA500,
-            0 0 8px #ffb347,
-            0 0 16px #ffb347;
-        }
-        100% {
-          box-shadow:
-            0 0 3px #FFA500,
             0 0 6px #FFA500,
             0 0 12px #ffb347,
             0 0 24px #ffb347;
+        }
+        50% {
+          box-shadow:
+            0 0 4px #FFA500,
+            0 0 8px #FFA500,
+            0 0 16px #ffb347,
+            0 0 32px #ffb347;
         }
     }
 
@@ -684,6 +679,23 @@
     @keyframes terminalExpand {
         0% { transform: scale(0.8); opacity: 0; }
         100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Fixed system logs panel */
+    #systemLogsContainer {
+        position: fixed;
+        left: 10px;
+        right: 10px;
+        bottom: 60px;
+        max-height: 160px;
+        overflow-y: auto;
+        transform: translateY(100%);
+        transition: transform 0.5s ease-out;
+        z-index: 900;
+    }
+
+    #systemLogsContainer.open {
+        transform: translateY(0);
     }
 </style>
 
@@ -1245,7 +1257,7 @@
         });
     }
 
-    // Idle floating pixels from SOCIAL button
+    // Idle glowing sparks from SOCIAL button
     function startSocialParticles() {
         const button = safeGetElement('socialToggle');
         if (!button) return;
@@ -1253,16 +1265,20 @@
         setInterval(() => {
             const rect = button.getBoundingClientRect();
             const particle = document.createElement('div');
-            particle.className = 'social-pixel';
+            particle.className = 'social-spark';
             const size = Math.random() < 0.5 ? 1 : 2;
             particle.style.width = size + 'px';
             particle.style.height = size + 'px';
-            particle.style.background = '#FFA500';
-            particle.style.boxShadow = '0 0 2px #FFA500';
-            particle.style.left = rect.left + Math.random() * rect.width + 'px';
-            particle.style.top = rect.top + 'px';
-            const dy = -(20 + Math.random() * 20);
+            particle.style.left = rect.left + rect.width / 2 + 'px';
+            particle.style.top = rect.top + rect.height / 2 + 'px';
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 20 + Math.random() * 20;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+            particle.style.setProperty('--dx', dx + 'px');
             particle.style.setProperty('--dy', dy + 'px');
+
             document.body.appendChild(particle);
             particle.addEventListener('animationend', () => {
                 if (particle.parentNode) particle.parentNode.removeChild(particle);
@@ -1332,9 +1348,11 @@
                 setTimeout(() => {
                     document.getElementById('terminal-loading').style.opacity = '0';
                     document.getElementById('main-content').style.opacity = '1';
-                    
+
                     setTimeout(() => {
                         document.getElementById('terminal-loading').style.display = 'none';
+                        const logs = document.getElementById('systemLogsContainer');
+                        if (logs) logs.classList.add('open');
                     }, 300);
                 }, 300);
             }
