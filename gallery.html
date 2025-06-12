@@ -163,13 +163,6 @@
         box-shadow: 0 0 10px #888888;
     }
 
-    .pxl-outline-canvas {
-        position: absolute;
-        pointer-events: none;
-        image-rendering: pixelated;
-        z-index: -1;
-    }
-
     @keyframes flicker {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.4; }
@@ -987,14 +980,6 @@
             console.error('Error checking for updates:', error);
         }
     }, 1000); // Check every second
-</script>
-<script>
-function hexToRgb(hex){hex=hex.replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');const num=parseInt(hex,16);return{r:(num>>16)&255,g:(num>>8)&255,b:num&255};}
-function parseColor(str){if(!str)return{r:0,g:255,b:0};if(str.startsWith('rgb')){let m=str.match(/\d+/g);return{r:+m[0],g:+m[1],b:+m[2]};}return hexToRgb(str);}
-function vary(v){return Math.max(0,Math.min(255,v+(Math.random()*60-30)));}
-function drawHalo(el,color){const {r,g,b}=parseColor(color);const layers=[{e:2,o1:0.8,o2:0.9},{e:4,o1:0.6,o2:0.7},{e:6,o1:0.2,o2:0.3}];el.style.position='relative';layers.forEach(l=>{const rect=el.getBoundingClientRect();const c=document.createElement('canvas');c.width=rect.width+l.e*2;c.height=rect.height+l.e*2;c.className='pxl-outline-canvas';c.style.top=-l.e+'px';c.style.left=-l.e+'px';const ctx=c.getContext('2d');const s=2;for(let x=0;x<c.width;x+=s){ctx.fillStyle=`rgba(${vary(r)},${vary(g)},${vary(b)},${l.o1+Math.random()*(l.o2-l.o1)})`;ctx.fillRect(x,0,s,s);ctx.fillRect(x,c.height-s,s,s);}for(let y=0;y<c.height;y+=s){ctx.fillStyle=`rgba(${vary(r)},${vary(g)},${vary(b)},${l.o1+Math.random()*(l.o2-l.o1)})`;ctx.fillRect(0,y,s,s);ctx.fillRect(c.width-s,y,s,s);}el.appendChild(c);});}
-function replaceGlows(){document.querySelectorAll('*').forEach(el=>{const st=getComputedStyle(el);if(st.boxShadow!=='none'||st.filter.includes('drop-shadow')){el.style.boxShadow='none';if(st.filter.includes('drop-shadow'))el.style.filter='none';const col=st.borderColor!=='rgba(0, 0, 0, 0)'?st.borderColor:st.color;drawHalo(el,col);}});}
-window.addEventListener('DOMContentLoaded',replaceGlows);
 </script>
 
 </body>
