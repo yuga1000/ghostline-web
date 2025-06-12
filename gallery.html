@@ -259,23 +259,26 @@
         animation: none;
     }
 
-    .root-canvas {
-        position: absolute;
-        top: 50%;
-        width: 80px;
-        height: 40px;
-        transform: translateY(-50%);
+    /* Sparks from button */
+    .spark {
+        position: fixed;
+        width: 3px;
+        height: 3px;
+        background: #00BFFF;
         pointer-events: none;
+        z-index: 1000;
+        box-shadow: 0 0 6px #00BFFF;
     }
 
-    #leftRoot {
-        right: 100%;
-        margin-right: -2px;
-    }
-
-    #rightRoot {
-        left: 100%;
-        margin-left: -2px;
+    @keyframes sparkUp {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-150px) translateX(var(--drift)) scale(0);
+        }
     }
     
     /* Admin link */
@@ -532,11 +535,9 @@
 
 <!-- Donate Button -->
 <div class="donate-wrapper">
-    <canvas id="leftRoot" class="root-canvas"></canvas>
     <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
         <span class="glow-blue">SUPPORT PROJECT</span>
     </button>
-    <canvas id="rightRoot" class="root-canvas"></canvas>
 </div>
 
 <script>
@@ -765,124 +766,128 @@
         document.getElementById('donateBtn').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function drawRoots() {
-        const left = document.getElementById('leftRoot');
-        const right = document.getElementById('rightRoot');
-        if (!left || !right) return;
+    // Animated branching lines and sparks
+    function createBranchingLines() {
+        const button = document.getElementById('donateBtn');
+        const rect = button.getBoundingClientRect();
 
-        const draw = (ctx, direction) => {
-            const w = ctx.canvas.width;
-            const h = ctx.canvas.height;
-            ctx.strokeStyle = '#00BFFF';
-            ctx.lineWidth = 2;
-            ctx.shadowColor = '#00BFFF';
-            ctx.shadowBlur = 6;
-            ctx.beginPath();
-            let x = direction === 'left' ? w : 0;
-            let y = h / 2;
-            ctx.moveTo(x, y);
-            for (let i = 0; i < 4; i++) {
-                x += direction === 'left' ? -Math.random() * (w / 3) : Math.random() * (w / 3);
-                y += (Math.random() - 0.5) * h * 0.8;
-                ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-        };
+        const startPoints = [
+            { x: rect.left + rect.width / 2, y: rect.top },
+            { x: rect.right, y: rect.top + rect.height / 2 },
+            { x: rect.left + rect.width / 2, y: rect.bottom },
+            { x: rect.left, y: rect.top + rect.height / 2 },
+        ];
 
-        draw(left.getContext('2d'), 'left');
-        draw(right.getContext('2d'), 'right');
-    }
+        const canvas = document.createElement('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.position = 'fixed';
+        canvas.style.left = 0;
+        canvas.style.top = 0;
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = 1500;
+        document.body.appendChild(canvas);
 
-    function animateRoots() {
-        const startSide = (canvas, side) => {
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width;
-            const h = canvas.height;
-            const dirs = [
-                { dx: 0, dy: -1 },
-                { dx: 1, dy: 0 },
-                { dx: 0, dy: 1 },
-                { dx: -1, dy: 0 },
-            ];
-            const allowed = side === 'left' ? [0, 2, 3] : [0, 1, 2];
-            const branches = [];
-            const speed = 2;
-            const maxDepth = 4;
+        const ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#00BFFF';
+        ctx.lineWidth = 2;
 
-            const startX = side === 'left' ? w : 0;
-            const startY = h / 2;
+        const dirs = [
+            { dx: 0, dy: -1 },
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: 1 },
+            { dx: -1, dy: 0 },
+        ];
 
-            function addBranch(x, y, dir, depth) {
-                const length = 6 + Math.random() * 20;
-                branches.push({ x, y, dir, length, progress: 0, depth });
-            }
+        const branches = [];
+        const speed = 2;
+        const maxDepth = 5;
 
-            addBranch(startX, startY, side === 'left' ? 3 : 1, 0);
+        function addBranch(x, y, dir, depth) {
+            const length = 10 + Math.random() * 30;
+            branches.push({ x, y, dir, length, progress: 0, depth });
+        }
 
-            ctx.strokeStyle = '#00BFFF';
-            ctx.lineWidth = 2;
-            ctx.shadowColor = '#00BFFF';
-            ctx.shadowBlur = 6;
+        for (let d = 0; d < 4; d++) addBranch(startPoints[d].x, startPoints[d].y, d, 0);
 
-            const startTime = Date.now();
+        function step() {
+            for (let i = branches.length - 1; i >= 0; i--) {
+                const b = branches[i];
+                const dir = dirs[b.dir];
+                const prev = b.progress;
+                b.progress = Math.min(b.progress + speed, b.length);
 
-            function step() {
-                for (let i = branches.length - 1; i >= 0; i--) {
-                    const b = branches[i];
-                    const dir = dirs[b.dir];
-                    const prev = b.progress;
-                    b.progress = Math.min(b.progress + speed, b.length);
+                ctx.beginPath();
+                ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
+                ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
+                ctx.stroke();
 
-                    ctx.beginPath();
-                    ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
-                    ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
-                    ctx.stroke();
+                if (b.progress >= b.length) {
+                    const endX = b.x + dir.dx * b.length;
+                    const endY = b.y + dir.dy * b.length;
+                    branches.splice(i, 1);
 
-                    if (b.progress >= b.length) {
-                        const endX = b.x + dir.dx * b.length;
-                        const endY = b.y + dir.dy * b.length;
-                        branches.splice(i, 1);
-
-                        if (b.depth < maxDepth) {
-                            const avail = allowed.filter(d => d !== (b.dir + 2) % 4);
-                            let count = Math.floor(Math.random() * 2);
-                            while (count-- > 0 && avail.length) {
-                                const idx = Math.floor(Math.random() * avail.length);
-                                const nd = avail.splice(idx, 1)[0];
-                                addBranch(endX, endY, nd, b.depth + 1);
-                            }
+                    if (b.depth < maxDepth) {
+                        const available = [0, 1, 2, 3].filter(dd => dd !== (b.dir + 2) % 4);
+                        let count = Math.floor(Math.random() * 3);
+                        while (count-- > 0 && available.length) {
+                            const idx = Math.floor(Math.random() * available.length);
+                            const nd = available.splice(idx, 1)[0];
+                            addBranch(endX, endY, nd, b.depth + 1);
                         }
                     }
                 }
-
-                if (branches.length && Date.now() - startTime < 2300) {
-                    requestAnimationFrame(step);
-                } else {
-                    setTimeout(() => {
-                        canvas.style.transition = 'opacity 0.5s';
-                        canvas.style.opacity = 0;
-                    }, 200);
-                }
             }
 
-            canvas.style.opacity = 1;
-            requestAnimationFrame(step);
-        };
+            if (branches.length) {
+                requestAnimationFrame(step);
+            } else {
+                setTimeout(() => canvas.remove(), 300);
+                showDonateModal();
+            }
+        }
 
-        startSide(document.getElementById('leftRoot'), 'left');
-        startSide(document.getElementById('rightRoot'), 'right');
+        requestAnimationFrame(step);
+    }
 
-        setTimeout(showDonateModal, 2300);
+    function createSparks() {
+        const button = document.getElementById('donateBtn');
+        const rect = button.getBoundingClientRect();
+
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                const spark = document.createElement('div');
+                spark.className = 'spark';
+
+                const startX = rect.left + Math.random() * rect.width;
+                const startY = rect.top + rect.height / 2;
+
+                spark.style.left = startX + 'px';
+                spark.style.top = startY + 'px';
+
+                const drift = (Math.random() - 0.5) * 50;
+                spark.style.setProperty('--drift', drift + 'px');
+
+                const colors = ['#00BFFF', '#33CCFF', '#66D9FF', '#00FFFF'];
+                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+                spark.style.animation = 'sparkUp 1.5s ease-out forwards';
+
+                document.body.appendChild(spark);
+
+                setTimeout(() => spark.remove(), 1500);
+            }, i * 30);
+        }
     }
 
     function handleDonateClick() {
-        animateRoots();
+        createSparks();
+        createBranchingLines();
     }
 
     // Initialize on load
     window.addEventListener('load', () => {
         initGallery();
-        drawRoots();
     });
     
     // Refresh when page gains focus (switching from admin)
