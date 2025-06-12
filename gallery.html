@@ -155,7 +155,26 @@
         right: 10px;
         box-shadow: 0 0 10px #888888;
     }
-    
+
+    @keyframes flicker {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+    }
+
+    .ghosted {
+        opacity: 0.6;
+        filter: blur(0.5px);
+        animation: flicker 2s infinite;
+    }
+
+    .wind-icon {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        pointer-events: none;
+        font-size: 12px;
+    }
+
     /* Price display */
     .price-display {
         font-family: 'Share Tech Mono', monospace;
@@ -485,11 +504,11 @@
         
         grid.innerHTML = filtered.map((item, index) => {
             return `
-            <div class="gallery-card terminal-border bg-black p-3" onclick="showDetailModal('${item.id}')">
+            <div class="gallery-card terminal-border bg-black p-3 ${item.status === 'lost' ? 'ghosted' : ''}" onclick="showDetailModal('${item.id}')">
                 <div class="relative">
                     <div class="h-48 flex items-center justify-center bg-gray-900">
-                        ${item.image 
-                            ? `<img src="${item.image}" alt="${item.title || item.id}" class="pixel-art" style="width: 100%; height: 100%; object-fit: cover;">` 
+                        ${item.image
+                            ? `<img src="${item.image}" alt="${item.title || item.id}" class="pixel-art" style="width: 100%; height: 100%; object-fit: cover;">`
                             : `<div class="text-center text-green-600 text-xs">
                                  <p>NO IMAGE</p>
                                  <p class="mt-2">${item.title || item.id}</p>
@@ -497,6 +516,7 @@
                         }
                     </div>
                     <div class="${item.status === 'available' ? 'status-available' : item.status === 'sold' ? 'status-sold' : 'status-ghost'}"></div>
+                    ${item.status === 'lost' ? '<div class="wind-icon">💨</div>' : ''}
                     <div class="card-overlay">
                         <p class="text-sm glow-text mb-2">${item.title || 'Untitled'}</p>
                         <p class="text-xs mb-2">ID: ${item.id}</p>
@@ -523,7 +543,10 @@
         
         document.getElementById('detailTitle').textContent = artwork.title || 'Untitled';
         document.getElementById('detailId').textContent = artwork.id;
-        document.getElementById('detailStatus').textContent = artwork.status === 'available' ? 'Available' : artwork.status === 'sold' ? 'Sold' : 'Ghost';
+        document.getElementById('detailStatus').textContent =
+            artwork.status === 'available' ? 'Available' :
+            artwork.status === 'sold' ? 'Sold' :
+            artwork.status === 'lost' ? 'Lost' : 'Ghost';
         document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : 'Contact for price';
         document.getElementById('detailDescription').textContent = artwork.description || 'No description available.';
         document.getElementById('detailDimensions').textContent = artwork.dimensions || 'Not specified';
