@@ -645,6 +645,51 @@
         }
     }
 
+    /* Pixel frame glow + random vibration */
+    .pxl-frame {
+        position: relative;
+        z-index: 1;
+    }
+
+    .pxl-frame::before,
+    .pxl-frame::after,
+    .pxl-frame .glow-3 {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        image-rendering: pixelated;
+        border: 2px solid;
+        border-radius: 0;
+        z-index: -1;
+        animation: pxl-flicker 2.5s infinite steps(1, end);
+    }
+
+    .pxl-frame::before {
+        top: -2px; left: -2px; right: -2px; bottom: -2px;
+        border-color: rgba(255, 165, 0, 0.70);
+        animation-delay: 0s;
+    }
+
+    .pxl-frame::after {
+        top: -4px; left: -4px; right: -4px; bottom: -4px;
+        border-color: rgba(255, 165, 0, 0.40);
+        animation-delay: 0.2s;
+    }
+
+    .pxl-frame .glow-3 {
+        top: -6px; left: -6px; right: -6px; bottom: -6px;
+        border-color: rgba(255, 165, 0, 0.20);
+        position: absolute;
+        animation-delay: 0.4s;
+    }
+
+    @keyframes pxl-flicker {
+        0%   { opacity: 1;     }
+        33%  { opacity: 0.9;   }
+        66%  { opacity: 0.95;  }
+        100% { opacity: 1;     }
+    }
+
     /* SOCIAL panel styling */
     #socialPanel {
         display: none;
@@ -1418,7 +1463,10 @@
         }
     });
 </script>
-<button id="socialToggle">SOCIAL</button>
+<div class="pxl-frame">
+  <div class="glow-3"></div>
+  <button id="socialToggle">SOCIAL</button>
+</div>
 <div id="socialPanel">
   <a href="https://instagram.com" target="_blank">Instagram</a>
   <a href="https://tiktok.com" target="_blank">TikTok</a>
