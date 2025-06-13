@@ -195,25 +195,11 @@
     .logo-container {
         background: #000000;
         border: 2px solid #00ff00;
-        box-shadow: 0 0 4px rgba(0, 255, 0, 0.8), 
-                    0 0 8px rgba(0, 255, 0, 0.6),
-                    0 0 12px rgba(0, 255, 0, 0.4);
-        animation: logoPixelGlow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes logoPixelGlow {
-        0% { 
-            box-shadow: 0 0 4px rgba(0, 255, 0, 0.8), 
-                       0 0 8px rgba(0, 255, 0, 0.6),
-                       0 0 12px rgba(0, 255, 0, 0.4);
-            border-color: #00ff00;
-        }
-        100% { 
-            box-shadow: 0 0 6px rgba(0, 255, 0, 1), 
-                       0 0 12px rgba(0, 255, 0, 0.8),
-                       0 0 18px rgba(0, 255, 0, 0.6);
-            border-color: #44ff44;
-        }
+        /* Pixelated halo using layered square shadows */
+        box-shadow:
+            0 0 0 2px #00FF00,
+            0 0 0 4px #00CC00,
+            0 0 0 6px #009900;
     }
     
     .enlarged-logo {
