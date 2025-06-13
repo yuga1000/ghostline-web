@@ -89,12 +89,23 @@
         }
     }
     
-    .pixel-text-sm {
-        font-family: 'Share Tech Mono', monospace;
-        color: #00ff00;
-        font-size: 12px;
-        letter-spacing: 1px;
-    }
+.pixel-text-sm {
+    font-family: 'Share Tech Mono', monospace;
+    color: #00ff00;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.symbol-strip {
+    font-family: 'Share Tech Mono', monospace;
+    color: #00ff00;
+    text-shadow: 0 0 4px #0f0, 0 0 6px #0f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
+}
 
     .logo-subtitle {
         font-family: 'Share Tech Mono', monospace;
