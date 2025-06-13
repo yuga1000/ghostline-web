@@ -749,13 +749,16 @@
     /* Floating system logs panel */
     .system-logs {
         position: fixed;
-        bottom: 40px;
+        bottom: 50px;
         left: 10px;
-        width: 260px;
-        max-height: 150px;
-        overflow-y: auto;
+        width: 280px;
+        height: 80px;
+        overflow: hidden;
         font-family: monospace;
-        color: #00BFFF;
+        color: #00EAFF;
+        border: 1px solid #00EAFF;
+        box-shadow: none;
+        animation: none;
         opacity: 1;
         transform: translateY(0);
         transition: opacity 0.3s ease, transform 0.3s ease;
@@ -798,9 +801,7 @@
     }
 
     #systemLogsContainer.collapsed {
-        opacity: 0;
-        transform: translateY(10px);
-        pointer-events: none;
+        display: none;
     }
 
     #systemLogsContainer {
@@ -811,7 +812,8 @@
         .system-logs {
             bottom: 50px;
             left: 10px;
-            width: 90%;
+            width: 280px;
+            height: 80px;
         }
         #logsToggle {
             bottom: 10px;
@@ -944,8 +946,8 @@
 
         <!-- Floating System Logs -->
         <div class="terminal-border bg-black bg-opacity-50 p-3 space-y-2 system-logs collapsed" id="systemLogsContainer">
-            <div class="pixel-text-sm text-xs mb-2 cursor-pointer text-right" style="color:#00BFFF;font-family:monospace;" id="systemLogsHeader">[SYSTEM_LOGS]</div>
-            <div class="pixel-text-xs space-y-1 max-h-32 overflow-y-auto" style="color:#00BFFF;font-family:monospace;" id="systemLogs">
+            <div class="pixel-text-sm text-xs mb-2 cursor-pointer text-right" style="color:#00EAFF;font-family:monospace;" id="systemLogsHeader">[SYSTEM_LOGS]</div>
+            <div class="pixel-text-xs space-y-1" style="color:#00EAFF;font-family:monospace; overflow:hidden;" id="systemLogs">
                 <div>> AI_CORE: Initializing...</div>
                 <div>> VISUAL_PROC: Loading algorithms...</div>
                 <div>> CREATIVITY_ENGINE: Activating...</div>
