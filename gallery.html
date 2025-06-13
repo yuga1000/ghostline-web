@@ -188,6 +188,17 @@
         color: #00ff00;
         font-size: 14px;
     }
+
+    .coin-icon {
+        width: 32px;
+        height: 32px;
+        image-rendering: pixelated;
+    }
+
+    .price-symbol {
+        font-size: 14px;
+        margin-left: 2px;
+    }
     
     .pixel-art {
         image-rendering: pixelated;
@@ -592,6 +603,8 @@
 </div>
 
 <script>
+    const priceSymbols = ['⟁', '✶', '⚗', '⌁', '🜁', '☍'];
+    const priceSymbol = priceSymbols[Math.floor(Math.random() * priceSymbols.length)];
     // Load artworks from localStorage
     let galleryItems = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
     let currentCategory = 'all';
@@ -657,7 +670,8 @@
                 <div class="mt-3">
                     <p class="text-xs text-green-600">${formatDate(item.creationDate)}</p>
                     <div class="price-display flex items-center gap-2 mt-2">
-                        <img src="ghostcoin.gif" alt="coin" style="width: 16px; height: 16px; image-rendering: pixelated;">
+                        <img src="ghostcoin.gif" alt="coin" class="coin-icon">
+                        <span class="price-symbol pixel-text glow-text">${priceSymbol}</span>
                         <span class="text-sm">${item.price ? item.price + ' ETH' : 'Contact for price'}</span>
                     </div>
                 </div>
