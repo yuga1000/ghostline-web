@@ -1,1 +1,11 @@
-
+{
+  "name": "ghostline-web",
+  "version": "1.0.0",
+  "description": "Static deployment of ghostline-web via Railway",
+  "scripts": {
+    "start": "serve -l 8080"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
