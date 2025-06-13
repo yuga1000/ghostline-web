@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Static deployment of ghostline-web via Railway",
   "scripts": {
-    "start": "serve -l 8080"
+    "start": "serve ."
   },
   "dependencies": {
-    "serve": "^14.2.0"
+    "serve": "^14.2.4"
   }
 }
