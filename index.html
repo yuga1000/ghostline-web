@@ -445,23 +445,6 @@
         }
     }
 
-    /* Secret admin access - special glow when clicked */
-    .secret-activated {
-        animation: secretGlow 0.3s ease-out;
-    }
-
-    @keyframes secretGlow {
-        0% { 
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
-        }
-        50% { 
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 
-                       0 0 25px rgba(0, 255, 0, 0.9);
-        }
-        100% { 
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
-        }
-    }
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {
@@ -621,31 +604,13 @@
         font-weight: bold;
         padding: 10px 16px;
         border: 2px dashed #FFA500;
-        text-shadow: 0 0 1px #FFA500, 0 0 2px #FFA500;
         cursor: pointer;
         box-shadow: none;
+        text-shadow: none;
     }
 
     .terminal-activate {
-        animation: terminalPulse 0.5s forwards;
-    }
-
-    @keyframes terminalPulse {
-        0% {
-            box-shadow:
-              0 0 2px #FFA500,
-              0 0 6px #FFA500;
-        }
-        50% {
-            box-shadow:
-              0 0 10px #ffffff,
-              0 0 20px #FFA500;
-        }
-        100% {
-            box-shadow:
-              0 0 2px #FFA500,
-              0 0 6px #FFA500;
-        }
+        animation: none;
     }
 
     /* Pixel frame glow + random vibration */
@@ -729,84 +694,6 @@
         100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Floating system logs panel */
-    .system-logs {
-        position: fixed;
-        bottom: 50px;
-        left: 10px;
-        width: 280px;
-        height: 80px;
-        overflow: hidden;
-        font-family: monospace;
-        color: #00EAFF;
-        border: 1px solid #00EAFF;
-        box-shadow: none;
-        animation: none;
-        opacity: 1;
-        transform: translateY(0);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        z-index: 10000;
-    }
-
-    #logsToggle {
-        position: fixed;
-        bottom: 10px;
-        left: 10px;
-        z-index: 10001;
-        width: 22px;
-        height: 22px;
-        background-color: black;
-        color: #00ff00;
-        font-family: monospace;
-        font-weight: bold;
-        border: 2px solid #00ff00;
-        line-height: 18px;
-        text-align: center;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-    }
-
-    @keyframes logsGlow {
-        0%, 100% {
-            box-shadow:
-              0 0 2px #00ff00,
-              0 0 6px #00ff00,
-              0 0 12px #44ff44,
-              0 0 24px #44ff44;
-        }
-        50% {
-            box-shadow:
-              0 0 4px #00ff00,
-              0 0 8px #00ff00,
-              0 0 16px #44ff44,
-              0 0 32px #44ff44;
-        }
-    }
-
-    #systemLogsContainer.collapsed {
-        display: none;
-    }
-
-    #systemLogsContainer {
-        transform: translateY(0);
-    }
-
-    @media (max-width: 768px) {
-        .system-logs {
-            bottom: 50px;
-            left: 10px;
-            width: 280px;
-            height: 80px;
-        }
-        #logsToggle {
-            bottom: 10px;
-            left: 10px;
-        }
-    }
-
-    #systemLogsContainer.open {
-        opacity: 1;
-    }
 </style>
 
 </head>
@@ -927,20 +814,7 @@
         </div>
 
 
-        <!-- Floating System Logs -->
-        <div class="terminal-border bg-black bg-opacity-50 p-3 space-y-2 system-logs collapsed" id="systemLogsContainer">
-            <div class="pixel-text-sm text-xs mb-2 cursor-pointer text-right" style="color:#00EAFF;font-family:monospace;" id="systemLogsHeader">[SYSTEM_LOGS]</div>
-            <div class="pixel-text-xs space-y-1" style="color:#00EAFF;font-family:monospace; overflow:hidden;" id="systemLogs">
-                <div>> AI_CORE: Initializing...</div>
-                <div>> VISUAL_PROC: Loading algorithms...</div>
-                <div>> CREATIVITY_ENGINE: Activating...</div>
-                <div>> ROBOT_ARTIST_01: Preparing canvas...</div>
-                <div>> COLOR_MATRIX: Generating palettes...</div>
-                <div>> LEARNING_SYSTEM: Analyzing databases...</div>
-            </div>
-        </div>
     </div>
-    <button id="logsToggle">[+]</button>
 
     <!-- SOCIAL Button Container -->
     <div id="socialContainer" class="pxl-frame">
@@ -954,16 +828,6 @@
         </div>
     </div>
 
-    <!-- Footer Command Line -->
-    <div class="absolute bottom-4 left-4 right-4" style="z-index: 5;" id="footerTerminal">
-        <div class="terminal-border bg-black p-2">
-            <div class="text-sm pixel-text-sm">
-                <span class="text-green-400">root@ghostline:~$</span>
-                <span class="glow-text">initiate_art_sequence</span>
-                <span class="blink ml-2">█</span>
-            </div>
-        </div>
-    </div>
     
     <!-- Scrolling Text Horizon -->
     <div class="scrolling-text">
@@ -984,9 +848,6 @@
 </div>
 
 <script>
-    // SECRET ADMIN ACCESS - 5 quick clicks on system logs
-    let adminClicks = 0;
-    let adminClickTimer = null;
 
     // Безопасные функции без ошибок
     function safeGetElement(id) {
@@ -1005,108 +866,6 @@
         }
     }
 
-    // SECRET ADMIN ACCESS SETUP
-    function setupSecretAccess() {
-        const systemLogsHeader = safeGetElement('systemLogsHeader');
-        const systemLogsContainer = safeGetElement('systemLogsContainer');
-        
-        if (systemLogsHeader && systemLogsContainer) {
-            // Add click handler to the header
-            systemLogsHeader.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                adminClicks++;
-                
-                // Visual feedback - brief glow
-                systemLogsContainer.classList.add('secret-activated');
-                setTimeout(() => {
-                    systemLogsContainer.classList.remove('secret-activated');
-                }, 300);
-                
-                // Reset timer on each click
-                if (adminClickTimer) {
-                    clearTimeout(adminClickTimer);
-                }
-                
-                // If 5 clicks reached - redirect to admin
-                if (adminClicks >= 5) {
-                    console.log('🔐 Secret admin access activated!');
-                    
-                    // Clear counter
-                    adminClicks = 0;
-                    
-                    // Redirect to admin page
-                    try {
-                        window.location.href = 'admin.html';
-                    } catch (error) {
-                        // Fallback - try different methods
-                        try {
-                            window.location.replace('admin.html');
-                        } catch (error2) {
-                            console.error('Could not navigate to admin.html:', error2);
-                            alert('Admin panel: admin.html');
-                        }
-                    }
-                    
-                    return;
-                }
-                
-                // Reset counter after 3 seconds if not completed
-                adminClickTimer = setTimeout(() => {
-                    adminClicks = 0;
-                    console.log('🔐 Admin click sequence reset');
-                }, 3000);
-                
-                console.log(`🔐 Admin clicks: ${adminClicks}/5`);
-            });
-            
-            // Make header look clickable on hover (subtle)
-            systemLogsHeader.style.transition = 'all 0.2s ease';
-            systemLogsHeader.addEventListener('mouseenter', function() {
-                this.style.opacity = '0.8';
-            });
-            systemLogsHeader.addEventListener('mouseleave', function() {
-                this.style.opacity = '1';
-            });
-        }
-    }
-    
-    // System logs
-    const logMessages = [
-        "> AI_CORE: Initializing neural networks...",
-        "> VISUAL_PROC: Loading pixel algorithms...", 
-        "> CREATIVITY_ENGINE: Activating imagination...",
-        "> ROBOT_ARTIST_01: Preparing digital canvas...",
-        "> COLOR_MATRIX: Generating palette variations...",
-        "> LEARNING_SYSTEM: Analyzing art databases..."
-    ];
-    
-    // Update system logs
-    function updateSystemLogs() {
-        const logsContainer = safeGetElement('systemLogs');
-        if (logsContainer) {
-            try {
-                const shuffled = [...logMessages].sort(() => Math.random() - 0.5);
-                logsContainer.innerHTML = shuffled.slice(0, 6).map(log => `<div>${log}</div>`).join('');
-            } catch (e) {
-                console.log('Log update error:', e);
-            }
-        }
-    }
-
-    function setupLogsToggle() {
-        const toggleBtn = safeGetElement('logsToggle');
-        const container = safeGetElement('systemLogsContainer');
-        const footer = safeGetElement('footerTerminal');
-
-        if (toggleBtn && container) {
-            toggleBtn.addEventListener('click', function() {
-                const collapsed = container.classList.toggle('collapsed');
-                toggleBtn.textContent = collapsed ? '[+]' : '[-]';
-                if (footer) footer.style.display = collapsed ? '' : 'none';
-            });
-        }
-    }
     
     // Create cosmic meteors - уменьшенная интенсивность в 4 раза
     function createCosmicMeteors() {
@@ -1483,13 +1242,6 @@
 
                     setTimeout(() => {
                         document.getElementById('terminal-loading').style.display = 'none';
-                        const logs = document.getElementById('systemLogsContainer');
-                        const footer = document.getElementById('footerTerminal');
-                        if (logs) {
-                            logs.classList.add('open');
-                            logs.classList.remove('collapsed');
-                        }
-                        if (footer) footer.style.display = 'none';
                     }, 300);
                 }, 300);
             }
@@ -1505,9 +1257,6 @@
         startTerminalLoading();
         
         try {
-            // Setup secret admin access FIRST
-            setupSecretAccess();
-            setupLogsToggle();
             
             // Start all effects (but they'll be hidden until loading completes)
             createCosmicMeteors();
@@ -1524,9 +1273,6 @@
             setInterval(updateRandomNumbers, 2000);
             updateRandomNumbers();
             
-            // System logs every 5 seconds
-            setInterval(updateSystemLogs, 5000);
-            updateSystemLogs();
             
             // Command change every 8 seconds
             setInterval(changeCommand, 8000);
@@ -1543,7 +1289,7 @@
             // Start idle pixels for SOCIAL button
             startSocialParticles();
             
-            console.log('🎨 GHOSTLINE initialized with secret admin access!');
+            console.log('🎨 GHOSTLINE initialized!');
             
         } catch (e) {
             console.log('Initialization error:', e);
