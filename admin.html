@@ -10,7 +10,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-```
     html, body {
         background: #000000;
         color: #00ff00;
@@ -200,8 +199,8 @@
     }
 
     }
+
 </style>
-```
 
 </head>
 <body class="scanlines" style="background-color: #000000;">
@@ -217,7 +216,6 @@
         </div>
     </div>
 
-```
 <!-- Admin Panel -->
 <div class="admin-panel hidden" id="adminPanel">
     <!-- Header Navigation -->
@@ -382,6 +380,7 @@
     </div>
 </div>
 
+<script>
     // Admin authentication
     const ADMIN_PASSWORD = 'ghostline';
     let artworks = [];
@@ -679,8 +678,6 @@
         input.click();
     }
 
-    });
-
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         try {
@@ -691,9 +688,8 @@
         }
     });
 </script>
-  });
-</script>
-```
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="supabase-admin.js"></script>
 
 </body>
 </html>
