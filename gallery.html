@@ -609,6 +609,21 @@
         '🜂', '🝊', '☍', '⟁'
     ];
     const priceSymbol = priceSymbols[Math.floor(Math.random() * priceSymbols.length)];
+
+    const symbolPool = [
+        '𐃉', '⧛', '☍', '⟁', '𐂂',
+        '⋔', '𓂀', '⧈', '⟡',
+        '🜂', '🝊'
+    ];
+    function generateSymbolStrip() {
+        const length = 8 + Math.floor(Math.random() * 5);
+        const result = [];
+        for (let i = 0; i < length; i++) {
+            result.push(symbolPool[Math.floor(Math.random() * symbolPool.length)]);
+        }
+        return result.join(' ');
+    }
+    const symbolStrip = generateSymbolStrip();
     // Load artworks from localStorage
     let galleryItems = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
     let currentCategory = 'all';
@@ -676,7 +691,7 @@
                     <div class="price-display flex items-center gap-2 mt-2">
                         <img src="ghostcoin.gif" alt="coin" class="coin-icon">
                         <span class="price-symbol pixel-text glow-text">${priceSymbol}</span>
-                        <span class="text-sm">${item.price ? item.price + ' ETH' : 'Contact for price'}</span>
+                        <span class="text-sm symbol-strip">${item.price ? item.price + ' ETH' : symbolStrip}</span>
                     </div>
                 </div>
             </div>
@@ -696,7 +711,7 @@
             artwork.status === 'available' ? 'Available' :
             artwork.status === 'sold' ? 'Sold' :
             artwork.status === 'lost' ? 'Lost' : 'Ghost';
-        document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : 'Contact for price';
+        document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : symbolStrip;
         document.getElementById('detailDescription').textContent = artwork.description || 'No description available.';
         document.getElementById('detailDimensions').textContent = artwork.dimensions || 'Not specified';
         document.getElementById('detailMedium').textContent = artwork.medium || 'Digital';
