@@ -603,7 +603,11 @@
 </div>
 
 <script>
-    const priceSymbols = ['⟁', '✶', '⚗', '⌁', '🜁', '☍'];
+    const priceSymbols = [
+        '⟁', '✶', '⚗', '⌁', '⟁',
+        '⟡', '⋔', '𓂀', '𐂂',
+        '🜂', '🝊', '☍', '⟁'
+    ];
     const priceSymbol = priceSymbols[Math.floor(Math.random() * priceSymbols.length)];
     // Load artworks from localStorage
     let galleryItems = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
