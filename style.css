@@ -681,3 +681,20 @@
         100% { transform: scale(1); opacity: 1; }
     }
 
+.ata-glyph-line,
+.ata-glyph-square {
+    font-family: monospace;
+    font-size: 24px;
+    color: #00ff00;
+    background: #000000;
+    display: inline-block;
+    padding: 4px 12px;
+}
+.ata-glyph-line {
+    letter-spacing: 8px;
+}
+.ata-glyph-square {
+    line-height: 1.2;
+    white-space: pre;
+    margin-top: 8px;
+}
