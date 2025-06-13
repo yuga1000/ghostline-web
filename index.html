@@ -618,40 +618,75 @@
     setTimeout(() => toggle.classList.remove("terminal-activate"), 500);
   });
 </script>
-<div id="ata-line" class="ata-glyph-line">█ ⚚ ⌁ ⏚ ⑂</div>
+<div id="ata-line" class="ata-glyph-line"></div>
 <div id="ata-square" class="ata-glyph-square"></div>
 <script>
-const ataGlyphs = ["█","▓","▒","░","⧉","⚚","☲","⑂","⌬","⌁","⌖","⌿","⏚","⸸","⛧","⍟","⏣","⏃","⬟","⌇","⌘","☍","⚷","⋔","⸮","⋇","⫷","⫸"];
-function getRandomATASet(count = 5) {
+const ataGlyphs = [
+  "█","▓","▒","░","⧉","⚚","☲","⑂","⌬","⌁","⌖","⌿","⏚","⸸",
+  "⛧","⍟","⏣","⏃","⬟","⌇","⌘","☍","⚷","⋔","⸮","⋇","⫷","⫸"
+];
+
+// --- ATA line logic ---
+let currentATALine = [];
+
+function pickUniqueGlyphs(count = 5) {
   const picked = [];
   while (picked.length < count) {
-    const g = ataGlyphs[Math.floor(Math.random()*ataGlyphs.length)];
+    const g = ataGlyphs[Math.floor(Math.random() * ataGlyphs.length)];
     if (!picked.includes(g)) picked.push(g);
   }
-  return picked.join(" ");
+  return picked;
 }
+
+function renderATALine() {
+  const line = document.getElementById('ata-line');
+  if (line) {
+    line.textContent = currentATALine.join(' ');
+  }
+}
+
+function updateOneGlyph() {
+  if (currentATALine.length === 0) return;
+  const index = Math.floor(Math.random() * currentATALine.length);
+  const available = ataGlyphs.filter(g => !currentATALine.includes(g));
+  if (available.length === 0) return;
+  const next = available[Math.floor(Math.random() * available.length)];
+  currentATALine[index] = next;
+  renderATALine();
+}
+
+function initATALine() {
+  currentATALine = pickUniqueGlyphs(5);
+  renderATALine();
+  setInterval(updateOneGlyph, 5000);
+}
+
+// --- ATA square logic (unchanged) ---
 function getRandomATASquare(size = 5) {
   let rows = [];
-  for (let i=0; i<size; i++) {
+  for (let i = 0; i < size; i++) {
     let row = [];
-    for (let j=0; j<size; j++) {
-      row.push(ataGlyphs[Math.floor(Math.random()*ataGlyphs.length)]);
+    for (let j = 0; j < size; j++) {
+      row.push(ataGlyphs[Math.floor(Math.random() * ataGlyphs.length)]);
     }
-    rows.push(row.join(" "));
+    rows.push(row.join(' '));
   }
-  return rows.join("\n");
+  return rows.join('\n');
 }
-setInterval(() => {
-  const line = document.getElementById("ata-line");
-  if (line) line.textContent = getRandomATASet();
-  const square = document.getElementById("ata-square");
-  if (square) square.textContent = getRandomATASquare();
-}, 5000);
-document.addEventListener("DOMContentLoaded", () => {
-  const line = document.getElementById("ata-line");
-  if (line) line.textContent = getRandomATASet();
-  const square = document.getElementById("ata-square");
-  if (square) square.textContent = getRandomATASquare();
+
+function initATASquare() {
+  const square = document.getElementById('ata-square');
+  if (square) {
+    square.textContent = getRandomATASquare();
+    setInterval(() => {
+      square.textContent = getRandomATASquare();
+    }, 5000);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initATALine();
+  initATASquare();
 });
 </script>
 
