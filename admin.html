@@ -275,19 +275,13 @@ select.admin-input {
                 </div>
 
                 <!-- Basic Info -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm mb-2">CODE</label>
-                        <input type="text" id="code" class="admin-input w-full" placeholder="GH-001" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2">STATUS</label>
-                        <select id="status" class="admin-input w-full">
-                            <option value="available">Available</option>
-                            <option value="sold">Sold</option>
-                            <option value="ghost">Ghost</option>
-                        </select>
-                    </div>
+                <div class="mb-4">
+                    <label class="block text-sm mb-2">STATUS</label>
+                    <select id="status" class="admin-input w-full">
+                        <option value="available">Available</option>
+                        <option value="sold">Sold</option>
+                        <option value="ghost">Ghost</option>
+                    </select>
                 </div>
 
                 <div class="mb-4">
@@ -495,28 +489,7 @@ select.admin-input {
         event.preventDefault();
 
         const editingId = document.getElementById('editingId').value;
-        const newCode = document.getElementById('code').value.trim();
-
-        const existingIndex = artworks.findIndex(a => a.code === newCode);
-        if (existingIndex !== -1 && (!editingId || artworks[existingIndex].id !== editingId)) {
-            alert('Artwork code already exists!');
-            return;
-        }
-
-        if (window.supabaseAdmin && (!editingId || existingIndex === -1 || artworks[existingIndex].id !== editingId)) {
-            try {
-                const exists = await window.supabaseAdmin.artworkExists(newCode);
-                if (exists) {
-                    alert('Artwork code already exists in database!');
-                    return;
-                }
-            } catch (err) {
-                console.error('Code check error:', err);
-            }
-        }
-
         const artwork = {
-            code: newCode,
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             category: document.getElementById('category').value,
@@ -578,40 +551,12 @@ select.admin-input {
         document.getElementById('uploadText').classList.remove('hidden');
         document.getElementById('imagePreviewContainer').classList.add('hidden');
         setDefaultDate();
-        generateNextCode();
     }
 
-    function generateNextCode() {
-        try {
-            const codeInput = document.getElementById('code');
-            if (!codeInput) return;
-            
-            if (artworks.length === 0) {
-                codeInput.value = 'GH-001';
-            } else {
-                const lastId = Math.max(...artworks.map(a => {
-                    if (a.code && a.code.includes('-')) {
-                        return parseInt(a.code.split('-')[1]) || 0;
-                    }
-                    return 0;
-                }));
-                const nextId = String(lastId + 1).padStart(3, '0');
-                codeInput.value = `GH-${nextId}`;
-            }
-        } catch (error) {
-            console.error('Generate code error:', error);
-            const codeInput = document.getElementById('code');
-            if (codeInput) {
-                codeInput.value = 'GH-001';
-            }
-        }
-    }
-
-    function editArtwork(code) {
-        const artwork = artworks.find(a => a.code === code);
+    function editArtwork(index) {
+        const artwork = artworks[index];
         if (artwork) {
             document.getElementById('editingId').value = artwork.id || '';
-            document.getElementById('code').value = artwork.code;
             document.getElementById('title').value = artwork.title || '';
             document.getElementById('description').value = artwork.description || '';
             document.getElementById('category').value = artwork.category || 'latest';
@@ -637,9 +582,10 @@ select.admin-input {
         }
     }
 
-    function deleteArtwork(code) {
-        if (confirm(`Delete artwork ${code}? This cannot be undone.`)) {
-            artworks = artworks.filter(a => a.code !== code);
+    function deleteArtwork(index) {
+        const artwork = artworks[index];
+        if (artwork && confirm('Delete selected artwork? This cannot be undone.')) {
+            artworks.splice(index, 1);
             saveToLocalStorage();
             loadArtworks();
             alert('Artwork deleted!');
@@ -656,16 +602,16 @@ select.admin-input {
                 return;
             }
 
-            listContainer.innerHTML = artworks.map(artwork => `
+            listContainer.innerHTML = artworks.map((artwork, index) => `
                 <div class="artwork-card">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center">
                             <span class="status-indicator status-${artwork.status || 'available'}"></span>
-                            <strong>${artwork.code || 'Unknown'}</strong>
+                            <strong>${artwork.title || 'Untitled'}</strong>
                         </div>
                         <div class="flex gap-2">
-                            <button class="admin-button text-xs" onclick="editArtwork('${artwork.code}')">EDIT</button>
-                            <button class="admin-button danger text-xs" onclick="deleteArtwork('${artwork.code}')">DELETE</button>
+                            <button class="admin-button text-xs" onclick="editArtwork(${index})">EDIT</button>
+                            <button class="admin-button danger text-xs" onclick="deleteArtwork(${index})">DELETE</button>
                         </div>
                     </div>
                     
@@ -705,7 +651,6 @@ select.admin-input {
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         try {
-            generateNextCode();
             console.log('Admin panel initialized successfully');
         } catch (error) {
             console.error('Initialization error:', error);

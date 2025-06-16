@@ -6,49 +6,9 @@ class SupabaseAdmin {
             window.SUPABASE_URL,
             window.SUPABASE_ANON_KEY
         );
-        
+
         // Storage bucket name
         this.BUCKET_NAME = 'images';
-    }
-
-    // Check if artwork code exists in database
-    async artworkExists(code) {
-        try {
-            const { data, error } = await this.supabase
-                .from('images')
-                .select('id')
-                .eq('code', code)
-                .single();
-            
-            if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-                throw error;
-            }
-            
-            return !!data;
-        } catch (error) {
-            console.error('Error checking artwork existence:', error);
-            return false;
-        }
-    }
-
-    // Get artwork by its code
-    async getArtworkByCode(code) {
-        try {
-            const { data, error } = await this.supabase
-                .from('images')
-                .select('*')
-                .eq('code', code)
-                .single();
-
-            if (error && error.code !== 'PGRST116') {
-                throw error;
-            }
-
-            return data || null;
-        } catch (error) {
-            console.error('Error fetching artwork by code:', error);
-            return null;
-        }
     }
 
     // Upload image to Supabase Storage
