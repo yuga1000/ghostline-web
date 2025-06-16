@@ -21,11 +21,11 @@
     
     .terminal-border {
         border: 2px solid #00ff00;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        box-shadow: none;
     }
-    
+
     .glow-text {
-        text-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
+        text-shadow: none;
     }
 
     .no-glow {
@@ -61,7 +61,7 @@
     
     .admin-input:focus {
         outline: none;
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        box-shadow: none;
     }
     
     .admin-button {
@@ -77,7 +77,7 @@
     .admin-button:hover {
         background: #00ff00;
         color: #000000;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        box-shadow: none;
     }
     
     .admin-button.danger {
@@ -112,17 +112,17 @@
         margin-right: 8px;
     }
     
-    .status-available { 
-        background: #00ff00; 
-        box-shadow: 0 0 10px #00ff00;
+    .status-available {
+        background: #00ff00;
+        box-shadow: none;
     }
-    .status-sold { 
-        background: #ff0000; 
-        box-shadow: 0 0 10px #ff0000;
+    .status-sold {
+        background: #ff0000;
+        box-shadow: none;
     }
-    .status-ghost { 
-        background: #888888; 
-        box-shadow: 0 0 10px #888888;
+    .status-ghost {
+        background: #888888;
+        box-shadow: none;
     }
     
     .login-screen {
@@ -172,12 +172,12 @@
     }
     
     .nav-link:hover {
-        text-shadow: 0 0 10px #00ff00;
+        text-shadow: none;
     }
     
     .nav-active {
         color: #ffffff;
-        text-shadow: 0 0 10px #00ff00;
+        text-shadow: none;
     }
 
     @keyframes blink {
@@ -387,7 +387,7 @@
 
 <script>
     // Admin authentication
-    const ADMIN_PASSWORD = 'GL_admin2025!';
+    const ADMIN_PASSWORD = 'astral-vault-702';
     let artworks = [];
     
     // Safely load artworks from localStorage
@@ -645,15 +645,23 @@
         }
     }
 
-    function exportData() {
-        const dataStr = JSON.stringify(artworks, null, 2);
-        const dataBlob = new Blob([dataStr], {type: 'application/json'});
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'ghostline_artworks.json';
-        link.click();
-        URL.revokeObjectURL(url);
+    async function exportData() {
+        if (!window.supabaseAdmin) {
+            alert('Supabase not initialized');
+            return;
+        }
+        for (const artwork of artworks) {
+            try {
+                if (artwork.image && artwork.image.startsWith('data:')) {
+                    const url = await window.supabaseAdmin.uploadArtworkImage(artwork.id, artwork.image);
+                    artwork.image = url;
+                }
+                await window.supabaseAdmin.saveArtworkToDB(artwork);
+            } catch (err) {
+                console.error('Export error:', err);
+            }
+        }
+        alert('Export complete!');
     }
 
     function importData() {
@@ -694,6 +702,7 @@
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="supabase-env.js"></script>
 <script src="supabase-admin.js"></script>
 
 </body>
