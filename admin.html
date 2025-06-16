@@ -360,10 +360,6 @@
             <div class="terminal-border bg-black p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg glow-text">ARTWORK COLLECTION</h2>
-                    <div class="flex gap-2">
-                        <button class="admin-button text-xs" onclick="exportData()">EXPORT</button>
-                        <button class="admin-button text-xs" onclick="importData()">IMPORT</button>
-                    </div>
                 </div>
                 
                 <div class="max-h-96 overflow-y-auto" id="artworkList">
@@ -476,12 +472,31 @@
     }
 
     // Form handling
-    function saveArtwork(event) {
+    async function saveArtwork(event) {
         event.preventDefault();
-        
+
         const editingId = document.getElementById('editingId').value;
+        const newId = document.getElementById('artworkId').value.trim();
+
+        if ((!editingId || editingId !== newId) && artworks.some(a => a.id === newId)) {
+            alert('Artwork ID already exists!');
+            return;
+        }
+
+        if (window.supabaseAdmin && (!editingId || editingId !== newId)) {
+            try {
+                const exists = await window.supabaseAdmin.artworkExists(newId);
+                if (exists) {
+                    alert('Artwork ID already exists in database!');
+                    return;
+                }
+            } catch (err) {
+                console.error('ID check error:', err);
+            }
+        }
+
         const artwork = {
-            id: document.getElementById('artworkId').value,
+            id: newId,
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             category: document.getElementById('category').value,
@@ -497,14 +512,26 @@
             dateAdded: editingId ? artworks.find(a => a.id === editingId)?.dateAdded : new Date().toISOString()
         };
 
+        try {
+            if (currentImageData && currentImageData.startsWith('data:') && window.supabaseAdmin) {
+                artwork.image = await window.supabaseAdmin.uploadArtworkImage(newId, currentImageData);
+            }
+            if (window.supabaseAdmin) {
+                await window.supabaseAdmin.saveArtworkToDB(artwork);
+            }
+        } catch (err) {
+            console.error('Save error:', err);
+            alert('Error saving to Supabase');
+        }
+
         if (editingId) {
-            // Update existing
             const index = artworks.findIndex(a => a.id === editingId);
             if (index !== -1) {
                 artworks[index] = artwork;
+            } else {
+                artworks.push(artwork);
             }
         } else {
-            // Add new
             artworks.push(artwork);
         }
 
@@ -645,51 +672,6 @@
         }
     }
 
-    async function exportData() {
-        if (!window.supabaseAdmin) {
-            alert('Supabase not initialized');
-            return;
-        }
-        for (const artwork of artworks) {
-            try {
-                if (artwork.image && artwork.image.startsWith('data:')) {
-                    const url = await window.supabaseAdmin.uploadArtworkImage(artwork.id, artwork.image);
-                    artwork.image = url;
-                }
-                await window.supabaseAdmin.saveArtworkToDB(artwork);
-            } catch (err) {
-                console.error('Export error:', err);
-            }
-        }
-        alert('Export complete!');
-    }
-
-    function importData() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-                        if (confirm(`Import ${importedData.length} artworks? This will replace existing data.`)) {
-                            artworks = importedData;
-                            saveToLocalStorage();
-                            loadArtworks();
-                            alert('Data imported successfully!');
-                        }
-                    } catch (error) {
-                        alert('Invalid JSON file!');
-                    }
-                };
-                reader.readAsText(file);
-            }
-        };
-        input.click();
-    }
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {

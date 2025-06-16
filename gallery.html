@@ -624,14 +624,26 @@
         return result.join(' ');
     }
     const symbolStrip = generateSymbolStrip();
-    // Load artworks from localStorage
-    let galleryItems = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
+    const supabaseClient = window.supabase.createClient(window.SUPABASE_URL || '', window.SUPABASE_ANON_KEY || '');
+    let galleryItems = [];
     let currentCategory = 'all';
     let currentArtwork = null;
 
-    // Initialize gallery
-    function initGallery() {
+    async function fetchArtworks() {
+        try {
+            const { data, error } = await supabaseClient.from('artworks').select('*');
+            if (error) throw error;
+            return data || [];
+        } catch (err) {
+            console.error('Error fetching artworks:', err);
+            return [];
+        }
+    }
+
+    async function initGallery() {
         console.log('🎨 Initializing gallery...');
+        galleryItems = await fetchArtworks();
+        localStorage.setItem('ghostline_artworks', JSON.stringify(galleryItems));
         renderGallery();
         updateLiveStatus();
     }
@@ -641,16 +653,7 @@
         const grid = document.getElementById('galleryGrid');
         const emptyState = document.getElementById('emptyState');
         
-        // Force reload data from localStorage
-        try {
-            const freshData = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
-            if (JSON.stringify(freshData) !== JSON.stringify(galleryItems)) {
-                galleryItems = freshData;
-                console.log('🔄 Gallery data refreshed from localStorage');
-            }
-        } catch (error) {
-            console.error('Error loading fresh data:', error);
-        }
+
         
         const filtered = currentCategory === "all"
             ? galleryItems
@@ -977,18 +980,15 @@
     });
     
     // Refresh when page gains focus (switching from admin)
-    window.addEventListener('focus', function() {
+    window.addEventListener('focus', async function() {
         console.log('🔄 Page focused, checking for updates...');
-        try {
-            const newData = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
-            if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
-                console.log('📸 New artwork found!');
-                galleryItems = newData;
-                renderGallery();
-                updateLiveStatus();
-            }
-        } catch (error) {
-            console.error('Error on focus refresh:', error);
+        const newData = await fetchArtworks();
+        if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
+            console.log('📸 New artwork found!');
+            galleryItems = newData;
+            localStorage.setItem('ghostline_artworks', JSON.stringify(galleryItems));
+            renderGallery();
+            updateLiveStatus();
         }
     });
 
@@ -999,21 +999,20 @@
         }
     }
 
-    // Refresh gallery data more frequently
-    setInterval(() => {
-        try {
-            const newData = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
-            if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
-                console.log('🔄 New artwork detected, refreshing gallery...');
-                galleryItems = newData;
-                renderGallery();
-                updateLiveStatus();
-            }
-        } catch (error) {
-            console.error('Error checking for updates:', error);
+    // Refresh gallery data periodically
+    setInterval(async () => {
+        const newData = await fetchArtworks();
+        if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
+            console.log('🔄 New artwork detected, refreshing gallery...');
+            galleryItems = newData;
+            localStorage.setItem('ghostline_artworks', JSON.stringify(galleryItems));
+            renderGallery();
+            updateLiveStatus();
         }
-    }, 1000); // Check every second
+    }, 5000); // Check every 5 seconds
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="supabase-env.js"></script>
 
 </body>
 </html>
