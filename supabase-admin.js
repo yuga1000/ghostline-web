@@ -2,6 +2,7 @@
   const SUPABASE_URL = window.SUPABASE_URL || '';
   const SUPABASE_KEY = window.SUPABASE_ANON_KEY || '';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const BUCKET = 'images';
 
   async function ensureBucket(name) {
     try { await supabase.storage.createBucket(name, { public: true }); }
@@ -18,14 +19,16 @@
   }
 
   async function uploadImage(dataUrl) {
-    const bucket = 'public';
+    const bucket = BUCKET;
     await ensureBucket(bucket);
     const ext = dataUrl.substring(5).split(';')[0].split('/')[1];
     const unique = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const fileName = `${unique}.${ext}`;
     const blob = dataUrlToBlob(dataUrl);
     const { data, error } = await supabase.storage.from(bucket).upload(fileName, blob);
-    if (error) throw error;
+    if (error) {
+      throw new Error('Image upload failed: ' + error.message);
+    }
     const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(data.path);
     return publicUrl;
   }
