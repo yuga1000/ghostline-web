@@ -710,6 +710,31 @@ select.admin-input {
 <script src="supabase-env.js"></script>
 
 <script src="supabase-admin.js"></script>
+<div id="errorLog" style="position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; max-height:200px; overflow-y:auto; font-size:12px; z-index:9999; display:none;"></div>
 
+<script>
+// Показать все ошибки
+window.addEventListener('error', function(e) {
+    const errorLog = document.getElementById('errorLog');
+    errorLog.style.display = 'block';
+    errorLog.innerHTML += `<div>ERROR: ${e.message} at ${e.filename}:${e.lineno}</div>`;
+});
+
+// Показать ошибки Supabase
+window.addEventListener('unhandledrejection', function(e) {
+    const errorLog = document.getElementById('errorLog');
+    errorLog.style.display = 'block';
+    errorLog.innerHTML += `<div>PROMISE ERROR: ${e.reason}</div>`;
+});
+
+// Тестируем соединение при загрузке
+setTimeout(() => {
+    const errorLog = document.getElementById('errorLog');
+    errorLog.style.display = 'block';
+    errorLog.innerHTML += `<div>SUPABASE_URL: ${window.SUPABASE_URL || 'MISSING'}</div>`;
+    errorLog.innerHTML += `<div>SUPABASE_ADMIN: ${window.supabaseAdmin ? 'OK' : 'MISSING'}</div>`;
+}, 2000);
+</script>
+    
 </body>
 </html>
