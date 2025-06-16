@@ -30,9 +30,15 @@
   }
 
   async function saveArtworkToDB(artwork) {
-    const { error } = await supabase.from('artworks').insert([artwork]);
+    const { error } = await supabase.from('artworks').upsert(artwork, { onConflict: 'id' });
     if (error) throw error;
   }
 
-  window.supabaseAdmin = { uploadArtworkImage, saveArtworkToDB };
+  async function artworkExists(id) {
+    const { data, error } = await supabase.from('artworks').select('id').eq('id', id);
+    if (error) throw error;
+    return Array.isArray(data) && data.length > 0;
+  }
+
+  window.supabaseAdmin = { uploadArtworkImage, saveArtworkToDB, artworkExists };
 })();
