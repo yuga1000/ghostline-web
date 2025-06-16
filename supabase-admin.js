@@ -19,18 +19,22 @@
   }
 
   async function uploadImage(dataUrl) {
-    const bucket = BUCKET;
-    await ensureBucket(bucket);
     const ext = dataUrl.substring(5).split(';')[0].split('/')[1];
-    const unique = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const fileName = `${unique}.${ext}`;
+    const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const blob = dataUrlToBlob(dataUrl);
-    const { data, error } = await supabase.storage.from(bucket).upload(fileName, blob);
+    const { data, error } = await supabase.storage
+      .from(BUCKET)
+      .upload(filePath, blob, { contentType: blob.type });
     if (error) {
       throw new Error('Image upload failed: ' + error.message);
     }
-    const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(data.path);
-    return publicUrl;
+    const { data: urlData, error: urlError } = supabase.storage
+      .from(BUCKET)
+      .getPublicUrl(filePath);
+    if (urlError) {
+      throw new Error('URL fetch failed: ' + urlError.message);
+    }
+    return urlData.publicUrl;
   }
 
   async function saveArtworkToDB(artwork) {
