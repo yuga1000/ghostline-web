@@ -23,25 +23,32 @@
     const ext = dataUrl.substring(5).split(';')[0].split('/')[1];
     const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const blob = dataUrlToBlob(dataUrl);
-    const { data, error } = await supabase.storage
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(filePath, blob, { contentType: blob.type });
-    if (error) {
-      throw new Error('Image upload failed: ' + error.message);
+    if (uploadError) {
+      console.error('Image upload error:', uploadError);
+      throw new Error('Image upload failed: ' + uploadError.message);
     }
-    const { data: urlData, error: urlError } = supabase.storage
+
+    const { data: urlData } = supabase.storage
       .from(BUCKET)
       .getPublicUrl(filePath);
-    if (urlError) {
-      throw new Error('URL fetch failed: ' + urlError.message);
-    }
     const publicUrl = urlData.publicUrl;
 
-    const { error: insertError } = await supabase
+    const filename = originalName || filePath;
+    const { data: insertData, error: insertError } = await supabase
       .from('images')
-      .insert({ filename: originalName || filePath, url: publicUrl, created_at: new Date().toISOString() });
+      .insert([{ filename, url: publicUrl, created_at: new Date().toISOString() }])
+      .select();
     if (insertError) {
-      console.warn('DB insert error:', insertError.message);
+      console.error('DB insert error:', insertError);
+      throw new Error('Image insert failed: ' + insertError.message);
+    }
+
+    if (insertData && insertData.length) {
+      console.info('Image inserted:', insertData[0]);
     }
 
     return publicUrl;
