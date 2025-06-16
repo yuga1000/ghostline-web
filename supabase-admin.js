@@ -17,13 +17,14 @@
     return new Blob([arr], { type: contentType });
   }
 
-  async function uploadArtworkImage(id, dataUrl) {
-    const bucket = 'artworks';
+  async function uploadImage(dataUrl) {
+    const bucket = 'public';
     await ensureBucket(bucket);
-    const extMatch = dataUrl.substring(5).split(';')[0].split('/')[1];
-    const fileName = `${id}.${extMatch}`;
+    const ext = dataUrl.substring(5).split(';')[0].split('/')[1];
+    const unique = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const fileName = `${unique}.${ext}`;
     const blob = dataUrlToBlob(dataUrl);
-    const { data, error } = await supabase.storage.from(bucket).upload(fileName, blob, { upsert: true });
+    const { data, error } = await supabase.storage.from(bucket).upload(fileName, blob);
     if (error) throw error;
     const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(data.path);
     return publicUrl;
@@ -40,5 +41,5 @@
     return Array.isArray(data) && data.length > 0;
   }
 
-  window.supabaseAdmin = { uploadArtworkImage, saveArtworkToDB, artworkExists };
+  window.supabaseAdmin = { uploadImage, saveArtworkToDB, artworkExists };
 })();
