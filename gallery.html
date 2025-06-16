@@ -624,7 +624,7 @@
         return result.join(' ');
     }
     const symbolStrip = generateSymbolStrip();
-    const supabaseClient = window.supabase.createClient(window.SUPABASE_URL || '', window.SUPABASE_ANON_KEY || '');
+    let supabaseClient;
     let galleryItems = [];
     let currentCategory = 'all';
     let currentArtwork = null;
@@ -946,8 +946,12 @@
         createBranchingLines();
     }
 
-    // Initialize on load
+    // Initialize on load once Supabase script is available
     window.addEventListener('load', () => {
+        supabaseClient = window.supabase.createClient(
+            window.SUPABASE_URL || '',
+            window.SUPABASE_ANON_KEY || ''
+        );
         initGallery();
     });
     
