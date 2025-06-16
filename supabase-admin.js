@@ -15,7 +15,7 @@ class SupabaseAdmin {
     async artworkExists(artworkId) {
         try {
             const { data, error } = await this.supabase
-                .from('artworks')
+                .from('images')
                 .select('id')
                 .eq('id', artworkId)
                 .single();
@@ -79,7 +79,7 @@ class SupabaseAdmin {
             console.log('Saving artwork to database:', artwork);
             
             const { data, error } = await this.supabase
-                .from('artworks')
+                .from('images')
                 .upsert(artwork, { 
                     onConflict: 'id',
                     ignoreDuplicates: false 
@@ -105,7 +105,7 @@ class SupabaseAdmin {
     async loadArtworks() {
         try {
             const { data, error } = await this.supabase
-                .from('artworks')
+                .from('images')
                 .select('*')
                 .order('dateAdded', { ascending: false });
 
@@ -127,7 +127,7 @@ class SupabaseAdmin {
         try {
             // First, get the artwork to find the image URL
             const { data: artwork, error: fetchError } = await this.supabase
-                .from('artworks')
+                .from('images')
                 .select('image')
                 .eq('id', artworkId)
                 .single();
@@ -138,7 +138,7 @@ class SupabaseAdmin {
 
             // Delete from database
             const { error: deleteError } = await this.supabase
-                .from('artworks')
+                .from('images')
                 .delete()
                 .eq('id', artworkId);
 
