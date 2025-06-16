@@ -1,4 +1,3 @@
-```javascript
 // supabase-admin.js - Missing implementation file
 class SupabaseAdmin {
     constructor() {
@@ -174,4 +173,3 @@ class SupabaseAdmin {
 
 // Initialize the admin instance
 window.supabaseAdmin = new SupabaseAdmin();
-```
