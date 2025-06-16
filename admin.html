@@ -277,8 +277,8 @@ select.admin-input {
                 <!-- Basic Info -->
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-sm mb-2">ARTWORK ID</label>
-                        <input type="text" id="artworkId" class="admin-input w-full" placeholder="GH-001" required>
+                        <label class="block text-sm mb-2">CODE</label>
+                        <input type="text" id="code" class="admin-input w-full" placeholder="GH-001" required>
                     </div>
                     <div>
                         <label class="block text-sm mb-2">STATUS</label>
@@ -495,27 +495,28 @@ select.admin-input {
         event.preventDefault();
 
         const editingId = document.getElementById('editingId').value;
-        const newId = document.getElementById('artworkId').value.trim();
+        const newCode = document.getElementById('code').value.trim();
 
-        if ((!editingId || editingId !== newId) && artworks.some(a => a.id === newId)) {
-            alert('Artwork ID already exists!');
+        const existingIndex = artworks.findIndex(a => a.code === newCode);
+        if (existingIndex !== -1 && (!editingId || artworks[existingIndex].id !== editingId)) {
+            alert('Artwork code already exists!');
             return;
         }
 
-        if (window.supabaseAdmin && (!editingId || editingId !== newId)) {
+        if (window.supabaseAdmin && (!editingId || existingIndex === -1 || artworks[existingIndex].id !== editingId)) {
             try {
-                const exists = await window.supabaseAdmin.artworkExists(newId);
+                const exists = await window.supabaseAdmin.artworkExists(newCode);
                 if (exists) {
-                    alert('Artwork ID already exists in database!');
+                    alert('Artwork code already exists in database!');
                     return;
                 }
             } catch (err) {
-                console.error('ID check error:', err);
+                console.error('Code check error:', err);
             }
         }
 
         const artwork = {
-            id: newId,
+            code: newCode,
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             category: document.getElementById('category').value,
@@ -530,13 +531,20 @@ select.admin-input {
             url: currentImageData,
             date_added: editingId ? artworks.find(a => a.id === editingId)?.date_added : new Date().toISOString()
         };
+        if (editingId) {
+            artwork.id = editingId;
+        }
 
         try {
             if (currentImageData && currentImageData.startsWith('data:') && window.supabaseAdmin) {
                 artwork.url = await window.supabaseAdmin.uploadImage(currentImageData, currentImageFilename);
             }
+            let saved;
             if (window.supabaseAdmin) {
-                await window.supabaseAdmin.saveArtworkToDB(artwork);
+                saved = await window.supabaseAdmin.saveArtworkToDB(artwork);
+            }
+            if (!editingId && saved && saved.id) {
+                artwork.id = saved.id;
             }
         } catch (err) {
             console.error('Save error:', err);
@@ -570,40 +578,40 @@ select.admin-input {
         document.getElementById('uploadText').classList.remove('hidden');
         document.getElementById('imagePreviewContainer').classList.add('hidden');
         setDefaultDate();
-        generateNextId();
+        generateNextCode();
     }
 
-    function generateNextId() {
+    function generateNextCode() {
         try {
-            const artworkIdInput = document.getElementById('artworkId');
-            if (!artworkIdInput) return;
+            const codeInput = document.getElementById('code');
+            if (!codeInput) return;
             
             if (artworks.length === 0) {
-                artworkIdInput.value = 'GH-001';
+                codeInput.value = 'GH-001';
             } else {
                 const lastId = Math.max(...artworks.map(a => {
-                    if (a.id && a.id.includes('-')) {
-                        return parseInt(a.id.split('-')[1]) || 0;
+                    if (a.code && a.code.includes('-')) {
+                        return parseInt(a.code.split('-')[1]) || 0;
                     }
                     return 0;
                 }));
                 const nextId = String(lastId + 1).padStart(3, '0');
-                artworkIdInput.value = `GH-${nextId}`;
+                codeInput.value = `GH-${nextId}`;
             }
         } catch (error) {
-            console.error('Generate ID error:', error);
-            const artworkIdInput = document.getElementById('artworkId');
-            if (artworkIdInput) {
-                artworkIdInput.value = 'GH-001';
+            console.error('Generate code error:', error);
+            const codeInput = document.getElementById('code');
+            if (codeInput) {
+                codeInput.value = 'GH-001';
             }
         }
     }
 
-    function editArtwork(id) {
-        const artwork = artworks.find(a => a.id === id);
+    function editArtwork(code) {
+        const artwork = artworks.find(a => a.code === code);
         if (artwork) {
-            document.getElementById('editingId').value = id;
-            document.getElementById('artworkId').value = artwork.id;
+            document.getElementById('editingId').value = artwork.id || '';
+            document.getElementById('code').value = artwork.code;
             document.getElementById('title').value = artwork.title || '';
             document.getElementById('description').value = artwork.description || '';
             document.getElementById('category').value = artwork.category || 'latest';
@@ -629,9 +637,9 @@ select.admin-input {
         }
     }
 
-    function deleteArtwork(id) {
-        if (confirm(`Delete artwork ${id}? This cannot be undone.`)) {
-            artworks = artworks.filter(a => a.id !== id);
+    function deleteArtwork(code) {
+        if (confirm(`Delete artwork ${code}? This cannot be undone.`)) {
+            artworks = artworks.filter(a => a.code !== code);
             saveToLocalStorage();
             loadArtworks();
             alert('Artwork deleted!');
@@ -653,11 +661,11 @@ select.admin-input {
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center">
                             <span class="status-indicator status-${artwork.status || 'available'}"></span>
-                            <strong>${artwork.id || 'Unknown'}</strong>
+                            <strong>${artwork.code || 'Unknown'}</strong>
                         </div>
                         <div class="flex gap-2">
-                            <button class="admin-button text-xs" onclick="editArtwork('${artwork.id}')">EDIT</button>
-                            <button class="admin-button danger text-xs" onclick="deleteArtwork('${artwork.id}')">DELETE</button>
+                            <button class="admin-button text-xs" onclick="editArtwork('${artwork.code}')">EDIT</button>
+                            <button class="admin-button danger text-xs" onclick="deleteArtwork('${artwork.code}')">DELETE</button>
                         </div>
                     </div>
                     
@@ -697,7 +705,7 @@ select.admin-input {
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         try {
-            generateNextId();
+            generateNextCode();
             console.log('Admin panel initialized successfully');
         } catch (error) {
             console.error('Initialization error:', error);

@@ -11,13 +11,13 @@ class SupabaseAdmin {
         this.BUCKET_NAME = 'images';
     }
 
-    // Check if artwork ID exists in database
-    async artworkExists(artworkId) {
+    // Check if artwork code exists in database
+    async artworkExists(code) {
         try {
             const { data, error } = await this.supabase
                 .from('images')
                 .select('id')
-                .eq('id', artworkId)
+                .eq('code', code)
                 .single();
             
             if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
@@ -28,6 +28,26 @@ class SupabaseAdmin {
         } catch (error) {
             console.error('Error checking artwork existence:', error);
             return false;
+        }
+    }
+
+    // Get artwork by its code
+    async getArtworkByCode(code) {
+        try {
+            const { data, error } = await this.supabase
+                .from('images')
+                .select('*')
+                .eq('code', code)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                throw error;
+            }
+
+            return data || null;
+        } catch (error) {
+            console.error('Error fetching artwork by code:', error);
+            return null;
         }
     }
 
@@ -77,15 +97,27 @@ class SupabaseAdmin {
     async saveArtworkToDB(artwork) {
         try {
             console.log('Saving artwork to database:', artwork);
-            
-            const { data, error } = await this.supabase
-                .from('images')
-                .upsert(artwork, { 
-                    onConflict: 'id',
-                    ignoreDuplicates: false 
-                })
-                .select()
-                .single();
+
+            let query;
+            if (artwork.id) {
+                const { id, ...updateData } = artwork;
+                query = this.supabase
+                    .from('images')
+                    .update(updateData)
+                    .eq('id', id)
+                    .select()
+                    .single();
+            } else {
+                const insertData = { ...artwork };
+                delete insertData.id;
+                query = this.supabase
+                    .from('images')
+                    .insert(insertData)
+                    .select()
+                    .single();
+            }
+
+            const { data, error } = await query;
 
             if (error) {
                 console.error('Database save error:', error);
@@ -94,7 +126,7 @@ class SupabaseAdmin {
 
             console.log('Database save successful:', data);
             return data;
-            
+
         } catch (error) {
             console.error('Save to DB error:', error);
             throw new Error(`Failed to save artwork: ${error.message}`);
