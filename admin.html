@@ -294,56 +294,16 @@ select.admin-input {
                     <textarea id="description" class="admin-input w-full" placeholder="Describe the artwork..."></textarea>
                 </div>
 
-                <!-- Category and Price -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm mb-2">CATEGORY</label>
-                        <select id="category" class="admin-input w-full">
-                            <option value="latest">Latest</option>
-                            <option value="series">Series</option>
-                            <option value="rare">Rare</option>
-                            <option value="unusual">Unusual</option>
-                            <option value="collabs">Collabs</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2">PRICE (ETH)</label>
-                        <input type="number" id="price" class="admin-input w-full" step="0.001" placeholder="0.1">
-                    </div>
-                </div>
-
-                <!-- Technical Details -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm mb-2">DIMENSIONS</label>
-                        <input type="text" id="dimensions" class="admin-input w-full" placeholder="1920x1080 px">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2">MEDIUM/MATERIAL</label>
-                        <input type="text" id="medium" class="admin-input w-full" placeholder="Digital, AI-generated">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm mb-2">CREATION DATE</label>
-                        <input type="date" id="creationDate" class="admin-input w-full" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2">EDITION SIZE</label>
-                        <input type="text" id="edition" class="admin-input w-full" placeholder="1/1 or 10/100">
-                    </div>
-                </div>
-
-                <!-- Additional Fields -->
+                <!-- Price -->
                 <div class="mb-4">
-                    <label class="block text-sm mb-2">TAGS (comma separated)</label>
-                    <input type="text" id="tags" class="admin-input w-full" placeholder="abstract, digital, experimental">
+                    <label class="block text-sm mb-2">PRICE (ETH)</label>
+                    <input type="number" id="price" class="admin-input w-full" step="0.001" placeholder="0.1">
                 </div>
 
-                <div class="mb-6">
-                    <label class="block text-sm mb-2">NOTES</label>
-                    <textarea id="notes" class="admin-input w-full" placeholder="Private notes about this artwork..."></textarea>
+                <!-- Date -->
+                <div class="mb-4">
+                    <label class="block text-sm mb-2">DATE</label>
+                    <input type="date" id="creationDate" class="admin-input w-full" required>
                 </div>
 
                 <!-- Form Buttons -->
@@ -492,15 +452,9 @@ select.admin-input {
         const artwork = {
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
-            category: document.getElementById('category').value,
             status: document.getElementById('status').value,
             price: document.getElementById('price').value,
-            dimensions: document.getElementById('dimensions').value,
-            medium: document.getElementById('medium').value,
             creation_date: document.getElementById('creationDate').value,
-            edition: document.getElementById('edition').value,
-            tags: document.getElementById('tags').value,
-            notes: document.getElementById('notes').value,
             url: currentImageData,
             date_added: editingId ? artworks.find(a => a.id === editingId)?.date_added : new Date().toISOString()
         };
@@ -559,15 +513,9 @@ select.admin-input {
             document.getElementById('editingId').value = artwork.id || '';
             document.getElementById('title').value = artwork.title || '';
             document.getElementById('description').value = artwork.description || '';
-            document.getElementById('category').value = artwork.category || 'latest';
             document.getElementById('status').value = artwork.status || 'available';
             document.getElementById('price').value = artwork.price || '';
-            document.getElementById('dimensions').value = artwork.dimensions || '';
-            document.getElementById('medium').value = artwork.medium || '';
             document.getElementById('creationDate').value = artwork.creation_date || '';
-            document.getElementById('edition').value = artwork.edition || '';
-            document.getElementById('tags').value = artwork.tags || '';
-            document.getElementById('notes').value = artwork.notes || '';
             
             if (artwork.url) {
                 currentImageData = artwork.url;
@@ -618,10 +566,8 @@ select.admin-input {
                     <div class="grid grid-cols-3 gap-4">
                         <div class="col-span-2">
                             <p class="text-sm mb-1"><strong>Title:</strong> ${artwork.title || 'Untitled'}</p>
-                            <p class="text-xs text-green-400 mb-1"><strong>Category:</strong> ${artwork.category || 'latest'}</p>
                             <p class="text-xs text-green-400 mb-1"><strong>Price:</strong> ${artwork.price ? artwork.price + ' ETH' : 'Not set'}</p>
-                            <p class="text-xs text-green-400 mb-1"><strong>Dimensions:</strong> ${artwork.dimensions || 'Not specified'}</p>
-                            <p class="text-xs text-green-600"><strong>Created:</strong> ${artwork.creation_date || 'Unknown'}</p>
+                            <p class="text-xs text-green-600"><strong>Date:</strong> ${artwork.creation_date || 'Unknown'}</p>
                         </div>
                         <div class="text-right">
                             ${artwork.url ? `<img src="${artwork.url}" class="image-preview ml-auto">` : '<div class="w-16 h-16 border border-green-600 flex items-center justify-center text-xs">No Image</div>'}
