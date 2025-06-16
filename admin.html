@@ -27,6 +27,12 @@
     .glow-text {
         text-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
     }
+
+    .no-glow {
+        box-shadow: none !important;
+        text-shadow: none !important;
+        animation: none !important;
+    }
     
     .pixel-text {
         font-family: 'Press Start 2P', cursive;
@@ -206,13 +212,12 @@
 <body class="scanlines" style="background-color: #000000;">
     <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
-        <div class="terminal-border p-8 bg-black">
-            <h2 class="pixel-text text-xl glow-text mb-6 text-center">ADMIN ACCESS</h2>
+        <div class="terminal-border p-8 bg-black no-glow">
+            <h2 class="pixel-text text-xl mb-6 text-center">ADMIN ACCESS</h2>
             <div class="mb-4">
-                <input type="password" id="passwordInput" class="admin-input w-full" placeholder="Enter password..." onkeypress="checkPasswordOnEnter(event)">
+                <input type="password" id="passwordInput" class="admin-input w-full no-glow" placeholder="Enter password..." onkeypress="checkPasswordOnEnter(event)">
             </div>
-            <button class="admin-button w-full" onclick="checkPassword()">LOGIN</button>
-            <p class="text-xs text-green-600 mt-4 text-center">Default password: ghostline</p>
+            <button class="admin-button w-full no-glow" onclick="checkPassword()">LOGIN</button>
         </div>
     </div>
 
@@ -382,7 +387,7 @@
 
 <script>
     // Admin authentication
-    const ADMIN_PASSWORD = 'ghostline';
+    const ADMIN_PASSWORD = 'GL_admin2025!';
     let artworks = [];
     
     // Safely load artworks from localStorage
