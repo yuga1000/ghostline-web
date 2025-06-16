@@ -524,7 +524,7 @@
 
         try {
             if (currentImageData && currentImageData.startsWith('data:') && window.supabaseAdmin) {
-                artwork.image = await window.supabaseAdmin.uploadArtworkImage(newId, currentImageData);
+                artwork.image = await window.supabaseAdmin.uploadImage(currentImageData);
             }
             if (window.supabaseAdmin) {
                 await window.supabaseAdmin.saveArtworkToDB(artwork);
