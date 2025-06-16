@@ -531,7 +531,7 @@
             }
         } catch (err) {
             console.error('Save error:', err);
-            alert('Error saving to Supabase');
+            alert(err.message || 'Error saving to Supabase');
         }
 
         if (editingId) {
