@@ -450,12 +450,23 @@ select.admin-input {
         event.preventDefault();
 
         const editingId = document.getElementById('editingId').value;
+
+        const priceValue = document.getElementById('price').value.trim();
+        let parsedPrice = null;
+        if (priceValue !== '') {
+            parsedPrice = parseFloat(priceValue);
+            if (isNaN(parsedPrice)) {
+                alert('Price must be a valid number');
+                return;
+            }
+        }
+
         const artwork = {
             title: document.getElementById('title').value,
             description: document.getElementById('description').value,
             status: document.getElementById('status').value,
             category: document.getElementById('category').value,
-            price: document.getElementById('price').value,
+            price: parsedPrice,
             url: currentImageData
         };
         if (editingId) {
