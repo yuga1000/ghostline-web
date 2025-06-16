@@ -394,6 +394,7 @@
     }
     
     let currentImageData = null;
+    let currentImageFilename = '';
 
     async function checkPassword() {
         const password = document.getElementById('passwordInput').value;
@@ -440,6 +441,7 @@
     function previewImage(event) {
         const file = event.target.files[0];
         if (file) {
+            currentImageFilename = file.name;
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentImageData = e.target.result;
@@ -468,6 +470,7 @@
         const files = event.dataTransfer.files;
         if (files.length > 0) {
             const file = files[0];
+            currentImageFilename = file.name;
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -524,7 +527,7 @@
 
         try {
             if (currentImageData && currentImageData.startsWith('data:') && window.supabaseAdmin) {
-                artwork.image = await window.supabaseAdmin.uploadImage(currentImageData);
+                artwork.image = await window.supabaseAdmin.uploadImage(currentImageData, currentImageFilename);
             }
             if (window.supabaseAdmin) {
                 await window.supabaseAdmin.saveArtworkToDB(artwork);
@@ -557,6 +560,7 @@
         document.getElementById('formTitle').textContent = 'ADD NEW ARTWORK';
         document.getElementById('saveButton').textContent = 'SAVE ARTWORK';
         currentImageData = null;
+        currentImageFilename = '';
         document.getElementById('uploadText').classList.remove('hidden');
         document.getElementById('imagePreviewContainer').classList.add('hidden');
         setDefaultDate();
@@ -608,6 +612,7 @@
             
             if (artwork.image) {
                 currentImageData = artwork.image;
+                currentImageFilename = artwork.image.split('/').pop();
                 document.getElementById('imagePreview').src = artwork.image;
                 document.getElementById('uploadText').classList.add('hidden');
                 document.getElementById('imagePreviewContainer').classList.remove('hidden');
