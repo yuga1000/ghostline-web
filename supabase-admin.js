@@ -99,7 +99,7 @@ class SupabaseAdmin {
             const { data, error } = await this.supabase
                 .from('images')
                 .select('*')
-                .order('date_added', { ascending: false });
+                .order('created_at', { ascending: false });
 
             if (error) {
                 console.error('Load artworks error:', error);
