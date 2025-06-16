@@ -1,0 +1,17 @@
+.glyph-ticker {
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #33ff33;
+  font-family: "Courier New", monospace;
+  font-size: 1.25rem;
+}
+.glyph-ticker span {
+  display: inline-block;
+  padding: 0 0.1em;
+  animation: flicker 1s infinite;
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
