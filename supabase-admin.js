@@ -45,6 +45,7 @@ class SupabaseAdmin {
                 .from(this.BUCKET_NAME)
                 .getPublicUrl(uniqueFilename);
 
+            // Return the resulting URL
             return publicUrlData.publicUrl;
             
         } catch (error) {
@@ -57,6 +58,10 @@ class SupabaseAdmin {
     async saveArtworkToDB(artwork) {
         try {
             console.log('Saving artwork to database:', artwork);
+
+            if (!artwork.url) {
+                throw new Error('Image URL cannot be empty');
+            }
 
             let query;
             if (artwork.id) {
