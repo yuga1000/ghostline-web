@@ -1,4 +1,4 @@
-// supabase-admin.js - Missing implementation file
+// supabase-admin.js - Complete implementation
 class SupabaseAdmin {
     constructor() {
         // Initialize Supabase client with proper config
@@ -8,7 +8,7 @@ class SupabaseAdmin {
         );
         
         // Storage bucket name
-        this.BUCKET_NAME = 'images'; // Change to your actual bucket name
+        this.BUCKET_NAME = 'images';
     }
 
     // Check if artwork ID exists in database
@@ -107,7 +107,7 @@ class SupabaseAdmin {
             const { data, error } = await this.supabase
                 .from('images')
                 .select('*')
-                .order('dateAdded', { ascending: false });
+                .order('date_added', { ascending: false });
 
             if (error) {
                 console.error('Load artworks error:', error);
@@ -128,7 +128,7 @@ class SupabaseAdmin {
             // First, get the artwork to find the image URL
             const { data: artwork, error: fetchError } = await this.supabase
                 .from('images')
-                .select('image')
+                .select('url')
                 .eq('id', artworkId)
                 .single();
 
@@ -147,9 +147,9 @@ class SupabaseAdmin {
             }
 
             // If artwork has an image in storage, delete it
-            if (artwork?.image && artwork.image.includes(this.BUCKET_NAME)) {
+            if (artwork?.url && artwork.url.includes(this.BUCKET_NAME)) {
                 try {
-                    const filename = artwork.image.split('/').pop();
+                    const filename = artwork.url.split('/').pop();
                     const { error: storageError } = await this.supabase.storage
                         .from(this.BUCKET_NAME)
                         .remove([filename]);
