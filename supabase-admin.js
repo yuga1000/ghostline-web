@@ -24,7 +24,7 @@
     const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const blob = dataUrlToBlob(dataUrl);
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(filePath, blob, { contentType: blob.type });
     if (uploadError) {
