@@ -18,7 +18,8 @@
     return new Blob([arr], { type: contentType });
   }
 
-  async function uploadImage(dataUrl) {
+  async function uploadImage(dataUrl, originalName = '') {
+    await ensureBucket(BUCKET);
     const ext = dataUrl.substring(5).split(';')[0].split('/')[1];
     const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const blob = dataUrlToBlob(dataUrl);
@@ -34,7 +35,16 @@
     if (urlError) {
       throw new Error('URL fetch failed: ' + urlError.message);
     }
-    return urlData.publicUrl;
+    const publicUrl = urlData.publicUrl;
+
+    const { error: insertError } = await supabase
+      .from('images')
+      .insert({ filename: originalName || filePath, url: publicUrl, created_at: new Date().toISOString() });
+    if (insertError) {
+      console.warn('DB insert error:', insertError.message);
+    }
+
+    return publicUrl;
   }
 
   async function saveArtworkToDB(artwork) {
