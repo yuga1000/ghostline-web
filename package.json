@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Static deployment of ghostline-web via Railway",
   "scripts": {
-    "start": "node generate-env.js && serve ."
+    "start": "node generate-env.js && node server.js"
   },
   "dependencies": {
-    "serve": "^14.2.4"
+    "serve": "^14.2.4",
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
   }
 }
