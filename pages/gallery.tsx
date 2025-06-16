@@ -30,11 +30,11 @@ function AnimatedSymbol({ index }: AnimatedSymbolProps) {
 
 export default function Gallery() {
   return (
-    <div className="min-h-screen bg-black text-green-500 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-black text-green-500 flex flex-col items-center p-4 pb-8">
       <h1 className="text-2xl mb-4 font-bold">GHOSTLINE GALLERY</h1>
-      <img src="/IMG_2135.gif" alt="Artwork" className="w-full max-w-md mx-auto" />
+      <img src="/IMG_2135.gif" alt="Artwork" className="w-full mx-auto" />
 
-      <div className="flex items-center mt-4 space-x-4">
+      <div className="flex flex-wrap items-center justify-center mt-4 gap-4">
         <img src="/ghostcoin.gif" alt="Ghost Coin" className="w-16 h-16" />
         <div className="flex">
           {[0, 1, 2, 3, 4].map((idx) => (
