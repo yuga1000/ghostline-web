@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Static deployment of ghostline-web via Railway",
   "scripts": {
-    "start": "serve ."
+    "start": "node generate-env.js && serve ."
   },
   "dependencies": {
     "serve": "^14.2.4"
