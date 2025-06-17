@@ -265,12 +265,30 @@
         bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.9);
         color: #00ff00;
-        padding: 10px 20px;
+        padding: 15px 25px;
         border: 1px solid #00ff00;
         font-family: 'Share Tech Mono', monospace;
         text-align: center;
+        max-width: 80vw;
+        min-width: 300px;
+    }
+    
+    .lightbox-contact-btn {
+        background: #000BFF;
+        color: #ffffff;
+        border: 1px solid #000BFF;
+        padding: 8px 16px;
+        margin-top: 10px;
+        cursor: pointer;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .lightbox-contact-btn:hover {
+        background: #0015FF;
     }
     
     /* Contact modal styles */
@@ -649,7 +667,7 @@ function renderGallery() {
                      class="loading lazy-image"
                      style="image-rendering: pixelated; cursor: pointer;"
                      loading="lazy"
-                     onclick="openLightbox('${item.url || ''}', '${item.title || 'Artwork'}', '${item.status || 'available'}')">
+                     onclick="openLightbox('${item.url || ''}', '${item.title || 'Artwork'}', '${item.status || 'available'}', '${(item.description || '').replace(/'/g, "\\'")}', '${item.price || ''}')">
                 <div class="status-indicator status-${item.status || 'available'}" onclick="openContactModal('${item.title || 'Artwork'}')"></div>
             </div>
             <div class="symbol-section">
@@ -738,7 +756,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Анимация кнопки SUPPORT (из оригинала)
 // Lightbox functions
-function openLightbox(imageUrl, title, status) {
+function openLightbox(imageUrl, title, status, description, price) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxInfo = document.getElementById('lightboxInfo');
@@ -747,13 +765,20 @@ function openLightbox(imageUrl, title, status) {
     lightboxImage.alt = title;
     
     const statusText = status === 'sold' ? 'SOLD' : status === 'ghost' ? 'GHOST' : 'AVAILABLE';
+    const statusColor = status === 'sold' ? '#ff0000' : status === 'ghost' ? '#888888' : '#00ff00';
+    
     lightboxInfo.innerHTML = `
-        <div>${title.toUpperCase()}</div>
-        <div style="margin-top: 5px; color: ${status === 'sold' ? '#ff0000' : status === 'ghost' ? '#888888' : '#00ff00'};">
-            ${statusText}
+        <div style="font-size: 16px; margin-bottom: 8px;">${title.toUpperCase()}</div>
+        ${description ? `<div style="font-size: 12px; margin-bottom: 8px; color: #cccccc;">${description}</div>` : ''}
+        <div style="margin-bottom: 8px;">
+            <span style="color: ${statusColor};">${statusText}</span>
+            ${price ? ` • <span style="color: #00ff00;">${price} ETH</span>` : ''}
         </div>
-        <div style="margin-top: 10px; font-size: 12px; color: #666;">
-            Click anywhere to close • Click status to contact
+        <button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">
+            CONTACT ARTIST
+        </button>
+        <div style="margin-top: 8px; font-size: 10px; color: #666;">
+            Click anywhere to close
         </div>
     `;
     
