@@ -131,6 +131,36 @@
         image-rendering: pixelated;
     }
     
+    /* Status indicators */
+    .status-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        border: 1px solid #000;
+    }
+    
+    .status-available {
+        background: #00ff00;
+        box-shadow: 0 0 4px #00ff00;
+    }
+    
+    .status-sold {
+        background: #ff0000;
+        box-shadow: 0 0 4px #ff0000;
+    }
+    
+    .status-ghost {
+        background: #888888;
+        box-shadow: 0 0 4px #888888;
+    }
+    
+    .gallery-image {
+        position: relative;
+    }
+    
     @keyframes symbolFlicker {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.7; }
@@ -369,18 +399,25 @@ function renderGallery() {
     const grid = document.getElementById('galleryGrid');
     const emptyState = document.getElementById('emptyState');
     
-    if (galleryItems.length === 0) {
+    // Фильтрация по категории
+    let filteredItems = galleryItems;
+    if (currentCategory !== 'all') {
+        filteredItems = galleryItems.filter(item => item.category === currentCategory);
+    }
+    
+    if (filteredItems.length === 0) {
         grid.innerHTML = '';
         emptyState.classList.remove('hidden');
         return;
     }
     
     emptyState.classList.add('hidden');
-    grid.innerHTML = galleryItems.map((item, index) => `
+    grid.innerHTML = filteredItems.map((item, index) => `
         <div class="gallery-item">
             <div class="gallery-image">
-                <img src="${item.url || ''}" alt="${item.filename || 'Artwork'}" 
+                <img src="${item.url || ''}" alt="${item.title || 'Artwork'}" 
                      style="image-rendering: pixelated;">
+                <div class="status-indicator status-${item.status || 'available'}"></div>
             </div>
             <div class="symbol-section">
                 <div class="symbol-row">
@@ -407,13 +444,16 @@ function filterCategory(category) {
     });
     event.target.classList.add('active');
     renderGallery();
+    updateStatus();
 }
 
 // Обновление статуса
 function updateStatus() {
     const status = document.getElementById('liveStatus');
     if (status) {
-        status.textContent = `${galleryItems.length} IMAGES`;
+        const count = currentCategory === 'all' ? galleryItems.length : 
+                     galleryItems.filter(item => item.category === currentCategory).length;
+        status.textContent = `${count} IMAGES`;
     }
 }
 
