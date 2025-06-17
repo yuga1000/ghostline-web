@@ -263,16 +263,14 @@
     .lightbox-info {
         position: absolute;
         bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
+        right: 20px;
         background: rgba(0, 0, 0, 0.9);
         color: #00ff00;
-        padding: 15px 25px;
+        padding: 15px 20px;
         border: 1px solid #00ff00;
         font-family: 'Share Tech Mono', monospace;
-        text-align: center;
-        max-width: 80vw;
-        min-width: 300px;
+        text-align: left;
+        max-width: 300px;
     }
     
     .lightbox-contact-btn {
@@ -667,7 +665,7 @@ function renderGallery() {
                      class="loading lazy-image"
                      style="image-rendering: pixelated; cursor: pointer;"
                      loading="lazy"
-                     onclick="openLightbox('${item.url || ''}', '${item.title || 'Artwork'}', '${item.status || 'available'}', '${(item.description || '').replace(/'/g, "\\'")}', '${item.price || ''}')">
+                     onclick="openLightbox('${item.url || ''}', '${item.title || 'Artwork'}', '${item.status || 'available'}', '${(item.description || '').replace(/'/g, "\\'")}')">
                 <div class="status-indicator status-${item.status || 'available'}" onclick="openContactModal('${item.title || 'Artwork'}')"></div>
             </div>
             <div class="symbol-section">
@@ -756,7 +754,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Анимация кнопки SUPPORT (из оригинала)
 // Lightbox functions
-function openLightbox(imageUrl, title, status, description, price) {
+function openLightbox(imageUrl, title, status, description) {
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxInfo = document.getElementById('lightboxInfo');
@@ -767,18 +765,25 @@ function openLightbox(imageUrl, title, status, description, price) {
     const statusText = status === 'sold' ? 'SOLD' : status === 'ghost' ? 'GHOST' : 'AVAILABLE';
     const statusColor = status === 'sold' ? '#ff0000' : status === 'ghost' ? '#888888' : '#00ff00';
     
+    // Проверяем есть ли #donation в описании
+    const isDonationArt = description && description.toLowerCase().includes('#donation');
+    
     lightboxInfo.innerHTML = `
-        <div style="font-size: 16px; margin-bottom: 8px;">${title.toUpperCase()}</div>
-        ${description ? `<div style="font-size: 12px; margin-bottom: 8px; color: #cccccc;">${description}</div>` : ''}
-        <div style="margin-bottom: 8px;">
-            <span style="color: ${statusColor};">${statusText}</span>
-            ${price ? ` • <span style="color: #00ff00;">${price} ETH</span>` : ''}
+        <div style="font-size: 14px; margin-bottom: 8px; font-weight: bold;">${title.toUpperCase()}</div>
+        ${description ? `<div style="font-size: 11px; margin-bottom: 10px; color: #cccccc; line-height: 1.3;">${description}</div>` : ''}
+        <div style="margin-bottom: 12px;">
+            <span style="color: ${statusColor}; font-size: 12px;">${statusText}</span>
         </div>
-        <button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">
-            CONTACT ARTIST
-        </button>
-        <div style="margin-top: 8px; font-size: 10px; color: #666;">
-            Click anywhere to close
+        ${isDonationArt ? 
+            `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openDonationEmail('${title}');">
+                SUPPORT THIS ART
+            </button>` :
+            `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">
+                CONTACT ARTIST
+            </button>`
+        }
+        <div style="margin-top: 8px; font-size: 9px; color: #666;">
+            Click to close
         </div>
     `;
     
@@ -789,6 +794,21 @@ function openLightbox(imageUrl, title, status, description, price) {
 function closeLightbox() {
     document.getElementById('lightbox').style.display = 'none';
     document.body.style.overflow = 'auto';
+}
+
+// Donation email function
+function openDonationEmail(artworkTitle) {
+    const subject = `Donation for artwork: ${artworkTitle}`;
+    const body = `Hello!
+
+I want to support the digital artwork "${artworkTitle}".
+
+Please send me the donation details and I will provide proof of payment to receive the digital version.
+
+Thank you!`;
+    
+    const emailLink = `mailto:ghostline1000@proton.me?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(emailLink);
 }
 
 // Contact modal functions
