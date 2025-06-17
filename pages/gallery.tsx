@@ -36,7 +36,7 @@ export default function Gallery() {
 
       <div className="flex flex-wrap items-center justify-center mt-4 gap-4">
         <img src="/ghostcoin.gif" alt="Ghost Coin" className="w-16 h-16" />
-        <div className="flex">
+        <div className="flex flex-wrap justify-center">
           {[0, 1, 2, 3, 4].map((idx) => (
             <AnimatedSymbol key={idx} index={idx} />
           ))}
