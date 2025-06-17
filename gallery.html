@@ -17,7 +17,7 @@
             min-height: 100vh;
         }
 
-```
+
     .terminal-border {
         border: 2px solid #00ff00;
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
@@ -131,13 +131,6 @@
         image-rendering: pixelated;
     }
     
-    /* Hide any debug dots */
-    .debug-dots, 
-    ::before,
-    ::after {
-        content: none !important;
-    }
-    
     /* Status indicators */
     .status-indicator {
         position: absolute;
@@ -246,12 +239,10 @@
         box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
     }
 </style>
-```
+
 
 </head>
 <body class="scanlines">
-
-<!-- Header Navigation -->
 
 <div class="terminal-border bg-black p-2 m-4">
     <div class="flex justify-between items-center text-xs">
@@ -272,10 +263,10 @@
 <div class="container mx-auto px-4 pb-24">
     <!-- Title -->
     <div class="text-center mb-6">
-        <h1 class="pixel-text text-3xl mb-4">GHOSTLINE GALLERY</h1>
+        <h1 class="pixel-text text-3xl mb-4">GALLERY</h1>
     </div>
 
-```
+
 <!-- Category Tabs -->
 <div class="flex justify-center mb-8">
     <div class="flex gap-2">
@@ -297,7 +288,7 @@
 <div id="emptyState" class="text-center py-16 hidden">
     <p class="text-green-600 mb-4">No artworks in this category yet.</p>
 </div>
-```
+
 
 </div>
 
@@ -466,7 +457,6 @@ function updateStatus() {
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', async function() {
-    initSymbols();
     await loadGallery();
 });
 
