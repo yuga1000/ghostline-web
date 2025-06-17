@@ -17,7 +17,7 @@
             min-height: 100vh;
         }
 
-
+```
     .terminal-border {
         border: 2px solid #00ff00;
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
@@ -265,8 +265,76 @@
     .cursor-pointer:hover {
         background: #111111 !important;
     }
+    
+    /* Mobile adaptations */
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        /* Gallery grid - single column on mobile */
+        .grid.lg\\:grid-cols-4 {
+            grid-template-columns: 1fr !important;
+            gap: 1rem;
+        }
+        
+        /* Gallery items on mobile */
+        .gallery-item {
+            min-height: 280px;
+            margin-bottom: 1rem;
+        }
+        
+        .gallery-image {
+            min-height: 200px;
+            max-height: 220px;
+        }
+        
+        /* Category tabs responsive */
+        .category-tab {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+        
+        /* Header responsive */
+        .terminal-border .flex {
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+        }
+        
+        /* Title smaller on mobile */
+        .pixel-text {
+            font-size: 1.5rem !important;
+        }
+        
+        /* Donate button positioning for mobile */
+        .donate-wrapper {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            transform: none;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .donate-console {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px 20px;
+            position: relative;
+        }
+        
+        /* Modal responsive */
+        .modal-content {
+            margin: 1rem;
+            padding: 20px;
+            max-width: calc(100vw - 2rem);
+        }
+    }
 </style>
-
+```
 
 </head>
 <body class="scanlines">
@@ -287,7 +355,7 @@
 
 <!-- Main Content -->
 
-<div class="container mx-auto px-4 pb-24">
+<div class="container mx-auto px-4 pb-8">
     <!-- Title -->
     <div class="text-center mb-6">
         <h1 class="pixel-text text-3xl mb-4">GALLERY</h1>
@@ -296,7 +364,7 @@
 ```
 <!-- Category Tabs -->
 <div class="flex justify-center mb-8">
-    <div class="flex gap-2">
+    <div class="flex gap-2 flex-wrap">
         <button class="category-tab active" onclick="filterCategory('all')">ALL</button>
         <button class="category-tab" onclick="filterCategory('latest')">LATEST</button>
         <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
@@ -316,15 +384,14 @@
     <p class="text-green-600 mb-4">No artworks in this category yet.</p>
 </div>
 
-
-</div>
-
-<!-- Donate Button -->
-
+<!-- Donate Button - moved inside main content for mobile -->
 <div class="donate-wrapper">
     <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
         <span style="color: #ffffff;">SUPPORT PROJECT</span>
     </button>
+</div>
+```
+
 </div>
 
 <!-- Donate Modal -->
@@ -361,7 +428,7 @@
     </p>
     <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
 </div>
-
+```
 
 </div>
 
