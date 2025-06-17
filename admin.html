@@ -1,650 +1,444 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOSTLINE - Admin Panel</title>
+    <title>GHOSTLINE - Gallery</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        body {
+            background: #000000 !important;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .terminal-border {
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .pixel-text {
+            font-family: 'Press Start 2P', cursive;
+            image-rendering: pixelated;
+        }
+        
+        .scanlines {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+            background-size: 100% 3px;
+            animation: scanlines 0.1s linear infinite;
+        }
+        
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 3px; }
+        }
+        
+        .nav-link {
+            color: #00ff00;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .nav-active {
+            color: #ffffff;
+        }
+        
+        .category-tab {
+            padding: 8px 16px;
+            border: 1px solid #00ff00;
+            background: #000000;
+            color: #00ff00;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .category-tab.active {
+            background: #00ff00;
+            color: #000000;
+        }
+        
+        .pixel-art {
+            image-rendering: pixelated;
+        }
+        
+        .symbol-block {
+            display: inline-block;
+            font-family: monospace;
+        }
+        
+        /* Donate button */
+        .donate-wrapper {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
 
-```
-html, body {
-    background: #000000;
-    color: #00ff00;
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-}
+        .donate-console {
+            background: #000000;
+            border: 3px solid #00BFFF;
+            color: #00BFFF;
+            padding: 15px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 16px rgba(0, 191, 255, 0.4);
+            animation: subtleFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .donate-console:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 24px rgba(0, 191, 255, 0.8);
+            animation: none;
+        }
 
-.terminal-border {
-    border: 2px solid #00ff00;
-    box-shadow: none;
-}
+        /* Sparks from button */
+        .spark {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #00BFFF;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 0 6px #00BFFF;
+        }
 
-.glow-text {
-    text-shadow: none;
-}
+        @keyframes sparkUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-150px) translateX(var(--drift)) scale(0);
+            }
+        }
 
-.no-glow {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    animation: none !important;
-}
-
-.pixel-text {
-    font-family: 'Press Start 2P', cursive;
-    image-rendering: pixelated;
-}
-
-.scanlines {
-    background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
-    background-size: 100% 3px;
-    animation: scanlines 0.1s linear infinite;
-}
-
-@keyframes scanlines {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 3px; }
-}
-
-.admin-input {
-    background: #000000;
-    border: 1px solid #00ff00;
-    color: #00ff00;
-    padding: 8px 12px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
-}
-
-.admin-input:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-.admin-button {
-    background: #000000;
-    border: 2px solid #00ff00;
-    color: #00ff00;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Share Tech Mono', monospace;
-}
-
-.admin-button:hover {
-    background: #00ff00;
-    color: #000000;
-    box-shadow: none;
-}
-
-.admin-button.danger {
-    border-color: #ff0000;
-    color: #ff0000;
-}
-
-.admin-button.danger:hover {
-    background: #ff0000;
-    color: #000000;
-}
-
-.image-preview {
-    max-width: 200px;
-    max-height: 200px;
-    object-fit: contain;
-    border: 1px solid #00ff00;
-    image-rendering: pixelated;
-}
-
-.artwork-card {
-    background: #000000;
-    border: 1px solid #00ff00;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-.status-indicator {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    margin-right: 8px;
-}
-
-.status-available {
-    background: #00ff00;
-    box-shadow: none;
-}
-.status-sold {
-    background: #ff0000;
-    box-shadow: none;
-}
-.status-ghost {
-    background: #888888;
-    box-shadow: none;
-}
-
-.login-screen {
-    position: fixed;
-    inset: 0;
-    background: #000000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.hidden { display: none; }
-
-textarea.admin-input {
-    resize: vertical;
-    min-height: 80px;
-}
-
-select.admin-input {
-    cursor: pointer;
-}
-
-.file-upload-area {
-    border: 2px dashed #00ff00;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.file-upload-area:hover {
-    background: rgba(0, 255, 0, 0.1);
-}
-
-.file-upload-area.dragover {
-    background: rgba(0, 255, 0, 0.2);
-    border-color: #44ff44;
-}
-
-/* Navigation styles */
-.nav-link {
-    transition: all 0.3s ease;
-    text-decoration: none;
-    cursor: pointer;
-    color: #00ff00;
-}
-
-.nav-link:hover {
-    text-shadow: none;
-}
-
-.nav-active {
-    color: #ffffff;
-    text-shadow: none;
-}
-
-@keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-}
-
-.blink {
-    animation: blink 1.4s infinite;
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
-    .grid-cols-2 {
-        grid-template-columns: 1fr;
-    }
-    
-    .lg\\:grid-cols-2 {
-        grid-template-columns: 1fr;
-    }
-    
-    .terminal-border {
-        margin: 0.5rem;
-    }
-}
-
-}
-```
-
-</style>
-
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: #000000;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+    </style>
 </head>
-<body class="scanlines" style="background-color: #000000;">
-    <!-- Login Screen -->
-    <div class="login-screen" id="loginScreen">
-        <div class="terminal-border p-8 bg-black no-glow">
-            <h2 class="pixel-text text-xl mb-6 text-center">ADMIN ACCESS</h2>
-            <div class="mb-4">
-                <input type="password" id="passwordInput" class="admin-input w-full no-glow" placeholder="Enter password..." onkeypress="checkPasswordOnEnter(event)">
-            </div>
-            <button class="admin-button w-full no-glow" onclick="checkPassword()">LOGIN</button>
+<body class="scanlines">
+
+<!-- Header Navigation -->
+<div class="terminal-border bg-black p-2 m-4">
+    <div class="flex justify-between items-center text-xs">
+        <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
+        <div class="flex gap-4">
+            <a href="index.html" class="nav-link">[HOME]</a>
+            <span class="nav-link nav-active">[GALLERY]</span>
+            <a href="stream.html" class="nav-link">[STREAM]</a>
         </div>
-    </div>
-
-<!-- Admin Panel -->
-
-<div class="admin-panel hidden" id="adminPanel">
-    <!-- Header Navigation -->
-    <div class="terminal-border bg-black p-2 m-4" style="background-color: #000000;">
-        <div class="flex justify-between items-center text-xs">
-            <div class="text-green-500 text-lg font-bold glow-text">GHOSTLINE</div>
-            <div class="flex gap-4">
-                <a href="index.html" class="nav-link">[HOME]</a>
-                <a href="gallery.html" class="nav-link">[GALLERY]</a>
-                <a href="stream.html" class="nav-link">[STREAM]</a>
-                <span class="nav-link nav-active">[ADMIN]</span>
-            </div>
-            <div class="flex gap-4">
-                <button class="admin-button danger text-xs" onclick="logout()">LOGOUT</button>
-            </div>
-        </div>
-    </div>
-
-```
-<div class="container mx-auto px-4 pb-8">
-    <!-- Title -->
-    <div class="text-center mb-8">
-        <h1 class="pixel-text text-3xl glow-text mb-2">ADMIN CONTROL PANEL</h1>
-        <p class="text-sm text-green-400">Gallery Management System</p>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Add/Edit Artwork Form -->
-        <div class="terminal-border bg-black p-6">
-            <h2 class="text-lg glow-text mb-4" id="formTitle">ADD NEW ARTWORK</h2>
-            
-            <form id="artworkForm" onsubmit="saveArtwork(event)">
-                <input type="hidden" id="editingId" value="">
-                
-                <!-- Image Upload -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">IMAGE</label>
-                    <div class="file-upload-area" onclick="document.getElementById('imageInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
-                        <div id="uploadText">
-                            <p>Click to upload or drag image here</p>
-                            <p class="text-xs text-green-600 mt-2">JPG, PNG, GIF supported</p>
-                        </div>
-                        <div id="imagePreviewContainer" class="hidden">
-                            <img id="imagePreview" class="image-preview mx-auto">
-                            <p class="text-xs mt-2">Click to change image</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Basic Info -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">STATUS</label>
-                    <select id="status" class="admin-input w-full">
-                        <option value="available">Available</option>
-                        <option value="sold">Sold</option>
-                        <option value="ghost">Ghost</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">TITLE</label>
-                    <input type="text" id="title" class="admin-input w-full" placeholder="Artwork title..." required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">DESCRIPTION</label>
-                    <textarea id="description" class="admin-input w-full" placeholder="Describe the artwork..."></textarea>
-                </div>
-
-                <!-- Price -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">PRICE (ETH)</label>
-                    <input type="number" id="price" class="admin-input w-full" step="0.001" placeholder="0.1">
-                </div>
-
-                <!-- Category -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">CATEGORY</label>
-                    <select id="category" class="admin-input w-full">
-                        <option value="latest" selected>LATEST</option>
-                        <option value="series">SERIES</option>
-                        <option value="rare">RARE</option>
-                        <option value="ghost">GHOST</option>
-                        <option value="collabs">COLLABS</option>
-                    </select>
-                </div>
-
-                <!-- Form Buttons -->
-                <div class="flex gap-4">
-                    <button type="submit" class="admin-button flex-1" id="saveButton">SAVE ARTWORK</button>
-                    <button type="button" class="admin-button" onclick="resetForm()">CLEAR FORM</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Artwork List -->
-        <div class="terminal-border bg-black p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg glow-text">ARTWORK COLLECTION</h2>
-            </div>
-            
-            <div class="max-h-96 overflow-y-auto" id="artworkList">
-                <!-- Artwork items will be loaded here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer Command Line -->
-    <div class="mt-8">
-        <div class="terminal-border bg-black p-2">
-            <div class="text-sm">
-                <span class="text-green-400">admin@ghostline:~$</span> 
-                <span class="glow-text">manage_gallery_content</span>
-                <span class="blink ml-2">█</span>
-            </div>
+        <div>
+            <span id="liveStatus">Loading...</span>
         </div>
     </div>
 </div>
-```
 
+<!-- Main Content -->
+<div class="container mx-auto px-4 pb-24">
+    <!-- Title -->
+    <div class="text-center mb-6">
+        <h1 class="pixel-text text-3xl mb-4">GHOSTLINE GALLERY</h1>
+        
+        <!-- Ghostcoin и символы -->
+        <div class="flex items-center justify-center mb-6 gap-3">
+            <div class="flex-shrink-0">
+                <img src="ghostcoin.gif" alt="Ghost Coin" class="w-8 h-8 pixel-art">
+            </div>
+            <div class="flex gap-1" id="symbolContainer">
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Category Tabs -->
+    <div class="flex justify-center mb-8">
+        <div class="flex gap-2">
+            <button class="category-tab active" onclick="filterCategory('all')">ALL</button>
+            <button class="category-tab" onclick="filterCategory('latest')">LATEST</button>
+            <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
+            <button class="category-tab" onclick="filterCategory('rare')">RARE</button>
+            <button class="category-tab" onclick="filterCategory('ghost')">GHOST</button>
+            <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
+        </div>
+    </div>
+    
+    <!-- Gallery Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6" id="galleryGrid">
+        <!-- Gallery items will be loaded here -->
+    </div>
+    
+    <!-- Empty state -->
+    <div id="emptyState" class="text-center py-16 hidden">
+        <p class="text-green-600 mb-4">No artworks in this category yet.</p>
+    </div>
+</div>
+
+<!-- Donate Button -->
+<div class="donate-wrapper">
+    <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
+        <span style="color: #00BFFF;">SUPPORT PROJECT</span>
+    </button>
+</div>
+
+<!-- Donate Modal -->
+<div class="modal" id="donateModal">
+    <div class="modal-content">
+        <h3 class="pixel-text text-lg mb-4" style="color: #00ff00;">SUPPORT GHOSTLINE</h3>
+        <div class="terminal-border p-4 mb-4 bg-black">
+            <p class="text-sm mb-3">ETHEREUM ADDRESS:</p>
+            <p class="text-xs break-all mb-3" style="color: #00ff00;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
+            <button class="category-tab mb-2" onclick="copyAddress()">COPY ADDRESS</button>
+        </div>
+        <p class="text-xs text-green-600 mb-4">Your support helps robots learn art!</p>
+        <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
+    </div>
 </div>
 
 <script>
-    // Admin authentication
-    let artworks = [];
-    
-    // Safely load artworks from localStorage
-    try {
-        artworks = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
-    } catch (error) {
-        console.error('Error loading artworks from localStorage:', error);
-        artworks = [];
-    }
-    
-    let currentImageData = null;
-    let currentImageFilename = '';
+// Простая инициализация
+let galleryItems = [];
+let currentCategory = 'all';
 
-    async function checkPassword() {
-        const password = document.getElementById('passwordInput').value;
-        try {
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            });
+// Символы для анимации
+const blockSymbols = ['█','▓','▒','░','▖','▗','▘','▝','▚','▞','▛','▜','▟','▙'];
 
-            if (res.ok) {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                loadArtworks();
-            } else {
-                alert('Incorrect password!');
-                document.getElementById('passwordInput').value = '';
-            }
-        } catch (err) {
-            console.error('Login error:', err);
-            alert('Login failed.');
-        }
-    }
-
-    function checkPasswordOnEnter(event) {
-        if (event.key === 'Enter') {
-            checkPassword();
-        }
-    }
-
-    function logout() {
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('adminPanel').classList.add('hidden');
-        document.getElementById('passwordInput').value = '';
-    }
-
-
-    // Image handling
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (file) {
-            currentImageFilename = file.name;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentImageData = e.target.result;
-                document.getElementById('imagePreview').src = currentImageData;
-                document.getElementById('uploadText').classList.add('hidden');
-                document.getElementById('imagePreviewContainer').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Drag and drop
-    function handleDragOver(event) {
-        event.preventDefault();
-        event.currentTarget.classList.add('dragover');
-    }
-
-    function handleDragLeave(event) {
-        event.currentTarget.classList.remove('dragover');
-    }
-
-    function handleDrop(event) {
-        event.preventDefault();
-        event.currentTarget.classList.remove('dragover');
-        
-        const files = event.dataTransfer.files;
-        if (files.length > 0) {
-            const file = files[0];
-            currentImageFilename = file.name;
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentImageData = e.target.result;
-                    document.getElementById('imagePreview').src = currentImageData;
-                    document.getElementById('uploadText').classList.add('hidden');
-                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-    }
-
-    // Form handling
-    async function saveArtwork(event) {
-        event.preventDefault();
-
-        const editingId = document.getElementById('editingId').value;
-
-        const priceValue = document.getElementById('price').value.trim();
-        let parsedPrice = null;
-        if (priceValue !== '') {
-            parsedPrice = parseFloat(priceValue);
-            if (isNaN(parsedPrice)) {
-                alert('Price must be a valid number');
-                return;
-            }
-        }
-
-        const artwork = {
-            title: document.getElementById('title').value,
-            description: document.getElementById('description').value,
-            status: document.getElementById('status').value,
-            category: document.getElementById('category').value,
-            price: parsedPrice,
-            url: currentImageData
-        };
-        if (editingId) {
-            artwork.id = editingId;
-        }
-
-        try {
-            if (currentImageData && currentImageData.startsWith('data:') && window.supabaseAdmin) {
-                artwork.url = await window.supabaseAdmin.uploadImage(currentImageData, currentImageFilename);
-            }
-            let saved;
-            if (window.supabaseAdmin) {
-                saved = await window.supabaseAdmin.saveArtworkToDB(artwork);
-            }
-            if (!editingId && saved && saved.id) {
-                artwork.id = saved.id;
-            }
-        } catch (err) {
-            console.error('Save error:', err);
-            alert(err.message || 'Error saving to Supabase');
-        }
-
-        if (editingId) {
-            const index = artworks.findIndex(a => a.id === editingId);
-            if (index !== -1) {
-                artworks[index] = artwork;
-            } else {
-                artworks.push(artwork);
-            }
-        } else {
-            artworks.push(artwork);
-        }
-
-        saveToLocalStorage();
-        loadArtworks();
-        resetForm();
-        alert(editingId ? 'Artwork updated!' : 'Artwork saved!');
-    }
-
-    function resetForm() {
-        document.getElementById('artworkForm').reset();
-        document.getElementById('editingId').value = '';
-        document.getElementById('formTitle').textContent = 'ADD NEW ARTWORK';
-        document.getElementById('saveButton').textContent = 'SAVE ARTWORK';
-        currentImageData = null;
-        currentImageFilename = '';
-        document.getElementById('uploadText').classList.remove('hidden');
-        document.getElementById('imagePreviewContainer').classList.add('hidden');
-        document.getElementById('category').value = 'latest';
-    }
-
-    function editArtwork(index) {
-        const artwork = artworks[index];
-        if (artwork) {
-            document.getElementById('editingId').value = artwork.id || '';
-            document.getElementById('title').value = artwork.title || '';
-            document.getElementById('description').value = artwork.description || '';
-            document.getElementById('status').value = artwork.status || 'available';
-            document.getElementById('price').value = artwork.price || '';
-            document.getElementById('category').value = artwork.category || 'latest';
-            
-            if (artwork.url) {
-                currentImageData = artwork.url;
-                currentImageFilename = artwork.url.split('/').pop();
-                document.getElementById('imagePreview').src = artwork.url;
-                document.getElementById('uploadText').classList.add('hidden');
-                document.getElementById('imagePreviewContainer').classList.remove('hidden');
-            }
-            
-            document.getElementById('formTitle').textContent = 'EDIT ARTWORK';
-            document.getElementById('saveButton').textContent = 'UPDATE ARTWORK';
-        }
-    }
-
-    function deleteArtwork(index) {
-        const artwork = artworks[index];
-        if (artwork && confirm('Delete selected artwork? This cannot be undone.')) {
-            artworks.splice(index, 1);
-            saveToLocalStorage();
-            loadArtworks();
-            alert('Artwork deleted!');
-        }
-    }
-
-    function loadArtworks() {
-        try {
-            const listContainer = document.getElementById('artworkList');
-            if (!listContainer) return;
-            
-            if (artworks.length === 0) {
-                listContainer.innerHTML = '<p class="text-green-600 text-center py-8">No artworks yet. Add your first piece!</p>';
-                return;
-            }
-
-            listContainer.innerHTML = artworks.map((artwork, index) => `
-                <div class="artwork-card">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center">
-                            <span class="status-indicator status-${artwork.status || 'available'}"></span>
-                            <strong>${artwork.title || 'Untitled'}</strong>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="admin-button text-xs" onclick="editArtwork(${index})">EDIT</button>
-                            <button class="admin-button danger text-xs" onclick="deleteArtwork(${index})">DELETE</button>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="col-span-2">
-                            <p class="text-sm mb-1"><strong>Title:</strong> ${artwork.title || 'Untitled'}</p>
-                            <p class="text-xs text-green-400 mb-1"><strong>Price:</strong> ${artwork.price ? artwork.price + ' ETH' : 'Not set'}</p>
-                            <p class="text-xs text-green-600"><strong>Category:</strong> ${artwork.category || 'latest'}</p>
-                        </div>
-                        <div class="text-right">
-                            ${artwork.url ? `<img src="${artwork.url}" class="image-preview ml-auto">` : '<div class="w-16 h-16 border border-green-600 flex items-center justify-center text-xs">No Image</div>'}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Load artworks error:', error);
-            const listContainer = document.getElementById('artworkList');
-            if (listContainer) {
-                listContainer.innerHTML = '<p class="text-red-500 text-center py-8">Error loading artworks</p>';
-            }
-        }
-    }
-
-    function saveToLocalStorage() {
-        try {
-            localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
-        } catch (error) {
-            console.error('Error saving to localStorage:', error);
-            alert('Error saving data. Check browser storage permissions.');
-        }
-    }
-
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            console.log('Admin panel initialized successfully');
-        } catch (error) {
-            console.error('Initialization error:', error);
-        }
+// Анимация символов
+function initSymbols() {
+    const symbols = document.querySelectorAll('.symbol-block');
+    symbols.forEach((symbol, index) => {
+        symbol.textContent = blockSymbols[0];
+        setInterval(() => {
+            symbol.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
+        }, 400 + index * 300);
     });
+}
+
+// Загрузка галереи
+function loadGallery() {
+    try {
+        galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+    } catch (e) {
+        galleryItems = [];
+    }
+    renderGallery();
+    updateStatus();
+}
+
+// Отображение галереи
+function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (galleryItems.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+    }
+    
+    emptyState.classList.add('hidden');
+    grid.innerHTML = galleryItems.map(item => `
+        <div class="terminal-border bg-black p-3">
+            <div class="h-48 bg-gray-900 flex items-center justify-center">
+                <img src="${item.url || ''}" alt="${item.filename || 'Artwork'}" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    `).join('');
+}
+
+// Фильтр категорий
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    renderGallery();
+}
+
+// Обновление статуса
+function updateStatus() {
+    const status = document.getElementById('liveStatus');
+    if (status) {
+        status.textContent = `${galleryItems.length} IMAGES`;
+    }
+}
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    initSymbols();
+    loadGallery();
+});
+
+// Анимация кнопки SUPPORT (из оригинала)
+function createSparks() {
+    const button = document.getElementById('donateBtn');
+    const rect = button.getBoundingClientRect();
+
+    for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+
+            const startX = rect.left + Math.random() * rect.width;
+            const startY = rect.top + rect.height / 2;
+
+            spark.style.left = startX + 'px';
+            spark.style.top = startY + 'px';
+
+            const drift = (Math.random() - 0.5) * 50;
+            spark.style.setProperty('--drift', drift + 'px');
+
+            const colors = ['#00BFFF', '#33CCFF', '#66D9FF', '#00FFFF'];
+            spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+            spark.style.animation = 'sparkUp 1.5s ease-out forwards';
+
+            document.body.appendChild(spark);
+
+            setTimeout(() => spark.remove(), 1500);
+        }, i * 30);
+    }
+}
+
+function createBranchingLines() {
+    const button = document.getElementById('donateBtn');
+    const rect = button.getBoundingClientRect();
+
+    const startPoints = [
+        { x: rect.left + rect.width / 2, y: rect.top },
+        { x: rect.right, y: rect.top + rect.height / 2 },
+        { x: rect.left + rect.width / 2, y: rect.bottom },
+        { x: rect.left, y: rect.top + rect.height / 2 },
+    ];
+
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed';
+    canvas.style.left = 0;
+    canvas.style.top = 0;
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = 1500;
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#00BFFF';
+    ctx.lineWidth = 2;
+
+    const dirs = [
+        { dx: 0, dy: -1 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: -1, dy: 0 },
+    ];
+
+    const branches = [];
+    const speed = 2;
+    const maxDepth = 5;
+
+    function addBranch(x, y, dir, depth) {
+        const length = 10 + Math.random() * 30;
+        branches.push({ x, y, dir, length, progress: 0, depth });
+    }
+
+    for (let d = 0; d < 4; d++) addBranch(startPoints[d].x, startPoints[d].y, d, 0);
+
+    function step() {
+        for (let i = branches.length - 1; i >= 0; i--) {
+            const b = branches[i];
+            const dir = dirs[b.dir];
+            const prev = b.progress;
+            b.progress = Math.min(b.progress + speed, b.length);
+
+            ctx.beginPath();
+            ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
+            ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
+            ctx.stroke();
+
+            if (b.progress >= b.length) {
+                const endX = b.x + dir.dx * b.length;
+                const endY = b.y + dir.dy * b.length;
+                branches.splice(i, 1);
+
+                if (b.depth < maxDepth) {
+                    const available = [0, 1, 2, 3].filter(dd => dd !== (b.dir + 2) % 4);
+                    let count = Math.floor(Math.random() * 3);
+                    while (count-- > 0 && available.length) {
+                        const idx = Math.floor(Math.random() * available.length);
+                        const nd = available.splice(idx, 1)[0];
+                        addBranch(endX, endY, nd, b.depth + 1);
+                    }
+                }
+            }
+        }
+
+        if (branches.length) {
+            requestAnimationFrame(step);
+        } else {
+            setTimeout(() => canvas.remove(), 300);
+            showDonateModal();
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
+function handleDonateClick() {
+    createSparks();
+    createBranchingLines();
+}
+
+function showDonateModal() {
+    document.getElementById('donateModal').style.display = 'flex';
+}
+
+function closeDonateModal() {
+    document.getElementById('donateModal').style.display = 'none';
+}
+
+function copyAddress() {
+    const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
+    navigator.clipboard.writeText(address).then(() => {
+        alert('Address copied!');
+    });
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
 <script src="supabase-env.js"></script>
 
-<script src="supabase-admin.js"></script>
-<div id="errorLog" style="position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; max-height:200px; overflow-y:auto; font-size:12px; z-index:9999; display:none;"></div>
-
-<script>
-// Показать все ошибки
-window.addEventListener('error', function(e) {
-    const errorLog = document.getElementById('errorLog');
-    errorLog.style.display = 'block';
-    errorLog.innerHTML += `<div>ERROR: ${e.message} at ${e.filename}:${e.lineno}</div>`;
-});
-
-// Показать ошибки Supabase
-window.addEventListener('unhandledrejection', function(e) {
-    const errorLog = document.getElementById('errorLog');
-    errorLog.style.display = 'block';
-    errorLog.innerHTML += `<div>PROMISE ERROR: ${e.reason}</div>`;
-});
-
-// Тестируем соединение при загрузке
-setTimeout(() => {
-    const errorLog = document.getElementById('errorLog');
-    errorLog.style.display = 'block';
-    errorLog.innerHTML += `<div>SUPABASE_URL: ${window.SUPABASE_URL || 'MISSING'}</div>`;
-    errorLog.innerHTML += `<div>SUPABASE_ADMIN: ${window.supabaseAdmin ? 'OK' : 'MISSING'}</div>`;
-}, 2000);
-</script>
-    
 </body>
 </html>
