@@ -17,7 +17,7 @@
             min-height: 100vh;
         }
 
-```
+
     .terminal-border {
         border: 2px solid #00ff00;
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
@@ -51,7 +51,7 @@
     
     .category-tab {
         padding: 8px 16px;
-        border: 1px solid #000BFF;
+        border: 1px solid #00ff00;
         background: #000000;
         color: #000BFF;
         cursor: pointer;
@@ -62,10 +62,12 @@
     .category-tab.active {
         background: #000BFF;
         color: #000000;
+        border: 1px solid #00ff00;
     }
     
     .category-tab:hover {
-        box-shadow: 0 0 8px rgba(0, 11, 255, 0.4);
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+        border-color: #44ff44;
     }
     
     .pixel-art {
@@ -240,12 +242,31 @@
         background: #000000;
         border: 2px solid #00ff00;
         padding: 30px;
-        max-width: 400px;
+        max-width: 500px;
         text-align: center;
         box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
     }
+    
+    /* Анимации для уведомлений */
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    
+    .cursor-pointer:hover {
+        background: #111111 !important;
+    }
 </style>
-```
+
 
 </head>
 <body class="scanlines">
@@ -294,7 +315,7 @@
 <div id="emptyState" class="text-center py-16 hidden">
     <p class="text-green-600 mb-4">No artworks in this category yet.</p>
 </div>
-```
+
 
 </div>
 
@@ -311,14 +332,37 @@
 <div class="modal" id="donateModal">
     <div class="modal-content">
         <h3 class="pixel-text text-lg mb-4" style="color: #00ff00;">SUPPORT GHOSTLINE</h3>
-        <div class="terminal-border p-4 mb-4 bg-black">
-            <p class="text-sm mb-3">ETHEREUM ADDRESS:</p>
-            <p class="text-xs break-all mb-3" style="color: #00ff00;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
-            <button class="category-tab mb-2" onclick="copyAddress()">COPY ADDRESS</button>
-        </div>
-        <p class="text-xs text-green-600 mb-4">Your support helps robots learn art!</p>
-        <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
+
+```
+    <!-- Ethereum -->
+    <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a', 'Ethereum')">
+        <p class="text-sm mb-2" style="color: #00ff00;">ETHEREUM (ETH)</p>
+        <p class="text-xs break-all mb-2" style="color: #ffffff;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
+        <p class="text-xs" style="color: #666;">Click to copy</p>
     </div>
+    
+    <!-- Bitcoin -->
+    <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d', 'Bitcoin')">
+        <p class="text-sm mb-2" style="color: #00ff00;">BITCOIN (BTC)</p>
+        <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d</p>
+        <p class="text-xs" style="color: #666;">Click to copy</p>
+    </div>
+    
+    <!-- USDT -->
+    <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B', 'USDT')">
+        <p class="text-sm mb-2" style="color: #00ff00;">USDT (TRC20)</p>
+        <p class="text-xs break-all mb-2" style="color: #ffffff;">0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B</p>
+        <p class="text-xs" style="color: #666;">Click to copy</p>
+    </div>
+    
+    <p class="text-xs text-green-600 mb-4">
+        Your support helps robots learn art!<br>
+        Click any address to copy instantly
+    </p>
+    <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
+</div>
+
+
 </div>
 
 <script>
@@ -467,6 +511,51 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // Анимация кнопки SUPPORT (из оригинала)
+// Универсальная функция копирования
+function copyToClipboard(address, currency) {
+    navigator.clipboard.writeText(address).then(() => {
+        // Показываем уведомление
+        showCopyNotification(`${currency} address copied!`);
+    }).catch(() => {
+        // Fallback для старых браузеров
+        const textArea = document.createElement('textarea');
+        textArea.value = address;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showCopyNotification(`${currency} address copied!`);
+    });
+}
+
+// Показ уведомления о копировании
+function showCopyNotification(message) {
+    // Создаем уведомление
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #000BFF;
+        color: white;
+        padding: 12px 20px;
+        border: 2px solid #000BFF;
+        z-index: 9999;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 14px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Убираем уведомление через 3 секунды
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
 function createSparks() {
     const button = document.getElementById('donateBtn');
     const rect = button.getBoundingClientRect();
@@ -591,13 +680,6 @@ function showDonateModal() {
 
 function closeDonateModal() {
     document.getElementById('donateModal').style.display = 'none';
-}
-
-function copyAddress() {
-    const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
-    navigator.clipboard.writeText(address).then(() => {
-        alert('Address copied!');
-    });
 }
 </script>
 
