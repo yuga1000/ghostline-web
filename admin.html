@@ -11,201 +11,275 @@
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 html, body {
-    background: #000000;
-    color: #00ff00;
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
+background: #000000;
+color: #00ff00;
+font-family: ‘Share Tech Mono’, monospace;
+min-height: 100vh;
+margin: 0;
+padding: 0;
 }
 
 .terminal-border {
-    border: 2px solid #00ff00;
-    box-shadow: none;
+border: 2px solid #00ff00;
+box-shadow: none;
 }
 
 .glow-text {
-    text-shadow: none;
+text-shadow: none;
 }
 
 .no-glow {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    animation: none !important;
+box-shadow: none !important;
+text-shadow: none !important;
+animation: none !important;
 }
 
 .pixel-text {
-    font-family: 'Press Start 2P', cursive;
-    image-rendering: pixelated;
+font-family: ‘Press Start 2P’, cursive;
+image-rendering: pixelated;
 }
 
 .scanlines {
-    background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
-    background-size: 100% 3px;
-    animation: scanlines 0.1s linear infinite;
+background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+background-size: 100% 3px;
+animation: scanlines 0.1s linear infinite;
 }
 
 @keyframes scanlines {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 3px; }
+0% { background-position: 0 0; }
+100% { background-position: 0 3px; }
 }
 
 .admin-input {
-    background: #000000;
-    border: 1px solid #00ff00;
-    color: #00ff00;
-    padding: 8px 12px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
+background: #000000;
+border: 1px solid #00ff00;
+color: #00ff00;
+padding: 8px 12px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 14px;
 }
 
 .admin-input:focus {
-    outline: none;
-    box-shadow: none;
+outline: none;
+box-shadow: none;
 }
 
 .admin-button {
-    background: #000000;
-    border: 2px solid #00ff00;
-    color: #00ff00;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Share Tech Mono', monospace;
+background: #000000;
+border: 2px solid #00ff00;
+color: #00ff00;
+padding: 10px 20px;
+cursor: pointer;
+transition: all 0.3s ease;
+font-family: ‘Share Tech Mono’, monospace;
 }
 
 .admin-button:hover {
-    background: #00ff00;
-    color: #000000;
-    box-shadow: none;
+background: #00ff00;
+color: #000000;
+box-shadow: none;
 }
 
 .admin-button.danger {
-    border-color: #ff0000;
-    color: #ff0000;
+border-color: #ff0000;
+color: #ff0000;
 }
 
 .admin-button.danger:hover {
-    background: #ff0000;
-    color: #000000;
+background: #ff0000;
+color: #000000;
 }
 
 .image-preview {
-    max-width: 200px;
-    max-height: 200px;
-    object-fit: contain;
-    border: 1px solid #00ff00;
-    image-rendering: pixelated;
+max-width: 200px;
+max-height: 200px;
+object-fit: contain;
+border: 1px solid #00ff00;
+image-rendering: pixelated;
 }
 
 .artwork-card {
-    background: #000000;
-    border: 1px solid #00ff00;
-    padding: 15px;
-    margin-bottom: 15px;
+background: #000000;
+border: 1px solid #00ff00;
+padding: 15px;
+margin-bottom: 15px;
 }
 
 .status-indicator {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    margin-right: 8px;
+width: 12px;
+height: 12px;
+display: inline-block;
+margin-right: 8px;
 }
 
 .status-available {
-    background: #00ff00;
-    box-shadow: none;
+background: #00ff00;
+box-shadow: none;
 }
 .status-sold {
-    background: #ff0000;
-    box-shadow: none;
+background: #ff0000;
+box-shadow: none;
 }
 .status-ghost {
-    background: #888888;
-    box-shadow: none;
+background: #888888;
+box-shadow: none;
 }
 
 .login-screen {
-    position: fixed;
-    inset: 0;
-    background: #000000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+position: fixed;
+inset: 0;
+background: #000000;
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 1000;
 }
 
 .hidden { display: none; }
 
 textarea.admin-input {
-    resize: vertical;
-    min-height: 80px;
+resize: vertical;
+min-height: 80px;
 }
 
 select.admin-input {
-    cursor: pointer;
+cursor: pointer;
 }
 
 .file-upload-area {
-    border: 2px dashed #00ff00;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
+border: 2px dashed #00ff00;
+padding: 40px;
+text-align: center;
+cursor: pointer;
+transition: all 0.3s ease;
 }
 
 .file-upload-area:hover {
-    background: rgba(0, 255, 0, 0.1);
+background: rgba(0, 255, 0, 0.1);
 }
 
 .file-upload-area.dragover {
-    background: rgba(0, 255, 0, 0.2);
-    border-color: #44ff44;
+background: rgba(0, 255, 0, 0.2);
+border-color: #44ff44;
 }
 
 /* Navigation styles */
 .nav-link {
-    transition: all 0.3s ease;
-    text-decoration: none;
-    cursor: pointer;
-    color: #00ff00;
+transition: all 0.3s ease;
+text-decoration: none;
+cursor: pointer;
+color: #00ff00;
 }
 
 .nav-link:hover {
-    text-shadow: none;
+text-shadow: none;
 }
 
 .nav-active {
-    color: #ffffff;
-    text-shadow: none;
+color: #ffffff;
+text-shadow: none;
 }
 
 @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+0%, 50% { opacity: 1; }
+51%, 100% { opacity: 0; }
 }
 
 .blink {
-    animation: blink 1.4s infinite;
+animation: blink 1.4s infinite;
 }
 
-/* Mobile styles */
+/* Improved layout */
+.admin-layout {
+display: grid;
+grid-template-columns: 400px 1fr;
+gap: 2rem;
+max-width: 1400px;
+margin: 0 auto;
+padding: 1rem;
+}
+
+.add-form {
+background: #000000;
+border: 2px solid #00ff00;
+padding: 1.5rem;
+height: fit-content;
+}
+
+.artwork-list {
+background: #000000;
+border: 2px solid #00ff00;
+padding: 1.5rem;
+min-height: 600px;
+}
+
+.artwork-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+gap: 1rem;
+}
+
+.artwork-item {
+background: #000000;
+border: 1px solid #004400;
+padding: 1rem;
+position: relative;
+}
+
+.artwork-image {
+width: 100%;
+height: 150px;
+background: #111111;
+border: 1px solid #00ff00;
+margin-bottom: 0.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.artwork-image img {
+max-width: 100%;
+max-height: 100%;
+object-fit: contain;
+}
+
+.artwork-controls {
+display: flex;
+gap: 0.5rem;
+margin-top: 0.5rem;
+}
+
+.compact-input {
+width: 100%;
+margin-bottom: 1rem;
+}
+
+.compact-input label {
+display: block;
+font-size: 12px;
+margin-bottom: 0.25rem;
+color: #00ff00;
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
-    .grid-cols-2 {
-        grid-template-columns: 1fr;
-    }
-    
-    .lg\:grid-cols-2 {
-        grid-template-columns: 1fr;
-    }
-    
-    .terminal-border {
-        margin: 0.5rem;
-    }
+.admin-layout {
+grid-template-columns: 1fr;
+gap: 1rem;
+padding: 0.5rem;
 }
 
+```
+.artwork-grid {
+    grid-template-columns: 1fr;
 }
 
+.terminal-border {
+    margin: 0.5rem;
+}
+```
+
+}
 </style>
 
 </head>
@@ -240,106 +314,106 @@ select.admin-input {
         </div>
     </div>
 
-<div class="container mx-auto px-4 pb-8">
-    <!-- Title -->
-    <div class="text-center mb-8">
-        <h1 class="pixel-text text-3xl glow-text mb-2">ADMIN CONTROL PANEL</h1>
-        <p class="text-sm text-green-400">Gallery Management System</p>
-    </div>
+```
+<!-- Title -->
+<div class="text-center mb-6">
+    <h1 class="pixel-text text-3xl glow-text mb-2">ADMIN CONTROL PANEL</h1>
+    <p class="text-sm text-green-400">Gallery Management System</p>
+</div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Add/Edit Artwork Form -->
-        <div class="terminal-border bg-black p-6">
-            <h2 class="text-lg glow-text mb-4" id="formTitle">ADD NEW ARTWORK</h2>
+<!-- Main Layout -->
+<div class="admin-layout">
+    <!-- Add/Edit Form (Left - Compact) -->
+    <div class="add-form">
+        <h2 class="text-lg glow-text mb-4" id="formTitle">ADD NEW ARTWORK</h2>
+        
+        <form id="artworkForm" onsubmit="saveArtwork(event)">
+            <input type="hidden" id="editingId" value="">
             
-            <form id="artworkForm" onsubmit="saveArtwork(event)">
-                <input type="hidden" id="editingId" value="">
-                
-                <!-- Image Upload -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">IMAGE</label>
-                    <div class="file-upload-area" onclick="document.getElementById('imageInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
-                        <div id="uploadText">
-                            <p>Click to upload or drag image here</p>
-                            <p class="text-xs text-green-600 mt-2">JPG, PNG, GIF supported</p>
-                        </div>
-                        <div id="imagePreviewContainer" class="hidden">
-                            <img id="imagePreview" class="image-preview mx-auto">
-                            <p class="text-xs mt-2">Click to change image</p>
-                        </div>
+            <!-- Image Upload -->
+            <div class="compact-input">
+                <label>IMAGE</label>
+                <div class="file-upload-area" onclick="document.getElementById('imageInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                    <div id="uploadText">
+                        <p class="text-sm">Click or drag image</p>
+                        <p class="text-xs text-green-600 mt-1">JPG, PNG, GIF</p>
+                    </div>
+                    <div id="imagePreviewContainer" class="hidden">
+                        <img id="imagePreview" class="image-preview mx-auto">
+                        <p class="text-xs mt-2">Click to change</p>
                     </div>
                 </div>
-
-                <!-- Basic Info -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">STATUS</label>
-                    <select id="status" class="admin-input w-full">
-                        <option value="available">Available</option>
-                        <option value="sold">Sold</option>
-                        <option value="ghost">Ghost</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">TITLE</label>
-                    <input type="text" id="title" class="admin-input w-full" placeholder="Artwork title..." required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">DESCRIPTION</label>
-                    <textarea id="description" class="admin-input w-full" placeholder="Describe the artwork..."></textarea>
-                </div>
-
-                <!-- Price -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">PRICE (ETH)</label>
-                    <input type="number" id="price" class="admin-input w-full" step="0.001" placeholder="0.1">
-                </div>
-
-                <!-- Category -->
-                <div class="mb-4">
-                    <label class="block text-sm mb-2">CATEGORY</label>
-                    <select id="category" class="admin-input w-full">
-                        <option value="latest" selected>LATEST</option>
-                        <option value="series">SERIES</option>
-                        <option value="rare">RARE</option>
-                        <option value="ghost">GHOST</option>
-                        <option value="collabs">COLLABS</option>
-                    </select>
-                </div>
-
-                <!-- Form Buttons -->
-                <div class="flex gap-4">
-                    <button type="submit" class="admin-button flex-1" id="saveButton">SAVE ARTWORK</button>
-                    <button type="button" class="admin-button" onclick="resetForm()">CLEAR FORM</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Artwork List -->
-        <div class="terminal-border bg-black p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg glow-text">ARTWORK COLLECTION</h2>
             </div>
-            
-            <div class="max-h-96 overflow-y-auto" id="artworkList">
-                <!-- Artwork items will be loaded here -->
+
+            <!-- Form Fields -->
+            <div class="compact-input">
+                <label>STATUS</label>
+                <select id="status" class="admin-input w-full">
+                    <option value="available">Available</option>
+                    <option value="sold">Sold</option>
+                    <option value="ghost">Ghost</option>
+                </select>
             </div>
-        </div>
+
+            <div class="compact-input">
+                <label>TITLE</label>
+                <input type="text" id="title" class="admin-input w-full" placeholder="Artwork title..." required>
+            </div>
+
+            <div class="compact-input">
+                <label>DESCRIPTION</label>
+                <textarea id="description" class="admin-input w-full" placeholder="Describe the artwork... Use #donation for donation artworks"></textarea>
+            </div>
+
+            <div class="compact-input">
+                <label>PRICE (ETH)</label>
+                <input type="number" id="price" class="admin-input w-full" step="0.001" placeholder="0.1">
+            </div>
+
+            <div class="compact-input">
+                <label>CATEGORY</label>
+                <select id="category" class="admin-input w-full">
+                    <option value="latest" selected>LATEST</option>
+                    <option value="series">SERIES</option>
+                    <option value="rare">RARE</option>
+                    <option value="ghost">GHOST</option>
+                    <option value="collabs">COLLABS</option>
+                </select>
+            </div>
+
+            <!-- Form Buttons -->
+            <div class="flex gap-2">
+                <button type="submit" class="admin-button flex-1" id="saveButton">SAVE</button>
+                <button type="button" class="admin-button" onclick="resetForm()">CLEAR</button>
+            </div>
+        </form>
     </div>
 
-    <!-- Footer Command Line -->
-    <div class="mt-8">
-        <div class="terminal-border bg-black p-2">
-            <div class="text-sm">
-                <span class="text-green-400">admin@ghostline:~$</span> 
-                <span class="glow-text">manage_gallery_content</span>
-                <span class="blink ml-2">█</span>
-            </div>
+    <!-- Artwork List (Right - Expanded) -->
+    <div class="artwork-list">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg glow-text">ARTWORK COLLECTION</h2>
+            <div class="text-sm text-green-400" id="artworkCount">0 ARTWORKS</div>
+        </div>
+        
+        <div class="artwork-grid" id="artworkGrid">
+            <!-- Artwork items will be loaded here -->
         </div>
     </div>
 </div>
+
+<!-- Footer Command Line -->
+<div class="mt-8">
+    <div class="terminal-border bg-black p-2">
+        <div class="text-sm">
+            <span class="text-green-400">admin@ghostline:~$</span> 
+            <span class="glow-text">manage_gallery_content</span>
+            <span class="blink ml-2">█</span>
+        </div>
+    </div>
+</div>
+```
 
 </div>
 
@@ -347,13 +421,32 @@ select.admin-input {
     // Admin authentication
     let artworks = [];
     
-    // Safely load artworks from localStorage
-    try {
-        artworks = JSON.parse(localStorage.getItem('ghostline_artworks') || '[]');
-    } catch (error) {
-        console.error('Error loading artworks from localStorage:', error);
-        artworks = [];
+    // Safely load artworks with fallback
+    function loadArtworksFromStorage() {
+        try {
+            const stored = localStorage.getItem('ghostline_artworks');
+            if (stored) {
+                artworks = JSON.parse(stored);
+            }
+        } catch (error) {
+            console.warn('localStorage not available:', error.message);
+            // Fallback to empty array if localStorage fails
+            artworks = [];
+        }
     }
+    
+    // Safe save to localStorage
+    function saveToLocalStorage() {
+        try {
+            localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
+        } catch (error) {
+            console.warn('Cannot save to localStorage:', error.message);
+            // Could implement alternative storage here
+        }
+    }
+    
+    // Initialize artworks
+    loadArtworksFromStorage();
     
     let currentImageData = null;
     let currentImageFilename = '';
@@ -392,7 +485,6 @@ select.admin-input {
         document.getElementById('adminPanel').classList.add('hidden');
         document.getElementById('passwordInput').value = '';
     }
-
 
     // Image handling
     function previewImage(event) {
@@ -506,7 +598,7 @@ select.admin-input {
         document.getElementById('artworkForm').reset();
         document.getElementById('editingId').value = '';
         document.getElementById('formTitle').textContent = 'ADD NEW ARTWORK';
-        document.getElementById('saveButton').textContent = 'SAVE ARTWORK';
+        document.getElementById('saveButton').textContent = 'SAVE';
         currentImageData = null;
         currentImageFilename = '';
         document.getElementById('uploadText').classList.remove('hidden');
@@ -533,7 +625,7 @@ select.admin-input {
             }
             
             document.getElementById('formTitle').textContent = 'EDIT ARTWORK';
-            document.getElementById('saveButton').textContent = 'UPDATE ARTWORK';
+            document.getElementById('saveButton').textContent = 'UPDATE';
         }
     }
 
@@ -549,44 +641,45 @@ select.admin-input {
 
     function loadArtworks() {
         try {
-            const listContainer = document.getElementById('artworkList');
-            if (!listContainer) return;
+            const gridContainer = document.getElementById('artworkGrid');
+            const countContainer = document.getElementById('artworkCount');
+            
+            if (!gridContainer) return;
+            
+            countContainer.textContent = `${artworks.length} ARTWORKS`;
             
             if (artworks.length === 0) {
-                listContainer.innerHTML = '<p class="text-green-600 text-center py-8">No artworks yet. Add your first piece!</p>';
+                gridContainer.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-green-600">No artworks yet. Add your first piece!</p></div>';
                 return;
             }
 
-            listContainer.innerHTML = artworks.map((artwork, index) => `
-                <div class="artwork-card">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center">
-                            <span class="status-indicator status-${artwork.status || 'available'}"></span>
-                            <strong>${artwork.title || 'Untitled'}</strong>
-                        </div>
-                        <div class="flex gap-2">
-                            <button class="admin-button text-xs" onclick="editArtwork(${index})">EDIT</button>
-                            <button class="admin-button danger text-xs" onclick="deleteArtwork(${index})">DELETE</button>
-                        </div>
+            gridContainer.innerHTML = artworks.map((artwork, index) => `
+                <div class="artwork-item">
+                    <div class="artwork-image">
+                        ${artwork.url ? `<img src="${artwork.url}" alt="${artwork.title || 'Artwork'}">` : '<div class="text-xs text-green-600">No Image</div>'}
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="col-span-2">
-                            <p class="text-sm mb-1"><strong>Title:</strong> ${artwork.title || 'Untitled'}</p>
-                            <p class="text-xs text-green-400 mb-1"><strong>Price:</strong> ${artwork.price ? artwork.price + ' ETH' : 'Not set'}</p>
-                            <p class="text-xs text-green-600"><strong>Category:</strong> ${artwork.category || 'latest'}</p>
+                    <div class="mb-2">
+                        <div class="flex items-center mb-1">
+                            <span class="status-indicator status-${artwork.status || 'available'}"></span>
+                            <strong class="text-sm">${artwork.title || 'Untitled'}</strong>
                         </div>
-                        <div class="text-right">
-                            ${artwork.url ? `<img src="${artwork.url}" class="image-preview ml-auto">` : '<div class="w-16 h-16 border border-green-600 flex items-center justify-center text-xs">No Image</div>'}
+                        <div class="text-xs text-green-400">
+                            ${artwork.category || 'latest'} • ${artwork.price ? artwork.price + ' ETH' : 'No price'}
                         </div>
+                        ${artwork.description ? `<div class="text-xs text-green-600 mt-1">${artwork.description.substring(0, 50)}${artwork.description.length > 50 ? '...' : ''}</div>` : ''}
+                    </div>
+                    
+                    <div class="artwork-controls">
+                        <button class="admin-button text-xs flex-1" onclick="editArtwork(${index})">EDIT</button>
+                        <button class="admin-button danger text-xs" onclick="deleteArtwork(${index})">DEL</button>
                     </div>
                 </div>
             `).join('');
         } catch (error) {
-            console.error('Load artworks error:', error);
-            const listContainer = document.getElementById('artworkList');
-            if (listContainer) {
-                listContainer.innerHTML = '<p class="text-red-500 text-center py-8">Error loading artworks</p>';
+            const gridContainer = document.getElementById('artworkGrid');
+            if (gridContainer) {
+                gridContainer.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-red-500">Error loading artworks</p></div>';
             }
         }
     }
@@ -595,19 +688,20 @@ select.admin-input {
         try {
             localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
         } catch (error) {
-            console.error('Error saving to localStorage:', error);
-            alert('Error saving data. Check browser storage permissions.');
+            console.warn('Cannot save to localStorage:', error.message);
+            // Show user-friendly message instead of alert
+            const statusMsg = document.createElement('div');
+            statusMsg.textContent = 'Warning: Cannot save to local storage. Changes may not persist.';
+            statusMsg.style.cssText = 'position:fixed;top:20px;right:20px;background:#ff6600;color:#000;padding:10px;z-index:9999;font-size:12px;';
+            document.body.appendChild(statusMsg);
+            setTimeout(() => statusMsg.remove(), 5000);
         }
     }
 
-
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-        try {
-            console.log('Admin panel initialized successfully');
-        } catch (error) {
-            console.error('Initialization error:', error);
-        }
+        // Silent initialization - no console logs
+        loadArtworksFromStorage();
     });
 </script>
 
@@ -616,31 +710,6 @@ select.admin-input {
 <script src="supabase-env.js"></script>
 
 <script src="supabase-admin.js"></script>
-<div id="errorLog" style="position:fixed; bottom:0; left:0; right:0; background:red; color:white; padding:10px; max-height:200px; overflow-y:auto; font-size:12px; z-index:9999; display:none;"></div>
 
-<script>
-// Показать все ошибки
-window.addEventListener('error', function(e) {
-    const errorLog = document.getElementById('errorLog');
-    errorLog.style.display = 'block';
-    errorLog.innerHTML += `<div>ERROR: ${e.message} at ${e.filename}:${e.lineno}</div>`;
-});
-
-// Показать ошибки Supabase
-window.addEventListener('unhandledrejection', function(e) {
-    const errorLog = document.getElementById('errorLog');
-    errorLog.style.display = 'block';
-    errorLog.innerHTML += `<div>PROMISE ERROR: ${e.reason}</div>`;
-});
-
-// Тестируем соединение при загрузке
-setTimeout(() => {
-    const errorLog = document.getElementById('errorLog');
-    errorLog.style.display = 'block';
-    errorLog.innerHTML += `<div>SUPABASE_URL: ${window.SUPABASE_URL || 'MISSING'}</div>`;
-    errorLog.innerHTML += `<div>SUPABASE_ADMIN: ${window.supabaseAdmin ? 'OK' : 'MISSING'}</div>`;
-}, 2000);
-</script>
-    
 </body>
 </html>
