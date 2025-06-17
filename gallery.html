@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -15,138 +16,205 @@
             padding: 0;
             min-height: 100vh;
         }
-        
-        .terminal-border {
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        }
-        
-        .pixel-text {
-            font-family: 'Press Start 2P', cursive;
-            image-rendering: pixelated;
-        }
-        
-        .scanlines {
-            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
-            background-size: 100% 3px;
-            animation: scanlines 0.1s linear infinite;
-        }
-        
-        @keyframes scanlines {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 3px; }
-        }
-        
-        .nav-link {
-            color: #00ff00;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .nav-active {
-            color: #ffffff;
-        }
-        
-        .category-tab {
-            padding: 8px 16px;
-            border: 1px solid #00ff00;
-            background: #000000;
-            color: #00ff00;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .category-tab.active {
-            background: #00ff00;
-            color: #000000;
-        }
-        
-        .pixel-art {
-            image-rendering: pixelated;
-        }
-        
-        .symbol-block {
-            display: inline-block;
-            font-family: monospace;
-        }
-        
-        /* Donate button */
-        .donate-wrapper {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-        }
 
-        .donate-console {
-            background: #000000;
-            border: 3px solid #00BFFF;
-            color: #00BFFF;
-            padding: 15px 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 16px rgba(0, 191, 255, 0.4);
-            animation: subtleFloat 4s ease-in-out infinite;
-        }
-        
-        @keyframes subtleFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .donate-console:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 24px rgba(0, 191, 255, 0.8);
-            animation: none;
-        }
+```
+    .terminal-border {
+        border: 2px solid #00ff00;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    }
+    
+    .pixel-text {
+        font-family: 'Press Start 2P', cursive;
+        image-rendering: pixelated;
+    }
+    
+    .scanlines {
+        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+        background-size: 100% 3px;
+        animation: scanlines 0.1s linear infinite;
+    }
+    
+    @keyframes scanlines {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 3px; }
+    }
+    
+    .nav-link {
+        color: #00ff00;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .nav-active {
+        color: #ffffff;
+    }
+    
+    .category-tab {
+        padding: 8px 16px;
+        border: 1px solid #00ff00;
+        background: #000000;
+        color: #00ff00;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .category-tab.active {
+        background: #00ff00;
+        color: #000000;
+    }
+    
+    .pixel-art {
+        image-rendering: pixelated;
+    }
+    
+    .symbol-block {
+        display: inline-block;
+        font-family: monospace;
+    }
+    
+    /* Expanded gallery item with space for symbols */
+    .gallery-item {
+        background: #000000;
+        border: 2px solid #00ff00;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        min-height: 300px;
+    }
+    
+    .gallery-image {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111111;
+        margin-bottom: 1rem;
+        min-height: 200px;
+    }
+    
+    .gallery-image img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        image-rendering: pixelated;
+    }
+    
+    /* Symbol section under each image */
+    .symbol-section {
+        border-top: 1px solid #004400;
+        padding-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 60px;
+    }
+    
+    .symbol-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .artwork-symbol {
+        color: #00ff00;
+        font-family: monospace;
+        font-size: 16px;
+        text-shadow: 0 0 2px #00ff00;
+        animation: symbolFlicker 1.5s infinite;
+    }
+    
+    .ghost-coin {
+        width: 24px;
+        height: 24px;
+        image-rendering: pixelated;
+    }
+    
+    @keyframes symbolFlicker {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    /* Donate button */
+    .donate-wrapper {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+    }
 
-        /* Sparks from button */
-        .spark {
-            position: fixed;
-            width: 3px;
-            height: 3px;
-            background: #00BFFF;
-            pointer-events: none;
-            z-index: 1000;
-            box-shadow: 0 0 6px #00BFFF;
-        }
+    .donate-console {
+        background: #000000;
+        border: 3px solid #00BFFF;
+        color: #00BFFF;
+        padding: 15px 40px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 16px rgba(0, 191, 255, 0.4);
+        animation: subtleFloat 4s ease-in-out infinite;
+    }
+    
+    @keyframes subtleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .donate-console:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 24px rgba(0, 191, 255, 0.8);
+        animation: none;
+    }
 
-        @keyframes sparkUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-150px) translateX(var(--drift)) scale(0);
-            }
-        }
+    /* Sparks from button */
+    .spark {
+        position: fixed;
+        width: 3px;
+        height: 3px;
+        background: #00BFFF;
+        pointer-events: none;
+        z-index: 1000;
+        box-shadow: 0 0 6px #00BFFF;
+    }
 
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
+    @keyframes sparkUp {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
-        
-        .modal-content {
-            background: #000000;
-            border: 2px solid #00ff00;
-            padding: 30px;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        100% {
+            opacity: 0;
+            transform: translateY(-150px) translateX(var(--drift)) scale(0);
         }
-    </style>
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-content {
+        background: #000000;
+        border: 2px solid #00ff00;
+        padding: 30px;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    }
+</style>
+```
+
 </head>
 <body class="scanlines">
 
 <!-- Header Navigation -->
+
 <div class="terminal-border bg-black p-2 m-4">
     <div class="flex justify-between items-center text-xs">
         <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
@@ -162,36 +230,41 @@
 </div>
 
 <!-- Main Content -->
+
 <div class="container mx-auto px-4 pb-24">
     <!-- Title -->
     <div class="text-center mb-6">
         <h1 class="pixel-text text-3xl mb-4">GHOSTLINE GALLERY</h1>
     </div>
-    
-    <!-- Category Tabs -->
-    <div class="flex justify-center mb-8">
-        <div class="flex gap-2">
-            <button class="category-tab active" onclick="filterCategory('all')">ALL</button>
-            <button class="category-tab" onclick="filterCategory('latest')">LATEST</button>
-            <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
-            <button class="category-tab" onclick="filterCategory('rare')">RARE</button>
-            <button class="category-tab" onclick="filterCategory('ghost')">GHOST</button>
-            <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
-        </div>
-    </div>
-    
-    <!-- Gallery Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6" id="galleryGrid">
-        <!-- Gallery items will be loaded here -->
-    </div>
-    
-    <!-- Empty state -->
-    <div id="emptyState" class="text-center py-16 hidden">
-        <p class="text-green-600 mb-4">No artworks in this category yet.</p>
+
+```
+<!-- Category Tabs -->
+<div class="flex justify-center mb-8">
+    <div class="flex gap-2">
+        <button class="category-tab active" onclick="filterCategory('all')">ALL</button>
+        <button class="category-tab" onclick="filterCategory('latest')">LATEST</button>
+        <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
+        <button class="category-tab" onclick="filterCategory('rare')">RARE</button>
+        <button class="category-tab" onclick="filterCategory('ghost')">GHOST</button>
+        <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
     </div>
 </div>
 
+<!-- Gallery Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="galleryGrid">
+    <!-- Gallery items will be loaded here -->
+</div>
+
+<!-- Empty state -->
+<div id="emptyState" class="text-center py-16 hidden">
+    <p class="text-green-600 mb-4">No artworks in this category yet.</p>
+</div>
+```
+
+</div>
+
 <!-- Donate Button -->
+
 <div class="donate-wrapper">
     <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
         <span style="color: #00BFFF;">SUPPORT PROJECT</span>
@@ -199,6 +272,7 @@
 </div>
 
 <!-- Donate Modal -->
+
 <div class="modal" id="donateModal">
     <div class="modal-content">
         <h3 class="pixel-text text-lg mb-4" style="color: #00ff00;">SUPPORT GHOSTLINE</h3>
@@ -236,6 +310,8 @@ function initArtworkSymbols() {
     const symbols = document.querySelectorAll('.artwork-symbol');
     symbols.forEach((symbol) => {
         const dataIndex = symbol.getAttribute('data-index');
+        if (!dataIndex) return;
+        
         const [artworkIndex, symbolIndex] = dataIndex.split('-').map(Number);
         
         symbol.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
@@ -299,14 +375,27 @@ function renderGallery() {
     }
     
     emptyState.classList.add('hidden');
-    grid.innerHTML = galleryItems.map(item => `
-        <div class="terminal-border bg-black p-3">
-            <div class="h-48 bg-gray-900 flex items-center justify-center">
+    grid.innerHTML = galleryItems.map((item, index) => `
+        <div class="gallery-item">
+            <div class="gallery-image">
                 <img src="${item.url || ''}" alt="${item.filename || 'Artwork'}" 
-                     style="width: 100%; height: 100%; object-fit: cover;">
+                     style="image-rendering: pixelated;">
+            </div>
+            <div class="symbol-section">
+                <div class="symbol-row">
+                    <img src="ghostcoin.gif" alt="Ghost Coin" class="ghost-coin">
+                    <span class="artwork-symbol" data-index="${index}-0">█</span>
+                    <span class="artwork-symbol" data-index="${index}-1">▓</span>
+                    <span class="artwork-symbol" data-index="${index}-2">▒</span>
+                    <span class="artwork-symbol" data-index="${index}-3">░</span>
+                    <span class="artwork-symbol" data-index="${index}-4">▖</span>
+                </div>
             </div>
         </div>
     `).join('');
+    
+    // Инициализируем анимацию символов после рендера
+    setTimeout(initArtworkSymbols, 100);
 }
 
 // Фильтр категорий
@@ -469,6 +558,7 @@ function copyAddress() {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 <script src="supabase-env.js"></script>
 
 </body>
