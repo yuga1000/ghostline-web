@@ -473,6 +473,23 @@
         <h1 class="pixel-text text-3xl glow-text-soft mb-2">GHOSTLINE GALLERY</h1>
     </div>
     
+    <!-- Ghostcoin и символы -->
+    <div class="flex items-center justify-center mb-8 gap-6">
+        <!-- Ghostcoin слева -->
+        <div class="flex-shrink-0">
+            <img src="ghostcoin.gif" alt="Ghost Coin" class="w-16 h-16 pixel-art">
+        </div>
+        
+        <!-- 5 символов справа -->
+        <div class="flex gap-2" id="symbolContainer">
+            <span class="symbol-block text-green-500 text-xl font-mono"></span>
+            <span class="symbol-block text-green-500 text-xl font-mono"></span>
+            <span class="symbol-block text-green-500 text-xl font-mono"></span>
+            <span class="symbol-block text-green-500 text-xl font-mono"></span>
+            <span class="symbol-block text-green-500 text-xl font-mono"></span>
+        </div>
+    </div>
+    
     <!-- Category Tabs -->
     <div class="flex justify-center mb-8 category-tabs">
         <div class="flex gap-2 flex-wrap items-center">
@@ -629,8 +646,35 @@
     let currentCategory = 'all';
     let currentArtwork = null;
 
+    // Массив блочных символов
+    const blockSymbols = [
+        '█','▓','▒','░','▖','▗','▘','▝','▚','▞','▛','▜','▟','▙','▁','▂','▃','▄','▅','▆','▇',
+        '◼','◻','▣','▤','▥','▦','▧','▨','▩','⬜','⬒','⬓','⬔','⬕','❒','❖','☐','☑','☒',
+        '⧈','⧉','⧠','⧃','⧂','🜁','🜂','🜃','🜄','🝓','🝔','🝕','🝖','🝗','🝘'
+    ];
+
+    // Инициализация анимированных символов
+    function initAnimatedSymbols() {
+        const symbolElements = document.querySelectorAll('.symbol-block');
+        
+        symbolElements.forEach((element, index) => {
+            // Начальный символ
+            element.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
+            
+            // Запускаем анимацию с разными интервалами для каждого символа
+            setInterval(() => {
+                element.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
+            }, 200 + index * 150); // Разные ритмы: 200ms, 350ms, 500ms, 650ms, 800ms
+        });
+    }
+
     async function fetchImages() {
         try {
+            // Проверяем доступность Supabase клиента
+            if (!supabaseClient) {
+                return [];
+            }
+            
             const { data, error } = await supabaseClient
                 .from('images')
                 .select('*')
@@ -638,7 +682,6 @@
             if (error) throw error;
             return data || [];
         } catch (err) {
-            console.error('Error fetching images:', err);
             return [];
         }
     }
@@ -647,134 +690,6 @@
         console.log('🎨 Initializing gallery...');
         galleryItems = await fetchImages();
         localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-        renderGallery();
-        updateLiveStatus();
-    }
-
-    // Render gallery items
-    function renderGallery() {
-        const grid = document.getElementById('galleryGrid');
-        const emptyState = document.getElementById('emptyState');
-        
-
-        
-        const filtered = currentCategory === "all"
-            ? galleryItems
-            : currentCategory === "ghost"
-                ? galleryItems.filter(item => item.status === "lost" || item.status === "ghosted" || item.status === "ghost")
-                : galleryItems.filter(item => item.category === currentCategory);
-        if (filtered.length === 0) {
-            grid.innerHTML = '';
-            emptyState.classList.remove('hidden');
-            return;
-        }
-        
-        emptyState.classList.add('hidden');
-        
-        grid.innerHTML = filtered.map((item) => {
-            return `
-            <div class="gallery-card terminal-border bg-black p-3">
-                <div class="relative">
-                    <div class="h-48 flex items-center justify-center bg-gray-900">
-                        <img src="${item.url}" alt="${item.filename}" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                </div>
-            </div>
-        `}).join('');
-    }
-
-    // Show detail modal
-    function showDetailModal(artworkId) {
-        const artwork = galleryItems.find(item => item.id === artworkId);
-        if (!artwork) return;
-        
-        currentArtwork = artwork;
-        
-        document.getElementById('detailTitle').textContent = artwork.title || 'Untitled';
-        document.getElementById('detailId').textContent = artwork.id;
-        document.getElementById('detailStatus').textContent =
-            artwork.status === 'available' ? 'Available' :
-            artwork.status === 'sold' ? 'Sold' :
-            artwork.status === 'lost' ? 'Lost' : 'Ghost';
-        document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : symbolStrip;
-        document.getElementById('detailDescription').textContent = artwork.description || 'No description available.';
-        document.getElementById('detailDimensions').textContent = artwork.dimensions || 'Not specified';
-        document.getElementById('detailMedium').textContent = artwork.medium || 'Digital';
-        document.getElementById('detailDate').textContent = formatDate(artwork.creationDate);
-        document.getElementById('detailEdition').textContent = artwork.edition || '1/1';
-        
-        if (artwork.tags) {
-            document.getElementById('detailTags').innerHTML = `
-                <p><strong>Tags:</strong></p>
-                <p class="text-green-400">${artwork.tags}</p>
-            `;
-        } else {
-            document.getElementById('detailTags').innerHTML = '';
-        }
-        
-        if (artwork.image) {
-            document.getElementById('detailImage').src = artwork.image;
-        } else {
-            document.getElementById('detailImage').src = 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100%" height="100%" fill="#001100"/>
-                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#00ff00" font-family="monospace">NO IMAGE</text>
-                </svg>
-            `);
-        }
-        
-        document.getElementById('detailModal').style.display = 'flex';
-    }
-
-    function closeDetailModal() {
-        document.getElementById('detailModal').style.display = 'none';
-    }
-
-    // Format date for display
-    function formatDate(dateString) {
-        if (!dateString) return 'Unknown';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-    }
-
-    // Force refresh gallery
-    function forceRefresh() {
-        console.log('🔄 Force refreshing gallery...');
-        try {
-            galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
-            renderGallery();
-            updateLiveStatus();
-            
-            // Visual feedback
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '✅';
-            button.style.background = '#00ff00';
-            button.style.color = '#000000';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-                button.style.color = '';
-            }, 1000);
-        } catch (error) {
-            console.error('Force refresh error:', error);
-        }
-    }
-
-    // Filter by category
-    function filterCategory(category) {
-        currentCategory = category;
-        
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        event.target.classList.add('active');
-        
         renderGallery();
     }
 
@@ -948,23 +863,34 @@
 
     // Initialize on load once Supabase script is available
     window.addEventListener('load', () => {
-        supabaseClient = window.supabase.createClient(
-            window.SUPABASE_URL || '',
-            window.SUPABASE_ANON_KEY || ''
-        );
-        initGallery();
+        // Проверяем доступность Supabase
+        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+            supabaseClient = window.supabase.createClient(
+                window.SUPABASE_URL,
+                window.SUPABASE_ANON_KEY
+            );
+            initGallery();
+        } else {
+            // Работаем с localStorage без предупреждений
+            galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+            renderGallery();
+            updateLiveStatus();
+        }
+        
+        // Инициализируем анимированные символы всегда
+        initAnimatedSymbols();
     });
     
     // Refresh when page gains focus (switching from admin)
     window.addEventListener('focus', async function() {
-        console.log('🔄 Page focused, checking for updates...');
-        const newData = await fetchImages();
-        if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
-            console.log('📸 New image found!');
-            galleryItems = newData;
-            localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-            renderGallery();
-            updateLiveStatus();
+        if (supabaseClient) {
+            const newData = await fetchImages();
+            if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
+                galleryItems = newData;
+                localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
+                renderGallery();
+                updateLiveStatus();
+            }
         }
     });
 
@@ -977,13 +903,14 @@
 
     // Refresh gallery data periodically
     setInterval(async () => {
-        const newData = await fetchImages();
-        if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
-            console.log('🔄 New image detected, refreshing gallery...');
-            galleryItems = newData;
-            localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-            renderGallery();
-            updateLiveStatus();
+        if (supabaseClient) {
+            const newData = await fetchImages();
+            if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
+                galleryItems = newData;
+                localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
+                renderGallery();
+                updateLiveStatus();
+            }
         }
     }, 5000); // Check every 5 seconds
 </script>
@@ -991,4 +918,131 @@
 <script src="supabase-env.js"></script>
 
 </body>
-</html>
+</html>ery();
+        updateLiveStatus();
+    }
+
+    // Render gallery items
+    function renderGallery() {
+        const grid = document.getElementById('galleryGrid');
+        const emptyState = document.getElementById('emptyState');
+        
+
+        
+        const filtered = currentCategory === "all"
+            ? galleryItems
+            : currentCategory === "ghost"
+                ? galleryItems.filter(item => item.status === "lost" || item.status === "ghosted" || item.status === "ghost")
+                : galleryItems.filter(item => item.category === currentCategory);
+        if (filtered.length === 0) {
+            grid.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        emptyState.classList.add('hidden');
+        
+        grid.innerHTML = filtered.map((item) => {
+            return `
+            <div class="gallery-card terminal-border bg-black p-3">
+                <div class="relative">
+                    <div class="h-48 flex items-center justify-center bg-gray-900">
+                        <img src="${item.url}" alt="${item.filename}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    // Show detail modal
+    function showDetailModal(artworkId) {
+        const artwork = galleryItems.find(item => item.id === artworkId);
+        if (!artwork) return;
+        
+        currentArtwork = artwork;
+        
+        document.getElementById('detailTitle').textContent = artwork.title || 'Untitled';
+        document.getElementById('detailId').textContent = artwork.id;
+        document.getElementById('detailStatus').textContent =
+            artwork.status === 'available' ? 'Available' :
+            artwork.status === 'sold' ? 'Sold' :
+            artwork.status === 'lost' ? 'Lost' : 'Ghost';
+        document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : symbolStrip;
+        document.getElementById('detailDescription').textContent = artwork.description || 'No description available.';
+        document.getElementById('detailDimensions').textContent = artwork.dimensions || 'Not specified';
+        document.getElementById('detailMedium').textContent = artwork.medium || 'Digital';
+        document.getElementById('detailDate').textContent = formatDate(artwork.creationDate);
+        document.getElementById('detailEdition').textContent = artwork.edition || '1/1';
+        
+        if (artwork.tags) {
+            document.getElementById('detailTags').innerHTML = `
+                <p><strong>Tags:</strong></p>
+                <p class="text-green-400">${artwork.tags}</p>
+            `;
+        } else {
+            document.getElementById('detailTags').innerHTML = '';
+        }
+        
+        if (artwork.image) {
+            document.getElementById('detailImage').src = artwork.image;
+        } else {
+            document.getElementById('detailImage').src = 'data:image/svg+xml;base64,' + btoa(`
+                <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100%" height="100%" fill="#001100"/>
+                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#00ff00" font-family="monospace">NO IMAGE</text>
+                </svg>
+            `);
+        }
+        
+        document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    }
+
+    // Force refresh gallery
+    function forceRefresh() {
+        try {
+            galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+            renderGallery();
+            updateLiveStatus();
+            
+            // Visual feedback
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '✅';
+            button.style.background = '#00ff00';
+            button.style.color = '#000000';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+                button.style.color = '';
+            }, 1000);
+        } catch (error) {
+            // Silent fail
+        }
+    }
+
+    // Filter by category
+    function filterCategory(category) {
+        currentCategory = category;
+        
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        renderGall
