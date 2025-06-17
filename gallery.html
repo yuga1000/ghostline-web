@@ -166,20 +166,6 @@
     <!-- Title -->
     <div class="text-center mb-6">
         <h1 class="pixel-text text-3xl mb-4">GHOSTLINE GALLERY</h1>
-        
-        <!-- Ghostcoin и символы -->
-        <div class="flex items-center justify-center mb-6 gap-3">
-            <div class="flex-shrink-0">
-                <img src="ghostcoin.gif" alt="Ghost Coin" class="w-8 h-8 pixel-art">
-            </div>
-            <div class="flex gap-1" id="symbolContainer">
-                <span class="symbol-block text-green-500 text-sm"></span>
-                <span class="symbol-block text-green-500 text-sm"></span>
-                <span class="symbol-block text-green-500 text-sm"></span>
-                <span class="symbol-block text-green-500 text-sm"></span>
-                <span class="symbol-block text-green-500 text-sm"></span>
-            </div>
-        </div>
     </div>
     
     <!-- Category Tabs -->
@@ -245,13 +231,58 @@ function initSymbols() {
     });
 }
 
+// Анимация символов для артворков
+function initArtworkSymbols() {
+    const symbols = document.querySelectorAll('.artwork-symbol');
+    symbols.forEach((symbol) => {
+        const dataIndex = symbol.getAttribute('data-index');
+        const [artworkIndex, symbolIndex] = dataIndex.split('-').map(Number);
+        
+        symbol.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
+        
+        // Уникальный интервал для каждого символа
+        const interval = 600 + (artworkIndex * 100) + (symbolIndex * 200);
+        setInterval(() => {
+            symbol.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
+        }, interval);
+    });
+}
+
 // Загрузка галереи
-function loadGallery() {
+async function loadGallery() {
     try {
-        galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+        // Сначала пробуем Supabase
+        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+            try {
+                const supabaseClient = window.supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+                
+                const { data, error } = await supabaseClient
+                    .from('images')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (!error && data) {
+                    galleryItems = data;
+                    localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
+                } else {
+                    throw new Error('Supabase error');
+                }
+            } catch (supabaseError) {
+                // Fallback на localStorage
+                galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+            }
+        } else {
+            // Нет Supabase - используем localStorage
+            galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+        }
     } catch (e) {
+        // На случай любых ошибок
         galleryItems = [];
     }
+    
     renderGallery();
     updateStatus();
 }
@@ -297,9 +328,9 @@ function updateStatus() {
 }
 
 // Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     initSymbols();
-    loadGallery();
+    await loadGallery();
 });
 
 // Анимация кнопки SUPPORT (из оригинала)
