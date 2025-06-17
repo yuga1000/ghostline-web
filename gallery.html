@@ -227,7 +227,43 @@
         }
     }
 
-    /* Modal styles */
+    /* Contact modal styles */
+    .contact-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2001;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .contact-modal-content {
+        background: #000000;
+        border: 2px solid #00ff00;
+        padding: 30px;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    }
+    
+    .email-button {
+        background: #000000;
+        border: 2px solid #00ff00;
+        color: #00ff00;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-family: 'Share Tech Mono', monospace;
+        text-decoration: none;
+        display: inline-block;
+        margin: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .email-button:hover {
+        background: #00ff00;
+        color: #000000;
+    }
     .modal {
         display: none;
         position: fixed;
@@ -394,6 +430,29 @@
 
 </div>
 
+<!-- Contact Modal -->
+
+<div class="contact-modal" id="contactModal">
+    <div class="contact-modal-content">
+        <h3 class="pixel-text text-lg mb-4" style="color: #00ff00;">CONTACT ARTIST</h3>
+        <p class="text-sm mb-4" style="color: #ffffff;">Interested in this artwork?</p>
+
+```
+    <div class="terminal-border p-4 mb-4 bg-black">
+        <p class="text-sm mb-3" style="color: #00ff00;">EMAIL:</p>
+        <a href="mailto:ghostline@example.com?subject=Artwork Inquiry&body=Hello! I'm interested in your artwork." 
+           class="email-button">
+            ghostline@example.com
+        </a>
+        <p class="text-xs mt-2" style="color: #666;">Click to send email</p>
+    </div>
+    
+    <button class="category-tab" onclick="closeContactModal()">CLOSE</button>
+</div>
+```
+
+</div>
+
 <!-- Donate Modal -->
 
 <div class="modal" id="donateModal">
@@ -529,9 +588,9 @@ function renderGallery() {
     emptyState.classList.add('hidden');
     grid.innerHTML = filteredItems.map((item, index) => `
         <div class="gallery-item">
-            <div class="gallery-image">
+            <div class="gallery-image" onclick="openContactModal('${item.title || 'Artwork'}')">
                 <img src="${item.url || ''}" alt="${item.title || 'Artwork'}" 
-                     style="image-rendering: pixelated;">
+                     style="image-rendering: pixelated; cursor: pointer;">
                 <div class="status-indicator status-${item.status || 'available'}"></div>
             </div>
             <div class="symbol-section">
@@ -578,6 +637,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // Анимация кнопки SUPPORT (из оригинала)
+// Contact modal functions
+function openContactModal(artworkTitle) {
+    const modal = document.getElementById('contactModal');
+    const emailLink = modal.querySelector('.email-button');
+    
+    // Update email with artwork title in subject
+    const subject = `Artwork Inquiry: ${artworkTitle}`;
+    const body = `Hello! I'm interested in the artwork "${artworkTitle}". Could you please provide more information?`;
+    
+    emailLink.href = `mailto:ghostline@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    modal.style.display = 'flex';
+}
+
+function closeContactModal() {
+    document.getElementById('contactModal').style.display = 'none';
+}
+
 // Универсальная функция копирования
 function copyToClipboard(address, currency) {
     navigator.clipboard.writeText(address).then(() => {
