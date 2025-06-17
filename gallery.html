@@ -227,6 +227,52 @@
         }
     }
 
+    /* Lightbox styles */
+    .lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 3000;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .lightbox img {
+        max-width: 90vw;
+        max-height: 90vh;
+        object-fit: contain;
+        border: 2px solid #00ff00;
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+    }
+    
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #00ff00;
+        font-size: 30px;
+        cursor: pointer;
+        font-family: 'Share Tech Mono', monospace;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px 15px;
+        border: 1px solid #00ff00;
+    }
+    
+    .lightbox-info {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #00ff00;
+        padding: 10px 20px;
+        border: 1px solid #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        text-align: center;
+    }
+    
     /* Contact modal styles */
     .contact-modal {
         display: none;
@@ -430,6 +476,14 @@
 
 </div>
 
+<!-- Lightbox -->
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <div class="lightbox-close" onclick="closeLightbox()">×</div>
+    <img id="lightboxImage" src="" alt="">
+    <div class="lightbox-info" id="lightboxInfo"></div>
+</div>
+
 <!-- Contact Modal -->
 
 <div class="contact-modal" id="contactModal">
@@ -588,14 +642,15 @@ function renderGallery() {
     emptyState.classList.add('hidden');
     grid.innerHTML = filteredItems.map((item, index) => `
         <div class="gallery-item">
-            <div class="gallery-image" onclick="openContactModal('${item.title || 'Artwork'}')">
+            <div class="gallery-image">
                 <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23111111'/%3E%3C/svg%3E" 
                      data-src="${item.url || ''}" 
                      alt="${item.title || 'Artwork'}" 
                      class="loading lazy-image"
                      style="image-rendering: pixelated; cursor: pointer;"
-                     loading="lazy">
-                <div class="status-indicator status-${item.status || 'available'}"></div>
+                     loading="lazy"
+                     onclick="openLightbox('${item.url || ''}', '${item.title || 'Artwork'}', '${item.status || 'available'}')">
+                <div class="status-indicator status-${item.status || 'available'}" onclick="openContactModal('${item.title || 'Artwork'}')"></div>
             </div>
             <div class="symbol-section">
                 <div class="symbol-row">
@@ -682,6 +737,35 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // Анимация кнопки SUPPORT (из оригинала)
+// Lightbox functions
+function openLightbox(imageUrl, title, status) {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxInfo = document.getElementById('lightboxInfo');
+    
+    lightboxImage.src = imageUrl;
+    lightboxImage.alt = title;
+    
+    const statusText = status === 'sold' ? 'SOLD' : status === 'ghost' ? 'GHOST' : 'AVAILABLE';
+    lightboxInfo.innerHTML = `
+        <div>${title.toUpperCase()}</div>
+        <div style="margin-top: 5px; color: ${status === 'sold' ? '#ff0000' : status === 'ghost' ? '#888888' : '#00ff00'};">
+            ${statusText}
+        </div>
+        <div style="margin-top: 10px; font-size: 12px; color: #666;">
+            Click anywhere to close • Click status to contact
+        </div>
+    `;
+    
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
 // Contact modal functions
 function openContactModal(artworkTitle) {
     const modal = document.getElementById('contactModal');
