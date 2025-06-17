@@ -1,466 +1,161 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHOSTLINE - Gallery</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-    html {
-        background: #000000;
-        height: 100%;
-    }
-    
-    body {
-        background: #000000;
-        color: #00ff00;
-        font-family: 'Share Tech Mono', monospace;
-        overflow-x: hidden;
-        margin: 0;
-        padding: 0;
-        min-height: 100%;
-    }
-    
-    .terminal-border {
-        border: 2px solid #00ff00;
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-    }
-    
-    .glow-text {
-        text-shadow: 0 0 8px #00ff00, 0 0 16px #00ff00;
-    }
-
-    .glow-text-soft {
-        text-shadow: 0 0 4px #00ff00, 0 0 8px #00ff00;
-    }
-
-    .glow-blue {
-        text-shadow: 0 0 4px #00BFFF, 0 0 8px #00BFFF;
-    }
-    
-    .pixel-text {
-        font-family: 'Press Start 2P', cursive;
-        image-rendering: pixelated;
-    }
-    
-    .scanlines {
-        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
-        background-size: 100% 3px;
-        animation: scanlines 0.1s linear infinite;
-    }
-    
-    @keyframes scanlines {
-        0% { background-position: 0 0; }
-        100% { background-position: 0 3px; }
-    }
-    
-    @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0; }
-    }
-    
-    .blink {
-        animation: blink 1.4s infinite;
-    }
-    
-    /* Navigation styles */
-    .nav-link {
-        transition: all 0.3s ease;
-        text-decoration: none;
-        cursor: pointer;
-        color: #00ff00;
-    }
-    
-    .nav-link:hover {
-        text-shadow: 0 0 10px #00ff00;
-    }
-    
-    .nav-active {
-        color: #ffffff;
-        text-shadow: 0 0 10px #00ff00;
-    }
-    
-    /* Category tabs */
-    .category-tab {
-        padding: 8px 16px;
-        border: 1px solid #00ff00;
-        background: #000000;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 12px;
-    }
-    
-    .category-tab:hover {
-        background: #001100;
-        box-shadow: 0 0 6px rgba(0, 255, 0, 0.4);
-    }
-    
-    .category-tab.active {
-        background: #00ff00;
-        color: #000000;
-    }
-    
-    /* Gallery card styles */
-    .gallery-card {
-        position: relative;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    
-    .gallery-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 255, 0, 0.3);
-    }
-    
-    .gallery-card:hover .card-overlay {
-        opacity: 1;
-    }
-    
-    .card-overlay {
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    /* Status indicators */
-    .status-available {
-        width: 12px;
-        height: 12px;
-        background: #00ff00;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        box-shadow: 0 0 10px #00ff00;
-    }
-    
-    .status-sold {
-        width: 12px;
-        height: 12px;
-        background: #ff0000;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        box-shadow: 0 0 10px #ff0000;
-    }
-
-    .status-ghost {
-        width: 12px;
-        height: 12px;
-        background: #888888;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        box-shadow: 0 0 10px #888888;
-    }
-
-    @keyframes flicker {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
-    }
-
-    .ghosted {
-        opacity: 0.6;
-        filter: blur(0.5px);
-        animation: flicker 2s infinite;
-    }
-
-    .wind-icon {
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        pointer-events: none;
-        font-size: 12px;
-    }
-
-    /* Price display */
-    .price-display {
-        font-family: 'Share Tech Mono', monospace;
-        color: #00ff00;
-        font-size: 14px;
-    }
-
-    .coin-icon {
-        width: 32px;
-        height: 32px;
-        image-rendering: pixelated;
-    }
-
-    .price-symbol {
-        font-size: 14px;
-        margin-left: 2px;
-    }
-    
-    .pixel-art {
-        image-rendering: pixelated;
-        image-rendering: -moz-crisp-edges;
-        image-rendering: crisp-edges;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    /* Detail modal */
-    .detail-modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.95);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-    
-    .detail-content {
-        background: #000000;
-        border: 2px solid #00ff00;
-        max-width: 800px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
-    }
-    
-    .detail-image {
-        max-width: 100%;
-        max-height: 400px;
-        object-fit: contain;
-        image-rendering: pixelated;
-    }
-    
-    /* Donate button */
-    .donate-wrapper {
-        position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        align-items: center;
-        z-index: 1000;
-    }
-
-    .donate-console {
-        background: #000000;
-        border: 3px solid #00BFFF;
-        color: #00BFFF;
-        padding: 15px 40px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 16px rgba(0, 191, 255, 0.4);
-        animation: subtleFloat 4s ease-in-out infinite;
-    }
-    
-    @keyframes subtleFloat {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    .donate-console:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 24px rgba(0, 191, 255, 0.8);
-        animation: none;
-    }
-
-    /* Sparks from button */
-    .spark {
-        position: fixed;
-        width: 3px;
-        height: 3px;
-        background: #00BFFF;
-        pointer-events: none;
-        z-index: 1000;
-        box-shadow: 0 0 6px #00BFFF;
-    }
-
-    @keyframes sparkUp {
-        0% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+        body {
+            background: #000000 !important;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
-        100% {
-            opacity: 0;
-            transform: translateY(-150px) translateX(var(--drift)) scale(0);
+        
+        .terminal-border {
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
         }
-    }
-    
-    /* Admin link */
-    .admin-link {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        font-size: 10px;
-        opacity: 0.5;
-        text-decoration: none;
-        color: #00ff00;
-        z-index: 100;
-    }
-    
-    .admin-link:hover {
-        opacity: 1;
-    }
-
-    .ascii-emoji {
-        font-family: monospace;
-        font-size: 1.2em;
-        color: #00ff00;
-        opacity: 0.75;
-    }
-
-    #emptyState {
-        text-align: center;
-    }
-
-    /* Modal styles */
-    .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.9);
-        z-index: 2000;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .modal-content {
-        background: #000000;
-        border: 2px solid #00ff00;
-        padding: 30px;
-        max-width: 400px;
-        text-align: center;
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
-    }
-
-    /* Animated donate modal */
-    #donateModal .terminal-animated {
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    #donateModal .terminal-animated::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-        height: 2px;
-        width: 0;
-        background: #00ff00;
-        box-shadow: 0 0 6px #00ff00;
-    }
-
-    #donateModal.line-start .terminal-animated::before {
-        animation: lineGrow 0.4s forwards;
-    }
-
-    @keyframes lineGrow {
-        to { width: 100%; }
-    }
-
-    #donateModal .modal-content {
-        transform: scaleY(0);
-        transform-origin: top;
-        opacity: 0;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    #donateModal.show .modal-content {
-        transform: scaleY(1);
-        opacity: 1;
-    }
-
-    @media (max-width: 768px) {
-        #donateModal .modal-content {
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+        
+        .pixel-text {
+            font-family: 'Press Start 2P', cursive;
+            image-rendering: pixelated;
         }
-    }
-    
-    /* Mobile styles */
-    @media (max-width: 768px) {
-        .header-bar {
-            flex-direction: column;
-            gap: 0.5rem;
+        
+        .scanlines {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+            background-size: 100% 3px;
+            animation: scanlines 0.1s linear infinite;
         }
-
-        .nav-links {
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.5rem;
+        
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 3px; }
         }
-
-        .gallery-grid {
-            grid-template-columns: 1fr !important;
-            gap: 1rem;
+        
+        .nav-link {
+            color: #00ff00;
+            text-decoration: none;
+            cursor: pointer;
         }
-
-        .category-tabs {
-            overflow: visible;
+        
+        .nav-active {
+            color: #ffffff;
         }
-
-        .category-tabs > div {
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
+        
         .category-tab {
-            padding: 4px 8px;
-            font-size: 10px;
-            margin-right: 4px;
-            margin-bottom: 6px;
+            padding: 8px 16px;
+            border: 1px solid #00ff00;
+            background: #000000;
+            color: #00ff00;
+            cursor: pointer;
+            font-size: 12px;
         }
-
-        .gallery-card {
-            padding: 8px;
+        
+        .category-tab.active {
+            background: #00ff00;
+            color: #000000;
         }
-
+        
+        .pixel-art {
+            image-rendering: pixelated;
+        }
+        
+        .symbol-block {
+            display: inline-block;
+            font-family: monospace;
+        }
+        
+        /* Donate button */
         .donate-wrapper {
-            bottom: 20px;
+            position: fixed;
+            bottom: 80px;
             left: 50%;
-            right: auto;
             transform: translateX(-50%);
+            z-index: 1000;
         }
 
         .donate-console {
-            padding: 12px 30px;
-            font-size: 14px;
+            background: #000000;
+            border: 3px solid #00BFFF;
+            color: #00BFFF;
+            padding: 15px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 16px rgba(0, 191, 255, 0.4);
+            animation: subtleFloat 4s ease-in-out infinite;
+        }
+        
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .donate-console:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 24px rgba(0, 191, 255, 0.8);
+            animation: none;
         }
 
-        .admin-link {
+        /* Sparks from button */
+        .spark {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #00BFFF;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 0 6px #00BFFF;
+        }
+
+        @keyframes sparkUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-150px) translateX(var(--drift)) scale(0);
+            }
+        }
+
+        /* Modal styles */
+        .modal {
             display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
         }
-    }
-
-</style>
-
+        
+        .modal-content {
+            background: #000000;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+    </style>
 </head>
-<body class="scanlines" style="background-color: #000000;">
-    <!-- Admin Link (hidden) -->
-    <a href="admin.html" class="admin-link">[ADMIN]</a>
+<body class="scanlines">
 
 <!-- Header Navigation -->
-<div class="terminal-border bg-black p-2 m-4" style="background-color: #000000;">
-    <div class="flex justify-between items-center text-xs header-bar">
-        <div class="text-green-500 text-lg font-bold glow-text">GHOSTLINE</div>
-        <div class="flex gap-4 nav-links">
+<div class="terminal-border bg-black p-2 m-4">
+    <div class="flex justify-between items-center text-xs">
+        <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
+        <div class="flex gap-4">
             <a href="index.html" class="nav-link">[HOME]</a>
             <span class="nav-link nav-active">[GALLERY]</span>
             <a href="stream.html" class="nav-link">[STREAM]</a>
         </div>
-        <div class="live-indicator">
-            <span class="live-dot"></span>
+        <div>
             <span id="liveStatus">Loading...</span>
         </div>
     </div>
@@ -469,580 +164,281 @@
 <!-- Main Content -->
 <div class="container mx-auto px-4 pb-24">
     <!-- Title -->
-    <div class="text-center mb-8">
-        <h1 class="pixel-text text-3xl glow-text-soft mb-2">GHOSTLINE GALLERY</h1>
-    </div>
-    
-    <!-- Ghostcoin и символы -->
-    <div class="flex items-center justify-center mb-8 gap-6">
-        <!-- Ghostcoin слева -->
-        <div class="flex-shrink-0">
-            <img src="ghostcoin.gif" alt="Ghost Coin" class="w-16 h-16 pixel-art">
-        </div>
+    <div class="text-center mb-6">
+        <h1 class="pixel-text text-3xl mb-4">GHOSTLINE GALLERY</h1>
         
-        <!-- 5 символов справа -->
-        <div class="flex gap-2" id="symbolContainer">
-            <span class="symbol-block text-green-500 text-xl font-mono"></span>
-            <span class="symbol-block text-green-500 text-xl font-mono"></span>
-            <span class="symbol-block text-green-500 text-xl font-mono"></span>
-            <span class="symbol-block text-green-500 text-xl font-mono"></span>
-            <span class="symbol-block text-green-500 text-xl font-mono"></span>
+        <!-- Ghostcoin и символы -->
+        <div class="flex items-center justify-center mb-6 gap-3">
+            <div class="flex-shrink-0">
+                <img src="ghostcoin.gif" alt="Ghost Coin" class="w-8 h-8 pixel-art">
+            </div>
+            <div class="flex gap-1" id="symbolContainer">
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+                <span class="symbol-block text-green-500 text-sm"></span>
+            </div>
         </div>
     </div>
     
     <!-- Category Tabs -->
-    <div class="flex justify-center mb-8 category-tabs">
-        <div class="flex gap-2 flex-wrap items-center">
+    <div class="flex justify-center mb-8">
+        <div class="flex gap-2">
             <button class="category-tab active" onclick="filterCategory('all')">ALL</button>
             <button class="category-tab" onclick="filterCategory('latest')">LATEST</button>
             <button class="category-tab" onclick="filterCategory('series')">SERIES</button>
             <button class="category-tab" onclick="filterCategory('rare')">RARE</button>
             <button class="category-tab" onclick="filterCategory('ghost')">GHOST</button>
             <button class="category-tab" onclick="filterCategory('collabs')">COLLABS</button>
-            <span class="text-green-600 mx-2">|</span>
-            <button class="category-tab" onclick="forceRefresh()" title="Refresh gallery"><span class="ascii-emoji">(⟁)</span></button>
         </div>
     </div>
     
     <!-- Gallery Grid -->
-    <div class="gallery-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6" id="galleryGrid">
-        <!-- Gallery items will be dynamically generated -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6" id="galleryGrid">
+        <!-- Gallery items will be loaded here -->
     </div>
     
     <!-- Empty state -->
     <div id="emptyState" class="text-center py-16 hidden">
         <p class="text-green-600 mb-4">No artworks in this category yet.</p>
-        <p class="text-xs text-green-800">Check back soon for new pieces!</p>
-    </div>
-    
-    <!-- Support Section -->
-    <div class="text-center my-12 text-sm text-green-600">
-        Support GHOSTLINE experiments → <span class="glow-text cursor-pointer" onclick="scrollToDonate()">[DONATE]</span>
-    </div>
-</div>
-
-<!-- Detail Modal -->
-<div class="detail-modal" id="detailModal">
-    <div class="detail-content">
-        <div class="p-6">
-            <div class="flex justify-between items-start mb-4">
-                <h3 class="pixel-text text-lg glow-text" id="detailTitle">Artwork Title</h3>
-                <button class="category-tab" onclick="closeDetailModal()">×</button>
-            </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                    <img id="detailImage" class="detail-image w-full">
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <p class="text-sm mb-2"><strong>ID:</strong> <span id="detailId"></span></p>
-                        <p class="text-sm mb-2"><strong>Status:</strong> <span id="detailStatus"></span></p>
-                        <p class="text-sm mb-2"><strong>Price:</strong> <span id="detailPrice"></span></p>
-                    </div>
-                    
-                    <div>
-                        <p class="text-xs text-green-400" id="detailDescription"></p>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <p><strong>Dimensions:</strong></p>
-                            <p id="detailDimensions" class="text-green-400"></p>
-                        </div>
-                        <div>
-                            <p><strong>Medium:</strong></p>
-                            <p id="detailMedium" class="text-green-400"></p>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <p><strong>Created:</strong></p>
-                            <p id="detailDate" class="text-green-400"></p>
-                        </div>
-                        <div>
-                            <p><strong>Edition:</strong></p>
-                            <p id="detailEdition" class="text-green-400"></p>
-                        </div>
-                    </div>
-                    
-                    <div id="detailTags" class="text-xs">
-                        <p><strong>Tags:</strong></p>
-                        <p class="text-green-400"></p>
-                    </div>
-                    
-                    <div class="pt-4">
-                        <button class="category-tab w-full" onclick="inquireArtwork()">INQUIRE ABOUT THIS PIECE</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Inquiry Modal -->
-<div class="modal" id="inquiryModal">
-    <div class="modal-content">
-        <h3 class="pixel-text text-lg glow-text mb-4">ACQUIRE THIS PIECE</h3>
-        <div class="terminal-border p-4 mb-4 bg-black">
-            <p class="text-sm mb-2">TO INQUIRE ABOUT THIS ARTWORK:</p>
-            <p class="text-xs text-green-400 mb-3">Send email to:</p>
-            <p class="text-xs glow-text mb-3" id="secretEmail">ghostlineart@protonmail.com</p>
-            <a id="mailtoButton" href="#" target="_blank" rel="noopener noreferrer" class="category-tab pixel-text">WRITE EMAIL</a>
-        </div>
-        <button class="category-tab" onclick="closeModal()">CLOSE</button>
-    </div>
-</div>
-
-<!-- Donate Modal -->
-<div class="modal" id="donateModal">
-    <div class="terminal-animated">
-        <div class="modal-content">
-        <h3 class="pixel-text text-lg glow-text mb-4">SUPPORT GHOSTLINE</h3>
-        <div class="terminal-border p-4 mb-4 bg-black">
-            <p class="text-sm mb-3">ETHEREUM ADDRESS:</p>
-            <p class="text-xs glow-text break-all mb-3">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
-            <button class="category-tab mb-2" onclick="copyAddress()">COPY ADDRESS</button>
-        </div>
-        <p class="text-xs text-green-600 mb-4">Your support helps robots learn art!</p>
-        <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
-        </div>
     </div>
 </div>
 
 <!-- Donate Button -->
 <div class="donate-wrapper">
     <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
-        <span class="glow-blue">SUPPORT PROJECT</span>
+        <span style="color: #00BFFF;">SUPPORT PROJECT</span>
     </button>
 </div>
 
+<!-- Donate Modal -->
+<div class="modal" id="donateModal">
+    <div class="modal-content">
+        <h3 class="pixel-text text-lg mb-4" style="color: #00ff00;">SUPPORT GHOSTLINE</h3>
+        <div class="terminal-border p-4 mb-4 bg-black">
+            <p class="text-sm mb-3">ETHEREUM ADDRESS:</p>
+            <p class="text-xs break-all mb-3" style="color: #00ff00;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
+            <button class="category-tab mb-2" onclick="copyAddress()">COPY ADDRESS</button>
+        </div>
+        <p class="text-xs text-green-600 mb-4">Your support helps robots learn art!</p>
+        <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
+    </div>
+</div>
+
 <script>
-    const priceSymbols = [
-        '⟁', '✶', '⚗', '⌁', '⟁',
-        '⟡', '⋔', '𓂀', '𐂂',
-        '🜂', '🝊', '☍', '⟁'
-    ];
-    const priceSymbol = priceSymbols[Math.floor(Math.random() * priceSymbols.length)];
+// Простая инициализация
+let galleryItems = [];
+let currentCategory = 'all';
 
-    const symbolPool = [
-        '𐃉', '⧛', '☍', '⟁', '𐂂',
-        '⋔', '𓂀', '⧈', '⟡',
-        '🜂', '🝊'
-    ];
-    function generateSymbolStrip() {
-        const length = 8 + Math.floor(Math.random() * 5);
-        const result = [];
-        for (let i = 0; i < length; i++) {
-            result.push(symbolPool[Math.floor(Math.random() * symbolPool.length)]);
-        }
-        return result.join(' ');
+// Символы для анимации
+const blockSymbols = ['█','▓','▒','░','▖','▗','▘','▝','▚','▞','▛','▜','▟','▙'];
+
+// Анимация символов
+function initSymbols() {
+    const symbols = document.querySelectorAll('.symbol-block');
+    symbols.forEach((symbol, index) => {
+        symbol.textContent = blockSymbols[0];
+        setInterval(() => {
+            symbol.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
+        }, 400 + index * 300);
+    });
+}
+
+// Загрузка галереи
+function loadGallery() {
+    try {
+        galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
+    } catch (e) {
+        galleryItems = [];
     }
-    const symbolStrip = generateSymbolStrip();
-    let supabaseClient;
-    let galleryItems = [];
-    let currentCategory = 'all';
-    let currentArtwork = null;
+    renderGallery();
+    updateStatus();
+}
 
-    // Массив блочных символов
-    const blockSymbols = [
-        '█','▓','▒','░','▖','▗','▘','▝','▚','▞','▛','▜','▟','▙','▁','▂','▃','▄','▅','▆','▇',
-        '◼','◻','▣','▤','▥','▦','▧','▨','▩','⬜','⬒','⬓','⬔','⬕','❒','❖','☐','☑','☒',
-        '⧈','⧉','⧠','⧃','⧂','🜁','🜂','🜃','🜄','🝓','🝔','🝕','🝖','🝗','🝘'
-    ];
-
-    // Инициализация анимированных символов
-    function initAnimatedSymbols() {
-        const symbolElements = document.querySelectorAll('.symbol-block');
-        
-        symbolElements.forEach((element, index) => {
-            // Начальный символ
-            element.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
-            
-            // Запускаем анимацию с разными интервалами для каждого символа
-            setInterval(() => {
-                element.textContent = blockSymbols[Math.floor(Math.random() * blockSymbols.length)];
-            }, 200 + index * 150); // Разные ритмы: 200ms, 350ms, 500ms, 650ms, 800ms
-        });
+// Отображение галереи
+function renderGallery() {
+    const grid = document.getElementById('galleryGrid');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (galleryItems.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
     }
+    
+    emptyState.classList.add('hidden');
+    grid.innerHTML = galleryItems.map(item => `
+        <div class="terminal-border bg-black p-3">
+            <div class="h-48 bg-gray-900 flex items-center justify-center">
+                <img src="${item.url || ''}" alt="${item.filename || 'Artwork'}" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    `).join('');
+}
 
-    async function fetchImages() {
-        try {
-            // Проверяем доступность Supabase клиента
-            if (!supabaseClient) {
-                return [];
-            }
-            
-            const { data, error } = await supabaseClient
-                .from('images')
-                .select('*')
-                .order('created_at', { ascending: false });
-            if (error) throw error;
-            return data || [];
-        } catch (err) {
-            return [];
-        }
+// Фильтр категорий
+function filterCategory(category) {
+    currentCategory = category;
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    renderGallery();
+}
+
+// Обновление статуса
+function updateStatus() {
+    const status = document.getElementById('liveStatus');
+    if (status) {
+        status.textContent = `${galleryItems.length} IMAGES`;
     }
+}
 
-    async function initGallery() {
-        console.log('🎨 Initializing gallery...');
-        galleryItems = await fetchImages();
-        localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-        renderGallery();
-    }
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    initSymbols();
+    loadGallery();
+});
 
-    // Update live status
-    function updateLiveStatus() {
-        document.getElementById('liveStatus').textContent = `${galleryItems.length} IMAGES`;
-    }
+// Анимация кнопки SUPPORT (из оригинала)
+function createSparks() {
+    const button = document.getElementById('donateBtn');
+    const rect = button.getBoundingClientRect();
 
-    // Inquiry functions
-    function inquireArtwork() {
-        if (currentArtwork) {
-            document.getElementById("artworkId").textContent = `Artwork ID: ${currentArtwork.id}`;
-            const mailto = `mailto:ghostlineart@protonmail.com?subject=Artwork Inquiry: ${currentArtwork.id}&body=Hello, I would like to inquire about the artwork with ID ${currentArtwork.id}. My offer: `;
-            document.getElementById("mailtoButton").href = mailto;
-            document.getElementById("inquiryModal").style.display = "flex";
-            closeDetailModal();
-        }
-    }
-
-    // Modal functions
-    function closeModal() {
-        document.getElementById('inquiryModal').style.display = 'none';
-    }
-
-    function showDonateModal() {
-        const modal = document.getElementById('donateModal');
-        modal.style.display = 'flex';
-        modal.classList.add('line-start');
+    for (let i = 0; i < 15; i++) {
         setTimeout(() => {
-            modal.classList.add('show');
-        }, 500);
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+
+            const startX = rect.left + Math.random() * rect.width;
+            const startY = rect.top + rect.height / 2;
+
+            spark.style.left = startX + 'px';
+            spark.style.top = startY + 'px';
+
+            const drift = (Math.random() - 0.5) * 50;
+            spark.style.setProperty('--drift', drift + 'px');
+
+            const colors = ['#00BFFF', '#33CCFF', '#66D9FF', '#00FFFF'];
+            spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+            spark.style.animation = 'sparkUp 1.5s ease-out forwards';
+
+            document.body.appendChild(spark);
+
+            setTimeout(() => spark.remove(), 1500);
+        }, i * 30);
+    }
+}
+
+function createBranchingLines() {
+    const button = document.getElementById('donateBtn');
+    const rect = button.getBoundingClientRect();
+
+    const startPoints = [
+        { x: rect.left + rect.width / 2, y: rect.top },
+        { x: rect.right, y: rect.top + rect.height / 2 },
+        { x: rect.left + rect.width / 2, y: rect.bottom },
+        { x: rect.left, y: rect.top + rect.height / 2 },
+    ];
+
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed';
+    canvas.style.left = 0;
+    canvas.style.top = 0;
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = 1500;
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#00BFFF';
+    ctx.lineWidth = 2;
+
+    const dirs = [
+        { dx: 0, dy: -1 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: -1, dy: 0 },
+    ];
+
+    const branches = [];
+    const speed = 2;
+    const maxDepth = 5;
+
+    function addBranch(x, y, dir, depth) {
+        const length = 10 + Math.random() * 30;
+        branches.push({ x, y, dir, length, progress: 0, depth });
     }
 
-    function closeDonateModal() {
-        const modal = document.getElementById('donateModal');
-        modal.classList.remove('show', 'line-start');
-        modal.style.display = 'none';
-    }
+    for (let d = 0; d < 4; d++) addBranch(startPoints[d].x, startPoints[d].y, d, 0);
 
-    // Copy address
-    function copyAddress() {
-        const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
-        navigator.clipboard.writeText(address).then(() => {
-            alert('Address copied!');
-        });
-    }
+    function step() {
+        for (let i = branches.length - 1; i >= 0; i--) {
+            const b = branches[i];
+            const dir = dirs[b.dir];
+            const prev = b.progress;
+            b.progress = Math.min(b.progress + speed, b.length);
 
-    // Scroll to donate
-    function scrollToDonate() {
-        document.getElementById('donateBtn').scrollIntoView({ behavior: 'smooth' });
-    }
+            ctx.beginPath();
+            ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
+            ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
+            ctx.stroke();
 
-    // Animated branching lines and sparks
-    function createBranchingLines() {
-        const button = document.getElementById('donateBtn');
-        const rect = button.getBoundingClientRect();
+            if (b.progress >= b.length) {
+                const endX = b.x + dir.dx * b.length;
+                const endY = b.y + dir.dy * b.length;
+                branches.splice(i, 1);
 
-        const startPoints = [
-            { x: rect.left + rect.width / 2, y: rect.top },
-            { x: rect.right, y: rect.top + rect.height / 2 },
-            { x: rect.left + rect.width / 2, y: rect.bottom },
-            { x: rect.left, y: rect.top + rect.height / 2 },
-        ];
-
-        const canvas = document.createElement('canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.style.position = 'fixed';
-        canvas.style.left = 0;
-        canvas.style.top = 0;
-        canvas.style.pointerEvents = 'none';
-        canvas.style.zIndex = 1500;
-        document.body.appendChild(canvas);
-
-        const ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#00BFFF';
-        ctx.lineWidth = 2;
-
-        const dirs = [
-            { dx: 0, dy: -1 },
-            { dx: 1, dy: 0 },
-            { dx: 0, dy: 1 },
-            { dx: -1, dy: 0 },
-        ];
-
-        const branches = [];
-        const speed = 2;
-        const maxDepth = 5;
-
-        function addBranch(x, y, dir, depth) {
-            const length = 10 + Math.random() * 30;
-            branches.push({ x, y, dir, length, progress: 0, depth });
-        }
-
-        for (let d = 0; d < 4; d++) addBranch(startPoints[d].x, startPoints[d].y, d, 0);
-
-        function step() {
-            for (let i = branches.length - 1; i >= 0; i--) {
-                const b = branches[i];
-                const dir = dirs[b.dir];
-                const prev = b.progress;
-                b.progress = Math.min(b.progress + speed, b.length);
-
-                ctx.beginPath();
-                ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
-                ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
-                ctx.stroke();
-
-                if (b.progress >= b.length) {
-                    const endX = b.x + dir.dx * b.length;
-                    const endY = b.y + dir.dy * b.length;
-                    branches.splice(i, 1);
-
-                    if (b.depth < maxDepth) {
-                        const available = [0, 1, 2, 3].filter(dd => dd !== (b.dir + 2) % 4);
-                        let count = Math.floor(Math.random() * 3);
-                        while (count-- > 0 && available.length) {
-                            const idx = Math.floor(Math.random() * available.length);
-                            const nd = available.splice(idx, 1)[0];
-                            addBranch(endX, endY, nd, b.depth + 1);
-                        }
+                if (b.depth < maxDepth) {
+                    const available = [0, 1, 2, 3].filter(dd => dd !== (b.dir + 2) % 4);
+                    let count = Math.floor(Math.random() * 3);
+                    while (count-- > 0 && available.length) {
+                        const idx = Math.floor(Math.random() * available.length);
+                        const nd = available.splice(idx, 1)[0];
+                        addBranch(endX, endY, nd, b.depth + 1);
                     }
                 }
             }
-
-            if (branches.length) {
-                requestAnimationFrame(step);
-            } else {
-                setTimeout(() => canvas.remove(), 300);
-                showDonateModal();
-            }
         }
 
-        requestAnimationFrame(step);
-    }
-
-    function createSparks() {
-        const button = document.getElementById('donateBtn');
-        const rect = button.getBoundingClientRect();
-
-        for (let i = 0; i < 15; i++) {
-            setTimeout(() => {
-                const spark = document.createElement('div');
-                spark.className = 'spark';
-
-                const startX = rect.left + Math.random() * rect.width;
-                const startY = rect.top + rect.height / 2;
-
-                spark.style.left = startX + 'px';
-                spark.style.top = startY + 'px';
-
-                const drift = (Math.random() - 0.5) * 50;
-                spark.style.setProperty('--drift', drift + 'px');
-
-                const colors = ['#00BFFF', '#33CCFF', '#66D9FF', '#00FFFF'];
-                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
-
-                spark.style.animation = 'sparkUp 1.5s ease-out forwards';
-
-                document.body.appendChild(spark);
-
-                setTimeout(() => spark.remove(), 1500);
-            }, i * 30);
-        }
-    }
-
-    function handleDonateClick() {
-        createSparks();
-        createBranchingLines();
-    }
-
-    // Initialize on load once Supabase script is available
-    window.addEventListener('load', () => {
-        // Проверяем доступность Supabase
-        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-            supabaseClient = window.supabase.createClient(
-                window.SUPABASE_URL,
-                window.SUPABASE_ANON_KEY
-            );
-            initGallery();
+        if (branches.length) {
+            requestAnimationFrame(step);
         } else {
-            // Работаем с localStorage без предупреждений
-            galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
-            renderGallery();
-            updateLiveStatus();
-        }
-        
-        // Инициализируем анимированные символы всегда
-        initAnimatedSymbols();
-    });
-    
-    // Refresh when page gains focus (switching from admin)
-    window.addEventListener('focus', async function() {
-        if (supabaseClient) {
-            const newData = await fetchImages();
-            if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
-                galleryItems = newData;
-                localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-                renderGallery();
-                updateLiveStatus();
-            }
-        }
-    });
-
-    // Close modals on outside click
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal') || event.target.classList.contains('detail-modal')) {
-            event.target.style.display = 'none';
+            setTimeout(() => canvas.remove(), 300);
+            showDonateModal();
         }
     }
 
-    // Refresh gallery data periodically
-    setInterval(async () => {
-        if (supabaseClient) {
-            const newData = await fetchImages();
-            if (JSON.stringify(newData) !== JSON.stringify(galleryItems)) {
-                galleryItems = newData;
-                localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-                renderGallery();
-                updateLiveStatus();
-            }
-        }
-    }, 5000); // Check every 5 seconds
+    requestAnimationFrame(step);
+}
+
+function handleDonateClick() {
+    createSparks();
+    createBranchingLines();
+}
+
+function showDonateModal() {
+    document.getElementById('donateModal').style.display = 'flex';
+}
+
+function closeDonateModal() {
+    document.getElementById('donateModal').style.display = 'none';
+}
+
+function copyAddress() {
+    const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
+    navigator.clipboard.writeText(address).then(() => {
+        alert('Address copied!');
+    });
+}
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="supabase-env.js"></script>
 
 </body>
-</html>ery();
-        updateLiveStatus();
-    }
-
-    // Render gallery items
-    function renderGallery() {
-        const grid = document.getElementById('galleryGrid');
-        const emptyState = document.getElementById('emptyState');
-        
-
-        
-        const filtered = currentCategory === "all"
-            ? galleryItems
-            : currentCategory === "ghost"
-                ? galleryItems.filter(item => item.status === "lost" || item.status === "ghosted" || item.status === "ghost")
-                : galleryItems.filter(item => item.category === currentCategory);
-        if (filtered.length === 0) {
-            grid.innerHTML = '';
-            emptyState.classList.remove('hidden');
-            return;
-        }
-        
-        emptyState.classList.add('hidden');
-        
-        grid.innerHTML = filtered.map((item) => {
-            return `
-            <div class="gallery-card terminal-border bg-black p-3">
-                <div class="relative">
-                    <div class="h-48 flex items-center justify-center bg-gray-900">
-                        <img src="${item.url}" alt="${item.filename}" style="width: 100%; height: 100%; object-fit: cover;">
-                    </div>
-                </div>
-            </div>
-        `}).join('');
-    }
-
-    // Show detail modal
-    function showDetailModal(artworkId) {
-        const artwork = galleryItems.find(item => item.id === artworkId);
-        if (!artwork) return;
-        
-        currentArtwork = artwork;
-        
-        document.getElementById('detailTitle').textContent = artwork.title || 'Untitled';
-        document.getElementById('detailId').textContent = artwork.id;
-        document.getElementById('detailStatus').textContent =
-            artwork.status === 'available' ? 'Available' :
-            artwork.status === 'sold' ? 'Sold' :
-            artwork.status === 'lost' ? 'Lost' : 'Ghost';
-        document.getElementById('detailPrice').textContent = artwork.price ? artwork.price + ' ETH' : symbolStrip;
-        document.getElementById('detailDescription').textContent = artwork.description || 'No description available.';
-        document.getElementById('detailDimensions').textContent = artwork.dimensions || 'Not specified';
-        document.getElementById('detailMedium').textContent = artwork.medium || 'Digital';
-        document.getElementById('detailDate').textContent = formatDate(artwork.creationDate);
-        document.getElementById('detailEdition').textContent = artwork.edition || '1/1';
-        
-        if (artwork.tags) {
-            document.getElementById('detailTags').innerHTML = `
-                <p><strong>Tags:</strong></p>
-                <p class="text-green-400">${artwork.tags}</p>
-            `;
-        } else {
-            document.getElementById('detailTags').innerHTML = '';
-        }
-        
-        if (artwork.image) {
-            document.getElementById('detailImage').src = artwork.image;
-        } else {
-            document.getElementById('detailImage').src = 'data:image/svg+xml;base64,' + btoa(`
-                <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100%" height="100%" fill="#001100"/>
-                    <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#00ff00" font-family="monospace">NO IMAGE</text>
-                </svg>
-            `);
-        }
-        
-        document.getElementById('detailModal').style.display = 'flex';
-    }
-
-    function closeDetailModal() {
-        document.getElementById('detailModal').style.display = 'none';
-    }
-
-    // Format date for display
-    function formatDate(dateString) {
-        if (!dateString) return 'Unknown';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-    }
-
-    // Force refresh gallery
-    function forceRefresh() {
-        try {
-            galleryItems = JSON.parse(localStorage.getItem('ghostline_images') || '[]');
-            renderGallery();
-            updateLiveStatus();
-            
-            // Visual feedback
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = '✅';
-            button.style.background = '#00ff00';
-            button.style.color = '#000000';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-                button.style.color = '';
-            }, 1000);
-        } catch (error) {
-            // Silent fail
-        }
-    }
-
-    // Filter by category
-    function filterCategory(category) {
-        currentCategory = category;
-        
-        document.querySelectorAll('.category-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        event.target.classList.add('active');
-        
-        renderGall
+</html>
