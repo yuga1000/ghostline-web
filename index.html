@@ -109,12 +109,16 @@
             
             <!-- Title Section -->
             <div class="text-center mb-8">
-                <h1 class="pixel-text-title mb-2" onclick="showManifesto()" style="cursor: pointer;" id="titleLogo">
-                    <img src="components/ghostline_pixel_noglow.gif" 
+                <div class="pixel-text-title mb-2" onclick="showManifesto()" style="cursor: pointer; position: relative;" id="titleLogo">
+                    <img src="Logopng.png" 
                          alt="GHOSTLINE" 
-                         style="image-rendering: pixelated; animation-play-state: paused;"
-                         id="titleAnimation">
-                </h1>
+                         style="image-rendering: pixelated;"
+                         id="staticTitle">
+                    <img src="components/ghostline_pixel_noglow.gif" 
+                         alt="GHOSTLINE Animation" 
+                         style="image-rendering: pixelated; position: absolute; top: 0; left: 50%; transform: translateX(-50%); opacity: 0;"
+                         id="animatedTitle">
+                </div>
                 <div class="logo-subtitle">
                     ART &#9608;&#9608;E&#9608;&#9608; ROBOTS.
                 </div>
@@ -194,23 +198,26 @@
 
     // Show manifesto function
     function showManifesto() {
-        // Start the GIF animation
-        const titleImg = document.getElementById('titleAnimation');
-        if (titleImg) {
-            titleImg.style.animationPlayState = 'running';
-            titleImg.style.transform = 'scale(1.1)';
-            titleImg.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+        // Show animated GIF on top
+        const animatedTitle = document.getElementById('animatedTitle');
+        const staticTitle = document.getElementById('staticTitle');
+        
+        if (animatedTitle && staticTitle) {
+            // Fade in animated GIF
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'translateX(-50%) scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
         }
         
         // Open PDF after animation completes
         setTimeout(() => {
             window.open('ghostlinecodex.pdf', '_blank');
             
-            // Reset styles
-            if (titleImg) {
-                titleImg.style.transform = 'scale(1)';
-                titleImg.style.filter = 'none';
-                titleImg.style.animationPlayState = 'paused';
+            // Hide animated GIF, show static again
+            if (animatedTitle) {
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'translateX(-50%) scale(1)';
+                animatedTitle.style.filter = 'none';
             }
         }, 2000); // Wait for GIF animation to complete
     }
