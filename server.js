@@ -15,7 +15,14 @@ app.post('/api/login', (req, res) => {
   res.json({ message: 'success' });
 });
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.pdf')) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+    }
+  }
+}));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
