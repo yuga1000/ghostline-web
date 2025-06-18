@@ -100,9 +100,10 @@
             <div class="mb-4 relative">
                 <div class="w-48 h-48 mx-auto mb-2 logo-container p-2 flex items-center justify-center overflow-hidden">
                     <!-- Static GIF as main logo - enlarged -->
-                    <img src="IMG_2135.gif" 
-                         alt="GHOSTLINE Logo" 
-                         class="enlarged-logo" 
+                    <img src="IMG_2135.gif"
+                         alt="GHOSTLINE Logo"
+                         id="logo"
+                         class="enlarged-logo"
                          style="image-rendering: pixelated;">
                 </div>
             </div>
@@ -137,9 +138,11 @@
             <!-- Separator Line -->
             <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
             
+
         </div>
     </div>
 
+    <div id="pages-section" class="hidden max-h-screen overflow-y-auto my-8 space-y-8 flex flex-col items-center"></div>
 
 </div>
 
@@ -211,12 +214,8 @@
             animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
         }
         
-        // Open PDF after animation
+        // Reset back to static after animation
         setTimeout(() => {
-            console.log('Opening PDF...');
-            window.open('https://alqavrioetqfylwkqmak.supabase.co/storage/v1/object/public/images//ghostlinecodex%20.pdf', '_blank');
-            
-            // Reset back to static
             if (staticTitle && animatedTitle) {
                 staticTitle.style.opacity = '1';
                 animatedTitle.style.opacity = '0';
@@ -741,9 +740,20 @@ initATASquare();
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var logoImg = document.getElementById('logo');
-    if (logoImg) {
+    var pagesSection = document.getElementById('pages-section');
+    if (logoImg && pagesSection) {
       logoImg.addEventListener('click', function () {
-        window.open('https://alqavrioetqfylwkqmak.supabase.co/storage/v1/object/public/images/ghostlinecodex.pdf', '_blank');
+        if (pagesSection.childElementCount === 0) {
+          for (var i = 1; i <= 15; i++) {
+            var img = document.createElement('img');
+            img.src = 'pages/' + i + ' Large.jpeg';
+            img.alt = 'Page ' + i;
+            img.className = 'w-full max-w-screen-md mx-auto my-4 object-contain';
+            pagesSection.appendChild(img);
+          }
+        }
+        pagesSection.classList.remove('hidden');
+        pagesSection.scrollIntoView({ behavior: 'smooth' });
       });
     }
   });
