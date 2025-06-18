@@ -686,9 +686,9 @@ return picked;
 }
 
 function renderATALine() {
-const line = document.getElementById(‘ata-line’);
+const line = document.getElementById('ata-line');
 if (line) {
-line.textContent = currentATALine.join(’ ’);
+line.textContent = currentATALine.join(' ');
 }
 }
 
@@ -716,13 +716,13 @@ let row = [];
 for (let j = 0; j < size; j++) {
 row.push(ataGlyphs[Math.floor(Math.random() * ataGlyphs.length)]);
 }
-rows.push(row.join(’ ‘));
+rows.push(row.join(' '));
 }
-return rows.join(’\n’);
+return rows.join('\n');
 }
 
 function initATASquare() {
-const square = document.getElementById(‘ata-square’);
+const square = document.getElementById('ata-square');
 if (square) {
 square.textContent = getRandomATASquare();
 setInterval(() => {
@@ -731,7 +731,7 @@ square.textContent = getRandomATASquare();
 }
 }
 
-document.addEventListener(‘DOMContentLoaded’, () => {
+document.addEventListener('DOMContentLoaded', () => {
 initATALine();
 initATASquare();
 });
