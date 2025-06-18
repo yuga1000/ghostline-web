@@ -109,9 +109,16 @@
             
             <!-- Title Section -->
             <div class="text-center mb-8">
-                <h1 class="pixel-text-title mb-2">
-                    GHOSTLINE
-                </h1>
+                <div style="position: relative; display: inline-block;" onclick="showManifesto()" id="titleContainer">
+                    <img src="Logopng.png" 
+                         alt="GHOSTLINE"
+                         style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto;"
+                         id="staticTitle">
+                    <img src="components/ghostline_pixel_noglow.gif"
+                         alt="GHOSTLINE Animation"
+                         style="position: absolute; top: 0; left: 0; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
+                         id="animatedTitle">
+                </div>
                 <div class="logo-subtitle">
                     ART &#9608;&#9608;E&#9608;&#9608; ROBOTS.
                 </div>
@@ -189,11 +196,35 @@
         }
     }
 
-    // Show manifesto function (removed for now)
-    // function showManifesto() {
-    //     console.log('Manifesto clicked!');
-    //     window.open('ghostlinecodex.pdf', '_blank');
-    // }
+    // Show manifesto function
+    function showManifesto() {
+        console.log('Manifesto clicked!');
+        
+        const staticTitle = document.getElementById('staticTitle');
+        const animatedTitle = document.getElementById('animatedTitle');
+        
+        if (staticTitle && animatedTitle) {
+            // Hide static PNG, show animated GIF
+            staticTitle.style.opacity = '0';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+        }
+        
+        // Open PDF after animation
+        setTimeout(() => {
+            console.log('Opening PDF...');
+            window.open('ghostlinecodex.pdf', '_blank');
+            
+            // Reset back to static
+            if (staticTitle && animatedTitle) {
+                staticTitle.style.opacity = '1';
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
+            }
+        }, 2000);
+    }
     
     // Create cosmic meteors - reduced intensity by 4x
     function createCosmicMeteors() {
