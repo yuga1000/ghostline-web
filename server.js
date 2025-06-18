@@ -15,15 +15,7 @@ return res.status(403).json({ message: ‘Wrong password’ });
 res.json({ message: ‘success’ });
 });
 
-// Add MIME type for PDF files
-app.use(express.static(__dirname, {
-setHeaders: (res, path) => {
-if (path.endsWith(’.pdf’)) {
-res.setHeader(‘Content-Type’, ‘application/pdf’);
-res.setHeader(‘Content-Disposition’, ‘inline’);
-}
-}
-}));
+app.use(express.static(__dirname));
 
 app.listen(PORT, () => {
 console.log(`Server running on port ${PORT}`);
