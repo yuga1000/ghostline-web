@@ -109,14 +109,14 @@
             
             <!-- Title Section -->
             <div class="text-center mb-8">
-                <div class="pixel-text-title mb-2" onclick="showManifesto()" style="cursor: pointer; position: relative; display: inline-block;" id="titleLogo">
+                <div class="pixel-text-title mb-2" onclick="showManifesto()" style="cursor: pointer; position: relative; display: inline-block; min-height: 60px;" id="titleLogo">
                     <img src="Logopng.png" 
                          alt="GHOSTLINE" 
-                         style="image-rendering: pixelated; transition: opacity 0.3s ease; width: auto; height: auto;"
+                         style="image-rendering: pixelated; transition: opacity 0.3s ease; max-width: 400px; height: auto; display: block;"
                          id="staticTitle">
                     <img src="components/ghostline_pixel_noglow.gif" 
                          alt="GHOSTLINE Animation" 
-                         style="image-rendering: pixelated; position: absolute; top: 0; left: 50%; transform: translateX(-50%); opacity: 0; transition: all 0.3s ease; width: auto; height: auto;"
+                         style="image-rendering: pixelated; position: absolute; top: 0; left: 0; opacity: 0; transition: all 0.3s ease; max-width: 400px; height: auto; display: block;"
                          id="animatedTitle">
                 </div>
                 <div class="logo-subtitle">
@@ -207,11 +207,10 @@
         if (animatedTitle && staticTitle) {
             // Hide static PNG
             staticTitle.style.opacity = '0';
-            // Show animated GIF
+            // Show animated GIF in exact same position
             animatedTitle.style.opacity = '1';
-            animatedTitle.style.transform = 'translateX(-50%) scale(1.05)';
+            animatedTitle.style.transform = 'scale(1.05)';
             animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
-            animatedTitle.style.transition = 'all 0.3s ease';
         }
         
         // Open PDF after animation completes
@@ -223,7 +222,7 @@
             if (animatedTitle && staticTitle) {
                 animatedTitle.style.opacity = '0';
                 staticTitle.style.opacity = '1';
-                animatedTitle.style.transform = 'translateX(-50%) scale(1)';
+                animatedTitle.style.transform = 'scale(1)';
                 animatedTitle.style.filter = 'none';
             }
         }, 2000); // Wait for GIF animation to complete
