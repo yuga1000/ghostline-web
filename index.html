@@ -231,31 +231,31 @@
             return;
         }
 
-        // Lock positioning so all images overlap perfectly
-        animatedTitle.style.position = 'absolute';
-        animatedTitle.style.top = '0';
-        animatedTitle.style.left = '0';
+        // Apply the same positioning styles as the static title
+        animatedTitle.style.position = 'relative';
+        animatedTitle.style.top = '';
+        animatedTitle.style.left = '';
         animatedTitle.style.marginTop = '-220px';
-        animatedTitle.style.zIndex = '10';
+        animatedTitle.style.maxWidth = '400px';
+        animatedTitle.style.height = 'auto';
         animatedTitle.style.imageRendering = 'pixelated';
+        animatedTitle.style.zIndex = '10';
 
         // Hide the initial PNG but keep layout
         staticTitle.style.opacity = '0';
 
-        // Reset GIF source to force single play then show it
+        // Reset GIF source to force a single play
         animatedTitle.src = '';
         animatedTitle.style.opacity = '1';
-        setTimeout(() => {
-            animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
+        animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
 
-            // After the GIF plays, replace it with the final PNG
-            setTimeout(() => {
-                animatedTitle.src = 'components/IMG_3412.png';
-                if (popup) {
-                    popup.style.display = 'block';
-                }
-            }, 1200);
-        }, 0);
+        // After the GIF plays, replace it with the final PNG
+        setTimeout(() => {
+            animatedTitle.src = 'components/IMG_3412.png';
+            if (popup) {
+                popup.style.display = 'block';
+            }
+        }, 1200);
     }
     
     // Create cosmic meteors - reduced intensity by 4x
