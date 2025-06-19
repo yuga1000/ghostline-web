@@ -123,14 +123,14 @@
             
             <!-- Title Section -->
             <div class="text-center mb-8">
-                <div style="position: relative; display: inline-block;" onclick="showManifesto()" id="titleContainer">
+                <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer">
                     <img src="Logopng.png" 
                          alt="GHOSTLINE"
                          style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto;"
                          id="staticTitle">
                     <img src="components/ghostline_pixel_noglow.gif"
                          alt="GHOSTLINE Animation"
-                         style="position: absolute; top: 0; left: 0; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
+                         style="position: relative; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
                          id="animatedTitle">
                 </div>
                 <div class="logo-subtitle">
@@ -220,6 +220,7 @@
 function showManifesto() {
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
+        const titleContainer = document.getElementById('titleContainer');
         const popup = document.getElementById('terminal-popup');
 
         if (!staticTitle || !animatedTitle) {
@@ -234,9 +235,11 @@ function showManifesto() {
         // After the GIF plays, replace it with the final static PNG and show the popup
         setTimeout(() => {
             animatedTitle.src = 'components/IMG_3412.png';
-            animatedTitle.style.position = 'absolute';
-            animatedTitle.style.top = '0';
-            animatedTitle.style.left = '0';
+            if (titleContainer) {
+                titleContainer.style.marginTop = '0';
+            }
+            animatedTitle.style.position = 'relative';
+            animatedTitle.style.marginTop = '-220px';
             animatedTitle.style.zIndex = '10';
             animatedTitle.style.opacity = '1';
             animatedTitle.style.imageRendering = 'pixelated';
