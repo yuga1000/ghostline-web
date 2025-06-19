@@ -228,12 +228,25 @@ function showManifesto() {
 
         // Hide the initial static PNG and show the GIF
         staticTitle.style.display = 'none';
+
+        // Match the GIF dimensions and positioning so the later PNG stays put
+        const rect = staticTitle.getBoundingClientRect();
+        animatedTitle.style.width = rect.width + 'px';
+        animatedTitle.style.height = rect.height + 'px';
+        animatedTitle.style.position = 'absolute';
+        animatedTitle.style.top = '0';
+        animatedTitle.style.left = '0';
+
         animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
         animatedTitle.style.opacity = '1';
 
         // After the GIF plays, replace it with the final static PNG and show the popup
         setTimeout(() => {
+            // Swap in the PNG while keeping the absolute coordinates
             animatedTitle.src = 'components/IMG_3412.png';
+            animatedTitle.style.top = '0';
+            animatedTitle.style.left = '0';
+
             if (popup) {
                 popup.style.display = 'block';
             }
