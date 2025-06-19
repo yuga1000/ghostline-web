@@ -218,35 +218,26 @@
 
     // Show manifesto function
 function showManifesto() {
-        console.log('Manifesto clicked!');
-
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
         const popup = document.getElementById('terminal-popup');
-        
-        if (staticTitle && animatedTitle) {
-            // Hide static PNG, show animated GIF
-            staticTitle.style.opacity = '0';
-            animatedTitle.style.opacity = '1';
-            animatedTitle.style.transform = 'scale(1.05)';
-            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
-        }
-        
-        if (popup) {
-            setTimeout(() => {
-                popup.style.display = 'block';
-            }, 1000);
+
+        if (!staticTitle || !animatedTitle) {
+            return;
         }
 
-        // Reset back to static after animation
+        // Hide the initial static PNG and show the GIF
+        staticTitle.style.display = 'none';
+        animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
+        animatedTitle.style.opacity = '1';
+
+        // After the GIF plays, replace it with the final static PNG and show the popup
         setTimeout(() => {
-            if (staticTitle && animatedTitle) {
-                staticTitle.style.opacity = '1';
-                animatedTitle.style.opacity = '0';
-                animatedTitle.style.transform = 'scale(1)';
-                animatedTitle.style.filter = 'none';
+            animatedTitle.src = 'components/IMG_3412.png';
+            if (popup) {
+                popup.style.display = 'block';
             }
-        }, 2000);
+        }, 1200);
     }
     
     // Create cosmic meteors - reduced intensity by 4x
