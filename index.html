@@ -772,7 +772,11 @@ initATASquare();
         }
         pagesSection.classList.remove('hidden');
         pagesSection.scrollIntoView({ behavior: 'smooth' });
-        if (popup) popup.style.display = 'block';
+        if (popup) {
+          setTimeout(function () {
+            popup.style.display = 'block';
+          }, 1000);
+        }
       });
     }
     if (closeBtn && popup) {
