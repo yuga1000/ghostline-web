@@ -132,6 +132,10 @@
                          alt="GHOSTLINE Animation"
                          style="position: absolute; top: 0; left: 0; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
                          id="animatedTitle">
+                    <img src="components/IMG_3412.png"
+                         alt="GHOSTLINE Final"
+                         style="opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; position: absolute; top: 0; left: 0; z-index: 9;"
+                         id="finalTitle">
                 </div>
                 <div class="logo-subtitle">
                     ART &#9608;&#9608;E&#9608;&#9608; ROBOTS.
@@ -222,22 +226,24 @@ function showManifesto() {
 
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
+        const finalTitle = document.getElementById('finalTitle');
 
-        if (staticTitle && animatedTitle) {
-            // Hide static PNG, show animated GIF
+        if (staticTitle && animatedTitle && finalTitle) {
+            // Hide static PNG and final PNG, show animated GIF
             staticTitle.style.opacity = '0';
+            finalTitle.style.opacity = '0';
             animatedTitle.style.opacity = '1';
             animatedTitle.style.transform = 'scale(1.05)';
             animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
         }
 
-        // Reset back to static after animation
+        // Show final PNG after animation
         setTimeout(() => {
-            if (staticTitle && animatedTitle) {
-                staticTitle.style.opacity = '1';
+            if (staticTitle && animatedTitle && finalTitle) {
                 animatedTitle.style.opacity = '0';
                 animatedTitle.style.transform = 'scale(1)';
                 animatedTitle.style.filter = 'none';
+                finalTitle.style.opacity = '1';
             }
         }, 2000);
     }
