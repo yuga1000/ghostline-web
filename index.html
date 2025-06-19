@@ -94,10 +94,10 @@
     <div class="flex justify-between items-center text-xs">
         <div class="flex items-center space-x-4">
             <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
-            <span class="text-green-400" id="randomNumbers">█████</span>
+            <span class="text-green-400" id="randomNumbers">âââââ</span>
         </div>
         <div class="flex items-center space-x-4">
-            <span class="blink">█</span>
+            <span class="blink">â</span>
             <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
         </div>
     </div>
@@ -121,23 +121,22 @@
                 </div>
             </div>
             
-          <!-- Title Section -->
-
-<div class="text-center mb-8">
-  <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer">
-    <img src="Logopng.png"
-         alt="GHOSTLINE"
-         style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto; display: block;"
-         id="staticTitle">
-    <img src="components/ghostline_pixel_noglow.gif"
-         alt="GHOSTLINE Animation"
-         style="opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; display: block;"
-         id="animatedTitle">
-  </div>
-  <div class="logo-subtitle">
-    ART &#9608;&#9608;E&#9608;&#9608; ROBOTS.
-  </div>
-</div>
+            <!-- Title Section -->
+            <div class="text-center mb-8">
+                <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer">
+                    <img src="Logopng.png"
+                         alt="GHOSTLINE"
+                         style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto;"
+                         id="staticTitle">
+                    <img src="components/ghostline_pixel_noglow.gif"
+                         alt="GHOSTLINE Animation"
+                         style="position: absolute; top: 0; left: 0; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
+                         id="animatedTitle">
+                </div>
+                <div class="logo-subtitle">
+                    ART &#9608;&#9608;E&#9608;&#9608; ROBOTS.
+                </div>
+            </div>
             
             <!-- Navigation Buttons -->
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
@@ -181,18 +180,18 @@
 <!-- Scrolling Text Horizon -->
 <div class="scrolling-text">
     <div class="scroll-line" style="bottom: 120px; animation-delay: 0s; opacity: 0.2;">
-        ( ͡° ͜ʖ ͡°)🚂~~~
- ~~~~ o o o  //_[……………]_[&$£¥]_[%^*+]_{::::##} "IT IS PROGRAMMED TO REPRODUCE ITSELF." ONE MUST CONSIDER THAT DNA IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF.
+        ( Í¡Â° ÍÊ Í¡Â°)ð~~~
+ ~~~~ o o o  //_[â¦â¦â¦â¦â¦]_[&$Â£Â¥]_[%^*+]_{::::##} "IT IS PROGRAMMED TO REPRODUCE ITSELF." ONE MUST CONSIDER THAT DNA IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF.
     </div>
     <div class="scroll-line" style="bottom: 100px; animation-delay: -2.5s; opacity: 0.25;">
-      ▓▓▓▓╣▓▓╣▓▓╣▓▓╣▓▓
+      âââââ£âââ£âââ£âââ£ââ
 
-▓▓╩═╩══╩═╩══╩═╩▓▓
-▐███▌▐██▌▐██▌▐███▌ //*[……………]*[…..…]*[=====]*{#####} COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM “MEMORIES,” NOT ITS JUST CONSCIOUSNESS.
+âââ©ââ©âââ©ââ©âââ©ââ©ââ
+ââââââââââââââââââ //*[â¦â¦â¦â¦â¦]*[â¦..â¦]*[=====]*{#####} COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM âMEMORIES,â NOT ITS JUST CONSCIOUSNESS.
 </div>
 <div class="scroll-line" style="bottom: 80px; animation-delay: -5s; opacity: 0.3;">
-▐██▌==▐██▌==▐██▌==▐██▌▶
-██████████████████████   //*[……………]*[…..…]*[=====]*{#####}AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT.
+ââââ==ââââ==ââââ==âââââ¶
+ââââââââââââââââââââââ   //*[â¦â¦â¦â¦â¦]*[â¦..â¦]*[=====]*{#####}AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT.
 </div>
 </div>
 
@@ -217,46 +216,30 @@
         }
     }
 
-    let manifestoShown = false;
-
     // Show manifesto function
-    function showManifesto() {
-        if (manifestoShown) return;
-        manifestoShown = true;
+function showManifesto() {
+        console.log('Manifesto clicked!');
 
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
-        const popup = document.getElementById('terminal-popup');
 
-        if (!staticTitle || !animatedTitle) {
-            return;
+        if (staticTitle && animatedTitle) {
+            // Hide static PNG, show animated GIF
+            staticTitle.style.opacity = '0';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
         }
 
-        // Apply the same positioning styles as the static title
-        animatedTitle.style.position = 'relative';
-        animatedTitle.style.top = '';
-        animatedTitle.style.left = '';
-        animatedTitle.style.marginTop = '0';
-        animatedTitle.style.maxWidth = '400px';
-        animatedTitle.style.height = 'auto';
-        animatedTitle.style.imageRendering = 'pixelated';
-        animatedTitle.style.zIndex = '10';
-
-        // Hide the initial PNG but keep layout
-        staticTitle.style.opacity = '0';
-
-        // Reset GIF source to force a single play
-        animatedTitle.src = '';
-        animatedTitle.style.opacity = '1';
-        animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
-
-        // After the GIF plays, replace it with the final PNG
+        // Reset back to static after animation
         setTimeout(() => {
-            animatedTitle.src = 'components/IMG_3412.png';
-            if (popup) {
-                popup.style.display = 'block';
+            if (staticTitle && animatedTitle) {
+                staticTitle.style.opacity = '1';
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
             }
-        }, 1200);
+        }, 2000);
     }
     
     // Create cosmic meteors - reduced intensity by 4x
@@ -318,7 +301,7 @@
                     firefly.style.top = pos.y + 'px';
                     
                     // Fireflies fly predominantly upward
-                    const angle = -Math.PI/2 + (Math.random() - 0.5) * Math.PI/3; // Upward ±30°
+                    const angle = -Math.PI/2 + (Math.random() - 0.5) * Math.PI/3; // Upward Â±30Â°
                     const distance = Math.random() * 200 + 150;
                     const dx = Math.cos(angle) * distance * 0.3;
                     const dy = Math.sin(angle) * distance;
@@ -681,7 +664,7 @@
             // Start idle pixels for SOCIAL button
             startSocialParticles();
             
-            console.log('🎨 GHOSTLINE initialized!');
+            console.log('ð¨ GHOSTLINE initialized!');
             
         } catch (e) {
             console.log('Initialization error:', e);
@@ -703,11 +686,11 @@
 <div id="ata-square" class="ata-glyph-square"></div>
 <script>
 const ataGlyphs = [
-  "█","▓","▒","░","⧉","⚚","☲","⑂","⌬","⌁","⌖","⌿","⏚","⸸",
-  "⛧","⍟","⏣","⏃","⬟","⌇","⌘","☍","⚷","⋔","⸮","⋇","⫷","⫸"
+  "â","â","â","â","â§","â","â²","â","â¬","â","â","â¿","â","â¸¸",
+  "â§","â","â£","â","â¬","â","â","â","â·","â","â¸®","â","â«·","â«¸"
 ];
 
-// — ATA line logic —
+// â ATA line logic â
 let currentATALine = [];
 
 function pickUniqueGlyphs(count = 5) {
@@ -742,7 +725,7 @@ renderATALine();
 setInterval(updateOneGlyph, 5000);
 }
 
-// — ATA square logic (unchanged) —
+// â ATA square logic (unchanged) â
 function getRandomATASquare(size = 5) {
 let rows = [];
 for (let i = 0; i < size; i++) {
