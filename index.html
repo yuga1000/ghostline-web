@@ -234,6 +234,9 @@ function showManifesto() {
 
         // After the GIF plays, replace it with the final static PNG and show the popup
         setTimeout(() => {
+            if (titleContainer) {
+  titleContainer.style.marginTop = '0';
+}
             animatedTitle.src = 'components/IMG_3412.png';
             animatedTitle.style.position = 'relative';
             animatedTitle.style.marginTop = '-220px';
