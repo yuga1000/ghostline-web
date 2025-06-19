@@ -9,6 +9,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
+    <style>
+      #terminal-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 60%;
+        background: #000;
+        border: 2px solid #00ff00;
+        color: #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        z-index: 10000;
+        padding: 20px;
+      }
+      #terminal-close {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+      }
+    </style>
+
 </head>
 <body>
     <!-- Terminal loading screen check -->
@@ -143,6 +167,10 @@
     </div>
 
     <div id="pages-section" class="hidden max-h-screen overflow-y-auto my-8 space-y-8 flex flex-col items-center"></div>
+
+    <div id="terminal-popup">
+        <div id="terminal-close">X</div>
+    </div>
 
 </div>
 
@@ -741,6 +769,8 @@ initATASquare();
   document.addEventListener('DOMContentLoaded', function () {
     var logoImg = document.getElementById('logo');
     var pagesSection = document.getElementById('pages-section');
+    var popup = document.getElementById('terminal-popup');
+    var closeBtn = document.getElementById('terminal-close');
     if (logoImg && pagesSection) {
       logoImg.addEventListener('click', function () {
         if (pagesSection.childElementCount === 0) {
@@ -754,6 +784,12 @@ initATASquare();
         }
         pagesSection.classList.remove('hidden');
         pagesSection.scrollIntoView({ behavior: 'smooth' });
+        if (popup) popup.style.display = 'block';
+      });
+    }
+    if (closeBtn && popup) {
+      closeBtn.addEventListener('click', function () {
+        popup.style.display = 'none';
       });
     }
   });
