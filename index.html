@@ -217,11 +217,12 @@
     }
 
     // Show manifesto function
-    function showManifesto() {
+function showManifesto() {
         console.log('Manifesto clicked!');
-        
+
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
+        const popup = document.getElementById('terminal-popup');
         
         if (staticTitle && animatedTitle) {
             // Hide static PNG, show animated GIF
@@ -231,6 +232,12 @@
             animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
         }
         
+        if (popup) {
+            setTimeout(() => {
+                popup.style.display = 'block';
+            }, 1000);
+        }
+
         // Reset back to static after animation
         setTimeout(() => {
             if (staticTitle && animatedTitle) {
@@ -775,11 +782,6 @@ initATASquare();
         }
         pagesSection.classList.remove('hidden');
         pagesSection.scrollIntoView({ behavior: 'smooth' });
-        if (popup) {
-          setTimeout(function () {
-            popup.style.display = 'block';
-          }, 1000);
-        }
         if (portalPanel && !portalShown) {
           setTimeout(function () {
             portalPanel.classList.add('visible');
