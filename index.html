@@ -247,11 +247,13 @@
         // Reset GIF source to force a single play
         animatedTitle.src = '';
         animatedTitle.style.opacity = '1';
+        animatedTitle.style.display = 'block';
         animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
 
         // After the GIF plays, replace it with the final PNG
         setTimeout(() => {
             animatedTitle.src = 'components/IMG_3412.png';
+            animatedTitle.style.display = 'block';
             if (popup) {
                 popup.style.display = 'block';
             }
