@@ -720,19 +720,3 @@
     margin-top: 8px;
 }
 
-/* Adjust position of homepage navigation buttons */
-#navButtons {
-    margin-top: -150px;
-}
-
-@media (max-width: 768px) {
-    #navButtons {
-        margin-top: -120px;
-    }
-}
-
-@media (max-width: 480px) {
-    #navButtons {
-        margin-top: -80px;
-    }
-}
