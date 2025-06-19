@@ -113,6 +113,10 @@
         font-size: 14px;
         text-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00;
     }
+
+    #titleContainer {
+        margin-top: 2rem;
+    }
     
     .pixel-text-xs {
         font-family: 'Share Tech Mono', monospace;
