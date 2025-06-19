@@ -754,33 +754,9 @@ initATASquare();
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    var logoImg = document.getElementById('logo');
-    var pagesSection = document.getElementById('pages-section');
     var popup = document.getElementById('terminal-popup');
     var closeBtn = document.getElementById('terminal-close');
-    var portalPanel = document.getElementById('portalPanel');
-    var portalShown = false;
-    if (logoImg && pagesSection) {
-      logoImg.addEventListener('click', function () {
-        if (pagesSection.childElementCount === 0) {
-          for (var i = 1; i <= 15; i++) {
-            var img = document.createElement('img');
-            img.src = 'pages/' + i + ' Large.jpeg';
-            img.alt = 'Page ' + i;
-            img.className = 'w-full max-w-screen-md mx-auto my-4 object-contain';
-            pagesSection.appendChild(img);
-          }
-        }
-        pagesSection.classList.remove('hidden');
-        pagesSection.scrollIntoView({ behavior: 'smooth' });
-        if (portalPanel && !portalShown) {
-          setTimeout(function () {
-            portalPanel.classList.add('visible');
-            portalShown = true;
-          }, 1000);
-        }
-      });
-    }
+
     if (closeBtn && popup) {
       closeBtn.addEventListener('click', function () {
         popup.style.display = 'none';
