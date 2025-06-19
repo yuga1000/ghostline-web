@@ -160,6 +160,7 @@
     <div id="terminal-popup">
         <div id="terminal-close">X</div>
     </div>
+    <div id="portalPanel">PORTAL ACTIVATED</div>
 
 </main>
 
@@ -759,6 +760,8 @@ initATASquare();
     var pagesSection = document.getElementById('pages-section');
     var popup = document.getElementById('terminal-popup');
     var closeBtn = document.getElementById('terminal-close');
+    var portalPanel = document.getElementById('portalPanel');
+    var portalShown = false;
     if (logoImg && pagesSection) {
       logoImg.addEventListener('click', function () {
         if (pagesSection.childElementCount === 0) {
@@ -775,6 +778,12 @@ initATASquare();
         if (popup) {
           setTimeout(function () {
             popup.style.display = 'block';
+          }, 1000);
+        }
+        if (portalPanel && !portalShown) {
+          setTimeout(function () {
+            portalPanel.classList.add('visible');
+            portalShown = true;
           }, 1000);
         }
       });
