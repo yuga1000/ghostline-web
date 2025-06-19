@@ -234,6 +234,14 @@ function showManifesto() {
         // After the GIF plays, replace it with the final static PNG and show the popup
         setTimeout(() => {
             animatedTitle.src = 'components/IMG_3412.png';
+            animatedTitle.style.position = 'absolute';
+            animatedTitle.style.top = '0';
+            animatedTitle.style.left = '0';
+            animatedTitle.style.zIndex = '10';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.imageRendering = 'pixelated';
+            animatedTitle.style.maxWidth = '400px';
+            animatedTitle.style.height = 'auto';
             if (popup) {
                 popup.style.display = 'block';
             }
