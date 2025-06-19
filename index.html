@@ -123,14 +123,14 @@
             
             <!-- Title Section -->
             <div class="text-center mb-8">
-                <div style="position: relative; display: inline-block;" onclick="showManifesto()" id="titleContainer">
+                <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer">
                     <img src="Logopng.png"
                          alt="GHOSTLINE"
-                         style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto; margin-top: -220px;"
+                         style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto;"
                          id="staticTitle">
                     <img src="components/ghostline_pixel_noglow.gif"
                          alt="GHOSTLINE Animation"
-                         style="position: relative; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
+                         style="position: absolute; top: 0; left: 0; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
                          id="animatedTitle">
                 </div>
                 <div class="logo-subtitle">
@@ -139,7 +139,7 @@
             </div>
             
             <!-- Navigation Buttons -->
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-14">
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
                 <a href="gallery.html" class="console-button" id="galleryBtn">
                     GALLERY
                 </a>
@@ -147,9 +147,9 @@
                     STREAM
                 </a>
             </div>
-            
+
             <!-- Separator Line -->
-            <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-14 opacity-30"></div>
+            <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
             
 
         </div>
@@ -218,37 +218,28 @@
 
     // Show manifesto function
 function showManifesto() {
+        console.log('Manifesto clicked!');
+
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
-        const titleContainer = document.getElementById('titleContainer');
-        const popup = document.getElementById('terminal-popup');
 
-        if (!staticTitle || !animatedTitle) {
-            return;
+        if (staticTitle && animatedTitle) {
+            // Hide static PNG, show animated GIF
+            staticTitle.style.opacity = '0';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
         }
 
-        // Hide the initial static PNG and show the GIF
-        staticTitle.style.display = 'none';
-        animatedTitle.src = 'components/ghostline_pixel_noglow.gif';
-        animatedTitle.style.opacity = '1';
-
-        // After the GIF plays, replace it with the final static PNG and show the popup
+        // Reset back to static after animation
         setTimeout(() => {
-            if (titleContainer) {
-  titleContainer.style.marginTop = '0';
-}
-            animatedTitle.src = 'components/IMG_3412.png';
-            animatedTitle.style.position = 'relative';
-            animatedTitle.style.marginTop = '-220px';
-            animatedTitle.style.zIndex = '10';
-            animatedTitle.style.opacity = '1';
-            animatedTitle.style.imageRendering = 'pixelated';
-            animatedTitle.style.maxWidth = '400px';
-            animatedTitle.style.height = 'auto';
-            if (popup) {
-                popup.style.display = 'block';
+            if (staticTitle && animatedTitle) {
+                staticTitle.style.opacity = '1';
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
             }
-        }, 1200);
+        }, 2000);
     }
     
     // Create cosmic meteors - reduced intensity by 4x
