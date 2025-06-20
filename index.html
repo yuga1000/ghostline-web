@@ -174,6 +174,7 @@
             </div>
             <div class="image-wrapper">
                 <img id="manifestoImage" src="pages/2Large.jpeg" alt="manifesto image">
+                <div id="pixelOverlay" class="pixel-overlay"></div>
                 <div id="manifestoText"></div>
             </div>
         </div>
@@ -368,6 +369,7 @@ let currentManifestoSlide = 0;
         const loader = document.querySelector('#manifestoPanel .manifesto-loader');
         const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
         const indicator = document.getElementById('manifestoIndicator');
+        const overlay = document.getElementById('pixelOverlay');
 
         currentManifestoSlide = index;
         if (indicator) {
@@ -379,8 +381,26 @@ let currentManifestoSlide = 0;
             if (loaderText) loaderText.style.display = 'none';
             if (text) text.style.display = 'none';
             if (image) image.style.display = 'block';
+            if (overlay) {
+                overlay.innerHTML = '';
+                overlay.style.display = 'grid';
+                const rows = 20;
+                const cols = 20;
+                overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+                for (let i = 0; i < rows * cols; i++) {
+                    const block = document.createElement('div');
+                    block.className = 'pixel-block';
+                    overlay.appendChild(block);
+                }
+                revealPixels(overlay);
+            }
         } else if (index === 1) {
             if (image) image.style.display = 'none';
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+            }
             startManifestoLoading();
         }
     }
@@ -394,14 +414,15 @@ let currentManifestoSlide = 0;
     function revealPixels(overlay) {
         const blocks = Array.from(overlay.children);
         blocks.forEach(block => {
-            const delay = Math.random() * 200;
+            const delay = Math.random() * 500;
             setTimeout(() => {
                 block.style.opacity = '0';
             }, delay);
         });
         setTimeout(() => {
             overlay.style.display = 'none';
-        }, 500);
+            overlay.innerHTML = '';
+        }, 700);
     }
 
     // Create cosmic meteors - reduced intensity by 4x
