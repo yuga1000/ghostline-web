@@ -718,6 +718,9 @@
         width: 60vw;
         height: 60vh;
         background: #000;
+        border: 2px solid #00d9ff;
+        animation: borderPulseBlue 3s ease-in-out infinite;
+        font-family: 'Share Tech Mono', monospace;
         z-index: 10000;
         display: flex;
         justify-content: center;
@@ -735,26 +738,58 @@
 
     .manifesto-btn {
         position: absolute;
-        right: 20px;
+        right: 24px;
         top: 50%;
         transform: translateY(-50%);
         width: 20px;
         height: 20px;
-        background: red;
-        border: none;
-        border-radius: 4px;
+        background: #ff0000;
+        border: 2px solid #ff0000;
+        font-family: 'Share Tech Mono', monospace;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .manifesto-btn:hover {
+        box-shadow: 0 0 4px #ff0000;
     }
 
     .manifesto-arrow {
         position: absolute;
         top: 50%;
         font-size: 24px;
-        color: #fff;
+        color: #ffffff;
+        font-family: 'Share Tech Mono', monospace;
         transform: translateY(-50%);
+        cursor: pointer;
     }
-    .manifesto-arrow-left { left: 20px; }
-    .manifesto-arrow-right { right: 60px; }
+    .manifesto-arrow-left { left: 24px; }
+    .manifesto-arrow-right { right: 68px; }
+
+    .manifesto-close {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 16px;
+        height: 16px;
+        line-height: 14px;
+        font-size: 12px;
+        text-align: center;
+        border: 2px solid #ff0000;
+        color: #ffffff;
+        font-family: 'Share Tech Mono', monospace;
+        cursor: pointer;
+    }
+
+    .manifesto-close:hover {
+        box-shadow: 0 0 4px #ff0000;
+    }
+
+    .manifesto-arrow:hover {
+        text-shadow: 0 0 4px #00d9ff;
+    }
 
     @keyframes terminalExpand {
         0% { transform: scale(0.8); opacity: 0; }
@@ -777,5 +812,20 @@
     line-height: 1.2;
     white-space: pre;
     margin-top: 8px;
+}
+
+@keyframes borderPulseBlue {
+    0%, 100% {
+        border-color: #00d9ff;
+        box-shadow: 0 0 3px rgba(0, 217, 255, 0.5),
+                    0 0 6px rgba(0, 217, 255, 0.3),
+                    0 0 9px rgba(0, 217, 255, 0.2);
+    }
+    50% {
+        border-color: #80eaff;
+        box-shadow: 0 0 5px rgba(0, 217, 255, 0.7),
+                    0 0 10px rgba(0, 217, 255, 0.5),
+                    0 0 15px rgba(0, 217, 255, 0.3);
+    }
 }
 
