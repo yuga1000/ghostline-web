@@ -166,6 +166,7 @@
     </div>
     <div id="portalPanel">PORTAL ACTIVATED</div>
     <div id="manifestoPanel">
+        <div id="manifestoClose" class="manifesto-close">&#215;</div>
         <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
         <span class="manifesto-arrow manifesto-arrow-right">&#9654;</span>
         <button id="manifestoNextBtn" class="manifesto-btn"></button>
@@ -779,6 +780,19 @@ initATASquare();
     if (closeBtn && popup) {
       closeBtn.addEventListener('click', function () {
         popup.style.display = 'none';
+      });
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var manifestoPanel = document.getElementById('manifestoPanel');
+    var manifestoClose = document.getElementById('manifestoClose');
+
+    if (manifestoPanel && manifestoClose) {
+      manifestoClose.addEventListener('click', function () {
+        manifestoPanel.classList.remove('visible');
       });
     }
   });
