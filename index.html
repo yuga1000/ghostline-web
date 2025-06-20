@@ -165,6 +165,11 @@
         <div id="terminal-close">X</div>
     </div>
     <div id="portalPanel">PORTAL ACTIVATED</div>
+    <div id="manifestoPanel">
+        <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
+        <span class="manifesto-arrow manifesto-arrow-right">&#9654;</span>
+        <button id="manifestoNextBtn" class="manifesto-btn"></button>
+    </div>
 
 </main>
 
@@ -227,6 +232,7 @@ function showManifesto() {
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
         const finalTitle = document.getElementById('finalTitle');
+        const manifestoPanel = document.getElementById('manifestoPanel');
 
         if (staticTitle && animatedTitle && finalTitle) {
             // Hide static PNG and final PNG, then show animated GIF
@@ -244,6 +250,13 @@ function showManifesto() {
                 finalTitle.style.opacity = '1';
             }, 700);
         }
+
+        // Reveal manifesto panel after 1400ms
+        setTimeout(() => {
+            if (manifestoPanel) {
+                manifestoPanel.classList.add('visible');
+            }
+        }, 1400);
     }
     
     // Create cosmic meteors - reduced intensity by 4x
