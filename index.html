@@ -165,6 +165,7 @@
         <div id="terminal-close">X</div>
     </div>
     <div id="portalPanel">PORTAL ACTIVATED</div>
+    <div id="portalFlash"></div>
     <div id="manifestoPanel">
         <div id="manifestoClose" class="manifesto-close">&#215;</div>
         <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
@@ -234,6 +235,7 @@ function showManifesto() {
         const animatedTitle = document.getElementById('animatedTitle');
         const finalTitle = document.getElementById('finalTitle');
         const manifestoPanel = document.getElementById('manifestoPanel');
+        const portalFlash = document.getElementById('portalFlash');
 
         if (staticTitle && animatedTitle && finalTitle) {
             // Hide static PNG and final PNG, then show animated GIF
@@ -252,12 +254,44 @@ function showManifesto() {
             }, 700);
         }
 
-        // Reveal manifesto panel after 1400ms
+        // Flash line
+        if (portalFlash) {
+            portalFlash.style.display = 'block';
+            portalFlash.style.opacity = '1';
+            portalFlash.style.transition = 'none';
+            portalFlash.style.width = '0';
+            requestAnimationFrame(() => {
+                portalFlash.style.transition = 'width 100ms linear';
+                portalFlash.style.width = '100%';
+            });
+            setTimeout(() => {
+                portalFlash.style.transition = 'opacity 100ms linear';
+                portalFlash.style.opacity = '0';
+            }, 100);
+            setTimeout(() => {
+                portalFlash.style.display = 'none';
+                portalFlash.style.width = '0';
+                portalFlash.style.opacity = '1';
+            }, 200);
+        }
+
+        // Start unfolding panel at 100ms
         setTimeout(() => {
             if (manifestoPanel) {
                 manifestoPanel.classList.add('visible');
             }
-        }, 1400);
+        }, 100);
+
+        // Reveal child elements from 300ms onwards
+        if (manifestoPanel) {
+            const children = manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-btn, .manifesto-close');
+            children.forEach(el => {
+                const delay = Math.random() * 300;
+                setTimeout(() => {
+                    el.classList.add('child-visible');
+                }, 300 + delay);
+            });
+        }
     }
     
     // Create cosmic meteors - reduced intensity by 4x
@@ -793,6 +827,9 @@ initATASquare();
     if (manifestoPanel && manifestoClose) {
       manifestoClose.addEventListener('click', function () {
         manifestoPanel.classList.remove('visible');
+        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-btn, .manifesto-close').forEach(function(el){
+          el.classList.remove('child-visible');
+        });
       });
     }
   });
