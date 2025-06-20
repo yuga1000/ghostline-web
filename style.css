@@ -909,16 +909,18 @@
     display: none;
     white-space: pre-wrap;
     color: #00ff00;
-    text-align: center;
+    text-align: justify;
+    text-justify: inter-word;
     font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
     font-weight: 700;
     max-width: 100%;
     max-height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
     margin: auto;
     padding: 4px;
     box-sizing: border-box;
     word-break: break-word;
+    line-height: 1.2;
 }
 
 .crt-char {
