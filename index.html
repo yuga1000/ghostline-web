@@ -168,13 +168,12 @@
     <div id="portalFlash"></div>
     <div id="manifestoPanel">
         <div class="reveal-sequence">
-            <div class="manifesto-loader-text">loading slide_02.jpeg....</div>
+            <div class="manifesto-loader-text">loading manifesto...</div>
             <div class="manifesto-loader">
                 <div class="manifesto-loader-fill"></div>
             </div>
             <div class="image-wrapper">
-                <img id="manifestoImage" src="pages/2Large.jpeg" alt="slide_02">
-                <div class="pixel-overlay"></div>
+                <div id="manifestoText"></div>
             </div>
         </div>
         <div id="manifestoClose" class="manifesto-close">&#215;</div>
@@ -304,6 +303,50 @@ function showManifesto() {
         }
     }
 
+    const manifestoContent = `" I T I S PROGRAMMEO
+TO REPRODUCE ITSELF."
+"ONE MUST CONSIDER TNAT
+O N A I S N O T H I N G M O R E THAN
+A PROGRAN D E S I G N E D TO
+REPLICATE I I S E L F .
+I N T H I S L I M I T L E S S S E A O F
+I N F O R M AT I O N . L I F E I S MUCH
+M O R E T H A N A S I M P L E E N T I T Y
+T H AT Y O U C A N D E F I N .
+F O R S O M E L I F E F O R M S .
+G E N E S A C T A S D ATA - P R U I O I N G
+COMPONENTS O F T H E I R S Y S T E M .
+M A N K I N D G A I N S I T S
+INDIVIOUALITY FROM "MEMORIES,"
+N O T I T S J U S T MERSCIUSNESS.
+MEMORIES CANNOT B E DEFINED,
+Y E T I T I S MENORY THAT
+CREATES HUMANITY.
+NEXT CAME T H E COMPUTERS.
+A N O A V A S T G AT H E R I N G O F
+INFORMATION CREATED A NEW,
+PA R A L L E L S Y S T E M O F MEHORY
+A N D THOUGNT.
+- Y O U R A S S E R T I O N S A R E N O T P R O O F
+T H AT Y O U A R E A L I V I N G E N T I T Y !
+- C A N Y O U O F F E R P R O O F O F YOUR
+EXISTENCE? HOW C A N Y O U , WHEN
+N E I T H E R S C I E N C E N O R P H I L O S O -
+PHY CAN EXPLAIN WHAT L I F E I S ?»`;
+
+    function typeManifestoText(element) {
+        let index = 0;
+        element.textContent = '';
+        const interval = setInterval(() => {
+            if (index <= manifestoContent.length) {
+                element.textContent = manifestoContent.substring(0, index);
+                index++;
+            } else {
+                clearInterval(interval);
+            }
+        }, 20);
+    }
+
     function startManifestoLoading() {
         const panel = document.getElementById('manifestoPanel');
         if (!panel) return;
@@ -311,25 +354,13 @@ function showManifesto() {
         const loaderFill = panel.querySelector('.manifesto-loader-fill');
         const loader = panel.querySelector('.manifesto-loader');
         const loaderText = panel.querySelector('.manifesto-loader-text');
-        const img = panel.querySelector('#manifestoImage');
-        const overlay = panel.querySelector('.pixel-overlay');
+        const text = panel.querySelector('#manifestoText');
 
-        if (loaderFill && loader && loaderText && img && overlay) {
+        if (loaderFill && loader && loaderText && text) {
             loaderFill.style.width = '0%';
             loader.style.display = 'block';
             loaderText.style.display = 'block';
-            img.style.display = 'none';
-            overlay.style.display = 'grid';
-            overlay.innerHTML = '';
-
-            const gridSize = 32;
-            overlay.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-            overlay.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
-            for (let i = 0; i < gridSize * gridSize; i++) {
-                const block = document.createElement('div');
-                block.className = 'pixel-block';
-                overlay.appendChild(block);
-            }
+            text.style.display = 'none';
 
             requestAnimationFrame(() => {
                 loaderFill.style.width = '100%';
@@ -338,8 +369,8 @@ function showManifesto() {
             setTimeout(() => {
                 loader.style.display = 'none';
                 loaderText.style.display = 'none';
-                img.style.display = 'block';
-                revealPixels(overlay);
+                text.style.display = 'block';
+                typeManifestoText(text);
             }, 300);
         }
     }
