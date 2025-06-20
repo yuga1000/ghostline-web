@@ -173,6 +173,7 @@
                 <div class="manifesto-loader-fill"></div>
             </div>
             <div class="image-wrapper">
+                <img id="manifestoImage" src="pages/2Large.jpeg" alt="manifesto image">
                 <div id="manifestoText"></div>
             </div>
         </div>
@@ -287,7 +288,7 @@ function showManifesto() {
         setTimeout(() => {
             if (manifestoPanel) {
                 manifestoPanel.classList.add('visible');
-                startManifestoLoading();
+                showSlide(0);
             }
         }, 1000);
 
@@ -303,7 +304,7 @@ function showManifesto() {
         }
     }
 
-    const manifestoContent = `" I T I S PROGRAMMEO
+const manifestoContent = `" I T I S PROGRAMMEO
 TO REPRODUCE ITSELF."
 "ONE MUST CONSIDER TNAT
 O N A I S N O T H I N G M O R E THAN
@@ -334,17 +335,31 @@ EXISTENCE? HOW C A N Y O U , WHEN
 N E I T H E R S C I E N C E N O R P H I L O S O -
 PHY CAN EXPLAIN WHAT L I F E I S ?»`;
 
+let currentManifestoSlide = 0;
+
     function typeManifestoText(element) {
-        let index = 0;
-        element.textContent = '';
-        const interval = setInterval(() => {
-            if (index <= manifestoContent.length) {
-                element.textContent = manifestoContent.substring(0, index);
-                index++;
-            } else {
-                clearInterval(interval);
-            }
-        }, 20);
+        element.innerHTML = '';
+        const cursor = document.createElement('span');
+        cursor.className = 'crt-cursor';
+        cursor.textContent = '_';
+        element.appendChild(cursor);
+
+        const totalDuration = 400; // ms
+        const chars = manifestoContent.split('');
+        const delay = totalDuration / chars.length;
+
+        chars.forEach((ch, i) => {
+            setTimeout(() => {
+                const span = document.createElement('span');
+                span.className = 'crt-char';
+                if (ch === '\n') {
+                    element.insertBefore(document.createElement('br'), cursor);
+                } else {
+                    span.textContent = ch;
+                    element.insertBefore(span, cursor);
+                }
+            }, i * delay);
+        });
     }
 
     function startManifestoLoading() {
@@ -373,6 +388,31 @@ PHY CAN EXPLAIN WHAT L I F E I S ?»`;
                 typeManifestoText(text);
             }, 300);
         }
+    }
+
+    function showSlide(index) {
+        const image = document.getElementById('manifestoImage');
+        const text = document.getElementById('manifestoText');
+        const loader = document.querySelector('#manifestoPanel .manifesto-loader');
+        const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
+
+        currentManifestoSlide = index;
+
+        if (index === 0) {
+            if (loader) loader.style.display = 'none';
+            if (loaderText) loaderText.style.display = 'none';
+            if (text) text.style.display = 'none';
+            if (image) image.style.display = 'block';
+        } else if (index === 1) {
+            if (image) image.style.display = 'none';
+            startManifestoLoading();
+        }
+    }
+
+    function changeSlide(delta) {
+        const total = 2;
+        currentManifestoSlide = (currentManifestoSlide + delta + total) % total;
+        showSlide(currentManifestoSlide);
     }
 
     function revealPixels(overlay) {
@@ -918,6 +958,8 @@ initATASquare();
   document.addEventListener('DOMContentLoaded', function () {
     var manifestoPanel = document.getElementById('manifestoPanel');
     var manifestoClose = document.getElementById('manifestoClose');
+    var leftArrow = document.querySelector('.manifesto-arrow-left');
+    var rightArrow = document.querySelector('.manifesto-arrow-right');
 
     if (manifestoPanel && manifestoClose) {
       manifestoClose.addEventListener('click', function () {
@@ -926,6 +968,11 @@ initATASquare();
           el.classList.remove('child-visible');
         });
       });
+    }
+
+    if (leftArrow && rightArrow) {
+      leftArrow.addEventListener('click', function(){ changeSlide(-1); });
+      rightArrow.addEventListener('click', function(){ changeSlide(1); });
     }
   });
 </script>

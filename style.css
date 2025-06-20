@@ -905,3 +905,25 @@
     max-width: 90%;
     margin: auto;
 }
+
+.crt-char {
+    opacity: 0;
+    animation: crtBlink 0.2s steps(1) forwards;
+}
+
+.crt-cursor {
+    display: inline-block;
+    color: #00ff00;
+    animation: blinkCursor 0.7s steps(1, end) infinite;
+}
+
+@keyframes crtBlink {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes blinkCursor {
+    0%, 50% { opacity: 1; }
+    50.1%, 100% { opacity: 0; }
+}
