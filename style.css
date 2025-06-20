@@ -212,9 +212,8 @@
     
     .enlarged-logo {
         max-width: 100%;
-        height: auto;
-        transform: scale(3.6);
-        transform-origin: center;
+        max-height: 100%;
+        object-fit: contain;
         filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.4));
         image-rendering: pixelated;
     }
@@ -458,7 +457,7 @@
         }
         
         .enlarged-logo {
-            transform: scale(2.8);
+            transform: none;
         }
         
         .w-48 {
@@ -540,7 +539,7 @@
         }
         
         .enlarged-logo {
-            transform: scale(2.4);
+            transform: none;
         }
         
         .w-48 {
