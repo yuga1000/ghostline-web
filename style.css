@@ -523,6 +523,19 @@
             font-size: 10px !important;
             height: 150px !important;
         }
+
+        /* Manifesto panel mobile layout */
+        #manifestoPanel {
+            width: 90vw;
+            height: 67.5vh;
+        }
+
+        #manifestoImage {
+            width: 85%;
+            height: auto;
+            max-width: 90%;
+            margin: auto;
+        }
     }
     
     @media (max-width: 480px) {
