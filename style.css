@@ -729,9 +729,11 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%) scaleY(0);
-        width: 60vw;
-        height: 60vh;
+        width: 45vw;
+        height: 45vh;
         background: #000;
+        padding: 16px;
+        box-sizing: border-box;
         border: 4px solid transparent;
         border-image: repeating-linear-gradient(45deg, #b200ff 0, #b200ff 10px, transparent 10px, transparent 20px) 8;
         font-family: 'Share Tech Mono', monospace;
@@ -755,7 +757,7 @@
     .manifesto-arrow {
         position: absolute;
         top: 50%;
-        font-size: 24px;
+        font-size: 18px;
         color: #00ff00;
         font-family: 'Share Tech Mono', monospace;
         transform: translateY(-50%);
@@ -763,16 +765,16 @@
         opacity: 0;
         transition: opacity 0.2s ease;
     }
-    .manifesto-arrow-left { left: 24px; }
-    .manifesto-arrow-right { right: 68px; }
+    .manifesto-arrow-left { left: 18px; }
+    .manifesto-arrow-right { right: 50px; }
 
     .manifesto-close {
         position: absolute;
         top: 8px;
         right: 8px;
-        width: 20px;
-        height: 20px;
-        font-size: 14px;
+        width: 16px;
+        height: 16px;
+        font-size: 11px;
         display: flex;
         align-items: center;
         justify-content: center;
