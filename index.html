@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GHOSTLINE: Learning Art with Robots</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -177,6 +177,7 @@
                 <div id="manifestoText"></div>
             </div>
         </div>
+        <div id="manifestoIndicator" class="manifesto-indicator">1 / 2</div>
         <div id="manifestoClose" class="manifesto-close">&#215;</div>
         <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
         <span class="manifesto-arrow manifesto-arrow-right">&#9654;</span>
@@ -344,7 +345,7 @@ let currentManifestoSlide = 0;
         cursor.textContent = '_';
         element.appendChild(cursor);
 
-        const totalDuration = 400; // ms
+        const totalDuration = 800; // slower typewriter
         const chars = manifestoContent.split('');
         const delay = totalDuration / chars.length;
 
@@ -395,8 +396,12 @@ let currentManifestoSlide = 0;
         const text = document.getElementById('manifestoText');
         const loader = document.querySelector('#manifestoPanel .manifesto-loader');
         const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
+        const indicator = document.getElementById('manifestoIndicator');
 
         currentManifestoSlide = index;
+        if (indicator) {
+            indicator.textContent = (index + 1) + ' / 2';
+        }
 
         if (index === 0) {
             if (loader) loader.style.display = 'none';
