@@ -531,9 +531,10 @@
         }
 
         #manifestoImage {
-            width: 85%;
+            width: 95%;
+            max-width: 95%;
             height: auto;
-            max-width: 90%;
+            display: block;
             margin: auto;
         }
     }
