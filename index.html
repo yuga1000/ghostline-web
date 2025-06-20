@@ -170,7 +170,6 @@
         <div id="manifestoClose" class="manifesto-close">&#215;</div>
         <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
         <span class="manifesto-arrow manifesto-arrow-right">&#9654;</span>
-        <button id="manifestoNextBtn" class="manifesto-btn"></button>
     </div>
 
 </main>
@@ -284,7 +283,7 @@ function showManifesto() {
 
         // Reveal child elements from 300ms onwards
         if (manifestoPanel) {
-            const children = manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-btn, .manifesto-close');
+            const children = manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close');
             children.forEach(el => {
                 const delay = Math.random() * 300;
                 setTimeout(() => {
@@ -827,7 +826,7 @@ initATASquare();
     if (manifestoPanel && manifestoClose) {
       manifestoClose.addEventListener('click', function () {
         manifestoPanel.classList.remove('visible');
-        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-btn, .manifesto-close').forEach(function(el){
+        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
           el.classList.remove('child-visible');
         });
       });
