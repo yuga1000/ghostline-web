@@ -167,6 +167,16 @@
     <div id="portalPanel">PORTAL ACTIVATED</div>
     <div id="portalFlash"></div>
     <div id="manifestoPanel">
+        <div class="reveal-sequence">
+            <div class="manifesto-loader-text">loading slide_02.jpeg....</div>
+            <div class="manifesto-loader">
+                <div class="manifesto-loader-fill"></div>
+            </div>
+            <div class="image-wrapper">
+                <img id="manifestoImage" src="pages/2Large.jpeg" alt="slide_02">
+                <div class="pixel-overlay"></div>
+            </div>
+        </div>
         <div id="manifestoClose" class="manifesto-close">&#215;</div>
         <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
         <span class="manifesto-arrow manifesto-arrow-right">&#9654;</span>
@@ -274,10 +284,11 @@ function showManifesto() {
             }, 200);
         }
 
-        // Start unfolding panel at 100ms
+        // Start unfolding panel and run reveal
         setTimeout(() => {
             if (manifestoPanel) {
                 manifestoPanel.classList.add('visible');
+                startManifestoLoading();
             }
         }, 1000);
 
@@ -292,7 +303,60 @@ function showManifesto() {
             });
         }
     }
-    
+
+    function startManifestoLoading() {
+        const panel = document.getElementById('manifestoPanel');
+        if (!panel) return;
+
+        const loaderFill = panel.querySelector('.manifesto-loader-fill');
+        const loader = panel.querySelector('.manifesto-loader');
+        const loaderText = panel.querySelector('.manifesto-loader-text');
+        const img = panel.querySelector('#manifestoImage');
+        const overlay = panel.querySelector('.pixel-overlay');
+
+        if (loaderFill && loader && loaderText && img && overlay) {
+            loaderFill.style.width = '0%';
+            loader.style.display = 'block';
+            loaderText.style.display = 'block';
+            img.style.display = 'none';
+            overlay.style.display = 'grid';
+            overlay.innerHTML = '';
+
+            const gridSize = 32;
+            overlay.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            overlay.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const block = document.createElement('div');
+                block.className = 'pixel-block';
+                overlay.appendChild(block);
+            }
+
+            requestAnimationFrame(() => {
+                loaderFill.style.width = '100%';
+            });
+
+            setTimeout(() => {
+                loader.style.display = 'none';
+                loaderText.style.display = 'none';
+                img.style.display = 'block';
+                revealPixels(overlay);
+            }, 300);
+        }
+    }
+
+    function revealPixels(overlay) {
+        const blocks = Array.from(overlay.children);
+        blocks.forEach(block => {
+            const delay = Math.random() * 200;
+            setTimeout(() => {
+                block.style.opacity = '0';
+            }, delay);
+        });
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 500);
+    }
+
     // Create cosmic meteors - reduced intensity by 4x
     function createCosmicMeteors() {
         const container = safeGetElement('matrix-container');
@@ -750,6 +814,7 @@ while (picked.length < count) {
 const g = ataGlyphs[Math.floor(Math.random() * ataGlyphs.length)];
 if (!picked.includes(g)) picked.push(g);
 }
+
 return picked;
 }
 
