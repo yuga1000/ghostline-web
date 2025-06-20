@@ -697,6 +697,20 @@
         z-index: 9999;
     }
 
+    /* Flash line when opening manifesto */
+    #portalFlash {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        height: 2px;
+        background: #00ffff;
+        width: 0;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10001;
+        display: none;
+    }
+
     #portalPanel.visible {
         display: block;
     }
@@ -710,11 +724,11 @@
 
     /* Manifesto overlay panel */
     #manifestoPanel {
-        transform-origin: center;
+        transform-origin: top center;
         position: fixed;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%) scale(0);
+        transform: translate(-50%, -50%) scaleY(0);
         width: 60vw;
         height: 60vh;
         background: #000;
@@ -725,13 +739,13 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: transform 0.7s ease, opacity 0.7s ease;
+        transition: transform 0.2s ease, opacity 0.2s ease;
         opacity: 0;
         pointer-events: none;
     }
 
     #manifestoPanel.visible {
-        transform: translate(-50%, -50%) scale(1);
+        transform: translate(-50%, -50%) scaleY(1);
         opacity: 1;
         pointer-events: auto;
     }
@@ -750,6 +764,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
 
     .manifesto-btn:hover {
@@ -764,6 +780,8 @@
         font-family: 'Share Tech Mono', monospace;
         transform: translateY(-50%);
         cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
     }
     .manifesto-arrow-left { left: 24px; }
     .manifesto-arrow-right { right: 68px; }
@@ -781,6 +799,12 @@
         color: #ffffff;
         font-family: 'Share Tech Mono', monospace;
         cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    #manifestoPanel .child-visible {
+        opacity: 1;
     }
 
     .manifesto-close:hover {
