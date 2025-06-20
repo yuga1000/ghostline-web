@@ -701,6 +701,53 @@
         display: block;
     }
 
+    /* Manifesto overlay panel */
+    #manifestoPanel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        width: 60vw;
+        height: 60vh;
+        background: #000;
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.7s ease, opacity 0.7s ease;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    #manifestoPanel.visible {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .manifesto-btn {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        background: red;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .manifesto-arrow {
+        position: absolute;
+        top: 50%;
+        font-size: 24px;
+        color: #fff;
+        transform: translateY(-50%);
+    }
+    .manifesto-arrow-left { left: 20px; }
+    .manifesto-arrow-right { right: 60px; }
+
     @keyframes terminalExpand {
         0% { transform: scale(0.8); opacity: 0; }
         100% { transform: scale(1); opacity: 1; }
