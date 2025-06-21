@@ -883,8 +883,10 @@
     box-sizing: border-box;
 }
 #manifestoImage {
-    max-width: 90%;
-    max-height: 90%;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     display: none;
     margin: auto;
     image-rendering: pixelated;
@@ -960,22 +962,33 @@
 
 @media (max-width: 1024px) {
     #manifestoPanel {
-        width: 80vw;
-        height: 70vh;
+        max-width: 90vw;
+        max-height: 90vh;
+        width: auto;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        margin: auto;
     }
     #manifestoImage {
-        max-width: 90%;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
     }
 }
 
 @media (max-width: 600px) {
     #manifestoPanel {
-        width: 90vw;
-        height: 65vh;
+        max-width: 90vw;
+        max-height: 90vh;
+        width: auto;
+        height: auto;
+        aspect-ratio: 3 / 4;
+        margin: auto;
     }
     #manifestoImage {
-        max-width: 95%;
+        width: 100%;
         height: auto;
+        max-width: 100%;
         display: block;
         margin: auto;
     }
