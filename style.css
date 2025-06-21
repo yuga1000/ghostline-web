@@ -733,8 +733,8 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%) scaleY(0);
-        width: 45vw;
-        height: 45vh;
+        width: 31.5vw;
+        height: 31.5vh;
         background: #000;
         padding: 16px;
         box-sizing: border-box;
@@ -962,8 +962,8 @@
 
 @media (min-width: 601px) and (max-width: 1024px) {
     #manifestoPanel {
-        width: 80vw;
-        height: 85vh;
+        width: 56vw;
+        height: 59.5vh;
         aspect-ratio: 3 / 4;
         margin: auto;
         box-sizing: border-box;
@@ -978,8 +978,8 @@
 
 @media (max-width: 600px) {
     #manifestoPanel {
-        width: 90vw;
-        height: 90vh;
+        width: 63vw;
+        height: 63vh;
         margin: auto;
         box-sizing: border-box;
     }
