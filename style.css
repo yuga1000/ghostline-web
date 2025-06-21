@@ -738,8 +738,8 @@
         background: #000;
         padding: 16px;
         box-sizing: border-box;
-        border: 4px solid transparent;
-        border-image: repeating-linear-gradient(45deg, #b200ff 0, #b200ff 10px, transparent 10px, transparent 20px) 8;
+        border: 12px solid transparent;
+        border-image: repeating-linear-gradient(45deg, #b200ff 0, #b200ff 30px, transparent 30px, transparent 60px) 24;
         font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
         font-weight: 700;
         z-index: 10000;
