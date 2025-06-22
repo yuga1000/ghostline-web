@@ -963,15 +963,15 @@
 @media (min-width: 601px) and (max-width: 1024px) {
     /* Slightly larger manifesto panel for tablets */
     #manifestoPanel {
-        width: 70vw;
-        height: 78vh;
+        width: 60vw;
+        height: 68vh;
         aspect-ratio: 3 / 4;
         margin: auto;
         box-sizing: border-box;
     }
     #manifestoImage {
         width: auto;
-        max-width: 90%;
+        max-width: 82%;
         height: auto;
         display: block;
         margin: auto;
