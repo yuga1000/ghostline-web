@@ -980,15 +980,22 @@
 
 @media (max-width: 600px) {
     #manifestoPanel {
-        width: 70vw;
-        height: 70vh;
+        width: 90vw;
+        height: 90vh;
         margin: auto;
         box-sizing: border-box;
     }
     #manifestoImage {
-        max-width: 85%;
+        width: 95%;
         height: auto;
+        max-width: none;
         display: block;
+        margin: auto;
+    }
+    #manifestoText {
+        font-size: 14px;
+        overflow-y: auto;
+        width: 95%;
         margin: auto;
     }
 }
