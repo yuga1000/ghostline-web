@@ -978,6 +978,13 @@
     }
 }
 
+@media (orientation: landscape) and (min-width: 768px) and (max-width: 1024px) {
+    #manifestoPanel {
+        height: 90vh;
+        width: 60vw;
+    }
+}
+
 @media (max-width: 600px) {
     #manifestoPanel {
         width: 90vw;
