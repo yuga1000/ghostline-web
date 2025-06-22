@@ -1006,3 +1006,18 @@
         margin: auto;
     }
 }
+
+@media (min-width: 1025px) {
+    #manifestoPanel {
+        width: 50vw;
+        height: 70vh;
+        aspect-ratio: 3 / 4;
+        margin: auto;
+    }
+    #manifestoImage {
+        max-width: 90%;
+        height: auto;
+        display: block;
+        margin: auto;
+    }
+}
