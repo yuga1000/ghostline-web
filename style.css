@@ -962,8 +962,8 @@
 
 @media (min-width: 601px) and (max-width: 1024px) {
     #manifestoPanel {
-        width: 56vw;
-        height: 59.5vh;
+        width: 60vw;
+        height: 70vh;
         aspect-ratio: 3 / 4;
         margin: auto;
         box-sizing: border-box;
@@ -978,13 +978,13 @@
 
 @media (max-width: 600px) {
     #manifestoPanel {
-        width: 63vw;
-        height: 63vh;
+        width: 70vw;
+        height: 70vh;
         margin: auto;
         box-sizing: border-box;
     }
     #manifestoImage {
-        max-width: 90%;
+        max-width: 85%;
         height: auto;
         display: block;
         margin: auto;
