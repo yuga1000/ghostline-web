@@ -960,7 +960,7 @@
     50.1%, 100% { opacity: 0; }
 }
 
-@media (min-width: 551px) and (max-width: 964px) {
+@media (min-width: 601px) and (max-width: 1024px) {
     /* Slightly larger manifesto panel for tablets */
     #manifestoPanel {
         width: 60vw;
