@@ -62,52 +62,37 @@
         position: relative;
         overflow: hidden;
     }
-    
-    /* Isometric pixel button */
-    .donate-button {
-        background: #000000;
-        border: none;
-        color: #00FF00;
-        font-size: 16px;
-        padding: 20px 40px;
+    .donate-wrapper {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+    }
+
+    .donate-console {
+        background: #000BFF;
+        border: 3px solid #000BFF;
+        color: #ffffff;
+        padding: 15px 40px;
         cursor: pointer;
-        font-family: 'Press Start 2P', monospace;
-        transition: all 0.2s ease;
-        position: relative;
-        /* Isometric 3D effect */
-        box-shadow: 
-            0 -3px 0 0 #00FF00,
-            3px 0 0 0 #00FF00,
-            0 3px 0 0 #008800,
-            -3px 0 0 0 #00CC00,
-            3px 3px 0 0 #006600,
-            4px 4px 0 0 #005500,
-            5px 5px 0 0 #004400;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 16px rgba(0, 11, 255, 0.4);
+        animation: subtleFloat 4s ease-in-out infinite;
     }
-    
-    .donate-button:hover {
-        transform: translate(-2px, -2px);
-        box-shadow: 
-            0 -3px 0 0 #44FF44,
-            3px 0 0 0 #44FF44,
-            0 3px 0 0 #00CC00,
-            -3px 0 0 0 #22FF22,
-            5px 5px 0 0 #008800,
-            6px 6px 0 0 #006600,
-            7px 7px 0 0 #005500,
-            0 0 20px rgba(0, 255, 0, 0.3);
+
+    @keyframes subtleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
     }
-    
-    .donate-button:active {
-        transform: translate(2px, 2px);
-        box-shadow: 
-            0 -2px 0 0 #00FF00,
-            2px 0 0 0 #00FF00,
-            0 2px 0 0 #008800,
-            -2px 0 0 0 #00CC00,
-            2px 2px 0 0 #006600;
+
+    .donate-console:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 24px rgba(0, 11, 255, 0.8);
+        animation: none;
+        background: #0015FF;
     }
-    
+
     /* Placeholder for animated sparks from the button */
     
     /* Sparks from button */
@@ -115,10 +100,10 @@
         position: fixed;
         width: 3px;
         height: 3px;
-        background: #00FF00;
+        background: #000BFF;
         pointer-events: none;
         z-index: 1000;
-        box-shadow: 0 0 6px #00FF00;
+        box-shadow: 0 0 6px #000BFF;
     }
     
     @keyframes sparkUp {
@@ -458,9 +443,9 @@
             </div>
 
             <!-- SUPPORT BUTTON -->
-            <div class="relative mb-8">
-                <button class="donate-button" onclick="activateTerminal()" id="donateBtn">
-                    SUPPORT
+            <div class="donate-wrapper">
+                <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
+                    <span style="color: #ffffff;">SUPPORT PROJECT</span>
                 </button>
             </div>
         </div>
@@ -492,140 +477,132 @@
 </div>
 
 <script>
-    // ТЕРМИНАЛЬНЫЕ ЛИНИИ ОТ КНОПКИ
-    function activateTerminal() {
-        createSparks();
-        createBranchingLines();
+    
+function createSparks() {
+    const button = document.getElementById('donateBtn');
+    const rect = button.getBoundingClientRect();
+
+    for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+            const spark = document.createElement('div');
+            spark.className = 'spark';
+
+            const startX = rect.left + Math.random() * rect.width;
+            const startY = rect.top + rect.height / 2;
+
+            spark.style.left = startX + 'px';
+            spark.style.top = startY + 'px';
+
+            const drift = (Math.random() - 0.5) * 50;
+            spark.style.setProperty('--drift', drift + 'px');
+
+            const colors = ['#00BFFF', '#33CCFF', '#66D9FF', '#00FFFF'];
+            spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+            spark.style.animation = 'sparkUp 1.5s ease-out forwards';
+
+            document.body.appendChild(spark);
+
+            setTimeout(() => spark.remove(), 1500);
+        }, i * 30);
+    }
+}
+
+function createBranchingLines() {
+    const button = document.getElementById('donateBtn');
+    const rect = button.getBoundingClientRect();
+
+    const startPoints = [
+        { x: rect.left + rect.width / 2, y: rect.top },
+        { x: rect.right, y: rect.top + rect.height / 2 },
+        { x: rect.left + rect.width / 2, y: rect.bottom },
+        { x: rect.left, y: rect.top + rect.height / 2 },
+    ];
+
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.position = 'fixed';
+    canvas.style.left = 0;
+    canvas.style.top = 0;
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = 1500;
+    document.body.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#00BFFF';
+    ctx.lineWidth = 2;
+
+    const dirs = [
+        { dx: 0, dy: -1 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: 1 },
+        { dx: -1, dy: 0 },
+    ];
+
+    const branches = [];
+    const speed = 2;
+    const maxDepth = 5;
+
+    function addBranch(x, y, dir, depth) {
+        const length = 10 + Math.random() * 30;
+        branches.push({ x, y, dir, length, progress: 0, depth });
     }
 
-    // Генерация анимированных "веток" из центра кнопки
-    function createBranchingLines() {
-        const button = document.getElementById('donateBtn');
-        const rect = button.getBoundingClientRect();
-        const startX = rect.left + rect.width / 2;
-        const startY = rect.top + rect.height / 2;
+    for (let d = 0; d < 4; d++) addBranch(startPoints[d].x, startPoints[d].y, d, 0);
 
-        const canvas = document.createElement('canvas');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.style.position = 'fixed';
-        canvas.style.left = 0;
-        canvas.style.top = 0;
-        canvas.style.pointerEvents = 'none';
-        canvas.style.zIndex = 1500;
-        document.body.appendChild(canvas);
+    function step() {
+        for (let i = branches.length - 1; i >= 0; i--) {
+            const b = branches[i];
+            const dir = dirs[b.dir];
+            const prev = b.progress;
+            b.progress = Math.min(b.progress + speed, b.length);
 
-        const ctx = canvas.getContext('2d');
-        ctx.strokeStyle = '#00FF00';
-        ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
+            ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
+            ctx.stroke();
 
-        const dirs = [
-            { dx: 0, dy: -1 },
-            { dx: 1, dy: 0 },
-            { dx: 0, dy: 1 },
-            { dx: -1, dy: 0 },
-        ];
+            if (b.progress >= b.length) {
+                const endX = b.x + dir.dx * b.length;
+                const endY = b.y + dir.dy * b.length;
+                branches.splice(i, 1);
 
-        const branches = [];
-        const speed = 2;
-        const maxDepth = 5;
-
-        function addBranch(x, y, dir, depth) {
-            const length = 10 + Math.random() * 30;
-            branches.push({ x, y, dir, length, progress: 0, depth });
-        }
-
-        // Стартуем четырьмя направлениями
-        for (let d = 0; d < 4; d++) addBranch(startX, startY, d, 0);
-
-        function step() {
-            for (let i = branches.length - 1; i >= 0; i--) {
-                const b = branches[i];
-                const dir = dirs[b.dir];
-                const prev = b.progress;
-                b.progress = Math.min(b.progress + speed, b.length);
-
-                ctx.beginPath();
-                ctx.moveTo(b.x + dir.dx * prev, b.y + dir.dy * prev);
-                ctx.lineTo(b.x + dir.dx * b.progress, b.y + dir.dy * b.progress);
-                ctx.stroke();
-
-                if (b.progress >= b.length) {
-                    const endX = b.x + dir.dx * b.length;
-                    const endY = b.y + dir.dy * b.length;
-                    branches.splice(i, 1);
-
-                    if (b.depth < maxDepth) {
-                        const available = [0, 1, 2, 3].filter(d => d !== (b.dir + 2) % 4);
-                        let count = Math.floor(Math.random() * 3); // 0-2 ветки
-                        while (count-- > 0 && available.length) {
-                            const idx = Math.floor(Math.random() * available.length);
-                            const nd = available.splice(idx, 1)[0];
-                            addBranch(endX, endY, nd, b.depth + 1);
-                        }
+                if (b.depth < maxDepth) {
+                    const available = [0, 1, 2, 3].filter(dd => dd !== (b.dir + 2) % 4);
+                    let count = Math.floor(Math.random() * 3);
+                    while (count-- > 0 && available.length) {
+                        const idx = Math.floor(Math.random() * available.length);
+                        const nd = available.splice(idx, 1)[0];
+                        addBranch(endX, endY, nd, b.depth + 1);
                     }
                 }
             }
-
-            if (branches.length) {
-                requestAnimationFrame(step);
-            } else {
-                setTimeout(() => canvas.remove(), 300);
-                showDonateModal();
-            }
         }
 
-        requestAnimationFrame(step);
-    }
-    
-    // Create sparks flying up on button click
-    function createSparks() {
-        const button = document.getElementById('donateBtn');
-        const rect = button.getBoundingClientRect();
-        
-        for(let i = 0; i < 15; i++) {
-            setTimeout(() => {
-                const spark = document.createElement('div');
-                spark.className = 'spark';
-                
-                const startX = rect.left + Math.random() * rect.width;
-                const startY = rect.top + rect.height/2;
-                
-                spark.style.left = startX + 'px';
-                spark.style.top = startY + 'px';
-                
-                const drift = (Math.random() - 0.5) * 50;
-                spark.style.setProperty('--drift', drift + 'px');
-                
-                const colors = ['#00FF00', '#44FF44', '#66FF66', '#00FF88'];
-                spark.style.background = colors[Math.floor(Math.random() * colors.length)];
-                
-                spark.style.animation = 'sparkUp 1.5s ease-out forwards';
-                
-                document.body.appendChild(spark);
-                
-                setTimeout(() => spark.remove(), 1500);
-            }, i * 30);
+        if (branches.length) {
+            requestAnimationFrame(step);
+        } else {
+            setTimeout(() => canvas.remove(), 300);
+            showDonateModal();
         }
     }
-    
-    // Show donation modal
-    function showDonateModal() {
-        const modal = document.getElementById('donateModal');
-        modal.style.display = 'flex';
-        modal.classList.add('line-start');
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 500);
-    }
-    
-    // Close modal
-    function closeDonateModal() {
-        const modal = document.getElementById('donateModal');
-        modal.classList.remove('show', 'line-start');
-        modal.style.display = 'none';
-    }
-    
+
+    requestAnimationFrame(step);
+}
+
+function handleDonateClick() {
+    createSparks();
+    createBranchingLines();
+}
+
+function showDonateModal() {
+    document.getElementById('donateModal').style.display = 'flex';
+}
+
+function closeDonateModal() {
+    document.getElementById('donateModal').style.display = 'none';
+}
     // Copy address
     function copyAddress() {
         const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
