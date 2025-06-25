@@ -63,9 +63,10 @@
     }
     .donate-wrapper {
         position: fixed;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
+        bottom: 20px;
+        right: 20px;
+        left: auto;
+        transform: none;
         z-index: 1000;
     }
 
@@ -116,104 +117,45 @@
         }
     }
     
-    /* Terminal modal */
-    .terminal-modal {
+    /* Donate modal */
+    .modal {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background: rgba(0, 0, 0, 0.9);
         z-index: 2000;
         justify-content: center;
         align-items: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .terminal-modal.show {
-        opacity: 1;
     }
     
     .modal-content {
         background: #000000;
-        border: 2px solid #00FF00;
+        border: 2px solid #00ff00;
         padding: 30px;
         max-width: 500px;
         text-align: center;
         box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
-        transform: scale(0.8);
-        transition: transform 0.3s ease;
-    }
-    
-    .terminal-modal.show .modal-content {
-        transform: scale(1);
     }
 
-    /* Animated donate modal */
-    #donateModal .terminal-animated {
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-    }
-
-    #donateModal .terminal-animated::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-        height: 2px;
-        width: 0;
-        background: #00FF00;
-        box-shadow: 0 0 6px #00FF00;
-    }
-
-    #donateModal.line-start .terminal-animated::before {
-        animation: lineGrow 0.4s forwards;
-    }
-
-    @keyframes lineGrow {
-        to { width: 100%; }
-    }
-
-    #donateModal .modal-content {
-        transform: scaleY(0);
-        transform-origin: top;
-        opacity: 0;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    #donateModal.show .modal-content {
-        transform: scaleY(1);
-        opacity: 1;
-    }
 
     @media (max-width: 768px) {
         #donateModal .modal-content {
             padding: 20px;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
         }
+        .donate-wrapper {
+            position: relative;
+            bottom: auto;
+            right: auto;
+            left: auto;
+            transform: none;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
     }
     
-    .copy-button {
-        background: #000000;
-        border: 1px solid #00FF00;
-        color: #00FF00;
-        padding: 8px 16px;
-        cursor: pointer;
-        font-family: 'Share Tech Mono', monospace;
-        margin-top: 10px;
-        transition: all 0.2s ease;
-    }
-    
-    .copy-button:hover {
-        background: #001100;
-    }
+
     
     /* Status indicators - OFF по умолчанию */
     .status-online {
@@ -259,6 +201,27 @@
     
     .nav-link:hover {
         color: #44ff44;
+    }
+
+    .category-tab {
+        padding: 8px 16px;
+        border: 1px solid #00ff00;
+        background: #000000;
+        color: #000BFF;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .category-tab.active {
+        background: #000BFF;
+        color: #000000;
+        border: 1px solid #00ff00;
+    }
+
+    .category-tab:hover {
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+        border-color: #44ff44;
     }
     
     /* УЛУЧШЕННАЯ КОМПОЗИЦИЯ */
@@ -451,22 +414,21 @@
     </div>
 </div>
 
-<div class="terminal-modal" id="donateModal">
-    <div class="terminal-animated">
-        <div class="modal-content">
-            <h3 class="pixel-font text-lg mb-4 text-green-400">SUPPORT GHOSTLINE</h3>
+<div class="modal" id="donateModal">
+    <div class="modal-content">
+        <h3 class="pixel-font text-lg mb-4 text-green-400">SUPPORT GHOSTLINE</h3>
 
             <!-- Ethereum -->
-            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a', 'Ethereum')">
+            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('0x2451A14572F67C587eEfca42C1F4C414FA2ca6a', 'Ethereum')">
                 <p class="text-sm mb-2" style="color: #00ff00;">ETHEREUM (ETH)</p>
-                <p class="text-xs break-all mb-2" style="color: #ffffff;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
-                <p class="text-xs" style="color: #666;">Click to copy</p>
-            </div>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">0x2451A14572F67C587eEfca42C1F4C414FA2ca6a</p>
+            <p class="text-xs" style="color: #666;">Click to copy</p>
+        </div>
 
             <!-- Bitcoin -->
-            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d', 'Bitcoin')">
+            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d', 'Bitcoin')">
                 <p class="text-sm mb-2" style="color: #00ff00;">BITCOIN (BTC)</p>
-                <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d</p>
                 <p class="text-xs" style="color: #666;">Click to copy</p>
             </div>
 
@@ -481,9 +443,8 @@
                 Your support helps robots learn art!<br>
                 Click any address to copy instantly
             </p>
-            <button class="copy-button" onclick="closeDonateModal()">CLOSE</button>
+            <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
         </div>
-    </div>
 </div>
 
 <script>
