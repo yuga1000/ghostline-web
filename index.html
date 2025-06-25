@@ -123,7 +123,7 @@
             
             <!-- Title Section -->
             <div class="text-center mb-8">
-                <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer">
+                <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer" class="ghostline-title expanded">
                     <img src="Logopng.png"
                          alt="GHOSTLINE"
                          style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto;"
@@ -244,8 +244,14 @@ function showManifesto() {
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
         const finalTitle = document.getElementById('finalTitle');
+        const titleContainer = document.getElementById('titleContainer');
         const manifestoPanel = document.getElementById('manifestoPanel');
         const portalFlash = document.getElementById('portalFlash');
+
+        if (titleContainer) {
+            titleContainer.classList.remove('expanded');
+            titleContainer.classList.add('collapsed');
+        }
 
         if (staticTitle && animatedTitle && finalTitle) {
             // Hide static PNG and final PNG, then show animated GIF
@@ -437,6 +443,66 @@ let currentManifestoSlide = 0;
             overlay.style.display = 'none';
             overlay.innerHTML = '';
         }, 700);
+    }
+
+    function closeManifesto() {
+        const manifestoPanel = document.getElementById('manifestoPanel');
+        const portalFlash = document.getElementById('portalFlash');
+        const staticTitle = document.getElementById('staticTitle');
+        const animatedTitle = document.getElementById('animatedTitle');
+        const finalTitle = document.getElementById('finalTitle');
+        const titleContainer = document.getElementById('titleContainer');
+
+        if (manifestoPanel) {
+            manifestoPanel.classList.remove('visible');
+            manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(el => {
+                el.classList.remove('child-visible');
+            });
+        }
+
+        if (portalFlash) {
+            portalFlash.style.display = 'block';
+            portalFlash.style.opacity = '1';
+            portalFlash.style.transition = 'none';
+            portalFlash.style.width = '100%';
+            requestAnimationFrame(() => {
+                portalFlash.style.transition = 'width 100ms linear';
+                portalFlash.style.width = '0';
+            });
+            setTimeout(() => {
+                portalFlash.style.transition = 'opacity 100ms linear';
+                portalFlash.style.opacity = '0';
+            }, 100);
+            setTimeout(() => {
+                portalFlash.style.display = 'none';
+                portalFlash.style.width = '100%';
+                portalFlash.style.opacity = '1';
+            }, 200);
+        }
+
+        if (staticTitle && animatedTitle && finalTitle) {
+            finalTitle.style.opacity = '0';
+            animatedTitle.classList.add('reverse');
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+            setTimeout(() => {
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
+                animatedTitle.classList.remove('reverse');
+                staticTitle.style.opacity = '1';
+                if (titleContainer) {
+                    titleContainer.classList.remove('collapsed');
+                    titleContainer.classList.add('expanded');
+                }
+            }, 700);
+        } else if (titleContainer) {
+            setTimeout(() => {
+                titleContainer.classList.remove('collapsed');
+                titleContainer.classList.add('expanded');
+            }, 700);
+        }
     }
 
     // Create cosmic meteors - reduced intensity by 4x
@@ -975,10 +1041,7 @@ initATASquare();
 
     if (manifestoPanel && manifestoClose) {
       manifestoClose.addEventListener('click', function () {
-        manifestoPanel.classList.remove('visible');
-        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
-          el.classList.remove('child-visible');
-        });
+        closeManifesto();
       });
     }
 

@@ -119,6 +119,22 @@
     #titleContainer {
         margin-top: 2rem;
     }
+
+    .ghostline-title {
+        transition: opacity 0.7s ease;
+    }
+
+    .ghostline-title.collapsed {
+        opacity: 0;
+    }
+
+    .ghostline-title.expanded {
+        opacity: 1;
+    }
+
+    #animatedTitle.reverse {
+        transform: scale(1.05) scaleX(-1);
+    }
     
     .pixel-text-xs {
         font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
