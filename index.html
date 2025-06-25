@@ -248,12 +248,16 @@ function showManifesto() {
         const portalFlash = document.getElementById('portalFlash');
 
         if (staticTitle && animatedTitle && finalTitle) {
-            // Hide static PNG and final PNG, then show animated GIF
-            staticTitle.style.opacity = '0';
+            // show portal GIF first, then fade out the static title
             finalTitle.style.opacity = '0';
             animatedTitle.style.opacity = '1';
             animatedTitle.style.transform = 'scale(1.05)';
             animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+
+            // allow a moment for the GIF to appear before hiding the PNG title
+            setTimeout(() => {
+                staticTitle.style.opacity = '0';
+            }, 50);
 
             // Hide the GIF after one cycle and reveal the final PNG
             setTimeout(() => {
@@ -979,6 +983,26 @@ initATASquare();
         manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
           el.classList.remove('child-visible');
         });
+
+        const staticTitle = document.getElementById('staticTitle');
+        const animatedTitle = document.getElementById('animatedTitle');
+        const finalTitle = document.getElementById('finalTitle');
+
+        setTimeout(() => {
+          if (staticTitle && animatedTitle && finalTitle) {
+            finalTitle.style.opacity = '0';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+
+            setTimeout(() => {
+              animatedTitle.style.opacity = '0';
+              animatedTitle.style.transform = 'scale(1)';
+              animatedTitle.style.filter = 'none';
+              staticTitle.style.opacity = '1';
+            }, 700);
+          }
+        }, 200);
       });
     }
 
