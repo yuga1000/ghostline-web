@@ -16,7 +16,6 @@
             font-family: 'Share Tech Mono', monospace;
         }
 
-```
     .pixel-font {
         font-family: 'Share Tech Mono', monospace;
     }
@@ -455,23 +454,34 @@
 <div class="terminal-modal" id="donateModal">
     <div class="terminal-animated">
         <div class="modal-content">
-        <h3 class="pixel-font text-lg mb-4 text-green-400">SUPPORT GHOSTLINE</h3>
-        
-        <div class="terminal-border bg-black p-4 mb-4">
-            <p class="text-sm mb-2">ETHEREUM ADDRESS</p>
-            <p class="text-xs mb-2 text-green-400">Network: Ethereum Mainnet</p>
-            <p class="text-xs text-green-500 break-all mb-3" id="ethAddress">
-                0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a
+            <h3 class="pixel-font text-lg mb-4 text-green-400">SUPPORT GHOSTLINE</h3>
+
+            <!-- Ethereum -->
+            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a', 'Ethereum')">
+                <p class="text-sm mb-2" style="color: #00ff00;">ETHEREUM (ETH)</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
+                <p class="text-xs" style="color: #666;">Click to copy</p>
+            </div>
+
+            <!-- Bitcoin -->
+            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d', 'Bitcoin')">
+                <p class="text-sm mb-2" style="color: #00ff00;">BITCOIN (BTC)</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d</p>
+                <p class="text-xs" style="color: #666;">Click to copy</p>
+            </div>
+
+            <!-- USDT -->
+            <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B', 'USDT')">
+                <p class="text-sm mb-2" style="color: #00ff00;">USDT (TRC20)</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B</p>
+                <p class="text-xs" style="color: #666;">Click to copy</p>
+            </div>
+
+            <p class="text-xs text-green-600 mb-4">
+                Your support helps robots learn art!<br>
+                Click any address to copy instantly
             </p>
-            <button class="copy-button" onclick="copyAddress()">COPY ADDRESS</button>
-        </div>
-        
-        <p class="text-xs text-green-600 mb-4">
-            Send ETH to support robot artists!<br>
-            Your support helps AI learn to create art
-        </p>
-        
-        <button class="copy-button" onclick="closeDonateModal()">CLOSE</button>
+            <button class="copy-button" onclick="closeDonateModal()">CLOSE</button>
         </div>
     </div>
 </div>
@@ -603,29 +613,46 @@ function showDonateModal() {
 function closeDonateModal() {
     document.getElementById('donateModal').style.display = 'none';
 }
-    // Copy address
-    function copyAddress() {
-        const address = '0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a';
-        navigator.clipboard.writeText(address).then(() => {
-            event.target.textContent = 'COPIED!';
-            setTimeout(() => {
-                event.target.textContent = 'COPY ADDRESS';
-            }, 2000);
-        }).catch(() => {
-            const textArea = document.createElement('textarea');
-            textArea.value = address;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            event.target.textContent = 'COPIED!';
-            setTimeout(() => {
-                event.target.textContent = 'COPY ADDRESS';
-            }, 2000);
-        });
-    }
-    
+
+function copyToClipboard(address, currency) {
+    navigator.clipboard.writeText(address).then(() => {
+        showCopyNotification(`${currency} address copied!`);
+    }).catch(() => {
+        const textArea = document.createElement('textarea');
+        textArea.value = address;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showCopyNotification(`${currency} address copied!`);
+    });
+}
+
+function showCopyNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #000BFF;
+        color: white;
+        padding: 12px 20px;
+        border: 2px solid #000BFF;
+        z-index: 9999;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 14px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
 </script>
-```
 </body>
 </html>
