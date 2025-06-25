@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE: Learning Art with Robots</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+      #terminal-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 60%;
+        background: #000;
+        border: 2px solid #00ff00;
+        color: #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        z-index: 10000;
+        padding: 20px;
+      }
+      #terminal-close {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+      }
+    </style>
+
+</head>
+<body>
+
+<!-- Terminal Loading Screen -->
+
+<div id="terminal-loading" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    color: #00ff00;
+    font-family: 'Share Tech Mono', monospace;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+">
+    <div style="max-width: 600px; width: 90%;">
+        <div style="font-family: 'Press Start 2P', cursive; font-size: 32px; margin-bottom: 40px; text-shadow: 0 0 10px #00ff00;">
+            GHOSTLINE
+        </div>
+
+    <div style="text-align: left; font-size: 12px; height: 200px; overflow: hidden; margin-bottom: 30px;" id="terminal-output">
+        <div style="color: #666;">GHOSTLINE Terminal v14.5.7</div>
+        <div style="color: #666;">Copyright (c) 2025 Neural Networks Inc.</div>
+        <div style="color: #666;">All rights reserved.</div>
+        <div style="margin: 10px 0;"></div>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <div style="border: 2px solid #00ff00; height: 20px; background: #000000; position: relative;">
+            <div id="progress-fill" style="
+                height: 100%;
+                background: linear-gradient(90deg, #00ff00, #44ff44);
+                width: 0%;
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            "></div>
+        </div>
+        <div style="margin-top: 10px; font-size: 14px;">
+            <span id="progress-text">Initializing...</span> 
+            <span id="progress-percent" style="color: #44ff44;">0%</span>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<div class="slide-container scanlines" id="main-content" style="opacity: 0; transition: opacity 1s ease;">
+    <!-- Matrix Rain Effect -->
+    <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
+
+<!-- Header Terminal Bar -->
+<header class="terminal-border bg-black p-3 m-6 mb-8">
+    <div class="flex justify-between items-center text-xs">
+        <div class="flex items-center space-x-4">
+            <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
+            <span class="text-green-400" id="randomNumbers">âââââ</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="blink">â</span>
+            <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
+        </div>
+    </div>
+</header>
+
+<!-- Main Layout with Sidebar -->
+<main class="flex flex-col lg:flex-row p-4 h-full gap-6">
+    <!-- Main Content (Left) -->
+    <div class="w-full lg:w-3/4">
+        <div class="flex flex-col items-center justify-center px-4">
+            
+            <!-- Logo Section -->
+            <div class="mb-4 relative">
+                <div class="w-48 h-48 mx-auto mb-2 logo-container p-2 flex items-center justify-center overflow-hidden">
+                    <!-- Static GIF as main logo - enlarged -->
+                    <img src="components/Logothreehead_optimized.gif"
+                         alt="GHOSTLINE Logo"
+                         id="logo"
+                         class="enlarged-logo"
+                         style="max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated;">
+                </div>
+            </div>
+            
+            <!-- Title Section -->
+            <div class="text-center mb-8">
+                <div style="position: relative; display: inline-block; margin-top: -220px;" onclick="showManifesto()" id="titleContainer">
+                    <img src="Logopng.png"
+                         alt="GHOSTLINE"
+                         style="image-rendering: pixelated; cursor: pointer; max-width: 400px; height: auto;"
+                         id="staticTitle">
+                    <img src="components/ghostline_pixel_noglow.gif"
+                         alt="GHOSTLINE Animation"
+                         style="position: absolute; top: 0; left: 0; opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; z-index: 10;"
+                         id="animatedTitle">
+                    <img src="components/IMG_3412.png"
+                         alt="GHOSTLINE Final"
+                         style="opacity: 0; image-rendering: pixelated; max-width: 400px; height: auto; position: absolute; top: 0; left: 0; z-index: 9;"
+                         id="finalTitle">
+                </div>
+                <div class="logo-subtitle">
+                    ART &#9608;&#9608;E&#9608;&#9608; ROBOTS.
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-8 mb-12">
+                <a href="gallery.html" class="console-button" id="galleryBtn">
+                    GALLERY
+                </a>
+                <a href="stream.html" class="console-button" id="streamBtn">
+                    STREAM
+                </a>
+            </div>
+
+            <!-- Separator Line -->
+            <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
+            
+
+        </div>
+    </div>
+
+    <div id="pages-section" class="hidden max-h-screen overflow-y-auto my-8 space-y-8 flex flex-col items-center"></div>
+
+    <div id="terminal-popup">
+        <div id="terminal-close">X</div>
+    </div>
+    <div id="portalPanel">PORTAL ACTIVATED</div>
+    <div id="portalFlash"></div>
+    <div id="manifestoPanel">
+        <div class="reveal-sequence">
+            <div class="manifesto-loader-text">loading manifesto...</div>
+            <div class="manifesto-loader">
+                <div class="manifesto-loader-fill"></div>
+            </div>
+            <div class="image-wrapper">
+                <img id="manifestoImage" src="pages/2Large.jpeg" alt="manifesto image">
+                <div id="pixelOverlay" class="pixel-overlay"></div>
+                <div id="manifestoText"></div>
+            </div>
+        </div>
+        <div id="manifestoIndicator" class="manifesto-indicator">1 / 3</div>
+        <div id="manifestoClose" class="manifesto-close">&#215;</div>
+        <span class="manifesto-arrow manifesto-arrow-left">&#9664;</span>
+        <span class="manifesto-arrow manifesto-arrow-right">&#9654;</span>
+    </div>
+
+</main>
+
+<!-- SOCIAL Button Container -->
+<div id="socialContainer" class="pxl-frame">
+    <div class="glow-3"></div>
+    <button id="socialToggle">SOCIAL</button>
+    <div id="socialPanel">
+      <a href="https://instagram.com" target="_blank">Instagram</a>
+      <a href="https://tiktok.com" target="_blank">TikTok</a>
+      <a href="https://t.me/" target="_blank">Telegram</a>
+      <a href="https://youtube.com" target="_blank">YouTube</a>
+    </div>
+</div>
+
+
+<!-- Scrolling Text Horizon -->
+<div class="scrolling-text">
+    <div class="scroll-line" style="bottom: 120px; animation-delay: 0s; opacity: 0.2;">
+           [████]
+╞══╡╞══╡
+ ▓▓  ▓▓_[%^*+]_{::::##} "IT IS PROGRAMMED TO REPRODUCE ITSELF." ONE MUST CONSIDER THAT DNA IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF.
+    </div>
+    <div class="scroll-line" style="bottom: 100px; animation-delay: -2.5s; opacity: 0.25;">
+      ⎣▛██▜⎤≡≡≡⎣▛██▜⎤≡≡≡⎣▛██▜⎤
+ └╥╥┘    └╥╥┘    └╥╥┘
+ ██      ██      ██*[=====]*{#####} COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM âMEMORIES,â NOT ITS JUST CONSCIOUSNESS.
+</div>
+<div class="scroll-line" style="bottom: 80px; animation-delay: -5s; opacity: 0.3;">
+⎣▛██▜⎤≡≡≡⎣▛██▜⎤≡≡≡⎣▛██▜⎤≡≡≡⎣▛██▜⎤*{#####}AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT.
+</div>
+</div>
+
+</div>
+
+<script>
+
+    // Safe functions without errors
+    function safeGetElement(id) {
+        try {
+            return document.getElementById(id);
+        } catch (e) {
+            return null;
+        }
+    }
+    
+    function safeQuerySelector(selector) {
+        try {
+            return document.querySelector(selector);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Show manifesto function
+function showManifesto() {
+        console.log('Manifesto clicked!');
+
+        const staticTitle = document.getElementById('staticTitle');
+        const animatedTitle = document.getElementById('animatedTitle');
+        const finalTitle = document.getElementById('finalTitle');
+        const manifestoPanel = document.getElementById('manifestoPanel');
+        const portalFlash = document.getElementById('portalFlash');
+
+        if (staticTitle && animatedTitle && finalTitle) {
+            // Hide static PNG and final PNG, then show animated GIF
+            staticTitle.style.opacity = '0';
+            finalTitle.style.opacity = '0';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+
+            // Hide the GIF after one cycle and reveal the final PNG
+            setTimeout(() => {
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
+                finalTitle.style.opacity = '1';
+            }, 700);
+        }
+
+        // Flash line
+        if (portalFlash) {
+            portalFlash.style.display = 'block';
+            portalFlash.style.opacity = '1';
+            portalFlash.style.transition = 'none';
+            portalFlash.style.width = '0';
+            requestAnimationFrame(() => {
+                portalFlash.style.transition = 'width 100ms linear';
+                portalFlash.style.width = '100%';
+            });
+            setTimeout(() => {
+                portalFlash.style.transition = 'opacity 100ms linear';
+                portalFlash.style.opacity = '0';
+            }, 100);
+            setTimeout(() => {
+                portalFlash.style.display = 'none';
+                portalFlash.style.width = '0';
+                portalFlash.style.opacity = '1';
+            }, 200);
+        }
+
+        // Start unfolding panel and run reveal
+        setTimeout(() => {
+            if (manifestoPanel) {
+                manifestoPanel.classList.add('visible');
+                showSlide(0);
+            }
+        }, 1000);
+
+        // Reveal child elements from 300ms onwards
+        if (manifestoPanel) {
+            const children = manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close');
+            children.forEach(el => {
+                const delay = Math.random() * 300;
+                setTimeout(() => {
+                    el.classList.add('child-visible');
+                }, 300 + delay);
+            });
+        }
+    }
+
+const manifestoContent = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
+
+let currentManifestoSlide = 0;
+
+    function typeManifestoText(element) {
+        element.innerHTML = '';
+        const cursor = document.createElement('span');
+        cursor.className = 'crt-cursor';
+        cursor.textContent = '_';
+        element.appendChild(cursor);
+
+        const totalDuration = 800; // slower typewriter
+        const chars = manifestoContent.split('');
+        const delay = totalDuration / chars.length;
+
+        chars.forEach((ch, i) => {
+            setTimeout(() => {
+                const span = document.createElement('span');
+                span.className = 'crt-char';
+                if (ch === '\n') {
+                    element.insertBefore(document.createElement('br'), cursor);
+                } else {
+                    span.textContent = ch;
+                    element.insertBefore(span, cursor);
+                }
+            }, i * delay);
+        });
+    }
+
+    function startManifestoLoading() {
+        const panel = document.getElementById('manifestoPanel');
+        if (!panel) return;
+
+        const loaderFill = panel.querySelector('.manifesto-loader-fill');
+        const loader = panel.querySelector('.manifesto-loader');
+        const loaderText = panel.querySelector('.manifesto-loader-text');
+        const text = panel.querySelector('#manifestoText');
+
+        if (loaderFill && loader && loaderText && text) {
+            loaderFill.style.width = '0%';
+            loader.style.display = 'block';
+            loaderText.style.display = 'block';
+            text.style.display = 'none';
+
+            requestAnimationFrame(() => {
+                loaderFill.style.width = '100%';
+            });
+
+            setTimeout(() => {
+                loader.style.display = 'none';
+                loaderText.style.display = 'none';
+                text.style.display = 'block';
+                typeManifestoText(text);
+            }, 300);
+        }
+    }
+
+    function showSlide(index) {
+        const image = document.getElementById('manifestoImage');
+        const text = document.getElementById('manifestoText');
+        const loader = document.querySelector('#manifestoPanel .manifesto-loader');
+        const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
+        const indicator = document.getElementById('manifestoIndicator');
+        const overlay = document.getElementById('pixelOverlay');
+
+        currentManifestoSlide = index;
+        if (indicator) {
+            indicator.textContent = (index + 1) + ' / 3';
+        }
+
+        if (index === 0) {
+            if (loader) loader.style.display = 'none';
+            if (loaderText) loaderText.style.display = 'none';
+            if (text) text.style.display = 'none';
+            if (image) {
+                image.src = 'pages/2Large.jpeg';
+                image.style.display = 'block';
+            }
+            if (overlay) {
+                overlay.innerHTML = '';
+                overlay.style.display = 'grid';
+                const rows = 20;
+                const cols = 20;
+                overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+                for (let i = 0; i < rows * cols; i++) {
+                    const block = document.createElement('div');
+                    block.className = 'pixel-block';
+                    overlay.appendChild(block);
+                }
+                revealPixels(overlay);
+            }
+        } else if (index === 1) {
+            if (image) image.style.display = 'none';
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+            }
+            startManifestoLoading();
+        } else if (index === 2) {
+            if (loader) loader.style.display = 'none';
+            if (loaderText) loaderText.style.display = 'none';
+            if (text) text.style.display = 'none';
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.innerHTML = '';
+            }
+            if (image) {
+                image.src = 'components/3scene-terminator-draw.gif.gif?v=3';
+                image.style.display = 'block';
+            }
+        }
+    }
+
+    function changeSlide(delta) {
+        const total = 3;
+        currentManifestoSlide = (currentManifestoSlide + delta + total) % total;
+        showSlide(currentManifestoSlide);
+    }
+
+    function revealPixels(overlay) {
+        const blocks = Array.from(overlay.children);
+        blocks.forEach(block => {
+            const delay = Math.random() * 500;
+            setTimeout(() => {
+                block.style.opacity = '0';
+            }, delay);
+        });
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.innerHTML = '';
+        }, 700);
+    }
+
+    // Create cosmic meteors - reduced intensity by 4x
+    function createCosmicMeteors() {
+        const container = safeGetElement('matrix-container');
+        if (!container) return;
+        
+        setInterval(() => {
+            try {
+                const meteor = document.createElement('div');
+                meteor.className = 'matrix-char';
+                meteor.style.left = Math.random() * 100 + '%';
+                meteor.style.animationDelay = Math.random() * 4 + 's';
+                meteor.style.animationDuration = Math.random() * 2 + 5 + 's';
+                
+                container.appendChild(meteor);
+                
+                setTimeout(() => {
+                    if (meteor.parentNode) {
+                        meteor.parentNode.removeChild(meteor);
+                    }
+                }, 10000);
+            } catch (e) {
+                console.log('Meteor creation error:', e);
+            }
+        }, 1600); // Was 400ms, now 1600ms (4x less frequent)
+    }
+    
+    // Create fireflies from buttons upward
+    function createButtonFireflies(button) {
+        if (!button) return;
+        
+        try {
+            const rect = button.getBoundingClientRect();
+            
+            // Create fireflies around button perimeter
+            const positions = [
+                // Top border
+                {x: rect.left + rect.width * 0.2, y: rect.top},
+                {x: rect.left + rect.width * 0.5, y: rect.top},
+                {x: rect.left + rect.width * 0.8, y: rect.top},
+                // Bottom border
+                {x: rect.left + rect.width * 0.2, y: rect.bottom},
+                {x: rect.left + rect.width * 0.5, y: rect.bottom},
+                {x: rect.left + rect.width * 0.8, y: rect.bottom},
+                // Left border
+                {x: rect.left, y: rect.top + rect.height * 0.3},
+                {x: rect.left, y: rect.top + rect.height * 0.7},
+                // Right border
+                {x: rect.right, y: rect.top + rect.height * 0.3},
+                {x: rect.right, y: rect.top + rect.height * 0.7}
+            ];
+            
+            positions.forEach((pos, index) => {
+                setTimeout(() => {
+                    const firefly = document.createElement('div');
+                    firefly.className = 'button-firefly';
+                    firefly.style.left = pos.x + 'px';
+                    firefly.style.top = pos.y + 'px';
+                    
+                    // Fireflies fly predominantly upward
+                    const angle = -Math.PI/2 + (Math.random() - 0.5) * Math.PI/3; // Upward Â±30Â°
+                    const distance = Math.random() * 200 + 150;
+                    const dx = Math.cos(angle) * distance * 0.3;
+                    const dy = Math.sin(angle) * distance;
+                    
+                    firefly.style.setProperty('--dx', dx + 'px');
+                    firefly.style.setProperty('--dy', dy + 'px');
+                    firefly.style.animation = `fireflyUpward ${Math.random() * 2 + 2}s ease-out forwards`;
+                    
+                    document.body.appendChild(firefly);
+                    
+                    setTimeout(() => {
+                        if (firefly.parentNode) {
+                            firefly.parentNode.removeChild(firefly);
+                        }
+                    }, 4000);
+                }, index * 50); // Delay between fireflies
+            });
+            
+        } catch (e) {
+            console.log('Button fireflies error:', e);
+        }
+    }
+    
+    // Create fireflies around buttons - regular fireflies
+    function createFireflies() {
+        const galleryBtn = safeGetElement('galleryBtn');
+        const streamBtn = safeGetElement('streamBtn');
+        const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
+        
+        buttons.forEach(button => {
+            if (Math.random() < 0.6) {
+                try {
+                    const rect = button.getBoundingClientRect();
+                    const firefly = document.createElement('div');
+                    firefly.className = 'firefly';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 30 + Math.random() * 50;
+                    const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
+                    const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
+                    
+                    firefly.style.left = startX + 'px';
+                    firefly.style.top = startY + 'px';
+                    
+                    const flyDistance = 60 + Math.random() * 100;
+                    const flyAngle = Math.random() * Math.PI * 2;
+                    const flyX = Math.cos(flyAngle) * flyDistance;
+                    const flyY = Math.sin(flyAngle) * flyDistance;
+                    
+                    firefly.style.setProperty('--fly-x', flyX + 'px');
+                    firefly.style.setProperty('--fly-y', flyY + 'px');
+                    
+                    const duration = 2 + Math.random() * 3;
+                    firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.2s ease-in-out infinite`;
+                    firefly.style.animationDelay = Math.random() * 1 + 's';
+                    
+                    document.body.appendChild(firefly);
+                    
+                    setTimeout(() => {
+                        if (firefly.parentNode) {
+                            firefly.parentNode.removeChild(firefly);
+                        }
+                    }, (duration + 1) * 1000);
+                } catch (e) {
+                    console.log('Firefly creation error:', e);
+                }
+            }
+        });
+    }
+    
+    // Create floating pixels
+    function createFloatingPixels() {
+        try {
+            for (let i = 0; i < 4; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'floating-pixels';
+                
+                pixel.style.left = Math.random() * window.innerWidth + 'px';
+                pixel.style.top = Math.random() * window.innerHeight + 'px';
+                pixel.style.animationDelay = Math.random() * 8 + 's';
+                
+                const colors = ['#00ff00', '#33ff33', '#66ff66', '#44ff44'];
+                pixel.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(pixel);
+                
+                setTimeout(() => {
+                    if (pixel.parentNode) {
+                        pixel.parentNode.removeChild(pixel);
+                    }
+                }, 8000 + Math.random() * 2000);
+            }
+        } catch (e) {
+            console.log('Floating pixels error:', e);
+        }
+    }
+    
+    // Random numbers generator
+    function updateRandomNumbers() {
+        const element = safeGetElement('randomNumbers');
+        if (element) {
+            try {
+                let numbers = '';
+                for (let i = 0; i < 5; i++) {
+                    numbers += Math.floor(Math.random() * 10);
+                }
+                element.textContent = numbers;
+            } catch (e) {
+                console.log('Random numbers error:', e);
+            }
+        }
+    }
+    
+    // Add button click effects
+    function addButtonEffects() {
+        const galleryBtn = safeGetElement('galleryBtn');
+        const streamBtn = safeGetElement('streamBtn');
+        
+        if (galleryBtn) {
+            galleryBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Gallery button clicked! Redirecting to gallery.html');
+                createButtonFireflies(this);
+                
+                // Force redirect
+                setTimeout(() => {
+                    console.log('Forcing redirect to gallery.html');
+                    window.location.replace('gallery.html'); // Use replace instead of href
+                }, 800);
+            });
+        }
+        
+        if (streamBtn) {
+            streamBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Stream button clicked! Redirecting to stream.html');
+                createButtonFireflies(this);
+                
+                setTimeout(() => {
+                    console.log('Forcing redirect to stream.html');
+                    window.location.replace('stream.html');
+                }, 800);
+            });
+        }
+        
+    }
+    
+    // Command changer - fixed error
+    function changeCommand() {
+        const commands = [
+            'initiate_art_sequence',
+            'loading_neural_networks',
+            'processing_creativity_data',
+            'analyzing_color_patterns',
+            'generating_art_matrix'
+        ];
+        
+        const commandElements = document.querySelectorAll('.glow-text');
+        // Get last element (in footer)
+        const commandElement = commandElements[commandElements.length - 1];
+        
+        if (commandElement) {
+            try {
+                const randomCommand = commands[Math.floor(Math.random() * commands.length)];
+                commandElement.textContent = randomCommand;
+            } catch (e) {
+                console.log('Command change error:', e);
+            }
+        }
+    }
+    
+    // Logo hover effects
+    function addLogoEffects() {
+        const logo = safeQuerySelector('.enlarged-logo');
+        if (logo) {
+            logo.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(4.0)';
+                this.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+            });
+            
+            logo.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(3.6)';
+                this.style.filter = 'drop-shadow(0 0 8px rgba(0, 255, 0, 0.4))';
+            });
+        }
+    }
+    
+    // Mouse trail effect
+    function addMouseTrail() {
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() < 0.05) {
+                try {
+                    const particle = document.createElement('div');
+                    particle.className = 'pixel-particle';
+                    particle.style.left = e.clientX + 'px';
+                    particle.style.top = e.clientY + 'px';
+                    particle.style.width = '1px';
+                    particle.style.height = '1px';
+                    particle.style.background = '#00ff00';
+                    particle.style.opacity = '0.3';
+                    particle.style.animation = 'pixelExplode 0.8s ease-out forwards';
+                    
+                    const dx = (Math.random() - 0.5) * 15;
+                    const dy = (Math.random() - 0.5) * 15;
+                    particle.style.setProperty('--dx', dx + 'px');
+                    particle.style.setProperty('--dy', dy + 'px');
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 800);
+                } catch (e) {
+                    console.log('Mouse trail error:', e);
+                }
+            }
+        });
+    }
+
+    // Idle glowing sparks from SOCIAL button
+    function startSocialParticles() {
+        const button = safeGetElement('socialToggle');
+        if (!button) return;
+
+        setInterval(() => {
+            const rect = button.getBoundingClientRect();
+            const particle = document.createElement('div');
+            particle.className = 'social-spark';
+            const size = Math.random() < 0.5 ? 1 : 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = rect.left + rect.width / 2 + 'px';
+            particle.style.top = rect.top + rect.height / 2 + 'px';
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 20 + Math.random() * 20;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+            particle.style.setProperty('--dx', dx + 'px');
+            particle.style.setProperty('--dy', dy + 'px');
+
+            document.body.appendChild(particle);
+            particle.addEventListener('animationend', () => {
+                if (particle.parentNode) particle.parentNode.removeChild(particle);
+            });
+        }, 1000);
+    }
+    
+    // Terminal loading simulation
+    function startTerminalLoading() {
+        const loadingMessages = [
+            { text: "Initializing neural networks...", delay: 15 },
+            { text: "Loading AI systems...", delay: 13 },
+            { text: "Activating creativity engines...", delay: 4 },
+            { text: "System ready. Welcome to GHOSTLINE.", delay: 5 },
+            { text: "What is life?.", delay: 5 }
+        ];
+
+        const terminalOutput = document.getElementById('terminal-output');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressText = document.getElementById('progress-text');
+        
+        let currentMessage = 0;
+        let progress = 0;
+        
+        function typeMessage(message, callback) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.color = '#00ff00';
+            messageDiv.style.marginBottom = '2px';
+            terminalOutput.appendChild(messageDiv);
+            
+            let charIndex = 0;
+            const typingInterval = setInterval(() => {
+                if (charIndex < message.length) {
+                    messageDiv.textContent = '> ' + message.substring(0, charIndex + 1) + '_';
+                    charIndex++;
+                } else {
+                    messageDiv.textContent = '> ' + message;
+                    clearInterval(typingInterval);
+                    
+                    // Scroll down
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                    
+                    callback();
+                }
+            }, 1.5); // Fast typing
+        }
+        
+        function processNextMessage() {
+            if (currentMessage < loadingMessages.length) {
+                const message = loadingMessages[currentMessage];
+                progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
+                
+                // Update progress bar
+                progressFill.style.width = progress + '%';
+                progressPercent.textContent = Math.floor(progress) + '%';
+                progressText.textContent = message.text;
+                
+                typeMessage(message.text, () => {
+                    setTimeout(() => {
+                        currentMessage++;
+                        processNextMessage();
+                    }, message.delay);
+                });
+            } else {
+                // Loading complete
+                setTimeout(() => {
+                    document.getElementById('terminal-loading').style.opacity = '0';
+                    document.getElementById('main-content').style.opacity = '1';
+
+                    setTimeout(() => {
+                        document.getElementById('terminal-loading').style.display = 'none';
+                    }, 300);
+                }, 300);
+            }
+        }
+        
+        // Start loading process
+        setTimeout(processNextMessage, 100);
+    }
+    
+    // Initialize everything when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start terminal loading
+        startTerminalLoading();
+        
+        try {
+            
+            // Start all effects (but they'll be hidden until loading completes)
+            createCosmicMeteors();
+            
+            // Floating pixels every 10 seconds
+            setInterval(createFloatingPixels, 10000);
+            createFloatingPixels();
+            
+            // Fireflies every 600ms
+            setInterval(createFireflies, 600);
+            createFireflies();
+            
+            // Random numbers every 2 seconds
+            setInterval(updateRandomNumbers, 2000);
+            updateRandomNumbers();
+            
+            
+            // Command change every 8 seconds
+            setInterval(changeCommand, 8000);
+            
+            // Add button effects
+            addButtonEffects();
+            
+            // Add logo effects
+            addLogoEffects();
+            
+            // Add mouse trail
+            addMouseTrail();
+
+            // Start idle pixels for SOCIAL button
+            startSocialParticles();
+            
+            console.log('ð¨ GHOSTLINE initialized!');
+            
+        } catch (e) {
+            console.log('Initialization error:', e);
+        }
+    });
+</script>
+
+<script>
+  const toggle = document.getElementById("socialToggle");
+  const panel = document.getElementById("socialPanel");
+  toggle.addEventListener("click", () => {
+    toggle.classList.add("terminal-activate");
+    panel.classList.toggle("visible");
+    setTimeout(() => toggle.classList.remove("terminal-activate"), 500);
+  });
+</script>
+
+<div id="ata-line" class="ata-glyph-line"></div>
+<div id="ata-square" class="ata-glyph-square"></div>
+<script>
+const ataGlyphs = [
+  "█", "▓", "▒", "░", "■", "□", "▣", "▤", "▥", "▦", "▧", "▨", "▩", "▪", "▫",
+  "▖", "▗", "▘", "▙", "▚", "▛", "▜", "▝", "▞", "▟", "▔", "▕", "▌", "▐",
+  "┌", "┐", "└", "┘", "┬", "┴", "├", "┤", "┼", "━", "┃", "╋"
+];
+
+// â ATA line logic â
+let currentATALine = [];
+
+function pickUniqueGlyphs(count = 5) {
+const picked = [];
+while (picked.length < count) {
+const g = ataGlyphs[Math.floor(Math.random() * ataGlyphs.length)];
+if (!picked.includes(g)) picked.push(g);
+}
+
+return picked;
+}
+
+function renderATALine() {
+const line = document.getElementById('ata-line');
+if (line) {
+line.textContent = currentATALine.join(' ');
+}
+}
+
+function updateOneGlyph() {
+if (currentATALine.length === 0) return;
+const index = Math.floor(Math.random() * currentATALine.length);
+const available = ataGlyphs.filter(g => !currentATALine.includes(g));
+if (available.length === 0) return;
+const next = available[Math.floor(Math.random() * available.length)];
+currentATALine[index] = next;
+renderATALine();
+}
+
+function initATALine() {
+currentATALine = pickUniqueGlyphs(5);
+renderATALine();
+setInterval(updateOneGlyph, 5000);
+}
+
+// â ATA square logic (unchanged) â
+function getRandomATASquare(size = 5) {
+let rows = [];
+for (let i = 0; i < size; i++) {
+let row = [];
+for (let j = 0; j < size; j++) {
+row.push(ataGlyphs[Math.floor(Math.random() * ataGlyphs.length)]);
+}
+rows.push(row.join(' '));
+}
+return rows.join('\n');
+}
+
+function initATASquare() {
+const square = document.getElementById('ata-square');
+if (square) {
+square.textContent = getRandomATASquare();
+setInterval(() => {
+square.textContent = getRandomATASquare();
+}, 5000);
+}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+initATALine();
+initATASquare();
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var popup = document.getElementById('terminal-popup');
+    var closeBtn = document.getElementById('terminal-close');
+
+    if (closeBtn && popup) {
+      closeBtn.addEventListener('click', function () {
+        popup.style.display = 'none';
+      });
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var manifestoPanel = document.getElementById('manifestoPanel');
+    var manifestoClose = document.getElementById('manifestoClose');
+    var leftArrow = document.querySelector('.manifesto-arrow-left');
+    var rightArrow = document.querySelector('.manifesto-arrow-right');
+
+    if (manifestoPanel && manifestoClose) {
+      manifestoClose.addEventListener('click', function () {
+        manifestoPanel.classList.remove('visible');
+        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
+          el.classList.remove('child-visible');
+        });
+      });
+    }
+
+    if (leftArrow && rightArrow) {
+      leftArrow.addEventListener('click', function(){ changeSlide(-1); });
+      rightArrow.addEventListener('click', function(){ changeSlide(1); });
+    }
+  });
+</script>
+
+</body>
+</html>
