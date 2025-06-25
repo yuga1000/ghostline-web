@@ -460,49 +460,51 @@ let currentManifestoSlide = 0;
             });
         }
 
-        if (portalFlash) {
-            portalFlash.style.display = 'block';
-            portalFlash.style.opacity = '1';
-            portalFlash.style.transition = 'none';
-            portalFlash.style.width = '100%';
-            requestAnimationFrame(() => {
-                portalFlash.style.transition = 'width 100ms linear';
-                portalFlash.style.width = '0';
-            });
-            setTimeout(() => {
-                portalFlash.style.transition = 'opacity 100ms linear';
-                portalFlash.style.opacity = '0';
-            }, 100);
-            setTimeout(() => {
-                portalFlash.style.display = 'none';
-                portalFlash.style.width = '100%';
+        // Wait for the panel to finish closing before playing the portal effect
+        setTimeout(() => {
+            if (portalFlash) {
+                portalFlash.style.display = 'block';
                 portalFlash.style.opacity = '1';
-            }, 200);
-        }
+                portalFlash.style.transition = 'none';
+                portalFlash.style.width = '100%';
+                requestAnimationFrame(() => {
+                    portalFlash.style.transition = 'width 100ms linear';
+                    portalFlash.style.width = '0';
+                });
+                setTimeout(() => {
+                    portalFlash.style.transition = 'opacity 100ms linear';
+                    portalFlash.style.opacity = '0';
+                }, 100);
+                setTimeout(() => {
+                    portalFlash.style.display = 'none';
+                    portalFlash.style.width = '100%';
+                    portalFlash.style.opacity = '1';
+                }, 200);
+            }
 
-        if (staticTitle && animatedTitle && finalTitle) {
-            finalTitle.style.opacity = '0';
-            animatedTitle.classList.add('reverse');
-            animatedTitle.style.opacity = '1';
-            animatedTitle.style.transform = 'scale(1.05)';
-            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+            if (staticTitle && animatedTitle && finalTitle) {
+                finalTitle.style.opacity = '0';
+                animatedTitle.classList.add('reverse');
+                animatedTitle.style.opacity = '1';
+                animatedTitle.style.transform = 'scale(1.05)';
+                animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+            }
+
+            // After portal animation finishes, restore the title
             setTimeout(() => {
-                animatedTitle.style.opacity = '0';
-                animatedTitle.style.transform = 'scale(1)';
-                animatedTitle.style.filter = 'none';
-                animatedTitle.classList.remove('reverse');
-                staticTitle.style.opacity = '1';
+                if (staticTitle && animatedTitle && finalTitle) {
+                    animatedTitle.style.opacity = '0';
+                    animatedTitle.style.transform = 'scale(1)';
+                    animatedTitle.style.filter = 'none';
+                    animatedTitle.classList.remove('reverse');
+                    staticTitle.style.opacity = '1';
+                }
                 if (titleContainer) {
                     titleContainer.classList.remove('collapsed');
                     titleContainer.classList.add('expanded');
                 }
             }, 700);
-        } else if (titleContainer) {
-            setTimeout(() => {
-                titleContainer.classList.remove('collapsed');
-                titleContainer.classList.add('expanded');
-            }, 700);
-        }
+        }, 200); // Panel close transition duration
     }
 
     // Create cosmic meteors - reduced intensity by 4x
