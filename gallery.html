@@ -436,18 +436,13 @@
 </head>
 <body class="scanlines">
 
-<div class="terminal-border bg-black p-2 m-4">
-    <div class="flex justify-between items-center text-xs">
-        <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
-        <div class="flex gap-4">
-            <a href="index.html" class="nav-link">[HOME]</a>
-            <span class="nav-link nav-active">[GALLERY]</span>
-            <a href="stream.html" class="nav-link">[STREAM]</a>
-        </div>
-        <div>
-            <span id="liveStatus">Loading...</span>
-        </div>
-    </div>
+<div class="terminal-border bg-black p-2 m-4 flex flex-col items-center">
+    <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
+    <nav class="flex gap-4 mt-2 text-xs">
+        <a href="index.html" class="nav-link">[HOME]</a>
+        <span class="nav-link nav-active">[GALLERY]</span>
+        <a href="stream.html" class="nav-link">[STREAM]</a>
+    </nav>
 </div>
 
 <!-- Main Content -->
@@ -634,7 +629,6 @@ async function loadGallery() {
     }
     
     renderGallery();
-    updateStatus();
 }
 
 // Отображение галереи
@@ -733,17 +727,6 @@ function filterCategory(category) {
     });
     event.target.classList.add('active');
     renderGallery();
-    updateStatus();
-}
-
-// Обновление статуса
-function updateStatus() {
-    const status = document.getElementById('liveStatus');
-    if (status) {
-        const count = currentCategory === 'all' ? galleryItems.length : 
-                     galleryItems.filter(item => item.category === currentCategory).length;
-        status.textContent = `${count} IMAGES`;
-    }
 }
 
 // Инициализация при загрузке
