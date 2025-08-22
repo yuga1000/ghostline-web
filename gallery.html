@@ -369,6 +369,14 @@
             padding-left: 0.5rem;
             padding-right: 0.5rem;
         }
+
+        /* Navigation: align links in a single row on mobile */
+        #nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-direction: row;
+        }
         
         /* Gallery grid - single column on mobile */
         .grid.lg\\:grid-cols-4 {
@@ -438,7 +446,7 @@
 
 <div class="terminal-border bg-black p-2 m-4 flex flex-col items-center">
     <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
-    <nav class="flex gap-4 mt-2 text-xs">
+    <nav id="nav-menu" class="flex gap-4 mt-2 text-xs">
         <a href="index.html" class="nav-link">[HOME]</a>
         <span class="nav-link nav-active">[GALLERY]</span>
         <a href="stream.html" class="nav-link">[STREAM]</a>
