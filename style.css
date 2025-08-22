@@ -1065,4 +1065,21 @@
         height: auto !important;
         object-fit: contain !important;
     }
+
+    .manual-modal .manual-close,
+    .manual-modal .manual-prev,
+    .manual-modal .manual-next,
+    .manual-modal .close,
+    .manual-modal .prev,
+    .manual-modal .next,
+    .manual-modal [data-action="close"],
+    .manual-modal [data-action="previous"],
+    .manual-modal [data-action="next"] {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        margin: -16px;
+    }
 }
