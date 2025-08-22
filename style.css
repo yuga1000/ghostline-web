@@ -1044,7 +1044,11 @@
         max-height: calc(100vh - 64px);
         width: auto !important;
         height: auto !important;
-        overflow: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #000;
         background-size: contain !important;
         background-position: center;
         background-repeat: no-repeat;
