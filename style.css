@@ -749,7 +749,7 @@
         pointer-events: none;
         max-width: calc(100vw - 40px);
         max-height: calc(100vh - 40px);
-        overflow: visible;
+        overflow: hidden;
         /* Улучшенное отображение контента */
         flex-direction: column;
         /* Убираем ограничения для десктопа */
@@ -889,10 +889,10 @@
     /* Улучшенное отображение для десктопа */
     min-height: 0;
     flex: 1;
-    /* Убираем ограничения */
-    overflow: visible;
-    max-width: none;
-    max-height: none;
+    /* Контролируем overflow */
+    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
 }
 #manifestoImage {
     width: auto;
@@ -1031,12 +1031,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        /* Убираем overflow для полного отображения */
-        overflow: visible;
+        /* Возвращаем overflow для контроля рамки */
+        overflow: hidden;
     }
     #manifestoImage {
-        max-width: 85%;
-        max-height: 85%;
+        max-width: 80%;
+        max-height: 80%;
         width: auto;
         height: auto;
         display: block;
@@ -1066,8 +1066,8 @@
             max-height: calc(100vh - 160px);
         }
         #manifestoImage {
-            max-width: 80%;
-            max-height: 80%;
+            max-width: 75%;
+            max-height: 75%;
         }
     }
         background: rgba(0, 0, 0, .6);
