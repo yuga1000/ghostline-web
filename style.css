@@ -750,6 +750,8 @@
         max-width: calc(100vw - 40px);
         max-height: calc(100vh - 40px);
         overflow: auto;
+        /* Улучшенное отображение контента */
+        flex-direction: column;
     }
 
     #manifestoPanel.visible {
@@ -881,6 +883,9 @@
     justify-content: center;
     padding: 8px;
     box-sizing: border-box;
+    /* Улучшенное отображение для десктопа */
+    min-height: 0;
+    flex: 1;
 }
 #manifestoImage {
     width: auto;
@@ -892,6 +897,8 @@
     margin: auto;
     image-rendering: pixelated;
     box-sizing: border-box;
+    /* Улучшенное отображение для десктопа */
+    object-position: center;
 }
 .pixel-overlay {
     position: absolute;
@@ -1013,12 +1020,20 @@
         max-width: calc(100vw - 80px);
         max-height: calc(100vh - 80px);
         margin: auto;
+        /* Улучшенное позиционирование для десктопа */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     #manifestoImage {
         max-width: 90%;
+        max-height: 90%;
+        width: auto;
         height: auto;
         display: block;
         margin: auto;
+        object-fit: contain;
+        object-position: center;
     }
 }
 
