@@ -43,20 +43,72 @@
     const media = wrap?.querySelector('img,video,canvas');
     if (!wrap) return;
 
-    ['width','height','transform','aspectRatio'].forEach(p => wrap.style[p] = '');
-    wrap.style.maxWidth = 'calc(100vw - 64px)';
-    wrap.style.maxHeight = 'calc(100vh - 64px)';
-    wrap.style.overflow = 'hidden';
+    ['width','height','transform','aspectRatio','maxWidth','maxHeight','overflow'].forEach(p => wrap.style[p] = '');
+    wrap.style.overflow = 'auto';
 
     if (media){
-      ['width','height'].forEach(p => media.style[p] = '');
-      media.style.maxWidth = '100%';
-      media.style.maxHeight = '100%';
+      ['width','height','maxWidth','maxHeight','objectFit'].forEach(p => media.style[p] = '');
       media.style.objectFit = 'contain';
       const ratio = getMediaAspectRatio(media);
       if (ratio) wrap.style.aspectRatio = ratio;
     }
   }
+
+  function closeModal(){
+    const btn = document.querySelector(
+      '.manual-modal .manual-close, .manual-modal .close, .manual-modal [data-action="close"]'
+    );
+    btn?.click();
+  }
+
+  function prevModal(){
+    const btn = document.querySelector(
+      '.manual-modal .manual-prev, .manual-modal .prev, .manual-modal [data-action="previous"]'
+    );
+    btn?.click();
+  }
+
+  function nextModal(){
+    const btn = document.querySelector(
+      '.manual-modal .manual-next, .manual-modal .next, .manual-modal [data-action="next"]'
+    );
+    btn?.click();
+  }
+
+  document.addEventListener('click', (e) => {
+    const modal = document.querySelector('.manual-modal');
+    if (!modal) return;
+    const style = getComputedStyle(modal);
+    if (style.display === 'none') return;
+    const controlSelector = [
+      '.manual-close',
+      '.manual-prev',
+      '.manual-next',
+      '.close',
+      '.prev',
+      '.next',
+      '[data-action="close"]',
+      '[data-action="previous"]',
+      '[data-action="next"]'
+    ].join(', ');
+    if (modal.contains(e.target) && !e.target.closest('.manual-wrap') && !e.target.closest(controlSelector)) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const modal = document.querySelector('.manual-modal');
+    if (!modal) return;
+    const style = getComputedStyle(modal);
+    if (style.display === 'none') return;
+    if (e.key === 'Escape') {
+      closeModal();
+    } else if (e.key === 'ArrowLeft') {
+      prevModal();
+    } else if (e.key === 'ArrowRight') {
+      nextModal();
+    }
+  });
 
   window.normalizeManualModal = normalizeManualModal;
 

@@ -1031,23 +1031,22 @@
         place-items: center;
         padding: 32px;
         background: rgba(0, 0, 0, .6);
+        overflow: auto;
+        z-index: 1000;
     }
 
-    .manual-modal,
     .manual-modal * {
         overflow: visible;
     }
 
     .manual-wrap {
         box-sizing: border-box;
-        max-width: calc(100vw - 64px);
-        max-height: calc(100vh - 64px);
         width: auto !important;
         height: auto !important;
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
+        overflow: visible;
         background-color: #000;
         background-size: contain !important;
         background-position: center;
@@ -1063,8 +1062,6 @@
     .manual-wrap video,
     .manual-wrap canvas {
         display: block;
-        max-width: 100%;
-        max-height: 100%;
         width: auto !important;
         height: auto !important;
         object-fit: contain !important;
@@ -1083,7 +1080,21 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 16px;
-        margin: -16px;
+        padding: 24px;
+        margin: -24px;
+        z-index: 1;
+    }
+
+    .manual-modal .manual-close:focus-visible,
+    .manual-modal .manual-prev:focus-visible,
+    .manual-modal .manual-next:focus-visible,
+    .manual-modal .close:focus-visible,
+    .manual-modal .prev:focus-visible,
+    .manual-modal .next:focus-visible,
+    .manual-modal [data-action="close"]:focus-visible,
+    .manual-modal [data-action="previous"]:focus-visible,
+    .manual-modal [data-action="next"]:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
     }
 }
