@@ -23,22 +23,38 @@
     }
   }
 
+  function getMediaAspectRatio(el){
+    if (!el) return '';
+    if (el.tagName === 'IMG' && el.naturalWidth && el.naturalHeight){
+      return `${el.naturalWidth} / ${el.naturalHeight}`;
+    }
+    if (el.tagName === 'VIDEO' && el.videoWidth && el.videoHeight){
+      return `${el.videoWidth} / ${el.videoHeight}`;
+    }
+    if (el.tagName === 'CANVAS' && el.width && el.height){
+      return `${el.width} / ${el.height}`;
+    }
+    return '';
+  }
+
   function normalizeManualModal(){
     if (!isDesktop()) return;
     const wrap = document.querySelector('.manual-wrap');
     const media = wrap?.querySelector('img,video,canvas');
     if (!wrap) return;
 
-    ['width','height','transform'].forEach(p => wrap.style[p] = '');
+    ['width','height','transform','aspectRatio'].forEach(p => wrap.style[p] = '');
     wrap.style.maxWidth = 'calc(100vw - 64px)';
     wrap.style.maxHeight = 'calc(100vh - 64px)';
-    wrap.style.overflow = 'auto';
+    wrap.style.overflow = 'hidden';
 
     if (media){
       ['width','height'].forEach(p => media.style[p] = '');
       media.style.maxWidth = '100%';
       media.style.maxHeight = '100%';
       media.style.objectFit = 'contain';
+      const ratio = getMediaAspectRatio(media);
+      if (ratio) wrap.style.aspectRatio = ratio;
     }
   }
 
