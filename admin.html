@@ -421,30 +421,43 @@ padding: 0.5rem;
     // Admin authentication
     let artworks = [];
     
-    // Safely load artworks with fallback
-    function loadArtworksFromStorage() {
+    // Safely load artworks with fallback (Supabase or localStorage)
+    async function loadArtworksFromStorage() {
         try {
-            const stored = localStorage.getItem('ghostline_artworks');
-            if (stored) {
-                artworks = JSON.parse(stored);
+            if (window.supabaseAdmin) {
+                artworks = await window.supabaseAdmin.loadArtworks();
+                const serialized = JSON.stringify(artworks);
+                localStorage.setItem('ghostline_artworks', serialized);
+                localStorage.setItem('ghostline_images', serialized);
+            } else {
+                const stored =
+                    localStorage.getItem('ghostline_artworks') ||
+                    localStorage.getItem('ghostline_images');
+                if (stored) {
+                    artworks = JSON.parse(stored);
+                }
             }
         } catch (error) {
             console.warn('localStorage not available:', error.message);
-            // Fallback to empty array if localStorage fails
-            artworks = [];
+            const stored =
+                localStorage.getItem('ghostline_artworks') ||
+                localStorage.getItem('ghostline_images');
+            artworks = stored ? JSON.parse(stored) : [];
         }
     }
-    
+
     // Safe save to localStorage
     function saveToLocalStorage() {
         try {
-            localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
+            const serialized = JSON.stringify(artworks);
+            localStorage.setItem('ghostline_artworks', serialized);
+            localStorage.setItem('ghostline_images', serialized);
         } catch (error) {
             console.warn('Cannot save to localStorage:', error.message);
             // Could implement alternative storage here
         }
     }
-    
+
     // Initialize artworks
     loadArtworksFromStorage();
     
@@ -463,6 +476,7 @@ padding: 0.5rem;
             if (res.ok) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('adminPanel').classList.remove('hidden');
+                await loadArtworksFromStorage();
                 loadArtworks();
             } else {
                 alert('Incorrect password!');
@@ -686,7 +700,9 @@ padding: 0.5rem;
 
     function saveToLocalStorage() {
         try {
-            localStorage.setItem('ghostline_artworks', JSON.stringify(artworks));
+            const serialized = JSON.stringify(artworks);
+            localStorage.setItem('ghostline_artworks', serialized);
+            localStorage.setItem('ghostline_images', serialized);
         } catch (error) {
             console.warn('Cannot save to localStorage:', error.message);
             // Show user-friendly message instead of alert
@@ -699,9 +715,9 @@ padding: 0.5rem;
     }
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
         // Silent initialization - no console logs
-        loadArtworksFromStorage();
+        await loadArtworksFromStorage();
     });
 </script>
 
