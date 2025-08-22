@@ -287,6 +287,23 @@
     .lightbox-contact-btn:hover {
         background: #0015FF;
     }
+
+    @media (max-width: 640px) {
+        .lightbox {
+            flex-direction: column;
+            padding: 20px 10px;
+        }
+
+        .lightbox img {
+            max-height: 60vh;
+        }
+
+        .lightbox-info {
+            position: static;
+            margin-top: 12px;
+            max-width: 90vw;
+        }
+    }
     
     /* Contact modal styles */
     .contact-modal {
