@@ -643,13 +643,20 @@ padding: 0.5rem;
         }
     }
 
-    function deleteArtwork(index) {
+    async function deleteArtwork(index) {
         const artwork = artworks[index];
         if (artwork && confirm('Delete selected artwork? This cannot be undone.')) {
-            artworks.splice(index, 1);
-            saveToLocalStorage();
-            loadArtworks();
-            alert('Artwork deleted!');
+            try {
+                if (window.supabaseAdmin && artwork.id) {
+                    await window.supabaseAdmin.deleteArtwork(artwork.id);
+                }
+                artworks.splice(index, 1);
+                saveToLocalStorage();
+                loadArtworks();
+                alert('Artwork deleted!');
+            } catch (error) {
+                alert('Failed to delete artwork: ' + (error.message || error));
+            }
         }
     }
 
