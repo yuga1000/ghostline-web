@@ -961,10 +961,10 @@
 /* ПРОСТОЙ МАНУАЛ - БЕЗ ВСЯКИХ СЛОЖНОСТЕЙ */
 
 #manifestoPanel {
-    width: 70vw !important;
-    height: 80vh !important;
-    max-width: 1000px !important;
-    max-height: 800px !important;
+    width: 85vw !important;
+    height: 85vh !important;
+    max-width: 1400px !important;
+    max-height: 900px !important;
     margin: auto !important;
     padding: 8px !important;
     border: 1px solid #b200ff !important;
