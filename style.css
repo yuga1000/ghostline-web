@@ -734,6 +734,9 @@
         left: 50%;
         transform: translate(-50%, -50%) scaleY(0);
         background: #000;
+        padding: 2px;
+        box-sizing: border-box;
+        border: 1px solid #00ff00;
         font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
         font-weight: 700;
         z-index: 10000;
