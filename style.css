@@ -1024,26 +1024,26 @@
 
 @media (min-width: 1025px) {
     #manifestoPanel {
-        max-width: calc(100vw - 80px);
-        max-height: calc(100vh - 80px);
+        max-width: calc(100vw - 100px);
+        max-height: calc(100vh - 100px);
         margin: auto;
         /* Улучшенное позиционирование для десктопа */
         display: flex;
         align-items: center;
         justify-content: center;
-        /* Адаптивный overflow */
-        overflow: auto;
+        /* Убираем overflow для полного отображения */
+        overflow: visible;
     }
     #manifestoImage {
-        max-width: 90%;
-        max-height: 90%;
+        max-width: 95%;
+        max-height: 95%;
         width: auto;
         height: auto;
         display: block;
         margin: auto;
         object-fit: contain;
         object-position: center;
-        /* Адаптивные ограничения */
+        /* Убираем ограничения */
         min-width: auto;
         min-height: auto;
     }
@@ -1062,12 +1062,12 @@
     /* Дополнительные стили для больших экранов */
     @media (min-width: 1440px) {
         #manifestoPanel {
-            max-width: calc(100vw - 100px);
-            max-height: calc(100vh - 100px);
+            max-width: calc(100vw - 120px);
+            max-height: calc(100vh - 120px);
         }
         #manifestoImage {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 95%;
+            max-height: 95%;
         }
     }
         background: rgba(0, 0, 0, .6);
