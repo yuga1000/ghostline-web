@@ -397,6 +397,7 @@ let currentManifestoSlide = 0;
             if (image) {
                 image.src = 'pages/2Large.jpeg';
                 image.style.display = 'block';
+                image.style.visibility = 'visible';
             }
             if (overlay) {
                 overlay.innerHTML = '';
@@ -416,6 +417,7 @@ let currentManifestoSlide = 0;
             if (image) {
                 image.style.display = 'none';
                 image.src = '';
+                image.style.visibility = 'hidden';
             }
             if (overlay) {
                 overlay.style.display = 'none';
@@ -436,6 +438,7 @@ let currentManifestoSlide = 0;
             if (image) {
                 image.src = 'components/3scene-terminator-draw.gif.gif?v=3';
                 image.style.display = 'block';
+                image.style.visibility = 'visible';
             }
         } else if (index === 3) {
             if (loader) loader.style.display = 'none';
@@ -443,6 +446,7 @@ let currentManifestoSlide = 0;
             if (image) {
                 image.style.display = 'none';
                 image.src = '';
+                image.style.visibility = 'hidden';
             }
             if (overlay) {
                 overlay.style.display = 'none';
