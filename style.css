@@ -966,8 +966,8 @@
     max-width: none !important;
     max-height: none !important;
     margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
+    padding: 8px !important;
+    border: 3px solid #00ff00 !important;
     overflow: auto !important;
 }
 
