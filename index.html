@@ -426,6 +426,7 @@ let currentManifestoSlide = 0;
             console.log('Showing slide 1 - text slide');
             if (image) {
                 image.style.display = 'none';
+                image.src = '';
             }
             if (overlay) {
                 overlay.style.display = 'none';
@@ -433,10 +434,12 @@ let currentManifestoSlide = 0;
             }
             startManifestoLoading();
         } else if (index === 2) {
+            console.log('Showing slide 2 - image slide');
             if (loader) loader.style.display = 'none';
             if (loaderText) loaderText.style.display = 'none';
             if (text) {
                 text.style.display = 'none';
+                text.innerHTML = '';
             }
             if (overlay) {
                 overlay.style.display = 'none';
@@ -447,10 +450,12 @@ let currentManifestoSlide = 0;
                 image.style.display = 'block';
             }
         } else if (index === 3) {
+            console.log('Showing slide 3 - text slide');
             if (loader) loader.style.display = 'none';
             if (loaderText) loaderText.style.display = 'none';
             if (image) {
                 image.style.display = 'none';
+                image.src = '';
             }
             if (overlay) {
                 overlay.style.display = 'none';
