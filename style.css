@@ -961,17 +961,21 @@
 /* ПРОСТОЙ МАНУАЛ */
 
 #manifestoPanel {
-    width: 1000px;
-    height: 700px;
+    width: auto;
+    height: auto;
+    max-width: 90vw;
+    max-height: 90vh;
     margin: auto;
-    padding: 10px;
+    padding: 20px;
     border: 1px solid #b200ff;
     overflow: auto;
 }
 
 #manifestoImage {
-    width: 100%;
+    width: auto;
     height: auto;
+    max-width: 100%;
+    max-height: 80vh;
     object-fit: contain;
     display: block;
 }
