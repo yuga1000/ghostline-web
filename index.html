@@ -355,6 +355,8 @@ let currentManifestoSlide = 0;
         const loaderText = panel.querySelector('.manifesto-loader-text');
         const text = panel.querySelector('#manifestoText');
 
+        console.log('startManifestoLoading called', { loaderFill, loader, loaderText, text });
+
         if (loaderFill && loader && loaderText && text) {
             loaderFill.style.width = '0%';
             loader.style.display = 'block';
@@ -366,11 +368,18 @@ let currentManifestoSlide = 0;
             });
 
             setTimeout(() => {
+                console.log('Showing text after timeout');
                 loader.style.display = 'none';
                 loaderText.style.display = 'none';
                 text.style.display = 'block';
                 typeManifestoText(text);
             }, 300);
+        } else {
+            console.log('Some elements not found, showing text directly');
+            if (text) {
+                text.style.display = 'block';
+                typeManifestoText(text);
+            }
         }
     }
 
@@ -381,6 +390,8 @@ let currentManifestoSlide = 0;
         const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
         const indicator = document.getElementById('manifestoIndicator');
         const overlay = document.getElementById('pixelOverlay');
+
+        console.log('showSlide called with index:', index);
 
         currentManifestoSlide = index;
         if (indicator) {
@@ -412,6 +423,7 @@ let currentManifestoSlide = 0;
                 revealPixels(overlay);
             }
         } else if (index === 1) {
+            console.log('Showing slide 1 - text slide');
             if (image) {
                 image.style.display = 'none';
             }
