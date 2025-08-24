@@ -394,6 +394,13 @@ let currentManifestoSlide = 0;
         console.log('showSlide called with index:', index);
 
         currentManifestoSlide = index;
+        
+        // Устанавливаем атрибут для CSS селекторов
+        const panel = document.getElementById('manifestoPanel');
+        if (panel) {
+            panel.setAttribute('data-slide', index);
+        }
+        
         if (indicator) {
             indicator.textContent = (index + 1) + ' / 4';
         }

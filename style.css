@@ -989,6 +989,31 @@
     max-height: none !important;
     margin: auto !important;
 }
+
+/* ПРИНУДИТЕЛЬНЫЕ СТИЛИ ДЛЯ СЛАЙДОВ */
+#manifestoPanel[data-slide="0"] #manifestoText {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+#manifestoPanel[data-slide="1"] #manifestoImage {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+#manifestoPanel[data-slide="2"] #manifestoText {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+#manifestoPanel[data-slide="3"] #manifestoImage {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
         background: rgba(0, 0, 0, .6);
         overflow: auto;
         z-index: 1000;
