@@ -900,27 +900,7 @@
     box-sizing: border-box;
 }
 
-/* Специальные стили для всех изображений в мануале */
-#manifestoImage {
-    width: 80% !important;
-    height: auto !important;
-    max-width: 80% !important;
-    max-height: 80vh !important;
-    object-fit: contain !important;
-    object-position: center !important;
-    display: block !important;
-    margin: auto !important;
-}
 
-/* Дополнительные стили для GIF-файлов */
-#manifestoImage[src*=".gif"] {
-    width: 75% !important;
-    height: auto !important;
-    max-width: 75% !important;
-    max-height: 75vh !important;
-    object-fit: contain !important;
-    object-position: center !important;
-}
 .pixel-overlay {
     position: absolute;
     top: 0;
@@ -989,68 +969,25 @@
     50.1%, 100% { opacity: 0; }
 }
 
-/* Простые стили для мануала - без сложных медиа-запросов */
+/* ПРОСТОЙ МАНУАЛ - БЕЗ ВСЯКИХ СЛОЖНОСТЕЙ */
 
-/* Мобильная версия */
-@media (max-width: 600px) {
-    #manifestoPanel {
-        width: 95vw;
-        height: 95vh;
-        max-width: none;
-        max-height: none;
-        margin: auto;
-        overflow: auto;
-    }
-    #manifestoImage {
-        width: 100%;
-        height: auto;
-        max-width: 100%;
-        max-height: none;
-        object-fit: contain;
-    }
-    #manifestoText {
-        font-size: 14px;
-        width: 100%;
-        margin: auto;
-    }
+#manifestoPanel {
+    width: 90vw !important;
+    height: 90vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: auto !important;
+    overflow: auto !important;
 }
 
-/* Планшетная версия */
-@media (min-width: 601px) and (max-width: 1024px) {
-    #manifestoPanel {
-        width: 90vw;
-        height: 90vh;
-        max-width: none;
-        max-height: none;
-        margin: auto;
-        overflow: auto;
-    }
-    #manifestoImage {
-        width: 100%;
-        height: auto;
-        max-width: 100%;
-        max-height: none;
-        object-fit: contain;
-    }
-}
-
-/* Десктопная версия */
-@media (min-width: 1025px) {
-    #manifestoPanel {
-        width: 90vw;
-        height: 90vh;
-        max-width: none;
-        max-height: none;
-        margin: auto;
-        overflow: auto;
-    }
-    #manifestoImage {
-        width: 100%;
-        height: auto;
-        max-width: 100%;
-        max-height: none;
-        object-fit: contain;
-    }
+#manifestoImage {
+    width: 70% !important;
+    height: auto !important;
+    max-width: 70% !important;
+    max-height: 70vh !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: auto !important;
 }
         background: rgba(0, 0, 0, .6);
         overflow: auto;
