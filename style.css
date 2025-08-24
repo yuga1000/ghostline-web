@@ -899,6 +899,16 @@
     image-rendering: pixelated;
     box-sizing: border-box;
 }
+
+/* Специальные стили для GIF-файлов в мануале */
+#manifestoImage[src*=".gif"] {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: none;
+    object-fit: contain;
+    object-position: center;
+}
 .pixel-overlay {
     position: absolute;
     top: 0;
