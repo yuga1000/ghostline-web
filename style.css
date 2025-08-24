@@ -961,17 +961,17 @@
 /* ПРОСТОЙ МАНУАЛ */
 
 #manifestoPanel {
-    width: 800px;
-    height: 600px;
+    width: 1000px;
+    height: 700px;
     margin: auto;
-    padding: 20px;
-    border: 2px solid #b200ff;
+    padding: 10px;
+    border: 1px solid #b200ff;
     overflow: auto;
 }
 
 #manifestoImage {
     width: 100%;
-    height: 100%;
+    height: auto;
     object-fit: contain;
     display: block;
 }
