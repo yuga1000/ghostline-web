@@ -413,7 +413,10 @@ let currentManifestoSlide = 0;
                 revealPixels(overlay);
             }
         } else if (index === 1) {
-            if (image) image.style.display = 'none';
+            if (image) {
+                image.style.display = 'none';
+                image.src = '';
+            }
             if (overlay) {
                 overlay.style.display = 'none';
                 overlay.innerHTML = '';
@@ -437,7 +440,10 @@ let currentManifestoSlide = 0;
         } else if (index === 3) {
             if (loader) loader.style.display = 'none';
             if (loaderText) loaderText.style.display = 'none';
-            if (image) image.style.display = 'none';
+            if (image) {
+                image.style.display = 'none';
+                image.src = '';
+            }
             if (overlay) {
                 overlay.style.display = 'none';
                 overlay.innerHTML = '';
