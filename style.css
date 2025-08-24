@@ -962,8 +962,8 @@
 /* ПРОСТОЙ МАНУАЛ - БЕЗ ВСЯКИХ СЛОЖНОСТЕЙ */
 
 #manifestoPanel {
-    width: 95vw !important;
-    height: 95vh !important;
+    width: 98vw !important;
+    height: 98vh !important;
     max-width: none !important;
     max-height: none !important;
     margin: auto !important;
@@ -971,10 +971,10 @@
 }
 
 #manifestoImage {
-    width: 85% !important;
+    width: 95% !important;
     height: auto !important;
-    max-width: 85% !important;
-    max-height: 85vh !important;
+    max-width: 95% !important;
+    max-height: 95vh !important;
     object-fit: contain !important;
     display: block !important;
     margin: auto !important;
