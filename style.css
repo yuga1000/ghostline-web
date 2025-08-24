@@ -968,7 +968,11 @@
     margin: 0 !important;
     padding: 8px !important;
     border: 3px solid #b200ff !important;
+    border-style: solid !important;
+    border-width: 3px !important;
+    border-color: #b200ff !important;
     overflow: auto !important;
+    box-sizing: border-box !important;
 }
 
 #manifestoImage {
