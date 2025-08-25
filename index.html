@@ -346,6 +346,33 @@ let currentManifestoSlide = 0;
         });
     }
 
+    function typeManifestoTextSlide3(element) {
+        element.innerHTML = '';
+        const cursor = document.createElement('span');
+        cursor.className = 'crt-cursor';
+        cursor.textContent = '_';
+        element.appendChild(cursor);
+
+        const slide3Content = `▁▂▃▄▅▆▇█▇▆▅▄▃▂▁\n\nArt (even through AI) is not about 'perfect parameters', but about tuning the field where several waves coincide: desire, impulse, algorithm, randomness.`;
+        
+        const totalDuration = 600; // быстрее чем основной текст
+        const chars = slide3Content.split('');
+        const delay = totalDuration / chars.length;
+
+        chars.forEach((ch, i) => {
+            setTimeout(() => {
+                const span = document.createElement('span');
+                span.className = 'crt-char';
+                if (ch === '\n') {
+                    element.insertBefore(document.createElement('br'), cursor);
+                } else {
+                    span.textContent = ch;
+                    element.insertBefore(span, cursor);
+                }
+            }, i * delay);
+        });
+    }
+
     function startManifestoLoading() {
         const panel = document.getElementById('manifestoPanel');
         if (!panel) return;
@@ -468,9 +495,11 @@ let currentManifestoSlide = 0;
             }
             if (text) {
                 text.style.display = 'block';
-                text.innerHTML =
-`▁▂▃▄▅▆▇█▇▆▅▄▃▂▁\n\nArt (even through AI) is not about ‘perfect parameters’, but about tuning the field where several waves coincide: desire, impulse, algorithm, randomness.`;
-            }
+                text.innerHTML = "";
+                // Анимация печатания для 4-го слайда
+                setTimeout(() => {
+                    typeManifestoTextSlide3(text);
+                }, 100);            }
         }
     }
 
