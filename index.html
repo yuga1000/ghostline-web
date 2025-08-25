@@ -347,6 +347,7 @@ let currentManifestoSlide = 0;
     }
 
     function typeManifestoTextSlide3(element) {
+        console.log('typeManifestoTextSlide3 called');
         element.innerHTML = '';
         const cursor = document.createElement('span');
         cursor.className = 'crt-cursor';
@@ -355,9 +356,13 @@ let currentManifestoSlide = 0;
 
         const slide3Content = `▁▂▃▄▅▆▇█▇▆▅▄▃▂▁\n\nArt (even through AI) is not about 'perfect parameters', but about tuning the field where several waves coincide: desire, impulse, algorithm, randomness.`;
         
+        console.log('slide3Content:', slide3Content);
+        
         const totalDuration = 600; // быстрее чем основной текст
         const chars = slide3Content.split('');
         const delay = totalDuration / chars.length;
+
+        console.log('Starting animation with', chars.length, 'characters');
 
         chars.forEach((ch, i) => {
             setTimeout(() => {
@@ -496,8 +501,10 @@ let currentManifestoSlide = 0;
             if (text) {
                 text.style.display = 'block';
                 text.innerHTML = "";
+                console.log('Setting up animation for slide 3');
                 // Анимация печатания для 4-го слайда
                 setTimeout(() => {
+                    console.log('Calling typeManifestoTextSlide3');
                     typeManifestoTextSlide3(text);
                 }, 100);            }
         }
