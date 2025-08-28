@@ -1093,12 +1093,7 @@ initATASquare();
       });
     }
 
-    if (leftArrow && rightArrow) {
-      leftArrow.addEventListener('click', function(){ changeSlide(-1); });
-      rightArrow.addEventListener('click', function(){ changeSlide(1); });
-    }
-    
-    // Добавляем обработчики для больших областей кликабельности
+    // Убираем старые обработчики на стрелки и добавляем только большие области кликабельности
     if (manifestoPanel) {
       // Обработчик для больших областей кликабельности
       manifestoPanel.addEventListener('click', function(e) {

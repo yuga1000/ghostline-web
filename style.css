@@ -770,6 +770,7 @@
         opacity: 0;
         transition: opacity 0.2s ease;
         z-index: 1001;
+        display: none; /* Скрываем визуальные стрелки */
     }
     .manifesto-arrow-left { left: 18px; }
     .manifesto-arrow-right { right: 50px; }
@@ -803,14 +804,25 @@
         width: 30%;
         z-index: 1000;
         cursor: pointer;
+        background: linear-gradient(to center, rgba(0, 255, 0, 0.1), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     
     #manifestoPanel::before {
         left: 0;
+        background: linear-gradient(to right, rgba(0, 255, 0, 0.1), transparent);
     }
     
     #manifestoPanel::after {
         right: 0;
+        background: linear-gradient(to left, rgba(0, 255, 0, 0.1), transparent);
+    }
+    
+    /* Показываем индикаторы при наведении */
+    #manifestoPanel:hover::before,
+    #manifestoPanel:hover::after {
+        opacity: 1;
     }
 
     .manifesto-close {
