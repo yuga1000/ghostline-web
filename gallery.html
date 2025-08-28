@@ -267,6 +267,14 @@
         object-fit: contain;
         max-width: 100%;
         max-height: 100%;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        image-rendering: auto;
+        -webkit-image-rendering: auto;
+    }
+    
+    .lightbox-frame img.loaded {
+        opacity: 1;
     }
     
     .lightbox-close {
@@ -986,8 +994,37 @@ function openLightbox(imageUrl, title, status, description) {
         return;
     }
     
-    lightboxImage.src = imageUrl;
-    lightboxImage.alt = title;
+    // Добавляем версию для принудительного обновления кэша
+    const cacheBuster = imageUrl.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
+    const finalImageUrl = imageUrl + cacheBuster;
+    
+    console.log('Loading image with cache buster:', finalImageUrl);
+    
+    // Показываем лайтбокс сразу
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Добавляем плавное появление
+    setTimeout(() => {
+        lightbox.classList.add('show');
+    }, 10);
+    
+    // Загружаем изображение с обработкой ошибок
+    const tempImg = new Image();
+    tempImg.onload = function() {
+        console.log('Lightbox image loaded successfully:', finalImageUrl);
+        lightboxImage.src = finalImageUrl;
+        lightboxImage.alt = title;
+        lightboxImage.classList.add('loaded');
+    };
+    tempImg.onerror = function() {
+        console.error('Lightbox image failed to load:', finalImageUrl);
+        // Fallback на оригинальный URL
+        lightboxImage.src = imageUrl;
+        lightboxImage.alt = title;
+        lightboxImage.style.opacity = '0.5';
+    };
+    tempImg.src = finalImageUrl;
     
     const statusText = status === 'sold' ? 'SOLD' : status === 'ghost' ? 'GHOST' : 'AVAILABLE';
     const statusColor = status === 'sold' ? '#ff0000' : status === 'ghost' ? '#888888' : '#00ff00';
@@ -1013,14 +1050,6 @@ function openLightbox(imageUrl, title, status, description) {
             Click to close
         </div>
     `;
-    
-    lightbox.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Добавляем плавное появление
-    setTimeout(() => {
-        lightbox.classList.add('show');
-    }, 10);
     
     console.log('Lightbox opened successfully');
 }
