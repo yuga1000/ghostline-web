@@ -920,6 +920,8 @@ let currentManifestoSlide = 0;
     
     // Terminal loading simulation
     function startTerminalLoading() {
+        console.log('startTerminalLoading called');
+        
         const loadingMessages = [
             { text: "Initializing neural networks...", delay: 15 },
             { text: "Loading AI systems...", delay: 13 },
@@ -932,6 +934,22 @@ let currentManifestoSlide = 0;
         const progressFill = document.getElementById('progress-fill');
         const progressPercent = document.getElementById('progress-percent');
         const progressText = document.getElementById('progress-text');
+        
+        console.log('Elements found:', { terminalOutput, progressFill, progressPercent, progressText });
+        
+        // Проверяем что все элементы найдены
+        if (!terminalOutput || !progressFill || !progressPercent || !progressText) {
+            console.error('Some elements not found, skipping loading animation');
+            // Показываем контент сразу
+            setTimeout(() => {
+                document.getElementById('terminal-loading').style.opacity = '0';
+                document.getElementById('main-content').style.opacity = '1';
+                setTimeout(() => {
+                    document.getElementById('terminal-loading').style.display = 'none';
+                }, 300);
+            }, 100);
+            return;
+        }
         
         let currentMessage = 0;
         let progress = 0;
@@ -960,9 +978,13 @@ let currentManifestoSlide = 0;
         }
         
         function processNextMessage() {
+            console.log('processNextMessage called, currentMessage:', currentMessage);
+            
             if (currentMessage < loadingMessages.length) {
                 const message = loadingMessages[currentMessage];
                 progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
+                
+                console.log('Processing message:', message.text, 'progress:', progress);
                 
                 // Update progress bar
                 progressFill.style.width = progress + '%';
