@@ -851,26 +851,47 @@ function forceLoadAllImages() {
         if (realSrc && img.src !== realSrc) {
             console.log(`Force loading image ${index}:`, realSrc);
             
-            // Добавляем версию для принудительного обновления кэша
-            const cacheBuster = realSrc.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
-            const finalSrc = realSrc + cacheBuster;
-            
-            // Создаем новое изображение для предзагрузки
-            const preloadImg = new Image();
-            preloadImg.onload = function() {
-                console.log(`Image ${index} preloaded successfully:`, finalSrc);
-                img.src = finalSrc;
-                img.classList.remove('loading');
-                img.classList.add('loaded');
-            };
-            preloadImg.onerror = function() {
-                console.error(`Image ${index} failed to preload:`, finalSrc);
-                // Fallback на оригинальный src
-                img.src = realSrc;
-            };
-            preloadImg.src = finalSrc;
+            // Проверяем доступность файла
+            checkImageAvailability(realSrc, index).then(isAvailable => {
+                if (isAvailable) {
+                    // Добавляем версию для принудительного обновления кэша
+                    const cacheBuster = realSrc.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
+                    const finalSrc = realSrc + cacheBuster;
+                    
+                    // Создаем новое изображение для предзагрузки
+                    const preloadImg = new Image();
+                    preloadImg.onload = function() {
+                        console.log(`Image ${index} preloaded successfully:`, finalSrc);
+                        img.src = finalSrc;
+                        img.classList.remove('loading');
+                        img.classList.add('loaded');
+                    };
+                    preloadImg.onerror = function() {
+                        console.error(`Image ${index} failed to preload:`, finalSrc);
+                        // Fallback на оригинальный src
+                        img.src = realSrc;
+                    };
+                    preloadImg.src = finalSrc;
+                } else {
+                    console.error(`Image ${index} is not available:`, realSrc);
+                    img.style.opacity = '0.3';
+                    img.title = 'Image not available';
+                }
+            });
         }
     });
+}
+
+// Функция для проверки доступности изображения
+async function checkImageAvailability(url, index) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        console.log(`Image ${index} availability check:`, response.status, response.statusText);
+        return response.ok;
+    } catch (error) {
+        console.error(`Image ${index} availability check failed:`, error);
+        return false;
+    }
 }
 
 // Добавляем обработчики кликов для изображений
