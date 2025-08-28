@@ -348,43 +348,151 @@ let currentManifestoSlide = 0;
 
     function typeManifestoTextSlide3(element) {
         console.log('typeManifestoTextSlide3 called');
-        element.innerHTML = '';
-        const cursor = document.createElement('span');
-        cursor.className = 'crt-cursor';
-        cursor.textContent = '_';
-        element.appendChild(cursor);
-
-        const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
         
-        console.log('slide3Content:', slide3Content);
+        // Сначала показываем загрузку
+        const panel = document.getElementById('manifestoPanel');
+        const loaderFill = panel.querySelector('.manifesto-loader-fill');
+        const loader = panel.querySelector('.manifesto-loader');
+        const loaderText = panel.querySelector('.manifesto-loader-text');
         
-        const totalDuration = 600; // быстрее чем основной текст
-        const chars = slide3Content.split('');
-        const delay = totalDuration / chars.length;
+        if (loaderFill && loader && loaderText) {
+            loaderFill.style.width = '0%';
+            loader.style.display = 'block';
+            loaderText.style.display = 'block';
+            element.style.display = 'none';
 
-        console.log('Starting animation with', chars.length, 'characters');
+            // Анимация загрузки с логами для четвертого слайда
+            const loadingMessages = [
+                { text: "Loading philosophical data...", delay: 8 },
+                { text: "Processing consciousness patterns...", delay: 6 },
+                { text: "Initializing existential query...", delay: 4 },
+                { text: "Ready to display.", delay: 2 }
+            ];
 
-        chars.forEach((ch, i) => {
-            setTimeout(() => {
-                try {
-                    const span = document.createElement('span');
-                    span.className = 'crt-char';
-                    if (ch === '\n') {
-                        const br = document.createElement('br');
-                        if (cursor && cursor.parentNode) {
-                            cursor.parentNode.insertBefore(br, cursor);
-                        }
+            let currentMessage = 0;
+            let progress = 0;
+
+            function typeMessage(message, callback) {
+                loaderText.textContent = '> ' + message.text + '_';
+                
+                let charIndex = 0;
+                const typingInterval = setInterval(() => {
+                    if (charIndex < message.text.length) {
+                        loaderText.textContent = '> ' + message.text.substring(0, charIndex + 1) + '_';
+                        charIndex++;
                     } else {
-                        span.textContent = ch;
-                        if (cursor && cursor.parentNode) {
-                            cursor.parentNode.insertBefore(span, cursor);
-                        }
+                        loaderText.textContent = '> ' + message.text;
+                        clearInterval(typingInterval);
+                        callback();
                     }
-                } catch (error) {
-                    console.log('Animation error:', error);
+                }, 1.5);
+            }
+
+            function processNextMessage() {
+                if (currentMessage < loadingMessages.length) {
+                    const message = loadingMessages[currentMessage];
+                    progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
+                    
+                    // Update progress bar
+                    loaderFill.style.width = progress + '%';
+                    
+                    typeMessage(message, () => {
+                        setTimeout(() => {
+                            currentMessage++;
+                            processNextMessage();
+                        }, message.delay);
+                    });
+                } else {
+                    // Loading complete - показываем текст
+                    setTimeout(() => {
+                        console.log('Showing slide 3 text after loading');
+                        loader.style.display = 'none';
+                        loaderText.style.display = 'none';
+                        element.style.display = 'block';
+                        
+                        // Начинаем анимацию печатания
+                        element.innerHTML = '';
+                        const cursor = document.createElement('span');
+                        cursor.className = 'crt-cursor';
+                        cursor.textContent = '_';
+                        element.appendChild(cursor);
+
+                        const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
+                        
+                        console.log('slide3Content:', slide3Content);
+                        
+                        const totalDuration = 600; // быстрее чем основной текст
+                        const chars = slide3Content.split('');
+                        const delay = totalDuration / chars.length;
+
+                        console.log('Starting animation with', chars.length, 'characters');
+
+                        chars.forEach((ch, i) => {
+                            setTimeout(() => {
+                                try {
+                                    const span = document.createElement('span');
+                                    span.className = 'crt-char';
+                                    if (ch === '\n') {
+                                        const br = document.createElement('br');
+                                        if (cursor && cursor.parentNode) {
+                                            cursor.parentNode.insertBefore(br, cursor);
+                                        }
+                                    } else {
+                                        span.textContent = ch;
+                                        if (cursor && cursor.parentNode) {
+                                            cursor.parentNode.insertBefore(span, cursor);
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.log('Animation error:', error);
+                                }
+                            }, i * delay);
+                        });
+                    }, 200);
                 }
-            }, i * delay);
-        });
+            }
+
+            // Start loading process
+            setTimeout(processNextMessage, 100);
+        } else {
+            // Fallback если нет элементов загрузки
+            element.style.display = 'block';
+            element.innerHTML = '';
+            const cursor = document.createElement('span');
+            cursor.className = 'crt-cursor';
+            cursor.textContent = '_';
+            element.appendChild(cursor);
+
+            const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
+            
+            console.log('slide3Content:', slide3Content);
+            
+            const totalDuration = 600;
+            const chars = slide3Content.split('');
+            const delay = totalDuration / chars.length;
+
+            chars.forEach((ch, i) => {
+                setTimeout(() => {
+                    try {
+                        const span = document.createElement('span');
+                        span.className = 'crt-char';
+                        if (ch === '\n') {
+                            const br = document.createElement('br');
+                            if (cursor && cursor.parentNode) {
+                                cursor.parentNode.insertBefore(br, cursor);
+                            }
+                        } else {
+                            span.textContent = ch;
+                            if (cursor && cursor.parentNode) {
+                                cursor.parentNode.insertBefore(span, cursor);
+                            }
+                        }
+                    } catch (error) {
+                        console.log('Animation error:', error);
+                    }
+                }, i * delay);
+            });
+        }
     }
 
     function startManifestoLoading() {
@@ -404,17 +512,61 @@ let currentManifestoSlide = 0;
             loaderText.style.display = 'block';
             text.style.display = 'none';
 
-            requestAnimationFrame(() => {
-                loaderFill.style.width = '100%';
-            });
+            // Анимация загрузки с логами
+            const loadingMessages = [
+                { text: "Loading manifesto data...", delay: 8 },
+                { text: "Processing text content...", delay: 6 },
+                { text: "Initializing typewriter effect...", delay: 4 },
+                { text: "Ready to display.", delay: 2 }
+            ];
 
-            setTimeout(() => {
-                console.log('Showing text after timeout');
-                loader.style.display = 'none';
-                loaderText.style.display = 'none';
-                text.style.display = 'block';
-                typeManifestoText(text);
-            }, 300);
+            let currentMessage = 0;
+            let progress = 0;
+
+            function typeMessage(message, callback) {
+                loaderText.textContent = '> ' + message.text + '_';
+                
+                let charIndex = 0;
+                const typingInterval = setInterval(() => {
+                    if (charIndex < message.text.length) {
+                        loaderText.textContent = '> ' + message.text.substring(0, charIndex + 1) + '_';
+                        charIndex++;
+                    } else {
+                        loaderText.textContent = '> ' + message.text;
+                        clearInterval(typingInterval);
+                        callback();
+                    }
+                }, 1.5);
+            }
+
+            function processNextMessage() {
+                if (currentMessage < loadingMessages.length) {
+                    const message = loadingMessages[currentMessage];
+                    progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
+                    
+                    // Update progress bar
+                    loaderFill.style.width = progress + '%';
+                    
+                    typeMessage(message, () => {
+                        setTimeout(() => {
+                            currentMessage++;
+                            processNextMessage();
+                        }, message.delay);
+                    });
+                } else {
+                    // Loading complete
+                    setTimeout(() => {
+                        console.log('Showing text after loading');
+                        loader.style.display = 'none';
+                        loaderText.style.display = 'none';
+                        text.style.display = 'block';
+                        typeManifestoText(text);
+                    }, 200);
+                }
+            }
+
+            // Start loading process
+            setTimeout(processNextMessage, 100);
         } else {
             console.log('Some elements not found, showing text directly');
             if (text) {
