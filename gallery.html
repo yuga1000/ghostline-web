@@ -899,7 +899,24 @@ function addImageClickHandlers() {
             console.log('Image clicked:', { url, title, status, description });
             
             if (url) {
-                openLightbox(url, title, status, description);
+                // Проверяем, загрузилось ли изображение в галерее
+                if (this.complete && this.naturalWidth > 0) {
+                    console.log('Image is loaded in gallery, opening lightbox');
+                    openLightbox(url, title, status, description);
+                } else {
+                    console.log('Image not loaded in gallery, trying to load first');
+                    // Пытаемся загрузить изображение перед открытием лайтбокса
+                    const checkImg = new Image();
+                    checkImg.onload = function() {
+                        console.log('Image loaded successfully, opening lightbox');
+                        openLightbox(url, title, status, description);
+                    };
+                    checkImg.onerror = function() {
+                        console.error('Image failed to load, cannot open lightbox');
+                        alert('Image failed to load. Please try refreshing the page.');
+                    };
+                    checkImg.src = url;
+                }
             } else {
                 console.error('No URL found for clicked image');
             }
@@ -1041,8 +1058,9 @@ function openLightbox(imageUrl, title, status, description) {
         lightboxImage.alt = title;
         lightboxImage.classList.add('loaded');
     };
-    tempImg.onerror = function() {
+    tempImg.onerror = function(e) {
         console.error('Lightbox image failed to load:', finalImageUrl);
+        console.error('Error details:', e);
         
         if (isHeic) {
             // Для HEIC файлов показываем сообщение об ошибке
@@ -1070,10 +1088,43 @@ function openLightbox(imageUrl, title, status, description) {
             `;
             lightboxImage.parentNode.appendChild(errorDiv);
         } else {
-            // Fallback на оригинальный URL для других форматов
-            lightboxImage.src = imageUrl;
-            lightboxImage.alt = title;
-            lightboxImage.style.opacity = '0.5';
+            // Попробуем загрузить без cache buster
+            console.log('Trying fallback without cache buster:', imageUrl);
+            const fallbackImg = new Image();
+            fallbackImg.onload = function() {
+                console.log('Fallback image loaded successfully:', imageUrl);
+                lightboxImage.src = imageUrl;
+                lightboxImage.alt = title;
+                lightboxImage.classList.add('loaded');
+            };
+            fallbackImg.onerror = function() {
+                console.error('Fallback image also failed:', imageUrl);
+                // Показываем сообщение об ошибке
+                lightboxImage.style.display = 'none';
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                    color: #ff6b6b;
+                    font-family: 'Share Tech Mono', monospace;
+                    text-align: center;
+                    padding: 20px;
+                `;
+                errorDiv.innerHTML = `
+                    <div>
+                        <div style="font-size: 16px; margin-bottom: 10px;">⚠️ Image Failed to Load</div>
+                        <div style="font-size: 12px; color: #ccc;">
+                            The image could not be loaded.<br>
+                            Please try refreshing the page or contact support.
+                        </div>
+                    </div>
+                `;
+                lightboxImage.parentNode.appendChild(errorDiv);
+            };
+            fallbackImg.src = imageUrl;
         }
     };
     tempImg.src = finalImageUrl;
