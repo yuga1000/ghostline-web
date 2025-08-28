@@ -1126,8 +1126,8 @@ initATASquare();
         const rect = manifestoPanel.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const panelWidth = rect.width;
-        const leftThird = panelWidth * 0.2;   // Еще меньше левая область
-        const rightThird = panelWidth * 0.8;  // Еще больше правая область
+        const leftThird = panelWidth * 0.3;   // Левая область для предыдущего слайда
+        const rightThird = panelWidth * 0.7;  // Правая область для следующего слайда
         
         console.log('Click position:', { clickX, panelWidth, leftThird, rightThird });
         
@@ -1147,56 +1147,11 @@ initATASquare();
           console.log('Right third clicked - next slide');
           changeSlide(1);
         }
-        // Если клик в центре - закрываем мануал
-        else {
-          console.log('Center clicked - closing manifesto');
-          
-          // Закрываем мануал напрямую
-          manifestoPanel.classList.remove('visible');
-          manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
-            el.classList.remove('child-visible');
-          });
+        // В центре ничего не делаем
 
-          // Возвращаем заголовок в исходное состояние
-          const staticTitle = document.getElementById('staticTitle');
-          const animatedTitle = document.getElementById('animatedTitle');
-          const finalTitle = document.getElementById('finalTitle');
-
-          if (staticTitle && animatedTitle && finalTitle) {
-            finalTitle.style.opacity = '0';
-            animatedTitle.style.opacity = '0';
-            staticTitle.style.opacity = '1';
-            staticTitle.style.transform = 'scale(1)';
-            staticTitle.style.filter = 'none';
-          }
-        }
       });
       
-      // Добавляем двойной клик для закрытия мануала
-      manifestoPanel.addEventListener('dblclick', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Double click - closing manifesto');
-        
-        // Закрываем мануал
-        manifestoPanel.classList.remove('visible');
-        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
-          el.classList.remove('child-visible');
-        });
 
-        // Возвращаем заголовок в исходное состояние
-        const staticTitle = document.getElementById('staticTitle');
-        const animatedTitle = document.getElementById('animatedTitle');
-        const finalTitle = document.getElementById('finalTitle');
-
-        if (staticTitle && animatedTitle && finalTitle) {
-          finalTitle.style.opacity = '0';
-          animatedTitle.style.opacity = '0';
-          staticTitle.style.opacity = '1';
-          staticTitle.style.transform = 'scale(1)';
-          staticTitle.style.filter = 'none';
-        }
-      });
     }
   });
   </script>
