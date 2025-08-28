@@ -770,7 +770,6 @@
         opacity: 0;
         transition: opacity 0.2s ease;
         z-index: 1001;
-        display: none; /* Скрываем визуальные стрелки */
     }
     .manifesto-arrow-left { left: 18px; }
     .manifesto-arrow-right { right: 50px; }

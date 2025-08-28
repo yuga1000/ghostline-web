@@ -1093,8 +1093,19 @@ initATASquare();
       });
     }
 
-    // Убираем старые обработчики на стрелки и добавляем только большие области кликабельности
+    // Добавляем обработчики для больших областей кликабельности и визуальных стрелок
     if (manifestoPanel) {
+      // Обработчики для визуальных стрелок
+      if (leftArrow && rightArrow) {
+        leftArrow.addEventListener('click', function(e){ 
+          e.stopPropagation(); // Предотвращаем срабатывание обработчика панели
+          changeSlide(-1); 
+        });
+        rightArrow.addEventListener('click', function(e){ 
+          e.stopPropagation(); // Предотвращаем срабатывание обработчика панели
+          changeSlide(1); 
+        });
+      }
       // Обработчик для больших областей кликабельности
       manifestoPanel.addEventListener('click', function(e) {
         // Не обрабатываем клики на кнопку закрытия
@@ -1113,6 +1124,33 @@ initATASquare();
         // Если клик в правой трети - следующий слайд
         else if (clickX > panelWidth * 0.7) {
           changeSlide(1);
+        }
+        // Если клик в центре - закрываем мануал
+        else {
+          manifestoPanel.classList.remove('visible');
+          manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
+            el.classList.remove('child-visible');
+          });
+
+          const staticTitle = document.getElementById('staticTitle');
+          const animatedTitle = document.getElementById('animatedTitle');
+          const finalTitle = document.getElementById('finalTitle');
+
+          setTimeout(() => {
+            if (staticTitle && animatedTitle && finalTitle) {
+              finalTitle.style.opacity = '0';
+              animatedTitle.style.opacity = '1';
+              animatedTitle.style.transform = 'scale(1.05)';
+              animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+
+              setTimeout(() => {
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
+                staticTitle.style.opacity = '1';
+              }, 700);
+            }
+          }, 200);
         }
       });
     }
