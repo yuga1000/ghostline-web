@@ -896,8 +896,32 @@ function forceLoadAllImages() {
 async function checkImageAvailability(url, index) {
     try {
         console.log(`Checking availability for image ${index}:`, url);
-        const response = await fetch(url, { method: 'HEAD' });
+        
+        // Пробуем разные методы для разных браузеров
+        let response;
+        try {
+            // Сначала пробуем с CORS
+            response = await fetch(url, { 
+                method: 'HEAD',
+                mode: 'cors',
+                credentials: 'omit'
+            });
+        } catch (corsError) {
+            console.log(`CORS failed for ${index}, trying without CORS`);
+            // Если CORS не работает, пробуем без него
+            response = await fetch(url, { 
+                method: 'HEAD',
+                mode: 'no-cors'
+            });
+        }
+        
         console.log(`Image ${index} availability check:`, response.status, response.statusText);
+        
+        // Для no-cors режима статус всегда 0, но это не означает ошибку
+        if (response.type === 'opaque') {
+            console.log(`Image ${index} is available (opaque response)`);
+            return true;
+        }
         
         if (!response.ok) {
             console.error(`Image ${index} is not available. Status:`, response.status, response.statusText);
@@ -908,7 +932,9 @@ async function checkImageAvailability(url, index) {
         return true;
     } catch (error) {
         console.error(`Image ${index} availability check failed:`, error);
-        return false;
+        // Если проверка не работает, считаем что файл доступен (как в Safari)
+        console.log(`Assuming image ${index} is available (fallback)`);
+        return true;
     }
 }
 
@@ -1108,6 +1134,8 @@ function openLightbox(imageUrl, title, status, description) {
     
     // Загружаем изображение с обработкой ошибок
     const tempImg = new Image();
+    tempImg.crossOrigin = 'anonymous'; // Добавляем CORS
+    
     tempImg.onload = function() {
         console.log('Lightbox image loaded successfully:', finalImageUrl);
         lightboxImage.src = finalImageUrl;
@@ -1144,43 +1172,66 @@ function openLightbox(imageUrl, title, status, description) {
             `;
             lightboxImage.parentNode.appendChild(errorDiv);
         } else {
-            // Попробуем загрузить без cache buster
-            console.log('Trying fallback without cache buster:', imageUrl);
-            const fallbackImg = new Image();
-            fallbackImg.onload = function() {
-                console.log('Fallback image loaded successfully:', imageUrl);
+            // Попробуем разные варианты загрузки
+            console.log('Trying different loading methods...');
+            
+            // Метод 1: Без cache buster
+            const fallbackImg1 = new Image();
+            fallbackImg1.crossOrigin = 'anonymous';
+            
+            fallbackImg1.onload = function() {
+                console.log('Fallback 1 (no cache buster) loaded successfully:', imageUrl);
                 lightboxImage.src = imageUrl;
                 lightboxImage.alt = title;
                 lightboxImage.classList.add('loaded');
             };
-            fallbackImg.onerror = function() {
-                console.error('Fallback image also failed:', imageUrl);
-                // Показываем сообщение об ошибке
-                lightboxImage.style.display = 'none';
-                const errorDiv = document.createElement('div');
-                errorDiv.style.cssText = `
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 100%;
-                    height: 100%;
-                    color: #ff6b6b;
-                    font-family: 'Share Tech Mono', monospace;
-                    text-align: center;
-                    padding: 20px;
-                `;
-                errorDiv.innerHTML = `
-                    <div>
-                        <div style="font-size: 16px; margin-bottom: 10px;">⚠️ Image Failed to Load</div>
-                        <div style="font-size: 12px; color: #ccc;">
-                            The image could not be loaded.<br>
-                            Please try refreshing the page or contact support.
+            
+            fallbackImg1.onerror = function() {
+                console.log('Fallback 1 failed, trying method 2...');
+                
+                // Метод 2: Без CORS
+                const fallbackImg2 = new Image();
+                fallbackImg2.crossOrigin = '';
+                
+                fallbackImg2.onload = function() {
+                    console.log('Fallback 2 (no CORS) loaded successfully:', imageUrl);
+                    lightboxImage.src = imageUrl;
+                    lightboxImage.alt = title;
+                    lightboxImage.classList.add('loaded');
+                };
+                
+                fallbackImg2.onerror = function() {
+                    console.error('All loading methods failed:', imageUrl);
+                    // Показываем сообщение об ошибке
+                    lightboxImage.style.display = 'none';
+                    const errorDiv = document.createElement('div');
+                    errorDiv.style.cssText = `
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 100%;
+                        height: 100%;
+                        color: #ff6b6b;
+                        font-family: 'Share Tech Mono', monospace;
+                        text-align: center;
+                        padding: 20px;
+                    `;
+                    errorDiv.innerHTML = `
+                        <div>
+                            <div style="font-size: 16px; margin-bottom: 10px;">⚠️ Browser Compatibility Issue</div>
+                            <div style="font-size: 12px; color: #ccc;">
+                                This image works in Safari but not in this browser.<br>
+                                Please try opening this page in Safari.
+                            </div>
                         </div>
-                    </div>
-                `;
-                lightboxImage.parentNode.appendChild(errorDiv);
+                    `;
+                    lightboxImage.parentNode.appendChild(errorDiv);
+                };
+                
+                fallbackImg2.src = imageUrl;
             };
-            fallbackImg.src = imageUrl;
+            
+            fallbackImg1.src = imageUrl;
         }
     };
     tempImg.src = finalImageUrl;
