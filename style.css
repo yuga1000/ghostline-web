@@ -1080,11 +1080,19 @@
     }
     
     #manifestoImage {
-        max-height: 70vh !important;
+        max-height: 80vh !important;
+        max-width: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
     }
     
     #manifestoText {
         font-size: 14px !important;
+        line-height: 1.5 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        padding: 15px !important;
     }
 }
 
@@ -1096,11 +1104,19 @@
     }
     
     #manifestoImage {
-        max-height: 60vh !important;
+        max-height: 70vh !important;
+        max-width: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
     }
     
     #manifestoText {
         font-size: 12px !important;
+        line-height: 1.4 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        padding: 10px !important;
     }
 }
 
@@ -1111,11 +1127,19 @@
     }
     
     #manifestoImage {
-        max-height: 50vh !important;
+        max-height: 60vh !important;
+        max-width: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
     }
     
     #manifestoText {
         font-size: 13px !important;
+        line-height: 1.4 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        padding: 10px !important;
     }
 }
 
