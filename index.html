@@ -1128,8 +1128,8 @@ initATASquare();
         const rect = manifestoPanel.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const panelWidth = rect.width;
-        const leftThird = panelWidth * 0.3;
-        const rightThird = panelWidth * 0.7;
+        const leftThird = panelWidth * 0.25;  // Уменьшаем левую область
+        const rightThird = panelWidth * 0.75; // Увеличиваем правую область
         
         console.log('Click position:', { clickX, panelWidth, leftThird, rightThird });
         
