@@ -1223,6 +1223,49 @@
         font-size: 12px !important;
     }
 }
+
+/* Стили для заголовка на мобильных */
+@media (max-width: 768px) {
+    #staticTitle {
+        max-width: 300px !important;
+        height: auto !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    #animatedTitle {
+        max-width: 300px !important;
+        height: auto !important;
+    }
+    
+    #finalTitle {
+        max-width: 300px !important;
+        height: auto !important;
+    }
+    
+    #titleContainer {
+        margin-top: -150px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #staticTitle {
+        max-width: 250px !important;
+    }
+    
+    #animatedTitle {
+        max-width: 250px !important;
+    }
+    
+    #finalTitle {
+        max-width: 250px !important;
+    }
+    
+    #titleContainer {
+        margin-top: -120px !important;
+    }
+}
         background: rgba(0, 0, 0, .6);
         overflow: auto;
         z-index: 1000;
