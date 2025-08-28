@@ -1074,9 +1074,7 @@ initATASquare();
     var rightArrow = document.querySelector('.manifesto-arrow-right');
 
     if (manifestoPanel && manifestoClose) {
-      manifestoClose.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+      manifestoClose.addEventListener('click', function () {
         console.log('Close button clicked - closing manifesto');
         
         // Закрываем мануал
