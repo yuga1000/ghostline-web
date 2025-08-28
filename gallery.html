@@ -595,6 +595,9 @@
     <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
         <span style="color: #ffffff;">SUPPORT PROJECT</span>
     </button>
+    <button class="category-tab" onclick="cleanupUnavailableImages()" style="margin-top: 10px;">
+        CLEANUP BROKEN IMAGES
+    </button>
 </div>
 
 
@@ -874,8 +877,15 @@ function forceLoadAllImages() {
                     preloadImg.src = finalSrc;
                 } else {
                     console.error(`Image ${index} is not available:`, realSrc);
-                    img.style.opacity = '0.3';
-                    img.title = 'Image not available';
+                    // Скрываем недоступные изображения
+                    const galleryItem = img.closest('.gallery-item');
+                    if (galleryItem) {
+                        galleryItem.style.display = 'none';
+                        console.log(`Hiding gallery item ${index} - image not available`);
+                    } else {
+                        img.style.opacity = '0.3';
+                        img.title = 'Image not available';
+                    }
                 }
             });
         }
@@ -899,6 +909,30 @@ async function checkImageAvailability(url, index) {
     } catch (error) {
         console.error(`Image ${index} availability check failed:`, error);
         return false;
+    }
+}
+
+// Функция для очистки недоступных изображений
+async function cleanupUnavailableImages() {
+    console.log('Cleaning up unavailable images...');
+    const availableItems = [];
+    
+    for (let i = 0; i < galleryItems.length; i++) {
+        const item = galleryItems[i];
+        const isAvailable = await checkImageAvailability(item.url, i);
+        
+        if (isAvailable) {
+            availableItems.push(item);
+        } else {
+            console.log(`Removing unavailable image: ${item.title}`);
+        }
+    }
+    
+    if (availableItems.length !== galleryItems.length) {
+        console.log(`Cleaned up ${galleryItems.length - availableItems.length} unavailable images`);
+        galleryItems = availableItems;
+        localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
+        renderGallery();
     }
 }
 
