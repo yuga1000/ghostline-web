@@ -1088,6 +1088,7 @@
         z-index: 1000 !important;
         text-align: center !important;
         box-sizing: border-box !important;
+        transform: none !important;
     }
     
     #manifestoPanel * {
@@ -1137,6 +1138,7 @@
         z-index: 1000 !important;
         text-align: center !important;
         box-sizing: border-box !important;
+        transform: none !important;
     }
     
     #manifestoPanel * {
@@ -1186,6 +1188,7 @@
         z-index: 1000 !important;
         text-align: center !important;
         box-sizing: border-box !important;
+        transform: none !important;
     }
     
     #manifestoPanel * {
