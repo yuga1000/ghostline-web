@@ -1153,11 +1153,32 @@ initATASquare();
         else {
           console.log('Center clicked - closing manifesto');
           
-          // Вызываем функцию закрытия кнопки
-          const closeBtn = document.getElementById('manifestoClose');
-          if (closeBtn) {
-            closeBtn.click();
-          } else {
+          // Прямое закрытие мануала
+          manifestoPanel.classList.remove('visible');
+          manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
+            el.classList.remove('child-visible');
+          });
+
+          const staticTitle = document.getElementById('staticTitle');
+          const animatedTitle = document.getElementById('animatedTitle');
+          const finalTitle = document.getElementById('finalTitle');
+
+          setTimeout(() => {
+            if (staticTitle && animatedTitle && finalTitle) {
+              finalTitle.style.opacity = '0';
+              animatedTitle.style.opacity = '1';
+              animatedTitle.style.transform = 'scale(1.05)';
+              animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+
+              setTimeout(() => {
+                animatedTitle.style.opacity = '0';
+                animatedTitle.style.transform = 'scale(1)';
+                animatedTitle.style.filter = 'none';
+                staticTitle.style.opacity = '1';
+              }, 700);
+            }
+          }, 200);
+        }
             // Fallback - прямая логика закрытия
             manifestoPanel.classList.remove('visible');
             manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
@@ -1185,6 +1206,37 @@ initATASquare();
             }, 200);
           }
         }
+      });
+      
+      // Добавляем двойной клик для закрытия мануала
+      manifestoPanel.addEventListener('dblclick', function(e) {
+        console.log('Double click - closing manifesto');
+        
+        // Прямое закрытие мануала
+        manifestoPanel.classList.remove('visible');
+        manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
+          el.classList.remove('child-visible');
+        });
+
+        const staticTitle = document.getElementById('staticTitle');
+        const animatedTitle = document.getElementById('animatedTitle');
+        const finalTitle = document.getElementById('finalTitle');
+
+        setTimeout(() => {
+          if (staticTitle && animatedTitle && finalTitle) {
+            finalTitle.style.opacity = '0';
+            animatedTitle.style.opacity = '1';
+            animatedTitle.style.transform = 'scale(1.05)';
+            animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+
+            setTimeout(() => {
+              animatedTitle.style.opacity = '0';
+              animatedTitle.style.transform = 'scale(1)';
+              animatedTitle.style.filter = 'none';
+              staticTitle.style.opacity = '1';
+            }, 700);
+          }
+        }, 200);
       });
     }
   });
