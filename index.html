@@ -1097,6 +1097,30 @@ initATASquare();
       leftArrow.addEventListener('click', function(){ changeSlide(-1); });
       rightArrow.addEventListener('click', function(){ changeSlide(1); });
     }
+    
+    // Добавляем обработчики для больших областей кликабельности
+    if (manifestoPanel) {
+      // Обработчик для больших областей кликабельности
+      manifestoPanel.addEventListener('click', function(e) {
+        // Не обрабатываем клики на кнопку закрытия
+        if (e.target.closest('.manifesto-close')) {
+          return;
+        }
+        
+        const rect = manifestoPanel.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const panelWidth = rect.width;
+        
+        // Если клик в левой трети - предыдущий слайд
+        if (clickX < panelWidth * 0.3) {
+          changeSlide(-1);
+        }
+        // Если клик в правой трети - следующий слайд
+        else if (clickX > panelWidth * 0.7) {
+          changeSlide(1);
+        }
+      });
+    }
   });
   </script>
 

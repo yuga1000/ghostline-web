@@ -769,9 +769,49 @@
         cursor: pointer;
         opacity: 0;
         transition: opacity 0.2s ease;
+        z-index: 1001;
     }
     .manifesto-arrow-left { left: 18px; }
     .manifesto-arrow-right { right: 50px; }
+    
+    /* Большие области кликабельности для мобильных устройств */
+    .manifesto-arrow::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        bottom: -50px;
+        width: 60px;
+        background: transparent;
+        cursor: pointer;
+    }
+    
+    .manifesto-arrow-left::before {
+        right: -30px;
+    }
+    
+    .manifesto-arrow-right::before {
+        left: -30px;
+    }
+    
+    /* Дополнительные области кликабельности для всего мануала */
+    #manifestoPanel::before,
+    #manifestoPanel::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 30%;
+        z-index: 1000;
+        cursor: pointer;
+    }
+    
+    #manifestoPanel::before {
+        left: 0;
+    }
+    
+    #manifestoPanel::after {
+        right: 0;
+    }
 
     .manifesto-close {
         position: absolute;
