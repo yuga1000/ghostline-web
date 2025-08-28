@@ -705,6 +705,9 @@ async function loadGallery() {
 
 // Отображение галереи
 function renderGallery() {
+    console.log('renderGallery called with items:', galleryItems);
+    console.log('Current category:', currentCategory);
+    
     const grid = document.getElementById('galleryGrid');
     const emptyState = document.getElementById('emptyState');
     
@@ -713,6 +716,8 @@ function renderGallery() {
     if (currentCategory !== 'all') {
         filteredItems = galleryItems.filter(item => item.category === currentCategory);
     }
+    
+    console.log('Filtered items:', filteredItems);
     
     if (filteredItems.length === 0) {
         grid.innerHTML = '';
@@ -757,12 +762,38 @@ function renderGallery() {
     
     // Добавляем обработчики кликов для изображений
     addImageClickHandlers();
+    
+    // Принудительно загружаем все изображения для отладки
+    setTimeout(forceLoadAllImages, 1000);
+}
+
+// Принудительная загрузка всех изображений для отладки
+function forceLoadAllImages() {
+    console.log('Force loading all images...');
+    const images = document.querySelectorAll('.lazy-image');
+    images.forEach((img, index) => {
+        const realSrc = img.getAttribute('data-src');
+        if (realSrc && img.src !== realSrc) {
+            console.log(`Force loading image ${index}:`, realSrc);
+            img.src = realSrc;
+        }
+    });
 }
 
 // Добавляем обработчики кликов для изображений
 function addImageClickHandlers() {
     const images = document.querySelectorAll('.gallery-image-clickable');
-    images.forEach(img => {
+    console.log('Found', images.length, 'images to add click handlers');
+    
+    images.forEach((img, index) => {
+        console.log(`Image ${index}:`, {
+            src: img.src,
+            dataUrl: img.getAttribute('data-url'),
+            dataTitle: img.getAttribute('data-title'),
+            dataStatus: img.getAttribute('data-status'),
+            dataDescription: img.getAttribute('data-description')
+        });
+        
         img.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -776,7 +807,18 @@ function addImageClickHandlers() {
             
             if (url) {
                 openLightbox(url, title, status, description);
+            } else {
+                console.error('No URL found for clicked image');
             }
+        });
+        
+        // Также добавляем обработчик для отладки загрузки изображений
+        img.addEventListener('load', function() {
+            console.log(`Image ${index} loaded successfully:`, this.src);
+        });
+        
+        img.addEventListener('error', function() {
+            console.error(`Image ${index} failed to load:`, this.src);
         });
     });
 }
@@ -784,6 +826,7 @@ function addImageClickHandlers() {
 // Lazy loading для картинок
 function initLazyLoading() {
     const lazyImages = document.querySelectorAll('.lazy-image');
+    console.log('Found', lazyImages.length, 'lazy images to load');
     
     const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
@@ -791,17 +834,21 @@ function initLazyLoading() {
                 const img = entry.target;
                 const realSrc = img.getAttribute('data-src');
                 
+                console.log('Loading image:', realSrc);
+                
                 if (realSrc) {
                     // Создаем новое изображение для предзагрузки
                     const newImg = new Image();
                     
                     newImg.onload = function() {
+                        console.log('Image loaded successfully:', realSrc);
                         img.src = realSrc;
                         img.classList.remove('loading');
                         img.classList.add('loaded');
                     };
                     
                     newImg.onerror = function() {
+                        console.error('Image failed to load:', realSrc);
                         img.classList.remove('loading');
                         img.style.opacity = '0.3';
                     };
