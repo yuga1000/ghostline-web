@@ -1086,6 +1086,10 @@
         top: 0 !important;
         left: 0 !important;
         z-index: 1000 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
     
     #manifestoImage {
@@ -1128,6 +1132,10 @@
         top: 0 !important;
         left: 0 !important;
         z-index: 1000 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
     
     #manifestoImage {
@@ -1170,6 +1178,10 @@
         top: 0 !important;
         left: 0 !important;
         z-index: 1000 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
     }
     
     #manifestoImage {
