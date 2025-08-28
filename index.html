@@ -361,54 +361,15 @@ let currentManifestoSlide = 0;
             loaderText.style.display = 'block';
             element.style.display = 'none';
 
-            // Анимация загрузки с логами для четвертого слайда
-            const loadingMessages = [
-                { text: "Loading philosophical data...", delay: 8 },
-                { text: "Processing consciousness patterns...", delay: 6 },
-                { text: "Initializing existential query...", delay: 4 },
-                { text: "Ready to display.", delay: 2 }
-            ];
+            requestAnimationFrame(() => {
+                loaderFill.style.width = '100%';
+            });
 
-            let currentMessage = 0;
-            let progress = 0;
-
-            function typeMessage(message, callback) {
-                loaderText.textContent = '> ' + message.text + '_';
-                
-                let charIndex = 0;
-                const typingInterval = setInterval(() => {
-                    if (charIndex < message.text.length) {
-                        loaderText.textContent = '> ' + message.text.substring(0, charIndex + 1) + '_';
-                        charIndex++;
-                    } else {
-                        loaderText.textContent = '> ' + message.text;
-                        clearInterval(typingInterval);
-                        callback();
-                    }
-                }, 1.5);
-            }
-
-            function processNextMessage() {
-                if (currentMessage < loadingMessages.length) {
-                    const message = loadingMessages[currentMessage];
-                    progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
-                    
-                    // Update progress bar
-                    loaderFill.style.width = progress + '%';
-                    
-                    typeMessage(message, () => {
-                        setTimeout(() => {
-                            currentMessage++;
-                            processNextMessage();
-                        }, message.delay);
-                    });
-                } else {
-                    // Loading complete - показываем текст
-                    setTimeout(() => {
-                        console.log('Showing slide 3 text after loading');
-                        loader.style.display = 'none';
-                        loaderText.style.display = 'none';
-                        element.style.display = 'block';
+            setTimeout(() => {
+                console.log('Showing slide 3 text after loading');
+                loader.style.display = 'none';
+                loaderText.style.display = 'none';
+                element.style.display = 'block';
                         
                         // Начинаем анимацию печатания
                         element.innerHTML = '';
@@ -512,61 +473,17 @@ let currentManifestoSlide = 0;
             loaderText.style.display = 'block';
             text.style.display = 'none';
 
-            // Анимация загрузки с логами
-            const loadingMessages = [
-                { text: "Loading manifesto data...", delay: 8 },
-                { text: "Processing text content...", delay: 6 },
-                { text: "Initializing typewriter effect...", delay: 4 },
-                { text: "Ready to display.", delay: 2 }
-            ];
+            requestAnimationFrame(() => {
+                loaderFill.style.width = '100%';
+            });
 
-            let currentMessage = 0;
-            let progress = 0;
-
-            function typeMessage(message, callback) {
-                loaderText.textContent = '> ' + message.text + '_';
-                
-                let charIndex = 0;
-                const typingInterval = setInterval(() => {
-                    if (charIndex < message.text.length) {
-                        loaderText.textContent = '> ' + message.text.substring(0, charIndex + 1) + '_';
-                        charIndex++;
-                    } else {
-                        loaderText.textContent = '> ' + message.text;
-                        clearInterval(typingInterval);
-                        callback();
-                    }
-                }, 1.5);
-            }
-
-            function processNextMessage() {
-                if (currentMessage < loadingMessages.length) {
-                    const message = loadingMessages[currentMessage];
-                    progress = Math.min(100, (currentMessage + 1) * (100 / loadingMessages.length));
-                    
-                    // Update progress bar
-                    loaderFill.style.width = progress + '%';
-                    
-                    typeMessage(message, () => {
-                        setTimeout(() => {
-                            currentMessage++;
-                            processNextMessage();
-                        }, message.delay);
-                    });
-                } else {
-                    // Loading complete
-                    setTimeout(() => {
-                        console.log('Showing text after loading');
-                        loader.style.display = 'none';
-                        loaderText.style.display = 'none';
-                        text.style.display = 'block';
-                        typeManifestoText(text);
-                    }, 200);
-                }
-            }
-
-            // Start loading process
-            setTimeout(processNextMessage, 100);
+            setTimeout(() => {
+                console.log('Showing text after timeout');
+                loader.style.display = 'none';
+                loaderText.style.display = 'none';
+                text.style.display = 'block';
+                typeManifestoText(text);
+            }, 300);
         } else {
             console.log('Some elements not found, showing text directly');
             if (text) {
