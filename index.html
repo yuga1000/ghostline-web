@@ -1108,8 +1108,11 @@ initATASquare();
       }
       // Обработчик для больших областей кликабельности
       manifestoPanel.addEventListener('click', function(e) {
+        console.log('Manifesto panel clicked:', e.target);
+        
         // Не обрабатываем клики на кнопку закрытия
         if (e.target.closest('.manifesto-close')) {
+          console.log('Close button clicked, ignoring');
           return;
         }
         
@@ -1117,40 +1120,53 @@ initATASquare();
         const clickX = e.clientX - rect.left;
         const panelWidth = rect.width;
         
+        console.log('Click position:', { clickX, panelWidth, leftThird: panelWidth * 0.3, rightThird: panelWidth * 0.7 });
+        
         // Если клик в левой трети - предыдущий слайд
         if (clickX < panelWidth * 0.3) {
+          console.log('Left third clicked - previous slide');
           changeSlide(-1);
         }
         // Если клик в правой трети - следующий слайд
         else if (clickX > panelWidth * 0.7) {
+          console.log('Right third clicked - next slide');
           changeSlide(1);
         }
         // Если клик в центре - закрываем мануал
         else {
-          manifestoPanel.classList.remove('visible');
-          manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
-            el.classList.remove('child-visible');
-          });
+          console.log('Closing manifesto from center click');
+          
+          // Вызываем функцию закрытия кнопки
+          const closeBtn = document.getElementById('manifestoClose');
+          if (closeBtn) {
+            closeBtn.click();
+          } else {
+            // Fallback - прямая логика закрытия
+            manifestoPanel.classList.remove('visible');
+            manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
+              el.classList.remove('child-visible');
+            });
 
-          const staticTitle = document.getElementById('staticTitle');
-          const animatedTitle = document.getElementById('animatedTitle');
-          const finalTitle = document.getElementById('finalTitle');
+            const staticTitle = document.getElementById('staticTitle');
+            const animatedTitle = document.getElementById('animatedTitle');
+            const finalTitle = document.getElementById('finalTitle');
 
-          setTimeout(() => {
-            if (staticTitle && animatedTitle && finalTitle) {
-              finalTitle.style.opacity = '0';
-              animatedTitle.style.opacity = '1';
-              animatedTitle.style.transform = 'scale(1.05)';
-              animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
+            setTimeout(() => {
+              if (staticTitle && animatedTitle && finalTitle) {
+                finalTitle.style.opacity = '0';
+                animatedTitle.style.opacity = '1';
+                animatedTitle.style.transform = 'scale(1.05)';
+                animatedTitle.style.filter = 'drop-shadow(0 0 15px rgba(0, 255, 0, 0.8))';
 
-              setTimeout(() => {
-                animatedTitle.style.opacity = '0';
-                animatedTitle.style.transform = 'scale(1)';
-                animatedTitle.style.filter = 'none';
-                staticTitle.style.opacity = '1';
-              }, 700);
-            }
-          }, 200);
+                setTimeout(() => {
+                  animatedTitle.style.opacity = '0';
+                  animatedTitle.style.transform = 'scale(1)';
+                  animatedTitle.style.filter = 'none';
+                  staticTitle.style.opacity = '1';
+                }, 700);
+              }
+            }, 200);
+          }
         }
       });
     }
