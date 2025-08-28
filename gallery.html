@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>GHOSTLINE - Gallery</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -735,7 +738,7 @@ async function loadGallery() {
                 {
                     id: 1,
                     title: 'Test Artwork 1',
-                    url: 'pages/2Large.jpeg',
+                    url: 'pages/2Large.jpeg?v=' + Date.now(),
                     category: 'latest',
                     status: 'available',
                     description: 'Test artwork for gallery functionality'
@@ -743,7 +746,7 @@ async function loadGallery() {
                 {
                     id: 2,
                     title: 'Test Artwork 2',
-                    url: 'components/3scene-terminator-draw.gif.gif',
+                    url: 'components/3scene-terminator-draw.gif.gif?v=' + Date.now(),
                     category: 'series',
                     status: 'available',
                     description: 'Another test artwork'
@@ -751,7 +754,7 @@ async function loadGallery() {
                 {
                     id: 3,
                     title: 'Test Artwork 3',
-                    url: 'plate_noisemask.GIF',
+                    url: 'plate_noisemask.GIF?v=' + Date.now(),
                     category: 'rare',
                     status: 'sold',
                     description: 'Sold test artwork'
@@ -839,7 +842,25 @@ function forceLoadAllImages() {
         const realSrc = img.getAttribute('data-src');
         if (realSrc && img.src !== realSrc) {
             console.log(`Force loading image ${index}:`, realSrc);
-            img.src = realSrc;
+            
+            // Добавляем версию для принудительного обновления кэша
+            const cacheBuster = realSrc.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
+            const finalSrc = realSrc + cacheBuster;
+            
+            // Создаем новое изображение для предзагрузки
+            const preloadImg = new Image();
+            preloadImg.onload = function() {
+                console.log(`Image ${index} preloaded successfully:`, finalSrc);
+                img.src = finalSrc;
+                img.classList.remove('loading');
+                img.classList.add('loaded');
+            };
+            preloadImg.onerror = function() {
+                console.error(`Image ${index} failed to preload:`, finalSrc);
+                // Fallback на оригинальный src
+                img.src = realSrc;
+            };
+            preloadImg.src = finalSrc;
         }
     });
 }
@@ -901,23 +922,29 @@ function initLazyLoading() {
                 console.log('Loading image:', realSrc);
                 
                 if (realSrc) {
+                    // Добавляем версию для принудительного обновления кэша
+                    const cacheBuster = realSrc.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
+                    const finalSrc = realSrc + cacheBuster;
+                    
                     // Создаем новое изображение для предзагрузки
                     const newImg = new Image();
                     
                     newImg.onload = function() {
-                        console.log('Image loaded successfully:', realSrc);
-                        img.src = realSrc;
+                        console.log('Image loaded successfully:', finalSrc);
+                        img.src = finalSrc;
                         img.classList.remove('loading');
                         img.classList.add('loaded');
                     };
                     
                     newImg.onerror = function() {
-                        console.error('Image failed to load:', realSrc);
+                        console.error('Image failed to load:', finalSrc);
+                        // Fallback на оригинальный src
+                        img.src = realSrc;
                         img.classList.remove('loading');
                         img.style.opacity = '0.3';
                     };
                     
-                    newImg.src = realSrc;
+                    newImg.src = finalSrc;
                 }
                 
                 observer.unobserve(img);
