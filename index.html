@@ -367,43 +367,42 @@ let currentManifestoSlide = 0;
                 loader.style.display = 'none';
                 loaderText.style.display = 'none';
                 element.style.display = 'block';
-                        
-                        // Начинаем анимацию печатания
-                        element.innerHTML = '';
-                        const cursor = document.createElement('span');
-                        cursor.className = 'crt-cursor';
-                        cursor.textContent = '_';
-                        element.appendChild(cursor);
+                
+                // Начинаем анимацию печатания
+                element.innerHTML = '';
+                const cursor = document.createElement('span');
+                cursor.className = 'crt-cursor';
+                cursor.textContent = '_';
+                element.appendChild(cursor);
 
-                        const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
-                        
-                        const totalDuration = 600; // быстрее чем основной текст
-                        const chars = slide3Content.split('');
-                        const delay = totalDuration / chars.length;
+                const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
+                
+                const totalDuration = 600;
+                const chars = slide3Content.split('');
+                const delay = totalDuration / chars.length;
 
-                        chars.forEach((ch, i) => {
-                            setTimeout(() => {
-                                try {
-                                    const span = document.createElement('span');
-                                    span.className = 'crt-char';
-                                    if (ch === '\n') {
-                                        const br = document.createElement('br');
-                                        if (cursor && cursor.parentNode) {
-                                            cursor.parentNode.insertBefore(br, cursor);
-                                        }
-                                    } else {
-                                        span.textContent = ch;
-                                        if (cursor && cursor.parentNode) {
-                                            cursor.parentNode.insertBefore(span, cursor);
-                                        }
-                                    }
-                                } catch (error) {
-                                    console.log('Animation error:', error);
+                chars.forEach((ch, i) => {
+                    setTimeout(() => {
+                        try {
+                            const span = document.createElement('span');
+                            span.className = 'crt-char';
+                            if (ch === '\n') {
+                                const br = document.createElement('br');
+                                if (cursor && cursor.parentNode) {
+                                    cursor.parentNode.insertBefore(br, cursor);
                                 }
-                            }, i * delay);
-                        });
-                    }, 200);
-                }
+                            } else {
+                                span.textContent = ch;
+                                if (cursor && cursor.parentNode) {
+                                    cursor.parentNode.insertBefore(span, cursor);
+                                }
+                            }
+                        } catch (error) {
+                            console.log('Animation error:', error);
+                        }
+                    }, i * delay);
+                });
+            }, 200);
         } else {
             // Fallback если нет элементов загрузки
             element.style.display = 'block';
