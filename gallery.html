@@ -994,6 +994,30 @@ function openLightbox(imageUrl, title, status, description) {
         return;
     }
     
+    // Проверяем формат изображения
+    const isHeic = imageUrl.toLowerCase().includes('.heic');
+    if (isHeic) {
+        console.warn('HEIC format detected - may not work in all browsers');
+        // Показываем предупреждение пользователю
+        const warningDiv = document.createElement('div');
+        warningDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 165, 0, 0.9);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 10000;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+        `;
+        warningDiv.textContent = 'HEIC format detected - image may not display in this browser';
+        document.body.appendChild(warningDiv);
+        setTimeout(() => warningDiv.remove(), 5000);
+    }
+    
     // Добавляем версию для принудительного обновления кэша
     const cacheBuster = imageUrl.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
     const finalImageUrl = imageUrl + cacheBuster;
@@ -1019,10 +1043,38 @@ function openLightbox(imageUrl, title, status, description) {
     };
     tempImg.onerror = function() {
         console.error('Lightbox image failed to load:', finalImageUrl);
-        // Fallback на оригинальный URL
-        lightboxImage.src = imageUrl;
-        lightboxImage.alt = title;
-        lightboxImage.style.opacity = '0.5';
+        
+        if (isHeic) {
+            // Для HEIC файлов показываем сообщение об ошибке
+            lightboxImage.style.display = 'none';
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                color: #ff6b6b;
+                font-family: 'Share Tech Mono', monospace;
+                text-align: center;
+                padding: 20px;
+            `;
+            errorDiv.innerHTML = `
+                <div>
+                    <div style="font-size: 16px; margin-bottom: 10px;">⚠️ HEIC Format Not Supported</div>
+                    <div style="font-size: 12px; color: #ccc;">
+                        This image is in HEIC format which is only supported in Safari.<br>
+                        Please open this page in Safari to view the image.
+                    </div>
+                </div>
+            `;
+            lightboxImage.parentNode.appendChild(errorDiv);
+        } else {
+            // Fallback на оригинальный URL для других форматов
+            lightboxImage.src = imageUrl;
+            lightboxImage.alt = title;
+            lightboxImage.style.opacity = '0.5';
+        }
     };
     tempImg.src = finalImageUrl;
     
