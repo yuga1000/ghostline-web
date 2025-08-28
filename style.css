@@ -1086,10 +1086,6 @@
         top: 0 !important;
         left: 0 !important;
         z-index: 1000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
         text-align: center !important;
         box-sizing: border-box !important;
     }
@@ -1097,6 +1093,8 @@
     #manifestoPanel * {
         max-width: 100% !important;
         box-sizing: border-box !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
     
     #manifestoImage {
@@ -1139,10 +1137,6 @@
         top: 0 !important;
         left: 0 !important;
         z-index: 1000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
         text-align: center !important;
         box-sizing: border-box !important;
     }
@@ -1150,6 +1144,8 @@
     #manifestoPanel * {
         max-width: 100% !important;
         box-sizing: border-box !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
     
     #manifestoImage {
@@ -1192,10 +1188,6 @@
         top: 0 !important;
         left: 0 !important;
         z-index: 1000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
         text-align: center !important;
         box-sizing: border-box !important;
     }
@@ -1203,6 +1195,8 @@
     #manifestoPanel * {
         max-width: 100% !important;
         box-sizing: border-box !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
     
     #manifestoImage {
