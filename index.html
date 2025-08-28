@@ -1128,16 +1128,24 @@ initATASquare();
         const rect = manifestoPanel.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const panelWidth = rect.width;
+        const leftThird = panelWidth * 0.3;
+        const rightThird = panelWidth * 0.7;
         
-        console.log('Click position:', { clickX, panelWidth, leftThird: panelWidth * 0.3, rightThird: panelWidth * 0.7 });
+        console.log('Click position:', { clickX, panelWidth, leftThird, rightThird });
+        
+        // Проверяем, что клик действительно внутри панели
+        if (clickX < 0 || clickX > panelWidth) {
+            console.log('Click outside panel, ignoring');
+            return;
+        }
         
         // Если клик в левой трети - предыдущий слайд
-        if (clickX < panelWidth * 0.3) {
+        if (clickX < leftThird) {
           console.log('Left third clicked - previous slide');
           changeSlide(-1);
         }
         // Если клик в правой трети - следующий слайд
-        else if (clickX > panelWidth * 0.7) {
+        else if (clickX > rightThird) {
           console.log('Right third clicked - next slide');
           changeSlide(1);
         }
