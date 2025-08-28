@@ -885,9 +885,17 @@ function forceLoadAllImages() {
 // Функция для проверки доступности изображения
 async function checkImageAvailability(url, index) {
     try {
+        console.log(`Checking availability for image ${index}:`, url);
         const response = await fetch(url, { method: 'HEAD' });
         console.log(`Image ${index} availability check:`, response.status, response.statusText);
-        return response.ok;
+        
+        if (!response.ok) {
+            console.error(`Image ${index} is not available. Status:`, response.status, response.statusText);
+            return false;
+        }
+        
+        console.log(`Image ${index} is available`);
+        return true;
     } catch (error) {
         console.error(`Image ${index} availability check failed:`, error);
         return false;
@@ -920,24 +928,17 @@ function addImageClickHandlers() {
             console.log('Image clicked:', { url, title, status, description });
             
             if (url) {
-                // Проверяем, загрузилось ли изображение в галерее
-                if (this.complete && this.naturalWidth > 0) {
-                    console.log('Image is loaded in gallery, opening lightbox');
-                    openLightbox(url, title, status, description);
-                } else {
-                    console.log('Image not loaded in gallery, trying to load first');
-                    // Пытаемся загрузить изображение перед открытием лайтбокса
-                    const checkImg = new Image();
-                    checkImg.onload = function() {
-                        console.log('Image loaded successfully, opening lightbox');
+                // Сначала проверяем доступность файла
+                console.log('Checking file availability before opening lightbox...');
+                checkImageAvailability(url, 'lightbox').then(isAvailable => {
+                    if (isAvailable) {
+                        console.log('File is available, opening lightbox');
                         openLightbox(url, title, status, description);
-                    };
-                    checkImg.onerror = function() {
-                        console.error('Image failed to load, cannot open lightbox');
-                        alert('Image failed to load. Please try refreshing the page.');
-                    };
-                    checkImg.src = url;
-                }
+                    } else {
+                        console.error('File is not available, cannot open lightbox');
+                        alert('This image is not available. Please contact support or try refreshing the page.');
+                    }
+                });
             } else {
                 console.error('No URL found for clicked image');
             }
