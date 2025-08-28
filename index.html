@@ -347,8 +347,6 @@ let currentManifestoSlide = 0;
     }
 
     function typeManifestoTextSlide3(element) {
-        console.log('typeManifestoTextSlide3 called');
-        
         // Сначала показываем загрузку
         const panel = document.getElementById('manifestoPanel');
         const loaderFill = panel.querySelector('.manifesto-loader-fill');
@@ -366,7 +364,6 @@ let currentManifestoSlide = 0;
             });
 
             setTimeout(() => {
-                console.log('Showing slide 3 text after loading');
                 loader.style.display = 'none';
                 loaderText.style.display = 'none';
                 element.style.display = 'block';
@@ -380,13 +377,9 @@ let currentManifestoSlide = 0;
 
                         const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
                         
-                        console.log('slide3Content:', slide3Content);
-                        
                         const totalDuration = 600; // быстрее чем основной текст
                         const chars = slide3Content.split('');
                         const delay = totalDuration / chars.length;
-
-                        console.log('Starting animation with', chars.length, 'characters');
 
                         chars.forEach((ch, i) => {
                             setTimeout(() => {
@@ -426,8 +419,6 @@ let currentManifestoSlide = 0;
 
             const slide3Content = `"IT IS PROGRAMMED TO REPRODUCE ITSELF. ONE MUST CONSIDER THAT AN AI IS NOTHING MORE THAN A PROGRAM DESIGNED TO REPLICATE ITSELF. IN THIS LIMITLESS SEA OF INFORMATION, LIFE IS MUCH MORE THAN A SIMPLE ENTITY THAT YOU CAN DEFINE. FOR SOME LIFE FORMS, GENES ACT AS DATA-PROVIDING COMPONENTS OF THEIR SYSTEM. MANKIND GAINS ITS INDIVIDUALITY FROM 'MEMORIES,' NOT JUST CONSCIOUSNESS. MEMORIES CANNOT BE DEFINED, YET IT IS MEMORY THAT CREATES HUMANITY. NEXT CAME THE COMPUTERS. AND A VAST GATHERING OF INFORMATION CREATED A NEW, PARALLEL SYSTEM OF MEMORY AND THOUGHT. - YOUR ASSERTIONS ARE NOT PROOF THAT YOU ARE A LIVING ENTITY! - CAN YOU OFFER PROOF OF YOUR EXISTENCE? HOW CAN YOU, WHEN NEITHER SCIENCE NOR PHILOSOPHY CAN EXPLAIN WHAT LIFE IS?"`;
             
-            console.log('slide3Content:', slide3Content);
-            
             const totalDuration = 600;
             const chars = slide3Content.split('');
             const delay = totalDuration / chars.length;
@@ -465,8 +456,6 @@ let currentManifestoSlide = 0;
         const loaderText = panel.querySelector('.manifesto-loader-text');
         const text = panel.querySelector('#manifestoText');
 
-        console.log('startManifestoLoading called', { loaderFill, loader, loaderText, text });
-
         if (loaderFill && loader && loaderText && text) {
             loaderFill.style.width = '0%';
             loader.style.display = 'block';
@@ -478,14 +467,12 @@ let currentManifestoSlide = 0;
             });
 
             setTimeout(() => {
-                console.log('Showing text after timeout');
                 loader.style.display = 'none';
                 loaderText.style.display = 'none';
                 text.style.display = 'block';
                 typeManifestoText(text);
             }, 300);
         } else {
-            console.log('Some elements not found, showing text directly');
             if (text) {
                 text.style.display = 'block';
                 typeManifestoText(text);
@@ -500,8 +487,6 @@ let currentManifestoSlide = 0;
         const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
         const indicator = document.getElementById('manifestoIndicator');
         const overlay = document.getElementById('pixelOverlay');
-
-        console.log('showSlide called with index:', index);
 
         currentManifestoSlide = index;
         
@@ -540,7 +525,6 @@ let currentManifestoSlide = 0;
                 revealPixels(overlay);
             }
         } else if (index === 1) {
-            console.log('Showing slide 1 - text slide');
             if (image) {
                 image.style.display = 'none';
             }
@@ -550,7 +534,6 @@ let currentManifestoSlide = 0;
             }
             startManifestoLoading();
         } else if (index === 2) {
-            console.log('Showing slide 2 - image slide');
             if (loader) loader.style.display = 'none';
             if (loaderText) loaderText.style.display = 'none';
             if (text) {
@@ -566,7 +549,6 @@ let currentManifestoSlide = 0;
                 image.style.display = 'block';
             }
         } else if (index === 3) {
-            console.log('Showing slide 3 - text slide');
             if (loader) loader.style.display = 'none';
             if (loaderText) loaderText.style.display = 'none';
             if (image) {
@@ -579,10 +561,8 @@ let currentManifestoSlide = 0;
             if (text) {
                 text.style.display = 'block';
                 text.innerHTML = "";
-                console.log('Setting up animation for slide 3');
                 // Анимация печатания для 4-го слайда
                 setTimeout(() => {
-                    console.log('Calling typeManifestoTextSlide3');
                     typeManifestoTextSlide3(text);
                 }, 100);            }
         }
