@@ -366,13 +366,22 @@ let currentManifestoSlide = 0;
 
         chars.forEach((ch, i) => {
             setTimeout(() => {
-                const span = document.createElement('span');
-                span.className = 'crt-char';
-                if (ch === '\n') {
-                    element.insertBefore(document.createElement('br'), cursor);
-                } else {
-                    span.textContent = ch;
-                    element.insertBefore(span, cursor);
+                try {
+                    const span = document.createElement('span');
+                    span.className = 'crt-char';
+                    if (ch === '\n') {
+                        const br = document.createElement('br');
+                        if (cursor && cursor.parentNode) {
+                            cursor.parentNode.insertBefore(br, cursor);
+                        }
+                    } else {
+                        span.textContent = ch;
+                        if (cursor && cursor.parentNode) {
+                            cursor.parentNode.insertBefore(span, cursor);
+                        }
+                    }
+                } catch (error) {
+                    console.log('Animation error:', error);
                 }
             }, i * delay);
         });
@@ -1134,7 +1143,7 @@ initATASquare();
         }
         // Если клик в центре - закрываем мануал
         else {
-          console.log('Closing manifesto from center click');
+          console.log('Center clicked - closing manifesto');
           
           // Вызываем функцию закрытия кнопки
           const closeBtn = document.getElementById('manifestoClose');
