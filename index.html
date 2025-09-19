@@ -1069,25 +1069,34 @@ if (mode === 'logo') {
   try {
     const wrap = document.querySelector('.ata-sponsor-wrap');
     if (wrap) {
-      setInterval(() => {
-        const rect = wrap.getBoundingClientRect();
-        const startX = rect.left + rect.width / 2;
-        const startY = rect.top + 4; // near label
-        const firefly = document.createElement('div');
-        firefly.className = 'sponsor-firefly';
-        firefly.style.left = startX + 'px';
-        firefly.style.top = startY + 'px';
-        // random upward-ish direction
-        const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI / 3;
-        const distance = 80 + Math.random() * 80;
-        const dx = Math.cos(angle) * distance;
-        const dy = Math.sin(angle) * distance;
-        firefly.style.setProperty('--dx', dx + 'px');
-        firefly.style.setProperty('--dy', dy + 'px');
-        firefly.style.setProperty('--dur', (1.8 + Math.random() * 1.2) + 's');
-        document.body.appendChild(firefly);
-        setTimeout(() => firefly.remove(), 2400);
-      }, 700);
+      // create a few orbit tracks with dots of green/yellow
+      const orbitCount = 3;
+      for (let i = 0; i < orbitCount; i++) {
+        const orbit = document.createElement('div');
+        orbit.className = 'sponsor-orbit';
+        // center offsets around the label
+        const cx = (Math.random() - 0.5) * 40; // -20..20px
+        const cy = -10 + (Math.random() - 0.5) * 16; // around label
+        orbit.style.setProperty('--cx', cx + 'px');
+        orbit.style.setProperty('--cy', cy + 'px');
+        orbit.style.setProperty('--dur', (6 + Math.random() * 4) + 's');
+
+        // 2-3 dots per orbit
+        const dots = 2 + Math.floor(Math.random() * 2);
+        for (let d = 0; d < dots; d++) {
+          const dot = document.createElement('div');
+          dot.className = 'sponsor-dot';
+          const radius = 16 + Math.random() * 26; // 16..42px
+          dot.style.setProperty('--r', radius + 'px');
+          const greenOrYellow = Math.random() < 0.5 ? '#00ff00' : '#ffee55';
+          dot.style.setProperty('--c', greenOrYellow);
+          dot.style.setProperty('--f', (1.0 + Math.random() * 1.2) + 's');
+          // offset each dot by angle using rotate on wrapper via delay
+          dot.style.animationDelay = (Math.random() * 1.0) + 's';
+          orbit.appendChild(dot);
+        }
+        wrap.appendChild(orbit);
+      }
     }
   } catch (e) {}
   return;

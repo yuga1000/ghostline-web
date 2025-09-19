@@ -461,22 +461,36 @@
     margin-bottom: 4px;
 }
 
-/* Fireflies around sponsors label */
+/* Fireflies around sponsors label (orbiting) */
 .ata-sponsor-wrap { position: relative; display: inline-flex; flex-direction: column; align-items: flex-start; }
-.sponsor-firefly {
-    position: fixed;
+.sponsor-orbit {
+    position: absolute;
+    top: 8px; /* near the label */
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-origin: 0 0;
+    animation: sponsorOrbit var(--dur, 7s) linear infinite;
+}
+.sponsor-orbit .sponsor-dot {
+    position: absolute;
+    left: var(--r, 20px);
+    top: 0;
     width: 2px;
     height: 2px;
-    background: #00ff00;
+    background: var(--c, #00ff00);
     pointer-events: none;
-    z-index: 1002;
-    box-shadow: 0 0 2px #00ff00, 0 0 4px #00ff00;
+    box-shadow: 0 0 2px var(--c, #00ff00), 0 0 4px var(--c, #00ff00);
     opacity: 0.9;
-    animation: sponsorFireflyFloat var(--dur, 2.2s) ease-out forwards, fireflyGlow 1.2s ease-in-out infinite;
+    animation: sponsorFlicker var(--f, 1.4s) ease-in-out infinite;
 }
-@keyframes sponsorFireflyFloat {
-    0%   { transform: translate(0,0) scale(1); opacity: 0.9; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(0.3); opacity: 0; }
+@keyframes sponsorOrbit {
+    0%   { transform: translateX(var(--cx, 0)) translateY(var(--cy, 0)) rotate(0deg); }
+    100% { transform: translateX(var(--cx, 0)) translateY(var(--cy, 0)) rotate(360deg); }
+}
+@keyframes sponsorFlicker {
+    0%, 100% { opacity: 0.9; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
 }
 .ata-sponsor-link {
     display: inline-block;
