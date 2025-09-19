@@ -995,10 +995,12 @@ let currentManifestoSlide = 0;
 
 <div id="ata-line" class="ata-glyph-line"></div>
 <div id="ata-square" class="ata-glyph-square" data-mode="logo">
-  <div class="ata-sponsor-label">[ SPONSORS ]</div>
-  <a href="https://mabiangseni.com" target="_blank" rel="noopener noreferrer" class="ata-sponsor-link" aria-label="Sponsor: Mabiang Seni">
-    <img src="logo_sposors/F68A328E-A5FA-4432-90E8-F5DA5E880229.png" alt="Sponsor: Mabiang Seni" class="ata-sponsor-logo" loading="lazy">
-  </a>
+  <div class="ata-sponsor-wrap">
+    <div class="ata-sponsor-label">[ SPONSORS ]</div>
+    <a href="https://mabiangseni.com" target="_blank" rel="noopener noreferrer" class="ata-sponsor-link" aria-label="Sponsor: Mabiang Seni">
+      <img src="logo_sposors/F68A328E-A5FA-4432-90E8-F5DA5E880229.png" alt="Sponsor: Mabiang Seni" class="ata-sponsor-logo" loading="lazy">
+    </a>
+  </div>
 </div>
 <script>
 const ataGlyphs = [
@@ -1063,6 +1065,31 @@ if (!square) return;
 const mode = square.getAttribute('data-mode');
 if (mode === 'logo') {
   // Keep the img inside; do not overwrite with ASCII
+  // start fireflies around sponsors label
+  try {
+    const wrap = document.querySelector('.ata-sponsor-wrap');
+    if (wrap) {
+      setInterval(() => {
+        const rect = wrap.getBoundingClientRect();
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + 4; // near label
+        const firefly = document.createElement('div');
+        firefly.className = 'sponsor-firefly';
+        firefly.style.left = startX + 'px';
+        firefly.style.top = startY + 'px';
+        // random upward-ish direction
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI / 3;
+        const distance = 80 + Math.random() * 80;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        firefly.style.setProperty('--dx', dx + 'px');
+        firefly.style.setProperty('--dy', dy + 'px');
+        firefly.style.setProperty('--dur', (1.8 + Math.random() * 1.2) + 's');
+        document.body.appendChild(firefly);
+        setTimeout(() => firefly.remove(), 2400);
+      }, 700);
+    }
+  } catch (e) {}
   return;
 }
 
