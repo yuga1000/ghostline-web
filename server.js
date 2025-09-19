@@ -46,19 +46,20 @@ function requireAdmin(req, res, next) {
 }
 
 app.post('/api/login', (req, res) => {
-  const { password } = req.body;
+  const { password, remember } = req.body || {};
   if (!ADMIN_PASSWORD || password !== ADMIN_PASSWORD) {
     return res.status(403).json({ message: 'Wrong password' });
   }
   const ts = Date.now().toString();
   const sig = crypto.createHmac('sha256', SESSION_SECRET).update(ts).digest('hex');
   const token = `${ts}.${sig}`;
+  const maxAge = remember ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30d or 24h
   res.cookie('gl_admin', token, {
     httpOnly: true,
     secure: true,
     sameSite: 'strict',
     signed: true,
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge,
     path: '/',
   });
   res.json({ message: 'success' });
