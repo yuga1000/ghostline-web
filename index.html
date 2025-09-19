@@ -994,8 +994,9 @@ let currentManifestoSlide = 0;
 </script>
 
 <div id="ata-line" class="ata-glyph-line"></div>
-<div id="ata-square" class="ata-glyph-square"></div>
-<img src="logo_sposors/F68A328E-A5FA-4432-90E8-F5DA5E880229.png" alt="Sponsor" class="sponsor-logo-bl" loading="lazy">
+<div id="ata-square" class="ata-glyph-square" data-mode="logo">
+  <img src="logo_sposors/F68A328E-A5FA-4432-90E8-F5DA5E880229.png" alt="Sponsor" class="ata-sponsor-logo" loading="lazy">
+</div>
 <script>
 const ataGlyphs = [
   "█", "▓", "▒", "░", "■", "□", "▣", "▤", "▥", "▦", "▧", "▨", "▩", "▪", "▫",
@@ -1054,12 +1055,18 @@ return rows.join('\n');
 
 function initATASquare() {
 const square = document.getElementById('ata-square');
-if (square) {
+if (!square) return;
+
+const mode = square.getAttribute('data-mode');
+if (mode === 'logo') {
+  // Keep the img inside; do not overwrite with ASCII
+  return;
+}
+
 square.textContent = getRandomATASquare();
 setInterval(() => {
-square.textContent = getRandomATASquare();
+  square.textContent = getRandomATASquare();
 }, 5000);
-}
 }
 
 document.addEventListener('DOMContentLoaded', () => {
