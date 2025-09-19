@@ -451,6 +451,22 @@
     .ata-glyph-square img.ata-sponsor-logo { height: 64px; }
 }
 
+/* Sponsor label and link styling */
+.ata-sponsor-label {
+    font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
+    font-weight: 700;
+    color: #66ff66;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+.ata-sponsor-link {
+    display: inline-block;
+}
+.ata-sponsor-link img {
+    filter: saturate(0.85) hue-rotate(65deg);
+}
+
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {
