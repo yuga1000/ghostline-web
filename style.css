@@ -439,6 +439,40 @@
         }
     }
 
+    /* Sponsor strip */
+    .sponsor-strip {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .sponsor-frame {
+        pointer-events: auto;
+        background: #000000;
+        border: 2px solid #00ff00;
+        padding: 8px 12px;
+        box-shadow: 0 0 4px rgba(0, 255, 0, 0.6), 
+                    0 0 8px rgba(0, 255, 0, 0.4),
+                    0 0 12px rgba(0, 255, 0, 0.2);
+    }
+    .sponsor-logo {
+        height: 60px;
+        width: auto;
+        image-rendering: pixelated;
+        display: block;
+    }
+
+    @media (max-width: 640px) {
+        .sponsor-strip { height: 120px; }
+        .sponsor-logo { height: 44px; }
+    }
+
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {
