@@ -453,11 +453,11 @@
 
 /* Sponsor label and link styling */
 .ata-sponsor-label {
-    font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-    font-weight: 700;
+    font-family: 'Press Start 2P', cursive;
+    font-weight: 400;
     color: #66ff66;
-    font-size: 12px;
-    letter-spacing: 1px;
+    font-size: 10px;
+    letter-spacing: 0px;
     margin-bottom: 4px;
 }
 .ata-sponsor-link {
