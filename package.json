@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Static deployment of ghostline-web via Railway",
   "scripts": {
-    "start": "node generate-env.js && node server.js",
-    "build": "echo 'No build step required for static site'"
+    "start": "node generate-env.js && node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
@@ -12,8 +11,5 @@
     "cookie-parser": "^1.4.6",
     "helmet": "^7.1.0",
     "express-rate-limit": "^7.4.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
