@@ -1159,30 +1159,49 @@ if (mode === 'logo') {
   try {
     const wrap = document.querySelector('.ata-sponsor-wrap');
     if (wrap) {
-      // create a few orbit tracks with dots of green/yellow
-      const orbitCount = 3;
+      // create diverse fireflies around partners
+      const orbitCount = 6; // More orbits
       for (let i = 0; i < orbitCount; i++) {
         const orbit = document.createElement('div');
         orbit.className = 'sponsor-orbit';
-        // center offsets around the label
-        const cx = (Math.random() - 0.5) * 40; // -20..20px
-        const cy = -10 + (Math.random() - 0.5) * 16; // around label
+        
+        // More varied center positions
+        const cx = (Math.random() - 0.5) * 80; // -40..40px (wider range)
+        const cy = -15 + (Math.random() - 0.5) * 30; // around label (taller range)
         orbit.style.setProperty('--cx', cx + 'px');
         orbit.style.setProperty('--cy', cy + 'px');
-        orbit.style.setProperty('--dur', (6 + Math.random() * 4) + 's');
+        
+        // More varied speeds (some fast, some slow)
+        const speed = Math.random() < 0.3 ? (3 + Math.random() * 2) : (8 + Math.random() * 6);
+        orbit.style.setProperty('--dur', speed + 's');
 
-        // 2-3 dots per orbit
-        const dots = 2 + Math.floor(Math.random() * 2);
+        // Random number of dots per orbit (1-4)
+        const dots = 1 + Math.floor(Math.random() * 4);
         for (let d = 0; d < dots; d++) {
           const dot = document.createElement('div');
           dot.className = 'sponsor-dot';
-          const radius = 16 + Math.random() * 26; // 16..42px
+          
+          // More varied radii
+          const radius = 8 + Math.random() * 50; // 8..58px (wider range)
           dot.style.setProperty('--r', radius + 'px');
-          const greenOrYellow = Math.random() < 0.5 ? '#00ff00' : '#ffee55';
-          dot.style.setProperty('--c', greenOrYellow);
-          dot.style.setProperty('--f', (1.0 + Math.random() * 1.2) + 's');
-          // offset each dot by angle using rotate on wrapper via delay
-          dot.style.animationDelay = (Math.random() * 1.0) + 's';
+          
+          // More colors
+          const colors = ['#00ff00', '#ffee55', '#00ffff', '#ff00ff', '#ffff00', '#ff6600'];
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          dot.style.setProperty('--c', color);
+          
+          // More varied flicker speeds
+          const flickerSpeed = 0.5 + Math.random() * 2.5;
+          dot.style.setProperty('--f', flickerSpeed + 's');
+          
+          // Random delay for each dot
+          dot.style.animationDelay = (Math.random() * 2.0) + 's';
+          
+          // Random size variation
+          const size = Math.random() < 0.3 ? '1px' : '2px';
+          dot.style.width = size;
+          dot.style.height = size;
+          
           orbit.appendChild(dot);
         }
         wrap.appendChild(orbit);
