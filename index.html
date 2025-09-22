@@ -937,6 +937,63 @@ let currentManifestoSlide = 0;
         setTimeout(processNextMessage, 100);
     }
     
+    // Create real TV pixel noise effect
+    function createTVNoise() {
+        const label = safeGetElement('partners-label');
+        if (!label) return;
+        
+        // Create noise canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.opacity = '0.15';
+        canvas.style.zIndex = '1';
+        
+        label.appendChild(canvas);
+        
+        function resizeCanvas() {
+            const rect = label.getBoundingClientRect();
+            canvas.width = rect.width * 2; // High DPI
+            canvas.height = rect.height * 2;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            ctx.scale(2, 2);
+        }
+        
+        function drawNoise() {
+            const imageData = ctx.createImageData(canvas.width / 2, canvas.height / 2);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const noise = Math.random() * 255;
+                data[i] = 0;     // Red
+                data[i + 1] = noise; // Green
+                data[i + 2] = 0;     // Blue
+                data[i + 3] = 50;    // Alpha
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        resizeCanvas();
+        drawNoise();
+        
+        // Update noise every frame
+        function animate() {
+            drawNoise();
+            requestAnimationFrame(animate);
+        }
+        animate();
+        
+        // Resize on window resize
+        window.addEventListener('resize', resizeCanvas);
+    }
+
     // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Start terminal loading
@@ -975,6 +1032,9 @@ let currentManifestoSlide = 0;
             // Start idle pixels for SOCIAL button
             startSocialParticles();
             
+            // Create TV noise for partners label
+            setTimeout(createTVNoise, 2000);
+            
             console.log('ð¨ GHOSTLINE initialized!');
             
         } catch (e) {
@@ -999,10 +1059,7 @@ let currentManifestoSlide = 0;
 </div>
 <div id="ata-square" class="ata-glyph-square" data-mode="logo">
   <div class="ata-sponsor-wrap">
-    <div class="ata-sponsor-label">
-      <span class="label-text">[ PARTNERS ]</span>
-      <div class="pixel-noise"></div>
-    </div>
+    <div class="ata-sponsor-label" id="partners-label">[ PARTNERS ]</div>
     <a href="https://mabiangseni.com" target="_blank" rel="noopener noreferrer" class="ata-sponsor-link" aria-label="Sponsor: Mabiang Seni">
       <img src="logo_sposors/F68A328E-A5FA-4432-90E8-F5DA5E880229.png" alt="Sponsor: Mabiang Seni" class="ata-sponsor-logo" loading="lazy">
     </a>
