@@ -534,6 +534,44 @@
     box-shadow: 0 0 4px rgba(0,255,0,0.4);
 }
 
+/* Scroll hint styles */
+.scroll-hint {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 1000;
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+.scroll-arrow {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    color: #00ff00;
+    text-shadow: 0 0 8px rgba(0,255,0,0.8);
+    margin-bottom: 4px;
+    animation: scrollBounce 1.5s ease-in-out infinite;
+}
+
+.scroll-text {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    color: #66ff66;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+@keyframes scrollPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+@keyframes scrollBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {

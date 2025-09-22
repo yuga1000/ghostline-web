@@ -643,7 +643,7 @@ let currentManifestoSlide = 0;
         const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
         
         buttons.forEach(button => {
-            if (Math.random() < 0.6) {
+            if (Math.random() < 0.8) {
                 try {
                     const rect = button.getBoundingClientRect();
                     const firefly = document.createElement('div');
@@ -937,10 +937,22 @@ let currentManifestoSlide = 0;
         setTimeout(processNextMessage, 100);
     }
     
+    // Hide scroll hint when user scrolls
+    function hideScrollHint() {
+        const scrollHint = safeGetElement('scroll-hint');
+        if (scrollHint) {
+            scrollHint.style.opacity = '0';
+            scrollHint.style.transition = 'opacity 0.5s ease';
+        }
+    }
+
     // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Start terminal loading
         startTerminalLoading();
+        
+        // Hide scroll hint on scroll
+        window.addEventListener('scroll', hideScrollHint, { once: true });
         
         try {
             
@@ -951,8 +963,8 @@ let currentManifestoSlide = 0;
             setInterval(createFloatingPixels, 10000);
             createFloatingPixels();
             
-            // Fireflies every 600ms
-            setInterval(createFireflies, 600);
+            // Fireflies every 300ms (more frequent)
+            setInterval(createFireflies, 300);
             createFireflies();
             
             // Random numbers every 2 seconds
@@ -994,6 +1006,10 @@ let currentManifestoSlide = 0;
 </script>
 
 <div id="ata-line" class="ata-glyph-line"></div>
+<div id="scroll-hint" class="scroll-hint">
+  <div class="scroll-arrow">▼</div>
+  <div class="scroll-text">SCROLL</div>
+</div>
 <div id="ata-square" class="ata-glyph-square" data-mode="logo">
   <div class="ata-sponsor-wrap">
     <div class="ata-sponsor-label">[ PARTNERS ]</div>
