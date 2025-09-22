@@ -105,7 +105,7 @@
             <span class="text-green-400" id="randomNumbers">âââââ</span>
         </div>
         <div class="flex items-center space-x-2">
-            <span class="pixel-hearts" id="pixelHearts">♡♡♡</span>
+            <span class="pixel-hearts" id="pixelHearts">◊◊◊</span>
             <span class="glow-text pixel-text text-xs" id="userCounter">USERS: 0</span>
         </div>
         <div class="flex items-center space-x-4">
@@ -741,6 +741,8 @@ let currentManifestoSlide = 0;
                 // If no stored count, start with realistic number
                 if (currentCount === 0) {
                     currentCount = 23 + Math.floor(Math.random() * 15);
+                    // Save initial count immediately
+                    localStorage.setItem('ghostline_users', currentCount.toString());
                 }
                 
                 // Simulate user growth (0-1 users per update)
@@ -769,7 +771,7 @@ let currentManifestoSlide = 0;
             try {
                 // More users = more hearts (max 3 hearts)
                 const heartCount = Math.min(3, Math.max(1, Math.floor(userCount / 15) + 1));
-                const hearts = '♡'.repeat(heartCount);
+                const hearts = '◊'.repeat(heartCount);
                 heartsElement.textContent = hearts;
             } catch (e) {
                 console.log('Hearts update error:', e);
