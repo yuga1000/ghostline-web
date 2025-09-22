@@ -442,10 +442,14 @@
 /* Sponsor bottom-left minimal logo */
 /* Logo inside ATA square */
 .ata-glyph-square img.ata-sponsor-logo {
-    display: block;
+    display: block !important;
     width: auto;
     height: 90px;
     image-rendering: pixelated;
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative;
+    z-index: 10;
 }
 @media (max-width: 640px) {
     .ata-glyph-square img.ata-sponsor-logo { height: 64px; }
