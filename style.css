@@ -461,7 +461,7 @@
     margin-bottom: 4px;
 }
 
-/* Fireflies around sponsors label (orbiting) */
+/* Fireflies around partners label (orbiting) */
 .ata-sponsor-wrap { position: relative; display: inline-flex; flex-direction: column; align-items: flex-start; }
 .sponsor-orbit {
     position: absolute;
