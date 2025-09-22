@@ -540,7 +540,7 @@
 .scroll-hint {
     position: fixed;
     bottom: 20px;
-    left: 50px;
+    left: 70px;
     z-index: 1000;
     animation: scrollPulse 2s ease-in-out infinite;
 }

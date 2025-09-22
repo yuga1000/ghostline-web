@@ -1031,8 +1031,10 @@ let currentManifestoSlide = 0;
         // Start terminal loading
         startTerminalLoading();
         
-        // Hide scroll hint on scroll
-        window.addEventListener('scroll', hideScrollHint, { once: true });
+        // Hide scroll hint on scroll (with delay to ensure element exists)
+        setTimeout(() => {
+            window.addEventListener('scroll', hideScrollHint, { once: true });
+        }, 1000);
         
         try {
             
@@ -1069,6 +1071,9 @@ let currentManifestoSlide = 0;
             
             // Create TV noise for partners label
             setTimeout(createTVNoise, 2000);
+            
+            // Control scrolling text with random intervals
+            setTimeout(controlScrollingText, 3000);
             
             console.log('ð¨ GHOSTLINE initialized!');
             
