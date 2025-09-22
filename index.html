@@ -347,7 +347,7 @@ let currentManifestoSlide = 0;
     }
 
     function typeManifestoTextSlide3(element) {
-        // Сначала показываем загрузку
+        // First show loading
         const panel = document.getElementById('manifestoPanel');
         const loaderFill = panel.querySelector('.manifesto-loader-fill');
         const loader = panel.querySelector('.manifesto-loader');
@@ -454,7 +454,7 @@ let currentManifestoSlide = 0;
 
         currentManifestoSlide = index;
         
-        // Устанавливаем атрибут для CSS селекторов
+        // Set attribute for CSS selectors
         const panel = document.getElementById('manifestoPanel');
         if (panel) {
             panel.setAttribute('data-slide', index);
@@ -525,7 +525,7 @@ let currentManifestoSlide = 0;
             if (text) {
                 text.style.display = 'block';
                 text.innerHTML = "";
-                // Анимация печатания для 4-го слайда
+                // Typing animation for slide 4
                 setTimeout(() => {
                     typeManifestoTextSlide3(text);
                 }, 100);
@@ -1138,13 +1138,13 @@ initATASquare();
       manifestoClose.addEventListener('click', function () {
         console.log('Close button clicked - closing manifesto');
         
-        // Закрываем мануал
+        // Close manifesto
         manifestoPanel.classList.remove('visible');
         manifestoPanel.querySelectorAll('.manifesto-arrow, .manifesto-close').forEach(function(el){
           el.classList.remove('child-visible');
         });
 
-        // Возвращаем заголовок в исходное состояние
+        // Reset title to original state
         const staticTitle = document.getElementById('staticTitle');
         const animatedTitle = document.getElementById('animatedTitle');
         const finalTitle = document.getElementById('finalTitle');
@@ -1159,24 +1159,24 @@ initATASquare();
       });
     }
 
-    // Добавляем обработчики для больших областей кликабельности и визуальных стрелок
+    // Add handlers for large clickable areas and visual arrows
     if (manifestoPanel) {
-      // Обработчики для визуальных стрелок
+      // Handlers for visual arrows
       if (leftArrow && rightArrow) {
         leftArrow.addEventListener('click', function(e){ 
-          e.stopPropagation(); // Предотвращаем срабатывание обработчика панели
+          e.stopPropagation(); // Prevent panel handler from firing
           changeSlide(-1); 
         });
         rightArrow.addEventListener('click', function(e){ 
-          e.stopPropagation(); // Предотвращаем срабатывание обработчика панели
+          e.stopPropagation(); // Prevent panel handler from firing
           changeSlide(1); 
         });
       }
-      // Обработчик для больших областей кликабельности
+      // Handler for large clickable areas
       manifestoPanel.addEventListener('click', function(e) {
         console.log('Manifesto panel clicked:', e.target);
         
-        // Не обрабатываем клики на кнопку закрытия
+        // Don't handle clicks on close button
         if (e.target.closest('.manifesto-close')) {
           console.log('Close button clicked, ignoring');
           return;
@@ -1185,28 +1185,28 @@ initATASquare();
         const rect = manifestoPanel.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const panelWidth = rect.width;
-        const leftThird = panelWidth * 0.3;   // Левая область для предыдущего слайда
-        const rightThird = panelWidth * 0.7;  // Правая область для следующего слайда
+        const leftThird = panelWidth * 0.3;   // Left area for previous slide
+        const rightThird = panelWidth * 0.7;  // Right area for next slide
         
         console.log('Click position:', { clickX, panelWidth, leftThird, rightThird });
         
-        // Проверяем, что клик действительно внутри панели
+        // Check that click is actually inside panel
         if (clickX < 0 || clickX > panelWidth) {
             console.log('Click outside panel, ignoring');
             return;
         }
         
-        // Если клик в левой трети - предыдущий слайд
+        // If click in left third - previous slide
         if (clickX < leftThird) {
           console.log('Left third clicked - previous slide');
           changeSlide(-1);
         }
-        // Если клик в правой трети - следующий слайд
+        // If click in right third - next slide
         else if (clickX > rightThird) {
           console.log('Right third clicked - next slide');
           changeSlide(1);
         }
-        // В центре ничего не делаем
+        // In center do nothing
 
       });
       
