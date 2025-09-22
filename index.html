@@ -1071,8 +1071,8 @@ let currentManifestoSlide = 0;
             // Show the line
             line.style.display = 'block';
             
-            // Random delay before showing next line (15-30 seconds)
-            const delay = 15000 + Math.random() * 15000;
+            // Random delay before showing next line (15-60 seconds)
+            const delay = 15000 + Math.random() * 45000;
             setTimeout(showNextLine, delay);
         }
         
