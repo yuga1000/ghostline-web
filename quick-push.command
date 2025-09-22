@@ -19,7 +19,7 @@ git status --short
 echo ""
 
 # Автоматический коммит и push
-COMMIT_MSG="Обновление сайта $(date '+%Y-%m-%d %H:%M:%S')"
+COMMIT_MSG="Website update $(date '+%Y-%m-%d %H:%M:%S')"
 echo "Коммит: $COMMIT_MSG"
 echo ""
 

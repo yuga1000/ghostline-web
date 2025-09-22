@@ -16,7 +16,7 @@ if [ -z "$(git status --porcelain)" ]; then
 fi
 
 # Получаем комментарий к коммиту
-COMMIT_MESSAGE=${1:-"Обновление сайта $(date '+%Y-%m-%d %H:%M:%S')"}
+COMMIT_MESSAGE=${1:-"Website update $(date '+%Y-%m-%d %H:%M:%S')"}
 
 echo "Добавляем все изменения..."
 git add .

@@ -20,7 +20,7 @@ fi
 
 # Создаем коммит с текущим временем
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-COMMIT_MSG="Обновление сайта - $TIMESTAMP"
+COMMIT_MSG="Website update - $TIMESTAMP"
 
 echo "📝 Создаем коммит: $COMMIT_MSG"
 

@@ -450,9 +450,29 @@
     visibility: visible !important;
     position: relative;
     z-index: 10;
+    max-width: none !important;
+    min-width: auto !important;
+    -webkit-transform: none !important;
+    transform: none !important;
 }
+
+/* Desktop specific - ensure logo is visible */
+@media (min-width: 641px) {
+    .ata-glyph-square img.ata-sponsor-logo {
+        height: 90px !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
 @media (max-width: 640px) {
-    .ata-glyph-square img.ata-sponsor-logo { height: 64px; }
+    .ata-glyph-square img.ata-sponsor-logo { 
+        height: 64px !important;
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
 }
 
 /* Sponsor label and link styling */
