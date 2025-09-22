@@ -1003,6 +1003,29 @@ let currentManifestoSlide = 0;
         }
     }
 
+    // Control scrolling text with random intervals
+    function controlScrollingText() {
+        const scrollLines = document.querySelectorAll('.scroll-line');
+        
+        function showRandomLine() {
+            // Hide all lines first
+            scrollLines.forEach(line => {
+                line.style.display = 'none';
+            });
+            
+            // Show random line
+            const randomIndex = Math.floor(Math.random() * scrollLines.length);
+            scrollLines[randomIndex].style.display = 'block';
+            
+            // Random delay before next line (3-8 seconds)
+            const delay = 3000 + Math.random() * 5000;
+            setTimeout(showRandomLine, delay);
+        }
+        
+        // Start the cycle
+        showRandomLine();
+    }
+
     // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', function() {
         // Start terminal loading
