@@ -1003,14 +1003,30 @@ let currentManifestoSlide = 0;
         }
     }
 
-    // Control scrolling text - show all lines continuously
+    // Control scrolling text with random intervals
     function controlScrollingText() {
         const scrollLines = document.querySelectorAll('.scroll-line');
         
-        // Show all lines continuously
+        // Initially hide all lines
         scrollLines.forEach(line => {
-            line.style.display = 'block';
+            line.style.display = 'none';
         });
+        
+        function showNextLine() {
+            // Find a random line to show
+            const randomIndex = Math.floor(Math.random() * scrollLines.length);
+            const line = scrollLines[randomIndex];
+            
+            // Show the line
+            line.style.display = 'block';
+            
+            // Random delay before showing next line (2-6 seconds)
+            const delay = 2000 + Math.random() * 4000;
+            setTimeout(showNextLine, delay);
+        }
+        
+        // Start showing lines with random intervals
+        showNextLine();
     }
 
     // Initialize everything when page loads
