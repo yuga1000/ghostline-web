@@ -104,6 +104,10 @@
             <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
             <span class="text-green-400" id="randomNumbers">âââââ</span>
         </div>
+        <div class="flex items-center space-x-2">
+            <span class="pixel-hearts" id="pixelHearts">♥♥♥</span>
+            <span class="glow-text pixel-text text-xs" id="userCounter">USERS: 0</span>
+        </div>
         <div class="flex items-center space-x-4">
             <span class="blink">â</span>
             <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
@@ -726,6 +730,53 @@ let currentManifestoSlide = 0;
         }
     }
     
+    // User counter with realistic growth
+    function updateUserCounter() {
+        const element = safeGetElement('userCounter');
+        if (element) {
+            try {
+                // Get current count from localStorage or start with random base
+                let currentCount = parseInt(localStorage.getItem('ghostline_users') || '0');
+                
+                // If no stored count, start with realistic number
+                if (currentCount === 0) {
+                    currentCount = 1247 + Math.floor(Math.random() * 500);
+                }
+                
+                // Simulate user growth (1-3 users per update)
+                const growth = 1 + Math.floor(Math.random() * 3);
+                currentCount += growth;
+                
+                // Store updated count
+                localStorage.setItem('ghostline_users', currentCount.toString());
+                
+                // Update display
+                element.textContent = `USERS: ${currentCount.toLocaleString()}`;
+                
+                // Update hearts based on user count
+                updatePixelHearts(currentCount);
+                
+            } catch (e) {
+                console.log('User counter error:', e);
+            }
+        }
+    }
+    
+    // Update pixel hearts based on user count
+    function updatePixelHearts(userCount) {
+        const heartsElement = safeGetElement('pixelHearts');
+        if (heartsElement) {
+            try {
+                // More users = more hearts (max 5 hearts)
+                const heartCount = Math.min(5, Math.max(1, Math.floor(userCount / 1000) + 1));
+                const hearts = '♥'.repeat(heartCount);
+                heartsElement.textContent = hearts;
+            } catch (e) {
+                console.log('Hearts update error:', e);
+            }
+        }
+    }
+    
     // Add button click effects
     function addButtonEffects() {
         const galleryBtn = safeGetElement('galleryBtn');
@@ -1055,6 +1106,10 @@ let currentManifestoSlide = 0;
             // Random numbers every 2 seconds
             setInterval(updateRandomNumbers, 2000);
             updateRandomNumbers();
+            
+            // User counter every 30 seconds
+            setInterval(updateUserCounter, 30000);
+            updateUserCounter();
             
             
             // Command change every 8 seconds

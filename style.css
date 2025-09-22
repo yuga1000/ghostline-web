@@ -563,6 +563,26 @@
     50% { transform: translateY(-4px); }
 }
 
+/* Pixel hearts styling */
+.pixel-hearts {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    color: #ff0040;
+    text-shadow: 0 0 4px rgba(255, 0, 64, 0.8);
+    animation: heartPulse 2s ease-in-out infinite;
+}
+
+@keyframes heartPulse {
+    0%, 100% { 
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {
