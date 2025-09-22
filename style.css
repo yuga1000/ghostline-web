@@ -494,9 +494,12 @@
 }
 .ata-sponsor-link {
     display: inline-block;
+    margin-top: 8px;
 }
 .ata-sponsor-link img {
     filter: none;
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Terminal-style label brackets */
