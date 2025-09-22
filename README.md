@@ -1,19 +1,51 @@
 # Ghostline Web
 
-This repository contains the static files for the Ghostline web site.  The site can be hosted on [Railway](https://railway.app/) using the Node `serve` package.
+Этот репозиторий содержит статические файлы для сайта Ghostline. Сайт может быть размещен на GitHub Pages или Railway.
 
-## Running locally
+## 🚀 Быстрое обновление сайта
 
-Install dependencies and start the server on port `8080`:
+### Автоматический push (рекомендуется)
+```bash
+./update-site.sh
+```
+
+### Или через терминал
+```bash
+./auto-push.sh "Ваш комментарий к изменениям"
+```
+
+### Двойной клик (macOS)
+Просто дважды кликните на файл `quick-push.command` в Finder
+
+## 🔧 Локальный запуск
+
+Установите зависимости и запустите сервер на порту `8080`:
 
 ```bash
 npm install
 npm start
 ```
 
-## Deploying to Railway
+## 📡 Развертывание
 
-1. Connect this repository to Railway and enable deployments from the `main` branch.
-2. Railway will automatically run `npm start`, which serves the site on port `8080` with no build step.
+### GitHub Pages
+Сайт автоматически обновляется при push в main ветку:
+- 🌐 **Сайт**: https://yuga1000.github.io/ghostline-web/
+- 📁 **Репозиторий**: https://github.com/yuga1000/ghostline-web
 
-The application exposes the static content directly from this repository.
+### Railway
+1. Подключите этот репозиторий к Railway
+2. Включите развертывания из ветки `main`
+3. Railway автоматически запустит `npm start` на порту `8080`
+
+## 📝 Скрипты
+
+- `update-site.sh` - Быстрое обновление с автоматическим коммитом
+- `auto-push.sh` - Push с кастомным сообщением
+- `quick-push.command` - Двойной клик для macOS
+
+## ⚙️ Настройка Git
+
+Git уже настроен для этого репозитория:
+- Email: yuga1000@users.noreply.github.com
+- Name: yuga1000
