@@ -420,7 +420,7 @@
         font-size: 8px;
         color: #00ff00;
         opacity: 0.3;
-        animation: scrollHorizontal 10s linear infinite;
+        animation: scrollHorizontal 15s linear infinite;
     }
     
     @keyframes scrollHorizontal {
