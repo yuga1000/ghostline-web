@@ -191,7 +191,112 @@
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0.3; }
     }
-    
+
+    /* Agent Terminal Styles - CRT aesthetic */
+    .agent-terminal {
+        background: #000000;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .agent-terminal-content {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 4px;
+        scroll-behavior: smooth;
+    }
+
+    /* Custom scrollbar for webkit browsers */
+    .agent-terminal-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .agent-terminal-content::-webkit-scrollbar-track {
+        background: #000000;
+        border-left: 1px solid #00ff00;
+    }
+
+    .agent-terminal-content::-webkit-scrollbar-thumb {
+        background: #00ff00;
+        box-shadow: 0 0 4px #00ff00;
+    }
+
+    .agent-terminal-content::-webkit-scrollbar-thumb:hover {
+        background: #44ff44;
+    }
+
+    /* CRT scanline effect */
+    .agent-terminal::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(
+            0deg,
+            rgba(0, 255, 0, 0.03) 0px,
+            rgba(0, 0, 0, 0.2) 1px,
+            rgba(0, 0, 0, 0.2) 2px,
+            rgba(0, 255, 0, 0.03) 3px
+        );
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Log line animation */
+    .log-line {
+        animation: fadeInLog 0.3s ease-out;
+        line-height: 1.5;
+        margin: 2px 0;
+    }
+
+    @keyframes fadeInLog {
+        0% {
+            opacity: 0;
+            transform: translateX(-5px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Log color classes */
+    .log-success {
+        color: #00ff00;
+    }
+
+    .log-warning {
+        color: #ffff00;
+    }
+
+    .log-error {
+        color: #ff0000;
+    }
+
+    .log-info {
+        color: #00ffff;
+    }
+
+    .log-dim {
+        color: #666666;
+    }
+
+    .log-thinking {
+        color: #ff00ff;
+    }
+
+    .log-action {
+        color: #00ff88;
+    }
+
+    /* Auto-scroll to bottom */
+    .agent-terminal-content.auto-scroll {
+        scroll-behavior: smooth;
+    }
+
     .nav-link {
         color: #00ff00;
         text-decoration: none;
@@ -333,18 +438,22 @@
             
             <!-- Video Grid -->
             <div class="video-grid">
-                <!-- Robot 01 -->
+                <!-- Agent Terminal (Real-time Logs) -->
                 <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
-                        <span>[ROBOT_01 - "YUGA"]</span>
-                        <span><span class="status-online" id="status1"></span>OFF</span>
+                        <span>[AGENT_CONSCIOUSNESS - "LIVE LOGS"]</span>
+                        <span id="agent-status-indicator"><span class="status-online" id="status1"></span><span id="agent-status-text">STANDBY</span></span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative" id="robot1-feed">
-                        <div class="noise-mask"></div>
+                    <div class="agent-terminal h-40 terminal-border relative" id="agent-terminal-feed">
+                        <div class="agent-terminal-content pixel-font text-xs p-2" id="agent-log-content">
+                            <div class="log-dim">[WAITING FOR STREAM...]</div>
+                            <div class="log-dim">WebSocket: Disconnected</div>
+                            <div class="log-dim">Endpoint: ws://localhost:8765</div>
+                        </div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
-                        <div>STYLE: Abstract Expressionism</div>
-                        <div>STATUS: Standby</div>
+                        <div>PIPELINE: <span id="agent-pipeline-name">GLVSF Generation</span></div>
+                        <div>UPTIME: <span id="agent-uptime">--:--:--</span></div>
                     </div>
                 </div>
 
@@ -606,6 +715,161 @@ function showCopyNotification(message) {
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
+// ==================== WebSocket Client for Agent Terminal ====================
+
+let ws = null;
+let reconnectInterval = null;
+let isConnected = false;
+let startTime = null;
+
+// Initialize WebSocket connection
+function initWebSocket() {
+    // Close existing connection if any
+    if (ws) {
+        ws.close();
+    }
+
+    // Connect to WebSocket server
+    ws = new WebSocket('ws://localhost:8765');
+
+    ws.onopen = () => {
+        console.log('[WS] Connected to agent terminal stream');
+        isConnected = true;
+        startTime = Date.now();
+        updateStatus('STREAMING', true);
+        addLogLine('[STREAM CONNECTED]', 'log-success');
+
+        // Clear reconnect interval if exists
+        if (reconnectInterval) {
+            clearInterval(reconnectInterval);
+            reconnectInterval = null;
+        }
+
+        // Start uptime counter
+        startUptimeCounter();
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            handleLogMessage(data);
+        } catch (e) {
+            // If not JSON, treat as plain text log
+            addLogLine(event.data, 'log-info');
+        }
+    };
+
+    ws.onerror = (error) => {
+        console.error('[WS] Error:', error);
+        addLogLine('[CONNECTION ERROR]', 'log-error');
+    };
+
+    ws.onclose = () => {
+        console.log('[WS] Disconnected from agent terminal stream');
+        isConnected = false;
+        updateStatus('STANDBY', false);
+        addLogLine('[STREAM DISCONNECTED]', 'log-dim');
+
+        // Attempt to reconnect every 5 seconds
+        if (!reconnectInterval) {
+            reconnectInterval = setInterval(() => {
+                console.log('[WS] Attempting to reconnect...');
+                initWebSocket();
+            }, 5000);
+        }
+    };
+}
+
+// Handle incoming log message
+function handleLogMessage(data) {
+    const { type, content, timestamp, level, metadata } = data;
+
+    // Update pipeline name if provided
+    if (metadata && metadata.pipeline) {
+        document.getElementById('agent-pipeline-name').textContent = metadata.pipeline;
+    }
+
+    // Determine log class based on level
+    let logClass = 'log-info';
+    switch (level) {
+        case 'success': logClass = 'log-success'; break;
+        case 'warning': logClass = 'log-warning'; break;
+        case 'error': logClass = 'log-error'; break;
+        case 'thinking': logClass = 'log-thinking'; break;
+        case 'action': logClass = 'log-action'; break;
+        case 'dim': logClass = 'log-dim'; break;
+    }
+
+    // Add log line with timestamp if provided
+    const logText = timestamp ? `[${timestamp}] ${content}` : content;
+    addLogLine(logText, logClass);
+}
+
+// Add a log line to the terminal
+function addLogLine(text, className = 'log-info') {
+    const logContent = document.getElementById('agent-log-content');
+
+    // Create log line element
+    const logLine = document.createElement('div');
+    logLine.className = `log-line ${className}`;
+    logLine.textContent = text;
+
+    // Append to log content
+    logContent.appendChild(logLine);
+
+    // Auto-scroll to bottom
+    logContent.scrollTop = logContent.scrollHeight;
+
+    // Keep only last 100 lines to prevent memory issues
+    while (logContent.children.length > 100) {
+        logContent.removeChild(logContent.firstChild);
+    }
+}
+
+// Update status indicator
+function updateStatus(statusText, isActive) {
+    const statusIndicator = document.getElementById('status1');
+    const statusTextElement = document.getElementById('agent-status-text');
+
+    statusTextElement.textContent = statusText;
+
+    if (isActive) {
+        statusIndicator.classList.add('active');
+    } else {
+        statusIndicator.classList.remove('active');
+    }
+}
+
+// Uptime counter
+function startUptimeCounter() {
+    setInterval(() => {
+        if (!isConnected || !startTime) {
+            document.getElementById('agent-uptime').textContent = '--:--:--';
+            return;
+        }
+
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const hours = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+        const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+        const seconds = (elapsed % 60).toString().padStart(2, '0');
+
+        document.getElementById('agent-uptime').textContent = `${hours}:${minutes}:${seconds}`;
+    }, 1000);
+}
+
+// Initialize WebSocket on page load
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('[Agent Terminal] Initializing WebSocket connection...');
+    initWebSocket();
+});
+
+// Close WebSocket on page unload
+window.addEventListener('beforeunload', () => {
+    if (ws) {
+        ws.close();
+    }
+});
 
 </script>
 
