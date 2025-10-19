@@ -738,7 +738,9 @@ function initWebSocket() {
         isConnected = true;
         startTime = Date.now();
         updateStatus('STREAMING', true);
-        addLogLine('[STREAM CONNECTED]', 'log-success');
+
+        // Clear placeholder
+        clearPlaceholder();
 
         // Clear reconnect interval if exists
         if (reconnectInterval) {
@@ -762,14 +764,16 @@ function initWebSocket() {
 
     ws.onerror = (error) => {
         console.error('[WS] Error:', error);
-        addLogLine('[CONNECTION ERROR]', 'log-error');
+        // Don't show error in UI, just keep placeholder
     };
 
     ws.onclose = () => {
         console.log('[WS] Disconnected from agent terminal stream');
         isConnected = false;
         updateStatus('STANDBY', false);
-        addLogLine('[STREAM DISCONNECTED]', 'log-dim');
+
+        // Show placeholder instead of error messages
+        showPlaceholder();
 
         // Attempt to reconnect every 5 seconds
         if (!reconnectInterval) {
@@ -804,6 +808,22 @@ function handleLogMessage(data) {
     // Add log line with timestamp if provided
     const logText = timestamp ? `[${timestamp}] ${content}` : content;
     addLogLine(logText, logClass);
+}
+
+// Show placeholder (when not connected)
+function showPlaceholder() {
+    const logContent = document.getElementById('agent-log-content');
+    logContent.innerHTML = `
+        <div class="log-dim">[WAITING FOR STREAM...]</div>
+        <div class="log-dim">WebSocket: Disconnected</div>
+        <div class="log-dim">Endpoint: ws://localhost:8765</div>
+    `;
+}
+
+// Clear placeholder (when connected)
+function clearPlaceholder() {
+    const logContent = document.getElementById('agent-log-content');
+    logContent.innerHTML = '';
 }
 
 // Add a log line to the terminal
