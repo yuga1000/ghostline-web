@@ -729,8 +729,8 @@ function initWebSocket() {
         ws.close();
     }
 
-    // Connect to WebSocket server
-    ws = new WebSocket('ws://localhost:8765');
+    // Connect to WebSocket server (Railway)
+    ws = new WebSocket('wss://ghostline-web-production-7bc6.up.railway.app');
 
     ws.onopen = () => {
         console.log('[WS] Connected to agent terminal stream');
