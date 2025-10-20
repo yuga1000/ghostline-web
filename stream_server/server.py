@@ -1,28 +1,26 @@
 #!/usr/bin/env python3
 """
 Ghostline Stream Server for Railway
-WebSocket server for broadcasting logs to ghostline.live
+aiohttp server: HTTP POST + WebSocket on single port
 """
 
 import asyncio
-import websockets
 import json
 import os
 import time
 from datetime import datetime
 from typing import Set
+from aiohttp import web
 
 # Auth password from environment
 AUTH_PASSWORD = os.environ.get('STREAM_PASSWORD', 'ghostline2025')
 
-# Store connected clients
+# Store connected WebSocket clients
 clients: Set = set()
 
 
 def convert_event_to_frontend_format(event: dict) -> dict:
-    """
-    Convert log event to frontend WebSocket format.
-    """
+    """Convert log event to frontend WebSocket format."""
     # Get timestamp
     if isinstance(event.get('timestamp'), (int, float)):
         timestamp_str = time.strftime('%H:%M:%S', time.localtime(event['timestamp']))
@@ -50,110 +48,100 @@ def convert_event_to_frontend_format(event: dict) -> dict:
     }
 
 
-async def register_client(websocket):
-    """Register a new WebSocket client"""
-    clients.add(websocket)
-    print(f"[Stream Server] Client connected. Total clients: {len(clients)}")
-
-
-async def unregister_client(websocket):
-    """Unregister a disconnected WebSocket client"""
-    clients.remove(websocket)
-    print(f"[Stream Server] Client disconnected. Total clients: {len(clients)}")
-
-
 async def broadcast_log(message: dict):
-    """Broadcast log message to all connected clients"""
+    """Broadcast log message to all connected WebSocket clients"""
     if clients:
-        await asyncio.gather(
-            *[client.send(json.dumps(message)) for client in clients],
-            return_exceptions=True
-        )
-
-
-async def handle_websocket_client(websocket):
-    """Handle WebSocket client connection (frontend)"""
-    await register_client(websocket)
-    try:
-        async for message in websocket:
-            # Echo back if client sends anything (for testing)
-            print(f"[Stream Server] Received from client: {message}")
-    except websockets.exceptions.ConnectionClosed:
-        pass
-    finally:
-        await unregister_client(websocket)
-
-
-async def handle_tcp_client(reader, writer):
-    """Handle TCP client connection (receives logs from pipeline)"""
-    addr = writer.get_extra_info('peername')
-    print(f"[TCP] Connection from {addr}")
-
-    # Simple auth: first line should be password
-    try:
-        auth_line = await asyncio.wait_for(reader.readline(), timeout=5.0)
-        password = auth_line.decode('utf-8').strip()
-
-        if password != AUTH_PASSWORD:
-            print(f"[TCP] Auth failed from {addr}")
-            writer.close()
-            await writer.wait_closed()
-            return
-
-        print(f"[TCP] Auth success from {addr}")
-
-        # Now receive log events
-        while True:
-            data = await reader.readline()
-            if not data:
-                break
-
-            # Parse JSON event
+        # Send to all clients, ignore errors
+        for client in list(clients):
             try:
-                event = json.loads(data.decode('utf-8'))
-                # Convert to frontend format and broadcast
-                message = convert_event_to_frontend_format(event)
-                await broadcast_log(message)
-            except json.JSONDecodeError:
-                pass  # Invalid JSON, skip
-    except asyncio.TimeoutError:
-        print(f"[TCP] Auth timeout from {addr}")
-    except Exception as e:
-        print(f"[TCP] Error: {e}")
+                await client.send_str(json.dumps(message))
+            except Exception:
+                # Client disconnected, will be removed by handler
+                pass
+
+
+async def handle_websocket(request):
+    """Handle WebSocket connections (frontend clients)"""
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+
+    clients.add(ws)
+    print(f"[WebSocket] Client connected. Total: {len(clients)}")
+
+    try:
+        async for msg in ws:
+            # Echo back if client sends anything
+            if msg.type == web.WSMsgType.TEXT:
+                print(f"[WebSocket] Received: {msg.data}")
     finally:
-        writer.close()
-        await writer.wait_closed()
+        clients.discard(ws)
+        print(f"[WebSocket] Client disconnected. Total: {len(clients)}")
+
+    return ws
 
 
-async def main():
-    """Start WebSocket server and TCP listener"""
-    # Get port from environment (Railway provides PORT)
-    ws_port = int(os.environ.get('PORT', 8765))
-    tcp_port = ws_port + 1  # TCP on PORT+1
+async def handle_log_post(request):
+    """Handle HTTP POST /api/logs - receive logs from MacBook"""
+    # Check authorization header
+    auth_header = request.headers.get('Authorization', '')
+
+    if auth_header != f'Bearer {AUTH_PASSWORD}':
+        print(f"[HTTP] Unauthorized attempt")
+        return web.json_response({'error': 'Unauthorized'}, status=401)
+
+    try:
+        # Parse JSON body
+        event = await request.json()
+
+        # Convert to frontend format and broadcast
+        message = convert_event_to_frontend_format(event)
+        await broadcast_log(message)
+
+        print(f"[HTTP] Log: {event.get('message', '')[:60]}...")
+
+        return web.json_response({'status': 'ok'})
+
+    except json.JSONDecodeError:
+        return web.json_response({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        print(f"[HTTP] Error: {e}")
+        return web.json_response({'error': str(e)}, status=500)
+
+
+async def handle_health(request):
+    """Health check endpoint"""
+    return web.json_response({
+        'status': 'ok',
+        'clients': len(clients),
+        'server': 'Ghostline Stream Server'
+    })
+
+
+def create_app():
+    """Create aiohttp application"""
+    app = web.Application()
+
+    # Routes
+    app.router.add_get('/ws', handle_websocket)  # WebSocket endpoint
+    app.router.add_post('/api/logs', handle_log_post)  # HTTP POST for logs
+    app.router.add_get('/health', handle_health)  # Health check
+
+    return app
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
 
     print("=" * 70)
     print("🟢 GHOSTLINE STREAM SERVER 🟢")
     print("=" * 70)
-    print(f"WebSocket Server: ws://0.0.0.0:{ws_port}")
-    print(f"TCP Log Receiver: 0.0.0.0:{tcp_port}")
-    print(f"Auth: Password required for TCP")
+    print(f"Server: http://0.0.0.0:{port}")
+    print(f"  GET  /ws        - WebSocket (frontend clients)")
+    print(f"  POST /api/logs  - Receive logs (Bearer token required)")
+    print(f"  GET  /health    - Health check")
+    print(f"Auth: Bearer {AUTH_PASSWORD[:5]}***")
     print(f"Waiting for connections...")
     print("=" * 70)
 
-    # Start TCP server for receiving logs from pipelines
-    tcp_server = await asyncio.start_server(
-        handle_tcp_client, '0.0.0.0', tcp_port
-    )
-
-    # Start WebSocket server for frontend clients
-    async with websockets.serve(handle_websocket_client, '0.0.0.0', ws_port):
-        # Run both servers forever
-        async with tcp_server:
-            await asyncio.Future()
-
-
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\n[Stream Server] Shutting down...")
+    app = create_app()
+    web.run_app(app, host='0.0.0.0', port=port)
