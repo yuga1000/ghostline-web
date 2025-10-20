@@ -814,10 +814,15 @@ function showPlaceholder() {
     const noiseMask = document.getElementById('agent-noise-mask');
     const logContent = document.getElementById('agent-log-content');
 
+    // Clear all old logs
+    logContent.innerHTML = '';
+
     // Show noise mask like other robot blocks
     noiseMask.style.display = 'block';
     logContent.style.display = 'none';
-    logContent.innerHTML = '';
+
+    // Reset uptime
+    document.getElementById('agent-uptime').textContent = '--:--:--';
 }
 
 // Clear placeholder (when connected)
