@@ -51,13 +51,19 @@ def convert_event_to_frontend_format(event: dict) -> dict:
 async def broadcast_log(message: dict):
     """Broadcast log message to all connected WebSocket clients"""
     if clients:
+        print(f"[Broadcast] Sending to {len(clients)} clients: {message.get('content', '')[:50]}...")
         # Send to all clients, ignore errors
+        success_count = 0
         for client in list(clients):
             try:
                 await client.send_str(json.dumps(message))
-            except Exception:
+                success_count += 1
+            except Exception as e:
                 # Client disconnected, will be removed by handler
-                pass
+                print(f"[Broadcast] Failed to send to client: {e}")
+        print(f"[Broadcast] Sent to {success_count}/{len(clients)} clients")
+    else:
+        print(f"[Broadcast] No clients connected, message not sent")
 
 
 async def handle_websocket(request):
