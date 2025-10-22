@@ -9,7 +9,8 @@ import json
 import os
 import time
 from datetime import datetime
-from typing import Set
+from typing import Set, Dict
+from collections import defaultdict
 from aiohttp import web
 
 # Auth password from environment
@@ -17,6 +18,11 @@ AUTH_PASSWORD = os.environ.get('STREAM_PASSWORD', 'ghostline2025')
 
 # Store connected WebSocket clients
 clients: Set = set()
+
+# Rate limiting: Track connections per IP
+connection_tracker: Dict[str, list] = defaultdict(list)
+MAX_CONNECTIONS_PER_IP = 5  # Max 5 concurrent connections per IP
+CONNECTION_WINDOW = 60  # 60 seconds window
 
 
 def convert_event_to_frontend_format(event: dict) -> dict:
@@ -66,22 +72,49 @@ async def broadcast_log(message: dict):
         print(f"[Broadcast] No clients connected, message not sent")
 
 
+def check_rate_limit(ip: str) -> bool:
+    """Check if IP has exceeded connection rate limit."""
+    now = time.time()
+
+    # Clean old connections (older than window)
+    connection_tracker[ip] = [
+        conn_time for conn_time in connection_tracker[ip]
+        if now - conn_time < CONNECTION_WINDOW
+    ]
+
+    # Check if limit exceeded
+    if len(connection_tracker[ip]) >= MAX_CONNECTIONS_PER_IP:
+        return False
+
+    # Add new connection
+    connection_tracker[ip].append(now)
+    return True
+
+
 async def handle_websocket(request):
     """Handle WebSocket connections (frontend clients)"""
+    # Get client IP (check X-Forwarded-For for Railway proxy)
+    ip = request.headers.get('X-Forwarded-For', request.remote).split(',')[0].strip()
+
+    # Rate limiting check
+    if not check_rate_limit(ip):
+        print(f"[WebSocket] RATE LIMIT EXCEEDED for {ip}")
+        return web.Response(text='Too many connections', status=429)
+
     ws = web.WebSocketResponse()
     await ws.prepare(request)
 
     clients.add(ws)
-    print(f"[WebSocket] Client connected. Total: {len(clients)}")
+    print(f"[WebSocket] Client connected from {ip}. Total: {len(clients)}")
 
     try:
         async for msg in ws:
             # Echo back if client sends anything
             if msg.type == web.WSMsgType.TEXT:
-                print(f"[WebSocket] Received: {msg.data}")
+                print(f"[WebSocket] Received from {ip}: {msg.data}")
     finally:
         clients.discard(ws)
-        print(f"[WebSocket] Client disconnected. Total: {len(clients)}")
+        print(f"[WebSocket] Client {ip} disconnected. Total: {len(clients)}")
 
     return ws
 
@@ -92,12 +125,18 @@ async def handle_log_post(request):
     auth_header = request.headers.get('Authorization', '')
 
     if auth_header != f'Bearer {AUTH_PASSWORD}':
-        print(f"[HTTP] Unauthorized attempt")
+        print(f"[HTTP] Unauthorized attempt from {request.remote}")
         return web.json_response({'error': 'Unauthorized'}, status=401)
 
     try:
         # Parse JSON body
         event = await request.json()
+
+        # SECURITY: Limit message size to prevent DoS (5000 chars = ~1-2 paragraphs)
+        message_text = event.get('message', '')
+        if len(message_text) > 5000:
+            print(f"[HTTP] WARNING: Message too long ({len(message_text)} chars), truncating to 5000")
+            event['message'] = message_text[:5000] + '... [TRUNCATED]'
 
         # Convert to frontend format and broadcast
         message = convert_event_to_frontend_format(event)

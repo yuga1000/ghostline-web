@@ -71,7 +71,7 @@ app.post('/api/logout', (req, res) => {
 });
 
 // Hide admin entry under secret slug and protect direct file access
-app.get(`/${ADMIN_SLUG}`, (req, res) => {
+app.get(`/${ADMIN_SLUG}`, requireAdmin, (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.sendFile(path.join(__dirname, 'admin.html'));
 });

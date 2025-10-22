@@ -759,19 +759,26 @@ function initWebSocket() {
         // Start uptime counter
         startUptimeCounter();
 
-        // Start inactivity check (show placeholder if no logs for 30 seconds)
+        // Start inactivity check (show placeholder if no logs for 10 seconds)
         if (inactivityCheckInterval) {
             clearInterval(inactivityCheckInterval);
         }
         inactivityCheckInterval = setInterval(() => {
             const timeSinceLastLog = Date.now() - lastLogTime;
-            if (timeSinceLastLog > 30000) {
-                console.log('[WS] No logs for 30s - agent appears offline');
+            const secondsSinceLastLog = Math.floor(timeSinceLastLog / 1000);
+
+            // Debug: log time since last log
+            if (secondsSinceLastLog >= 5) {
+                console.log(`[Inactivity Check] ${secondsSinceLastLog}s since last log`);
+            }
+
+            if (timeSinceLastLog > 10000) {
+                console.log('[WS] No logs for 10s - agent appears offline, showing placeholder');
                 showPlaceholder();
                 updateStatus('STANDBY', false);
                 startTime = null;
             }
-        }, 5000); // Check every 5 seconds
+        }, 2000); // Check every 2 seconds
     };
 
     ws.onmessage = (event) => {
@@ -886,6 +893,9 @@ function addLogLine(text, className = 'log-info') {
     // Create log line element
     const logLine = document.createElement('div');
     logLine.className = `log-line ${className}`;
+
+    // SECURITY: Use textContent (not innerHTML) to prevent XSS
+    // textContent automatically escapes HTML, preventing script injection
     logLine.textContent = text;
 
     // Append to log content
