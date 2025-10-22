@@ -743,12 +743,11 @@ function initWebSocket() {
     ws.onopen = () => {
         console.log('[WS] Connected to agent terminal stream');
         isConnected = true;
-        startTime = Date.now();
         lastLogTime = Date.now();
-        updateStatus('STREAMING', true);
+        updateStatus('STANDBY', false);  // Start as STANDBY until first log
 
-        // Clear placeholder
-        clearPlaceholder();
+        // DON'T clear placeholder here - wait for actual logs
+        // Placeholder will be cleared in onmessage when first log arrives
 
         // Clear reconnect interval if exists
         if (reconnectInterval) {
@@ -756,7 +755,7 @@ function initWebSocket() {
             reconnectInterval = null;
         }
 
-        // Start uptime counter
+        // Start uptime counter (but don't set startTime yet)
         startUptimeCounter();
 
         // Start inactivity check (show placeholder if no logs for 10 seconds)
