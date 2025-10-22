@@ -727,6 +727,8 @@ let ws = null;
 let reconnectInterval = null;
 let isConnected = false;
 let startTime = null;
+let lastLogTime = null;
+let inactivityCheckInterval = null;
 
 // Initialize WebSocket connection
 function initWebSocket() {
@@ -742,6 +744,7 @@ function initWebSocket() {
         console.log('[WS] Connected to agent terminal stream');
         isConnected = true;
         startTime = Date.now();
+        lastLogTime = Date.now();
         updateStatus('STREAMING', true);
 
         // Clear placeholder
@@ -755,9 +758,37 @@ function initWebSocket() {
 
         // Start uptime counter
         startUptimeCounter();
+
+        // Start inactivity check (show placeholder if no logs for 30 seconds)
+        if (inactivityCheckInterval) {
+            clearInterval(inactivityCheckInterval);
+        }
+        inactivityCheckInterval = setInterval(() => {
+            const timeSinceLastLog = Date.now() - lastLogTime;
+            if (timeSinceLastLog > 30000) {
+                console.log('[WS] No logs for 30s - agent appears offline');
+                showPlaceholder();
+                updateStatus('STANDBY', false);
+                startTime = null;
+            }
+        }, 5000); // Check every 5 seconds
     };
 
     ws.onmessage = (event) => {
+        // Update last log time (agent is active)
+        lastLogTime = Date.now();
+
+        // Show log content if placeholder is visible
+        const noiseMask = document.getElementById('agent-noise-mask');
+        const logContent = document.getElementById('agent-log-content');
+        if (noiseMask.style.display !== 'none') {
+            clearPlaceholder();
+            updateStatus('STREAMING', true);
+            if (!startTime) {
+                startTime = Date.now();
+            }
+        }
+
         try {
             const data = JSON.parse(event.data);
             handleLogMessage(data);
@@ -776,6 +807,13 @@ function initWebSocket() {
         console.log('[WS] Disconnected from agent terminal stream');
         isConnected = false;
         updateStatus('STANDBY', false);
+        startTime = null;
+
+        // Clear inactivity check interval
+        if (inactivityCheckInterval) {
+            clearInterval(inactivityCheckInterval);
+            inactivityCheckInterval = null;
+        }
 
         // Show placeholder instead of error messages
         showPlaceholder();
