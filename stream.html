@@ -4,6 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Cache Control - Force reload on mobile devices -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>GHOSTLINE - Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -891,6 +897,18 @@ function startUptimeCounter() {
 window.addEventListener('DOMContentLoaded', () => {
     console.log('[Agent Terminal] Initializing WebSocket connection...');
     initWebSocket();
+});
+
+// Handle visibility change (mobile/tablet switching tabs)
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        console.log('[Page] Became visible - checking connection...');
+        // If disconnected, reconnect immediately
+        if (!isConnected && !ws || (ws && ws.readyState !== WebSocket.OPEN)) {
+            console.log('[Page] Reconnecting after visibility change...');
+            initWebSocket();
+        }
+    }
 });
 
 // Close WebSocket on page unload
