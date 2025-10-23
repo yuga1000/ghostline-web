@@ -124,13 +124,22 @@ async def handle_log_post(request):
     # Check authorization header
     auth_header = request.headers.get('Authorization', '')
 
+    # DEBUG: Log ALL incoming requests
+    print(f"[HTTP] POST /api/logs from {request.remote}")
+    print(f"[HTTP] Auth header: {auth_header[:20]}... (expected: Bearer {AUTH_PASSWORD[:10]}...)")
+
     if auth_header != f'Bearer {AUTH_PASSWORD}':
-        print(f"[HTTP] Unauthorized attempt from {request.remote}")
+        print(f"[HTTP] ❌ UNAUTHORIZED from {request.remote}")
+        print(f"[HTTP]    Got:      '{auth_header}'")
+        print(f"[HTTP]    Expected: 'Bearer {AUTH_PASSWORD}'")
         return web.json_response({'error': 'Unauthorized'}, status=401)
 
     try:
         # Parse JSON body
         event = await request.json()
+
+        # DEBUG: Log received event
+        print(f"[HTTP] ✓ Authorized - received event: level={event.get('level')}, message={event.get('message', '')[:40]}...")
 
         # SECURITY: Limit message size to prevent DoS (5000 chars = ~1-2 paragraphs)
         message_text = event.get('message', '')
@@ -140,16 +149,18 @@ async def handle_log_post(request):
 
         # Convert to frontend format and broadcast
         message = convert_event_to_frontend_format(event)
+        print(f"[HTTP] Broadcasting to {len(clients)} clients...")
         await broadcast_log(message)
 
-        print(f"[HTTP] Log: {event.get('message', '')[:60]}...")
+        print(f"[HTTP] ✓ Broadcast complete")
 
         return web.json_response({'status': 'ok'})
 
     except json.JSONDecodeError:
+        print(f"[HTTP] ❌ Invalid JSON from {request.remote}")
         return web.json_response({'error': 'Invalid JSON'}, status=400)
     except Exception as e:
-        print(f"[HTTP] Error: {e}")
+        print(f"[HTTP] ❌ Error: {type(e).__name__}: {e}")
         return web.json_response({'error': str(e)}, status=500)
 
 
