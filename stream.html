@@ -730,6 +730,10 @@ let startTime = null;
 let lastLogTime = null;
 let inactivityCheckInterval = null;
 
+// Log queue for animated display (300ms delay between logs)
+let logQueue = [];
+let isProcessingQueue = false;
+
 // Initialize WebSocket connection
 function initWebSocket() {
     // Close existing connection if any
@@ -856,7 +860,10 @@ function handleLogMessage(data) {
 
     // Add log line with timestamp if provided
     const logText = timestamp ? `[${timestamp}] ${content}` : content;
-    addLogLine(logText, logClass);
+
+    // Add to queue instead of showing immediately (for 300ms animation)
+    logQueue.push({ text: logText, className: logClass });
+    processLogQueue();
 }
 
 // Show placeholder (when not connected)
@@ -883,6 +890,30 @@ function clearPlaceholder() {
     // Hide noise mask and show log content
     noiseMask.style.display = 'none';
     logContent.style.display = 'block';
+}
+
+// Process log queue with 300ms delay between logs (typewriter effect)
+function processLogQueue() {
+    if (isProcessingQueue || logQueue.length === 0) {
+        return;
+    }
+
+    isProcessingQueue = true;
+
+    function processNext() {
+        if (logQueue.length === 0) {
+            isProcessingQueue = false;
+            return;
+        }
+
+        const { text, className } = logQueue.shift();
+        addLogLine(text, className);
+
+        // Process next log after 300ms
+        setTimeout(processNext, 300);
+    }
+
+    processNext();
 }
 
 // Add a log line to the terminal
