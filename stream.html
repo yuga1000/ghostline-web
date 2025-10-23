@@ -871,8 +871,8 @@ function showPlaceholder() {
     const noiseMask = document.getElementById('agent-noise-mask');
     const logContent = document.getElementById('agent-log-content');
 
-    // Clear all old logs
-    logContent.innerHTML = '';
+    // DON'T clear logs - just hide them behind placeholder
+    // User can still see logs when agent comes back online
 
     // Show noise mask like other robot blocks
     noiseMask.style.display = 'block';
