@@ -350,7 +350,58 @@
         opacity: 0.7;
     }
 
-    /* Icon styling for better visibility */
+    /* Icon styling - make icons prominent */
+    .log-icon {
+        display: inline-block;
+        width: 24px;
+        text-align: center;
+        margin-right: 8px;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .log-message {
+        flex: 1;
+    }
+
+    /* Icon animations based on log type */
+    .log-action .log-icon {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .log-success .log-icon {
+        animation: successSpin 3s ease-in-out infinite;
+    }
+
+    .log-thinking .log-icon {
+        animation: rotate 4s linear infinite;
+    }
+
+    .log-error .log-icon {
+        animation: errorBounce 0.5s ease;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+    }
+
+    @keyframes successSpin {
+        0%, 100% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(180deg) scale(1.2); }
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes errorBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+
+    /* Hover effect for entire line */
     .log-line:hover {
         background: rgba(0, 255, 0, 0.03);
         padding-left: 4px;
@@ -983,13 +1034,41 @@ function processLogQueue() {
 function addLogLine(text, className = 'log-info') {
     const logContent = document.getElementById('agent-log-content');
 
+    // Parse the log format: [HH:MM:SS] ICON message
+    // Remove timestamp if present (format: [12:28:48])
+    let cleanText = text.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, '');
+
+    // Extract icon and message
+    let icon = '';
+    let message = cleanText;
+
+    // Check for common icons at start
+    const iconMatch = cleanText.match(/^([▓⟡✓✗ℹ⚠]+)\s*/);
+    if (iconMatch) {
+        icon = iconMatch[1];
+        message = cleanText.substring(iconMatch[0].length);
+    }
+
     // Create log line element
     const logLine = document.createElement('div');
     logLine.className = `log-line ${className}`;
 
-    // SECURITY: Use textContent (not innerHTML) to prevent XSS
-    // textContent automatically escapes HTML, preventing script injection
-    logLine.textContent = text;
+    // Build HTML with icon and message separately
+    if (icon) {
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'log-icon';
+        iconSpan.textContent = icon;
+
+        const messageSpan = document.createElement('span');
+        messageSpan.className = 'log-message';
+        messageSpan.textContent = message;
+
+        logLine.appendChild(iconSpan);
+        logLine.appendChild(messageSpan);
+    } else {
+        // No icon - just show message
+        logLine.textContent = message;
+    }
 
     // Append to log content
     logContent.appendChild(logLine);
