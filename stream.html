@@ -381,6 +381,19 @@
         animation: errorBounce 0.5s ease;
     }
 
+    /* Typewriter cursor */
+    .log-line.typing .log-message::after {
+        content: '█';
+        color: #00ff00;
+        animation: blink 0.8s infinite;
+        margin-left: 2px;
+    }
+
+    @keyframes blink {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+    }
+
     @keyframes pulse {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.15); }
@@ -1030,7 +1043,7 @@ function processLogQueue() {
     processNext();
 }
 
-// Add a log line to the terminal
+// Add a log line to the terminal with typewriter effect
 function addLogLine(text, className = 'log-info') {
     const logContent = document.getElementById('agent-log-content');
 
@@ -1051,7 +1064,7 @@ function addLogLine(text, className = 'log-info') {
 
     // Create log line element
     const logLine = document.createElement('div');
-    logLine.className = `log-line ${className}`;
+    logLine.className = `log-line ${className} typing`;
 
     // Build HTML with icon and message separately
     if (icon) {
@@ -1061,17 +1074,36 @@ function addLogLine(text, className = 'log-info') {
 
         const messageSpan = document.createElement('span');
         messageSpan.className = 'log-message';
-        messageSpan.textContent = message;
+        messageSpan.textContent = ''; // Start empty for typewriter
 
         logLine.appendChild(iconSpan);
         logLine.appendChild(messageSpan);
+
+        // Append to log content
+        logContent.appendChild(logLine);
+
+        // Typewriter effect - type one character at a time
+        let charIndex = 0;
+        const typeSpeed = 15; // milliseconds per character
+
+        function typeNextChar() {
+            if (charIndex < message.length) {
+                messageSpan.textContent += message[charIndex];
+                charIndex++;
+                logContent.scrollTop = logContent.scrollHeight;
+                setTimeout(typeNextChar, typeSpeed);
+            } else {
+                // Remove typing cursor when done
+                logLine.classList.remove('typing');
+            }
+        }
+
+        typeNextChar();
     } else {
         // No icon - just show message
         logLine.textContent = message;
+        logContent.appendChild(logLine);
     }
-
-    // Append to log content
-    logContent.appendChild(logLine);
 
     // Auto-scroll to bottom
     logContent.scrollTop = logContent.scrollHeight;
