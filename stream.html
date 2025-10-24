@@ -272,33 +272,89 @@
         }
     }
 
-    /* Log color classes */
-    .log-success {
+    /* Log styling - Terminal-like appearance with glow effects */
+    .log-line {
+        line-height: 1.8;
+        padding: 3px 0;
+        transition: all 0.2s ease;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ACTION logs - Bright green with glow */
+    .log-action {
         color: #00ff00;
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.2);
+        font-weight: 500;
     }
 
-    .log-warning {
-        color: #ffff00;
+    /* SUCCESS logs - Brighter green with pulse */
+    .log-success {
+        color: #44ff44;
+        text-shadow: 0 0 15px rgba(68, 255, 68, 0.6), 0 0 25px rgba(68, 255, 68, 0.3);
+        font-weight: 600;
+        animation: successPulse 2s ease-in-out infinite;
     }
 
-    .log-error {
-        color: #ff0000;
+    @keyframes successPulse {
+        0%, 100% { text-shadow: 0 0 15px rgba(68, 255, 68, 0.6), 0 0 25px rgba(68, 255, 68, 0.3); }
+        50% { text-shadow: 0 0 20px rgba(68, 255, 68, 0.8), 0 0 35px rgba(68, 255, 68, 0.4); }
     }
 
-    .log-info {
+    /* THINKING logs - Cyan with italic style */
+    .log-thinking {
         color: #00ffff;
+        text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+        font-style: italic;
+        opacity: 0.95;
     }
 
+    /* ERROR logs - Red with background highlight */
+    .log-error {
+        color: #ff4444;
+        text-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+        background: rgba(255, 0, 0, 0.08);
+        padding: 2px 6px;
+        margin: 2px 0;
+        border-left: 3px solid #ff0000;
+        font-weight: 600;
+        animation: errorShake 0.5s ease;
+    }
+
+    @keyframes errorShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+    }
+
+    /* WARNING logs - Yellow/orange */
+    .log-warning {
+        color: #ffaa00;
+        text-shadow: 0 0 8px rgba(255, 170, 0, 0.5);
+        font-weight: 500;
+    }
+
+    /* INFO logs - Cyan/white */
+    .log-info {
+        color: #aaccff;
+        text-shadow: 0 0 5px rgba(170, 204, 255, 0.3);
+    }
+
+    /* DIM logs - Gray for timestamps etc */
     .log-dim {
         color: #666666;
+        opacity: 0.7;
     }
 
-    .log-thinking {
-        color: #ff00ff;
-    }
-
-    .log-action {
-        color: #00ff88;
+    /* Icon styling for better visibility */
+    .log-line:hover {
+        background: rgba(0, 255, 0, 0.03);
+        padding-left: 4px;
+        transition: all 0.2s ease;
     }
 
     /* Auto-scroll to bottom */
