@@ -60,6 +60,9 @@
         opacity: 0.8;
         mix-blend-mode: screen;
         pointer-events: none;
+        z-index: 10;  /* Ensure it's above log content */
+        top: 0;
+        left: 0;
     }
     
     .video-feed {
@@ -453,8 +456,8 @@
                     <div class="agent-terminal h-40 terminal-border relative" id="agent-terminal-feed">
                         <!-- Noise mask placeholder (shown when offline) -->
                         <div class="noise-mask" id="agent-noise-mask"></div>
-                        <!-- Log content (shown when streaming) -->
-                        <div class="agent-terminal-content pixel-font text-xs p-2" id="agent-log-content" style="display: none;"></div>
+                        <!-- Log content (always visible, dimmed by overlay when offline) -->
+                        <div class="agent-terminal-content pixel-font text-xs p-2" id="agent-log-content"></div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>PIPELINE: <span id="agent-pipeline-name">GLVSF Generation</span></div>
@@ -871,12 +874,13 @@ function showPlaceholder() {
     const noiseMask = document.getElementById('agent-noise-mask');
     const logContent = document.getElementById('agent-log-content');
 
-    // DON'T clear logs - just hide them behind placeholder
-    // User can still see logs when agent comes back online
-
-    // Show noise mask like other robot blocks
+    // Show noise mask as semi-transparent overlay OVER logs
+    // Logs remain visible underneath (dimmed)
     noiseMask.style.display = 'block';
-    logContent.style.display = 'none';
+    noiseMask.style.opacity = '0.6';  // Semi-transparent so logs show through
+
+    // Keep logs visible (don't hide them)
+    logContent.style.display = 'block';
 
     // Reset uptime
     document.getElementById('agent-uptime').textContent = '--:--:--';
@@ -887,8 +891,11 @@ function clearPlaceholder() {
     const noiseMask = document.getElementById('agent-noise-mask');
     const logContent = document.getElementById('agent-log-content');
 
-    // Hide noise mask and show log content
+    // Hide noise mask fully (logs clearly visible)
     noiseMask.style.display = 'none';
+    noiseMask.style.opacity = '1';
+
+    // Ensure logs are visible
     logContent.style.display = 'block';
 }
 
