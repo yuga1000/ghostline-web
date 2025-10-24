@@ -1085,7 +1085,7 @@ function addLogLine(text, className = 'log-info') {
 
         // Typewriter effect - type one character at a time
         let charIndex = 0;
-        const typeSpeed = 15; // milliseconds per character
+        const typeSpeed = 90; // milliseconds per character (slowed down 6x)
 
         function typeNextChar() {
             if (charIndex < message.length) {
