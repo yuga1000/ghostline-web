@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Cache Control - Force reload on mobile devices -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta name="version" content="2.1-typewriter">
 
     <title>GHOSTLINE - Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -1047,9 +1048,9 @@ function processLogQueue() {
 function addLogLine(text, className = 'log-info') {
     const logContent = document.getElementById('agent-log-content');
 
-    // Parse the log format: [HH:MM:SS] ICON message
-    // Remove timestamp if present (format: [12:28:48])
-    let cleanText = text.replace(/^\[\d{2}:\d{2}:\d{2}\]\s*/, '');
+    // Parse the log format: [HH:MM:SS.mmm] ICON message
+    // Remove timestamp if present (format: [12:28:48] or [12:28:48.206])
+    let cleanText = text.replace(/^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\]\s*/, '');
 
     // Extract icon and message
     let icon = '';
