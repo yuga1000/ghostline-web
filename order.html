@@ -534,6 +534,7 @@
         // Form submission
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            console.log('🚀 Form submitted - starting order process');
 
             const formData = {
                 size: document.querySelector('input[name="size"]:checked').value,
@@ -564,11 +565,14 @@
             };
 
             // Send email
+            console.log('📧 Attempting to send email with params:', emailParams);
             try {
-                await emailjs.send('service_1ni4wkp', 'template_rjoh19k', emailParams);
-                console.log('✓ Email sent');
+                const emailResponse = await emailjs.send('service_1ni4wkp', 'template_rjoh19k', emailParams);
+                console.log('✓ Email sent successfully:', emailResponse);
             } catch (error) {
-                console.error('Email error:', error);
+                console.error('❌ Email error:', error);
+                console.error('Error details:', error.text, error.status);
+                alert('Email failed to send: ' + error.text);
             }
 
             // Send to Google Sheets
