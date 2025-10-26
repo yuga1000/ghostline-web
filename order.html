@@ -565,7 +565,18 @@
             };
 
             // Send email
-            console.log('📧 Attempting to send email with params:', emailParams);
+            console.log('📧 Email params breakdown:');
+            console.log('  order_id:', emailParams.order_id);
+            console.log('  timestamp:', emailParams.timestamp);
+            console.log('  size:', emailParams.size);
+            console.log('  custom_width:', emailParams.custom_width);
+            console.log('  custom_height:', emailParams.custom_height);
+            console.log('  vibes:', emailParams.vibes);
+            console.log('  format:', emailParams.format);
+            console.log('  total_price:', emailParams.total_price);
+            console.log('  customer_email:', emailParams.customer_email);
+            console.log('  tx_hash:', emailParams.tx_hash);
+            console.log('Full emailParams object:', emailParams);
             try {
                 const emailResponse = await emailjs.send('service_1ni4wkp', 'template_5vvlo2b', emailParams);
                 console.log('✓ Email sent successfully:', emailResponse);
