@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v2.1 - Typewriter Effect + Icon Animations (2025-10-24) -->
+<!-- v2.3 - Emoji Filter (ASCII icons only: ▓⟡✓✗) (2025-10-25) -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -291,14 +291,27 @@
         color: #00ff00;
         text-shadow: 0 0 10px rgba(0, 255, 0, 0.5), 0 0 20px rgba(0, 255, 0, 0.2);
         font-weight: 500;
+        border: 1px solid rgba(0, 255, 0, 0.3);
+        border-left: 4px solid #00ff00;
+        padding: 6px 12px;
+        margin: 4px 0;
+        background: rgba(0, 255, 0, 0.05);
+        border-radius: 2px;
     }
 
-    /* SUCCESS logs - Brighter green with pulse */
+    /* SUCCESS logs - Brighter green with pulse and ASCII-style box */
     .log-success {
         color: #44ff44;
         text-shadow: 0 0 15px rgba(68, 255, 68, 0.6), 0 0 25px rgba(68, 255, 68, 0.3);
         font-weight: 600;
         animation: successPulse 2s ease-in-out infinite;
+        border: 2px solid rgba(68, 255, 68, 0.5);
+        border-left: 5px solid #44ff44;
+        padding: 8px 14px;
+        margin: 6px 0;
+        background: rgba(68, 255, 68, 0.08);
+        border-radius: 2px;
+        box-shadow: 0 0 10px rgba(68, 255, 68, 0.2);
     }
 
     @keyframes successPulse {
@@ -1052,6 +1065,10 @@ function addLogLine(text, className = 'log-info') {
     // Remove timestamp if present (format: [12:28:48] or [12:28:48.206])
     let cleanText = text.replace(/^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\]\s*/, '');
 
+    // Remove ALL emoji (keep only ASCII special chars like ▓⟡✓✗)
+    // This regex matches emoji ranges while preserving ASCII special chars
+    cleanText = cleanText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+
     // Extract icon and message
     let icon = '';
     let message = cleanText;
@@ -1085,7 +1102,7 @@ function addLogLine(text, className = 'log-info') {
 
         // Typewriter effect - type one character at a time
         let charIndex = 0;
-        const typeSpeed = 90; // milliseconds per character (slowed down 6x)
+        const typeSpeed = 270; // milliseconds per character (slowed down 18x for cinematic effect)
 
         function typeNextChar() {
             if (charIndex < message.length) {
