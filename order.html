@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<!-- Ghostline Order Page - Generative Art on Demand -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order | Ghostline</title>
+    <title>ORDER | GHOSTLINE</title>
 
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>">
+    <!-- Fonts (same as main site) -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
-        // Initialize EmailJS with your Public Key
         (function(){
             emailjs.init("1JlW1oH_5J37ZtpDV");
         })();
@@ -26,14 +24,14 @@
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background: #000;
+            font-family: 'Share Tech Mono', monospace;
+            background: #000000;
             color: #00ff00;
+            line-height: 1.6;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* CRT Scanlines effect */
+        /* CRT Scanlines */
         body::before {
             content: '';
             position: fixed;
@@ -54,216 +52,174 @@
 
         /* Container */
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px;
         }
 
         /* Header */
-        header {
-            text-align: center;
-            margin-bottom: 60px;
-            padding: 20px;
-            border: 2px solid #00ff00;
-            background: rgba(0, 255, 0, 0.05);
-            position: relative;
-        }
-
-        header::before {
-            content: '╔═══════════════════════════════════════╗';
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            padding: 0 10px;
-            font-size: 10px;
-            color: #00ff00;
-        }
-
         h1 {
-            font-size: 2.5rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 28px;
+            text-align: center;
             margin-bottom: 10px;
             text-shadow: 0 0 10px #00ff00;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
         }
 
         .subtitle {
-            font-size: 1rem;
-            color: #00ff00;
-            opacity: 0.8;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 60px;
         }
 
         /* Navigation */
         nav {
             text-align: center;
             margin-bottom: 40px;
+            font-size: 14px;
         }
 
         nav a {
             color: #00ff00;
             text-decoration: none;
-            margin: 0 15px;
-            padding: 8px 16px;
-            border: 1px solid #00ff00;
-            transition: all 0.3s;
+            margin: 0 20px;
+            transition: opacity 0.3s;
         }
 
         nav a:hover {
-            background: #00ff00;
-            color: #000;
+            opacity: 0.7;
         }
 
-        /* Section */
-        section {
-            margin-bottom: 60px;
-            padding: 30px;
-            border: 1px solid #00ff00;
-            background: rgba(0, 255, 0, 0.02);
-        }
-
+        /* Section titles */
         h2 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            margin: 40px 0 20px;
             text-shadow: 0 0 8px #00ff00;
-            border-bottom: 1px solid #00ff00;
-            padding-bottom: 10px;
-        }
-
-        /* Process steps */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .step {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #00ff00;
-            background: rgba(0, 255, 0, 0.03);
-        }
-
-        .step-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #00ff00;
-            text-shadow: 0 0 10px #00ff00;
-            margin-bottom: 10px;
         }
 
         /* Form */
-        .form-group {
-            margin-bottom: 25px;
-        }
-
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #00ff00;
+            margin: 20px 0 8px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        input[type="text"],
         input[type="email"],
-        input[type="number"],
-        textarea {
+        input[type="text"],
+        input[type="number"] {
             width: 100%;
             padding: 12px;
             background: #000;
             border: 1px solid #00ff00;
             color: #00ff00;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
         }
 
-        input:focus,
-        textarea:focus {
+        input:focus {
             outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
         }
 
-        /* Radio buttons for size */
-        .size-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-
-        .size-option {
-            padding: 15px;
-            border: 1px solid #00ff00;
-            background: rgba(0, 255, 0, 0.03);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .size-option:hover {
-            background: rgba(0, 255, 0, 0.1);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        }
-
-        .size-option input[type="radio"] {
-            margin-right: 8px;
-        }
-
-        .size-option.selected {
-            border: 2px solid #00ff00;
-            background: rgba(0, 255, 0, 0.1);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-        }
-
-        /* Checkboxes for vibe */
-        .vibe-options {
+        /* Radio/Checkbox options */
+        .options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
+            margin: 10px 0;
         }
 
-        .vibe-option {
-            padding: 10px;
+        .option {
+            padding: 15px;
             border: 1px solid #00ff00;
+            text-align: center;
             cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
         }
 
-        .vibe-option input[type="checkbox"] {
-            margin-right: 8px;
+        .option:hover {
+            background: rgba(0, 255, 0, 0.05);
         }
 
-        .vibe-option.checked {
+        .option.selected {
             background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .option input {
+            display: none;
+        }
+
+        .option-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+
+        .option-price {
+            opacity: 0.7;
+            font-size: 11px;
+        }
+
+        /* Custom size */
+        #customSizeSection {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            background: rgba(0, 255, 0, 0.02);
+        }
+
+        .size-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
         }
 
         /* Price display */
-        .price-display {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .price-box {
             text-align: center;
+            margin: 30px 0;
             padding: 20px;
             border: 2px solid #00ff00;
             background: rgba(0, 255, 0, 0.05);
-            margin: 20px 0;
+        }
+
+        .price-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .price-amount {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
             text-shadow: 0 0 10px #00ff00;
         }
 
-        /* Payment section */
-        .payment-info {
-            padding: 20px;
-            border: 2px solid #00ff00;
-            background: rgba(0, 255, 0, 0.05);
+        /* Wallet */
+        .wallet-box {
             margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            background: rgba(0, 255, 0, 0.02);
         }
 
         .wallet-address {
             background: #000;
-            padding: 15px;
+            padding: 10px;
             border: 1px solid #00ff00;
             word-break: break-all;
-            text-align: center;
-            font-size: 0.9rem;
+            font-size: 11px;
             margin: 10px 0;
+            text-align: center;
         }
 
         /* Submit button */
@@ -273,13 +229,11 @@
             background: #000;
             border: 2px solid #00ff00;
             color: #00ff00;
-            font-size: 1.2rem;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            margin-top: 30px;
         }
 
         .submit-btn:hover {
@@ -288,73 +242,68 @@
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
         }
 
-        .submit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        /* Success message */
+        .success {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            border: 2px solid #00ff00;
+            margin: 40px 0;
+        }
+
+        .success h2 {
+            margin-bottom: 20px;
         }
 
         /* FAQ */
-        .faq-item {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-left: 3px solid #00ff00;
-            background: rgba(0, 255, 0, 0.02);
-        }
-
-        .faq-question {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #00ff00;
-        }
-
-        .faq-answer {
-            color: #00ff00;
+        .faq {
+            margin-top: 60px;
             opacity: 0.8;
+        }
+
+        .faq-item {
+            margin: 20px 0;
+            font-size: 12px;
+        }
+
+        .faq-q {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .faq-a {
+            opacity: 0.7;
+            line-height: 1.8;
+        }
+
+        /* Info text */
+        .info-text {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 8px;
             line-height: 1.6;
         }
 
-        /* Custom size calculator */
-        #customSizeSection {
-            display: none;
-            padding: 20px;
-            border: 1px solid #00ff00;
-            background: rgba(0, 255, 0, 0.03);
-            margin-top: 15px;
-        }
-
-        .custom-size-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        /* Success message */
-        .success-message {
-            display: none;
-            padding: 20px;
-            border: 2px solid #00ff00;
-            background: rgba(0, 255, 0, 0.1);
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        /* Mobile responsive */
+        /* Responsive */
         @media (max-width: 768px) {
             h1 {
-                font-size: 1.8rem;
+                font-size: 20px;
             }
 
-            .steps {
+            h2 {
+                font-size: 14px;
+            }
+
+            .options {
                 grid-template-columns: 1fr;
             }
 
-            .size-options,
-            .vibe-options {
+            .size-inputs {
                 grid-template-columns: 1fr;
             }
 
-            .custom-size-inputs {
-                grid-template-columns: 1fr;
+            .price-amount {
+                font-size: 20px;
             }
         }
     </style>
@@ -362,249 +311,168 @@
 <body>
     <!-- Navigation -->
     <nav>
-        <a href="index.html">← Back to Home</a>
-        <a href="stream.html">Live Agent</a>
+        <a href="index.html">← HOME</a>
+        <a href="stream.html">LIVE AGENT</a>
     </nav>
 
     <div class="container">
         <!-- Header -->
-        <header>
-            <h1>ORDER GENERATIVE ART</h1>
-            <p class="subtitle">Unique 1/1 AI-Generated Artwork on Canvas</p>
-        </header>
+        <h1>ORDER</h1>
+        <p class="subtitle">Unique generative art on canvas</p>
 
-        <!-- How it Works -->
-        <section>
-            <h2>// HOW IT WORKS</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <p>Choose size & vibe</p>
+        <form id="orderForm">
+            <!-- Size -->
+            <h2>// SIZE</h2>
+            <div class="options">
+                <div class="option" data-size="small" data-price="0.05">
+                    <input type="radio" name="size" value="small" id="size-small">
+                    <div class="option-title">SMALL</div>
+                    <div>30×30 cm</div>
+                    <div class="option-price">0.05 ETH</div>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <p>Pay in crypto</p>
+                <div class="option selected" data-size="medium" data-price="0.1">
+                    <input type="radio" name="size" value="medium" id="size-medium" checked>
+                    <div class="option-title">MEDIUM</div>
+                    <div>50×50 cm</div>
+                    <div class="option-price">0.1 ETH</div>
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <p>AI generates artwork</p>
+                <div class="option" data-size="large" data-price="0.2">
+                    <input type="radio" name="size" value="large" id="size-large">
+                    <div class="option-title">LARGE</div>
+                    <div>80×80 cm</div>
+                    <div class="option-price">0.2 ETH</div>
                 </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <p>Receive unique piece</p>
+                <div class="option" data-size="custom" data-price="0">
+                    <input type="radio" name="size" value="custom" id="size-custom">
+                    <div class="option-title">CUSTOM</div>
+                    <div>10-200 cm</div>
+                    <div class="option-price">Calculate</div>
                 </div>
             </div>
-        </section>
 
-        <!-- Order Form -->
-        <section>
-            <h2>// CONFIGURE YOUR ORDER</h2>
-
-            <form id="orderForm">
-                <!-- Size Selection -->
-                <div class="form-group">
-                    <label>1. SELECT SIZE</label>
-                    <div class="size-options">
-                        <div class="size-option" data-size="small" data-price="0.05">
-                            <input type="radio" name="size" value="small" id="size-small">
-                            <label for="size-small">
-                                Small<br>30×30 cm<br>0.05 ETH
-                            </label>
-                        </div>
-                        <div class="size-option" data-size="medium" data-price="0.1">
-                            <input type="radio" name="size" value="medium" id="size-medium" checked>
-                            <label for="size-medium">
-                                Medium<br>50×50 cm<br>0.1 ETH
-                            </label>
-                        </div>
-                        <div class="size-option" data-size="large" data-price="0.2">
-                            <input type="radio" name="size" value="large" id="size-large">
-                            <label for="size-large">
-                                Large<br>80×80 cm<br>0.2 ETH
-                            </label>
-                        </div>
-                        <div class="size-option" data-size="custom" data-price="0">
-                            <input type="radio" name="size" value="custom" id="size-custom">
-                            <label for="size-custom">
-                                Custom<br>10-200 cm<br>Calculate →
-                            </label>
-                        </div>
+            <!-- Custom Size -->
+            <div id="customSizeSection">
+                <label>Custom Dimensions</label>
+                <div class="size-inputs">
+                    <div>
+                        <input type="number" id="customWidth" placeholder="Width (cm)" min="10" max="200">
                     </div>
-
-                    <!-- Custom Size Calculator -->
-                    <div id="customSizeSection">
-                        <h3>Custom Dimensions</h3>
-                        <div class="custom-size-inputs">
-                            <div>
-                                <label>Width (cm):</label>
-                                <input type="number" id="customWidth" min="10" max="200" placeholder="10-200">
-                            </div>
-                            <div>
-                                <label>Height (cm):</label>
-                                <input type="number" id="customHeight" min="10" max="200" placeholder="10-200">
-                            </div>
-                        </div>
-                        <p style="margin-top: 10px; opacity: 0.8;">
-                            Price = 0.03 ETH base + (area in m² × 0.15 ETH/m²)
-                        </p>
+                    <div>
+                        <input type="number" id="customHeight" placeholder="Height (cm)" min="10" max="200">
                     </div>
                 </div>
-
-                <!-- Vibe Selection (Optional) -->
-                <div class="form-group">
-                    <label>2. CHOOSE VIBE (Optional, +0.02 ETH each)</label>
-                    <div class="vibe-options">
-                        <div class="vibe-option">
-                            <input type="checkbox" name="vibe" value="cosmic" id="vibe-cosmic">
-                            <label for="vibe-cosmic">Cosmic / Space</label>
-                        </div>
-                        <div class="vibe-option">
-                            <input type="checkbox" name="vibe" value="organic" id="vibe-organic">
-                            <label for="vibe-organic">Organic / Nature</label>
-                        </div>
-                        <div class="vibe-option">
-                            <input type="checkbox" name="vibe" value="geometric" id="vibe-geometric">
-                            <label for="vibe-geometric">Geometric / Abstract</label>
-                        </div>
-                        <div class="vibe-option">
-                            <input type="checkbox" name="vibe" value="dark" id="vibe-dark">
-                            <label for="vibe-dark">Dark / Gothic</label>
-                        </div>
-                        <div class="vibe-option">
-                            <input type="checkbox" name="vibe" value="psychedelic" id="vibe-psychedelic">
-                            <label for="vibe-psychedelic">Psychedelic</label>
-                        </div>
-                        <div class="vibe-option">
-                            <input type="checkbox" name="vibe" value="minimal" id="vibe-minimal">
-                            <label for="vibe-minimal">Minimal</label>
-                        </div>
-                    </div>
-                    <p style="margin-top: 10px; opacity: 0.8;">
-                        ℹ Leave unchecked for full random generation
-                    </p>
-                </div>
-
-                <!-- Format Selection -->
-                <div class="form-group">
-                    <label>3. FORMAT</label>
-                    <div class="size-options">
-                        <div class="size-option">
-                            <input type="radio" name="format" value="rolled" id="format-rolled" checked>
-                            <label for="format-rolled">
-                                Rolled Canvas<br>(included)
-                            </label>
-                        </div>
-                        <div class="size-option">
-                            <input type="radio" name="format" value="stretched" id="format-stretched">
-                            <label for="format-stretched">
-                                Stretched on Frame<br>(+shipping cost)
-                            </label>
-                        </div>
-                    </div>
-                    <p style="margin-top: 10px; opacity: 0.8;">
-                        ℹ Stretched canvas requires custom shipping box (price calculated individually)
-                    </p>
-                </div>
-
-                <!-- Email -->
-                <div class="form-group">
-                    <label>4. YOUR EMAIL</label>
-                    <input type="email" name="email" id="email" placeholder="your@email.com" required>
-                </div>
-
-                <!-- Price Display -->
-                <div class="price-display">
-                    TOTAL: <span id="totalPrice">0.1</span> ETH
-                </div>
-
-                <!-- Payment Info -->
-                <div class="payment-info">
-                    <h3>5. PAYMENT</h3>
-                    <p style="margin-bottom: 15px;">Send exact amount to this address:</p>
-
-                    <label>Network:</label>
-                    <div class="wallet-address">Ethereum Mainnet (ETH)</div>
-
-                    <label>Wallet Address:</label>
-                    <div class="wallet-address" id="walletAddress">0x2451A14572F67C587eEfca42C1F4C414FA2ca6a</div>
-
-                    <p style="margin-top: 15px; opacity: 0.8;">
-                        ⚠️ Double-check address before sending!
-                    </p>
-                </div>
-
-                <!-- Transaction Hash -->
-                <div class="form-group">
-                    <label>6. TRANSACTION HASH</label>
-                    <input type="text" name="txHash" id="txHash" placeholder="Paste your transaction hash here" required>
-                    <p style="margin-top: 8px; opacity: 0.8;">
-                        Find it in your wallet after sending payment
-                    </p>
-                </div>
-
-                <!-- Submit -->
-                <button type="submit" class="submit-btn">
-                    PLACE ORDER
-                </button>
-            </form>
-
-            <!-- Success Message -->
-            <div class="success-message" id="successMessage">
-                <h2>✓ ORDER RECEIVED</h2>
-                <p>We'll verify your payment and send confirmation email within 24 hours.</p>
-                <p>Order ID: <span id="orderId"></span></p>
+                <p class="info-text">Price = 0.03 ETH + (area in m² × 0.15 ETH/m²)</p>
             </div>
-        </section>
+
+            <!-- Vibe (Optional) -->
+            <h2>// VIBE (optional)</h2>
+            <p class="info-text">+0.02 ETH each • Leave empty for full random</p>
+            <div class="options">
+                <div class="option vibe-option">
+                    <input type="checkbox" name="vibe" value="cosmic" id="vibe-cosmic">
+                    <label for="vibe-cosmic">COSMIC</label>
+                </div>
+                <div class="option vibe-option">
+                    <input type="checkbox" name="vibe" value="organic" id="vibe-organic">
+                    <label for="vibe-organic">ORGANIC</label>
+                </div>
+                <div class="option vibe-option">
+                    <input type="checkbox" name="vibe" value="geometric" id="vibe-geometric">
+                    <label for="vibe-geometric">GEOMETRIC</label>
+                </div>
+                <div class="option vibe-option">
+                    <input type="checkbox" name="vibe" value="dark" id="vibe-dark">
+                    <label for="vibe-dark">DARK</label>
+                </div>
+            </div>
+
+            <!-- Format -->
+            <h2>// FORMAT</h2>
+            <div class="options">
+                <div class="option selected">
+                    <input type="radio" name="format" value="rolled" id="format-rolled" checked>
+                    <div class="option-title">ROLLED</div>
+                    <div class="option-price">Included</div>
+                </div>
+                <div class="option">
+                    <input type="radio" name="format" value="stretched" id="format-stretched">
+                    <div class="option-title">STRETCHED</div>
+                    <div class="option-price">+Shipping</div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <label>Your Email</label>
+            <input type="email" name="email" id="email" placeholder="your@email.com" required>
+
+            <!-- Price -->
+            <div class="price-box">
+                <div class="price-label">TOTAL PRICE</div>
+                <div class="price-amount"><span id="totalPrice">0.100</span> ETH</div>
+            </div>
+
+            <!-- Payment -->
+            <div class="wallet-box">
+                <label>Payment</label>
+                <p class="info-text">Send exact amount to:</p>
+                <div class="wallet-address">0x2451A14572F67C587eEfca42C1F4C414FA2ca6a</div>
+                <p class="info-text">Network: Ethereum Mainnet</p>
+            </div>
+
+            <label>Transaction Hash</label>
+            <input type="text" name="txHash" id="txHash" placeholder="Paste TX hash after payment" required>
+
+            <!-- Submit -->
+            <button type="submit" class="submit-btn">PLACE ORDER</button>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success" id="successMessage">
+            <h2>ORDER RECEIVED</h2>
+            <p>Order ID: <span id="orderId"></span></p>
+            <p class="info-text">We'll verify payment and email you within 24h</p>
+        </div>
 
         <!-- FAQ -->
-        <section>
+        <div class="faq">
             <h2>// FAQ</h2>
 
             <div class="faq-item">
-                <div class="faq-question">Q: How long does generation take?</div>
-                <div class="faq-answer">A: 24-48 hours after payment confirmation. You'll receive photos of the finished piece.</div>
+                <div class="faq-q">Q: How long does it take?</div>
+                <div class="faq-a">A: 24-48 hours after payment confirmation</div>
             </div>
 
             <div class="faq-item">
-                <div class="faq-question">Q: Can I request a specific subject?</div>
-                <div class="faq-answer">A: No exact requests, but you can guide the vibe (cosmic, organic, etc.). Each piece is uniquely generated.</div>
+                <div class="faq-q">Q: Can I request specific subject?</div>
+                <div class="faq-a">A: No exact requests, but you can guide the vibe</div>
             </div>
 
             <div class="faq-item">
-                <div class="faq-question">Q: Is this a print or original?</div>
-                <div class="faq-answer">A: It's a unique 1/1 piece. AI generates the design, then it's plotted on canvas. No duplicates exist.</div>
+                <div class="faq-q">Q: Is this original or print?</div>
+                <div class="faq-a">A: Unique 1/1 piece. AI generates, plotter draws on canvas</div>
             </div>
 
             <div class="faq-item">
-                <div class="faq-question">Q: Shipping worldwide?</div>
-                <div class="faq-answer">A: Yes! Rolled canvas ships worldwide. Stretched canvas available but requires individual shipping quote.</div>
+                <div class="faq-q">Q: Shipping?</div>
+                <div class="faq-a">A: Worldwide. Rolled canvas ships free, stretched requires quote</div>
             </div>
-
-            <div class="faq-item">
-                <div class="faq-question">Q: What if I don't like the result?</div>
-                <div class="faq-answer">A: You'll see photos before shipping. If not satisfied, we can regenerate once for free.</div>
-            </div>
-        </section>
+        </div>
     </div>
 
     <!-- JavaScript -->
     <script>
-        // Price calculation
-        let basePrice = 0.1; // Default medium
+        let basePrice = 0.1;
         let vibePrice = 0;
-        let customPrice = 0;
 
         // Size selection
-        document.querySelectorAll('.size-option').forEach(option => {
+        document.querySelectorAll('.option[data-size]').forEach(option => {
             option.addEventListener('click', function() {
                 const radio = this.querySelector('input[type="radio"]');
                 radio.checked = true;
 
-                // Update visual selection
-                document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('.option[data-size]').forEach(opt => opt.classList.remove('selected'));
                 this.classList.add('selected');
 
-                // Show/hide custom size section
                 const customSection = document.getElementById('customSizeSection');
                 if (radio.value === 'custom') {
                     customSection.style.display = 'block';
@@ -626,9 +494,8 @@
             const height = parseFloat(document.getElementById('customHeight').value) || 0;
 
             if (width >= 10 && width <= 200 && height >= 10 && height <= 200) {
-                const area = (width * height) / 10000; // Convert to m²
-                customPrice = 0.03 + (area * 0.15);
-                basePrice = customPrice;
+                const area = (width * height) / 10000;
+                basePrice = 0.03 + (area * 0.15);
                 updateTotalPrice();
             }
         }
@@ -638,7 +505,7 @@
             option.addEventListener('click', function() {
                 const checkbox = this.querySelector('input[type="checkbox"]');
                 checkbox.checked = !checkbox.checked;
-                this.classList.toggle('checked', checkbox.checked);
+                this.classList.toggle('selected', checkbox.checked);
                 calculateVibePrice();
             });
         });
@@ -649,6 +516,16 @@
             updateTotalPrice();
         }
 
+        // Format selection
+        document.querySelectorAll('.option input[type="radio"][name="format"]').forEach(radio => {
+            radio.parentElement.addEventListener('click', function() {
+                document.querySelectorAll('.option input[type="radio"][name="format"]').forEach(r => {
+                    r.parentElement.classList.remove('selected');
+                });
+                this.classList.add('selected');
+            });
+        });
+
         function updateTotalPrice() {
             const total = basePrice + vibePrice;
             document.getElementById('totalPrice').textContent = total.toFixed(3);
@@ -658,7 +535,6 @@
         document.getElementById('orderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            // Collect form data
             const formData = {
                 size: document.querySelector('input[name="size"]:checked').value,
                 customWidth: document.getElementById('customWidth')?.value || null,
@@ -672,10 +548,8 @@
                 timestamp: new Date().toISOString()
             };
 
-            // Generate order ID
             const orderId = 'GH-' + Date.now().toString(36).toUpperCase();
 
-            // Prepare email params
             const emailParams = {
                 order_id: orderId,
                 timestamp: formData.timestamp,
@@ -689,16 +563,12 @@
                 tx_hash: formData.txHash
             };
 
-            // Send email via EmailJS
+            // Send email
             try {
-                await emailjs.send(
-                    'service_1ni4wkp',    // Service ID
-                    'template_rjoh19k',   // Template ID
-                    emailParams
-                );
-                console.log('✓ Email sent successfully');
+                await emailjs.send('service_1ni4wkp', 'template_rjoh19k', emailParams);
+                console.log('✓ Email sent');
             } catch (error) {
-                console.error('Email sending failed:', error);
+                console.error('Email error:', error);
             }
 
             // Send to Google Sheets
@@ -721,19 +591,16 @@
                         status: 'Pending'
                     })
                 });
-                console.log('✓ Data sent to Google Sheets');
+                console.log('✓ Sent to Sheets');
             } catch (error) {
-                console.error('Google Sheets error:', error);
+                console.error('Sheets error:', error);
             }
 
-            // Show success message
+            // Show success
             document.getElementById('orderForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
             document.getElementById('orderId').textContent = orderId;
         });
-
-        // Initialize: select medium size by default
-        document.querySelector('.size-option[data-size="medium"]').classList.add('selected');
     </script>
 </body>
 </html>
