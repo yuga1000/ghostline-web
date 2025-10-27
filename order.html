@@ -415,8 +415,10 @@
 <body>
 
 <div class="container">
-    <!-- Header -->
-    <h1>ORDER</h1>
+    <!-- Animated Header GIF -->
+    <div style="text-align: center; margin-bottom: 1rem;">
+        <img id="orderGif" src="/components/Order.GIF" alt="ORDER" style="max-width: 600px; width: 100%; height: auto; image-rendering: pixelated;">
+    </div>
     <p class="subtitle">Commission custom generative art piece</p>
 
     <!-- Navigation -->
@@ -719,6 +721,30 @@
         document.getElementById('orderForm').style.display = 'none';
         document.getElementById('successMessage').style.display = 'block';
         document.getElementById('orderId').textContent = orderId;
+    });
+
+    // Freeze GIF on last frame after one loop
+    // GIF plays once (3-4 seconds), then we freeze it
+    const gif = document.getElementById('orderGif');
+    let frozen = false;
+
+    // Wait for GIF to load
+    gif.addEventListener('load', function() {
+        // After 3.5 seconds (duration of one loop), freeze the GIF
+        setTimeout(() => {
+            if (!frozen) {
+                frozen = true;
+                // Create canvas to capture last frame
+                const canvas = document.createElement('canvas');
+                canvas.width = gif.naturalWidth;
+                canvas.height = gif.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(gif, 0, 0);
+
+                // Replace GIF with static image
+                gif.src = canvas.toDataURL('image/png');
+            }
+        }, 3500); // Adjust timing based on GIF duration
     });
 </script>
 
