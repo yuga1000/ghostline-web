@@ -260,6 +260,8 @@
         animation: fadeInLog 0.3s ease-out;
         line-height: 1.5;
         margin: 2px 0;
+        white-space: pre;  /* Preserve spaces for ASCII art and progress bars */
+        font-family: 'Share Tech Mono', monospace;  /* Ensure monospace for alignment */
     }
 
     @keyframes fadeInLog {
@@ -671,16 +673,16 @@
         </div>
 
             <!-- Bitcoin -->
-            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d', 'Bitcoin')">
+            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('1LwghpsSDNYoXPKmmX1rdTSq4DAP3UhqUH', 'Bitcoin')">
                 <p class="text-sm mb-2" style="color: #00ff00;">BITCOIN (BTC)</p>
-                <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">1LwghpsSDNYoXPKmmX1rdTSq4DAP3UhqUH</p>
                 <p class="text-xs" style="color: #666;">Click to copy</p>
             </div>
 
             <!-- USDT -->
-            <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B', 'USDT')">
+            <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU', 'USDT')">
                 <p class="text-sm mb-2" style="color: #00ff00;">USDT (TRC20)</p>
-                <p class="text-xs break-all mb-2" style="color: #ffffff;">0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</p>
                 <p class="text-xs" style="color: #666;">Click to copy</p>
             </div>
 
@@ -1074,8 +1076,9 @@ function addLogLine(text, className = 'log-info') {
     let icon = '';
     let message = cleanText;
 
-    // Check for common icons at start
-    const iconMatch = cleanText.match(/^([▓⟡✓✗ℹ⚠]+)\s*/);
+    // Check for common icons at start (expanded to include all ASCII art chars)
+    // Include: block elements (█▓▒░), arrows (→←↑↓▲▶), symbols (✓✗⟡◆●○•), etc
+    const iconMatch = cleanText.match(/^([▓⟡✓✗ℹ⚠█▒░→←▲▶◆●○•]+)\s*/);
     if (iconMatch) {
         icon = iconMatch[1];
         message = cleanText.substring(iconMatch[0].length);
