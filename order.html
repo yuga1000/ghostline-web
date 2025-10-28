@@ -1007,54 +1007,40 @@
         
         /* Mobile */
         @media (max-width: 768px) {
-            .size-grid,
-            .vibe-grid,
-            .format-grid,
+            .size-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.4rem;
+            }
+
+            .vibe-grid {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 0.3rem;
+            }
+
+            .format-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.4rem;
+            }
+
             .crypto-selector {
-                display: flex;
-                overflow-x: auto;
-                overflow-y: hidden;
-                gap: 0.8rem;
-                padding-bottom: 0.5rem;
-                scroll-snap-type: x mandatory;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .size-grid::-webkit-scrollbar,
-            .vibe-grid::-webkit-scrollbar,
-            .format-grid::-webkit-scrollbar,
-            .crypto-selector::-webkit-scrollbar {
-                height: 4px;
-            }
-
-            .size-grid::-webkit-scrollbar-track,
-            .vibe-grid::-webkit-scrollbar-track,
-            .format-grid::-webkit-scrollbar-track,
-            .crypto-selector::-webkit-scrollbar-track {
-                background: #000;
-            }
-
-            .size-grid::-webkit-scrollbar-thumb,
-            .vibe-grid::-webkit-scrollbar-thumb,
-            .format-grid::-webkit-scrollbar-thumb,
-            .crypto-selector::-webkit-scrollbar-thumb {
-                background: #00ff00;
-                border-radius: 2px;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.4rem;
             }
 
             .size-option,
             .vibe-option,
             .format-option,
             .crypto-option {
-                flex: 0 0 auto;
-                min-width: 140px;
-                scroll-snap-align: start;
-                padding: 0.6rem;
-                font-size: 7px;
+                padding: 0.4rem 0.2rem;
+                font-size: 6px;
             }
 
             .size-detail, .format-detail, .crypto-details {
-                font-size: 6px;
+                font-size: 5px;
             }
 
             .section-header {
@@ -1112,21 +1098,40 @@
                 margin: 0.8rem 0 0.4rem;
             }
 
+            .size-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.3rem;
+            }
+
+            .vibe-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 0.2rem;
+            }
+
+            .format-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.3rem;
+            }
+
+            .crypto-selector {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.3rem;
+            }
+
             .size-option,
             .vibe-option,
             .format-option,
             .crypto-option {
-                min-width: 120px;
-                padding: 0.5rem;
-                font-size: 6px;
+                padding: 0.3rem 0.1rem;
+                font-size: 5px;
             }
 
             .size-title, .vibe-title, .format-title {
-                font-size: 6px;
+                font-size: 5px;
             }
 
             .size-detail, .format-detail, .crypto-details {
-                font-size: 5px;
+                font-size: 4px;
                 margin-top: 0.2rem;
             }
 
