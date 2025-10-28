@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ORDER | GHOSTLINE</title>
 
-    <!-- Fonts (IBM Plex Mono + Press Start 2P) -->
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Fonts (Press Start 2P only - all pixel fonts) -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -23,262 +23,831 @@
             box-sizing: border-box;
         }
 
+        /* Audio controller - compact version */
+        .audio-toggle {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            width: 24px;
+            height: 24px;
+            background: #000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-size: 8px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0.6;
+            font-family: 'Press Start 2P', cursive;
+            padding: 2px;
+        }
+
+        .audio-toggle:hover {
+            opacity: 1;
+            background: #001a00;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+        }
+
+        .audio-toggle.muted {
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+
         body {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-weight: 700;
+            font-family: 'Press Start 2P', cursive;
             background: #000000;
             color: #00ff00;
-            line-height: 1.2;
+            line-height: 1.6;
             overflow-x: hidden;
+            padding: 2rem;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        /* SVG Canvas for lines */
+        #lineCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Floating pixels (fireflies) */
+        .pixel {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(100px, -100px);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50px, -200px);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translate(150px, -150px);
+                opacity: 0.8;
+            }
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: #000;
+            border: 2px solid #00ff00;
+            padding: 0.8rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .top-nav-logo {
+            font-size: 14px;
+            color: #9b7bb5;
+            letter-spacing: 3px;
+            font-weight: 400;
+        }
+
+        .top-nav-links {
+            display: flex;
+            gap: 2rem;
+            font-size: 8px;
+        }
+
+        .top-nav-links a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+
+        .top-nav-links a::before {
+            content: '[';
+            margin-right: 4px;
+        }
+
+        .top-nav-links a::after {
+            content: ']';
+            margin-left: 4px;
+        }
+
+        .top-nav-links a:hover {
+            text-shadow: 0 0 4px #00ff00;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00ff00;
+            font-size: 8px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Cursor styles - simple and effective */
+        button, .size-option, .vibe-option, .format-option, a {
+            cursor: pointer;
+        }
+        
+        input[type="text"], input[type="email"], input[type="number"] {
+            cursor: text;
+        }
+        
+        /* Add visual feedback instead of complex cursors */
+        .size-option, .vibe-option, .format-option {
+            position: relative;
+            transition: transform 0.1s ease;
+        }
+        
+        .size-option:active, .vibe-option:active, .format-option:active {
+            transform: scale(0.98);
+        }
+        
+        /* Glow effect on hover for better feedback */
+        button:hover, a:hover {
+            text-shadow: 0 0 5px currentColor;
         }
 
         /* Container */
         .container {
-            max-width: 1280px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 3rem 1.5rem;
+            padding: 0.5rem 2rem;
         }
 
-        /* Header - большой заголовок как на главной */
-        h1 {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 48px;
-            color: #ffffff;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+        /* Header */
+        .header-gif {
             text-align: center;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 4px rgba(255, 255, 255, 0.8),
-                         0 0 8px rgba(0, 255, 0, 0.6),
-                         0 0 16px rgba(0, 255, 0, 0.4),
-                         0 0 24px rgba(0, 255, 0, 0.2);
+            margin-bottom: 0.3rem;
+            margin-top: 0.5rem;
         }
 
-        /* Subtitle - тонкий шрифт, белый */
-        .subtitle {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            font-weight: 300;
-            color: #ffffff;
-            text-align: center;
-            letter-spacing: 1px;
-            margin-bottom: 4rem;
+        .header-gif img {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            image-rendering: pixelated;
         }
 
-        /* Navigation - маленький зелёный текст */
-        nav {
-            text-align: center;
-            margin-bottom: 3rem;
-            font-size: 12px;
-            font-weight: 300;
+        .green-line {
+            border-top: 1px solid #00ff00;
+            margin-bottom: 0.3rem;
         }
 
-        nav a {
+        /* Section headers with blinking cursor */
+        .section-header {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
             color: #00ff00;
-            text-decoration: none;
-            margin: 0 1.5rem;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
-        }
-
-        nav a:hover {
-            text-shadow: 0 0 4px #00ff00;
-        }
-
-        /* Section headers - средний размер, жирный, зелёный */
-        h2 {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: #00ff00;
+            margin-top: 0.3rem;
+            margin-bottom: 0.5rem;
             letter-spacing: 2px;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
+            font-weight: 400;
         }
 
-        /* Form labels - маленький, тонкий, белый */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 12px;
+            background: #00ff00;
+            margin-left: 8px;
+            animation: blink 1s steps(1) infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        @keyframes blink-line {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Size options - square grid */
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 0.5rem;
+            justify-items: center;
+        }
+
+        .size-option {
+            padding: 0.3rem 0.2rem;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            background: #000;
+            transition: all 0.2s;
+            font-size: 8px;
+            max-width: 100px;
+            min-height: 65px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .size-option::before {
+            content: '[';
+            position: absolute;
+            left: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff00;
+            font-size: 65px;
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            line-height: 1;
+        }
+
+        .size-option::after {
+            content: ']';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff00;
+            font-size: 65px;
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            line-height: 1;
+        }
+
+        .size-option:hover {
+            background: #001a00;
+            border-color: #44ff44;
+        }
+
+        .size-option.selected {
+            background: #001a33;
+            border-color: #4488ff;
+            box-shadow: inset 0 0 20px rgba(68, 136, 255, 0.3);
+        }
+
+        .size-title {
+            font-size: 10px;
+            margin-bottom: 0.2rem;
+            color: #00ff00;
+            font-weight: 400;
+        }
+
+        .size-detail {
+            font-size: 7px;
+            color: #66ff66;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        /* Vibe options - all in one row, square */
+        .vibe-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+            justify-items: center;
+        }
+
+        .vibe-option {
+            padding: 0.3rem 0.2rem;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            font-size: 8px;
+            background: #000;
+            transition: all 0.2s;
+            font-weight: 400;
+            max-width: 90px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .vibe-option::before {
+            content: '[';
+            position: absolute;
+            left: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff00;
+            font-size: 50px;
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            line-height: 1;
+        }
+
+        .vibe-option::after {
+            content: ']';
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff00;
+            font-size: 50px;
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            line-height: 1;
+        }
+
+        .vibe-option:hover {
+            background: #001a00;
+        }
+
+        /* Vibe selected colors will be set randomly via JavaScript */
+        .vibe-option.selected {
+            /* Colors set dynamically */
+        }
+
+        /* Format options - horizontal */
+        .format-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem;
+            margin-bottom: 0.8rem;
+            justify-items: center;
+        }
+
+        .format-option {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #00ff00;
+            text-align: center;
+            cursor: pointer;
+            background: #000;
+            font-size: 9px;
+            transition: all 0.2s;
+            font-weight: 400;
+        }
+
+        .format-option:hover {
+            background: #001a00;
+            border-color: #44ff44;
+        }
+
+        .format-option.selected {
+            background: #331933;
+            border-color: #ff44ff;
+            box-shadow: inset 0 0 20px rgba(255, 68, 255, 0.3);
+        }
+
+        .format-title {
+            font-size: 8px;
+            margin-bottom: 0.15rem;
+            font-weight: 400;
+        }
+
+        .format-detail {
+            font-size: 5px;
+            color: #66ff66;
+            line-height: 1.3;
+            font-weight: 400;
+        }
+
+        /* Attention box for STRETCHED */
+        #attentionBox {
+            display: none;
+            position: absolute;
+            left: calc(50% + 250px); /* Moved further right */
+            transform: translateX(-50%);
+            top: 100%; /* Position below the format options */
+            margin-top: 40px; /* Add some gap from format */
+            background: #000;
+            border: 2px solid #ff1493; /* Deep Pink */
+            padding: 0.6rem;
+            width: 160px;
+            z-index: 10;
+            opacity: 0;
+        }
+        
+        #attentionBox.visible {
+            animation: pulse-border 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { 
+                border-color: #ff1493;
+                box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+            }
+            50% { 
+                border-color: #ff69b4;
+                box-shadow: 0 0 20px rgba(255, 20, 147, 0.8);
+            }
+        }
+        
+        @keyframes arcade-blink {
+            0% { opacity: 0; transform: translateX(-50%) scaleY(0.1); }
+            10% { opacity: 1; transform: translateX(-50%) scaleY(0.1); }
+            20% { opacity: 0; transform: translateX(-50%) scaleY(0.3); }
+            30% { opacity: 1; transform: translateX(-50%) scaleY(0.3); }
+            40% { opacity: 0; transform: translateX(-50%) scaleY(0.5); }
+            50% { opacity: 1; transform: translateX(-50%) scaleY(0.5); }
+            60% { opacity: 0; transform: translateX(-50%) scaleY(0.7); }
+            70% { opacity: 1; transform: translateX(-50%) scaleY(0.7); }
+            80% { opacity: 0; transform: translateX(-50%) scaleY(0.9); }
+            90% { opacity: 1; transform: translateX(-50%) scaleY(1); }
+            95% { opacity: 0; transform: translateX(-50%) scaleY(1); }
+            100% { opacity: 1; transform: translateX(-50%) scaleY(1); }
+        }
+
+        .attention-header {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-bottom: 0.5rem;
+            color: #ff1493; /* Deep Pink */
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .warning-triangle {
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 14px solid #ff1493; /* Deep Pink */
+            position: relative;
+        }
+
+        .warning-triangle::after {
+            content: '!';
+            position: absolute;
+            top: 4px;
+            left: -2px;
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .attention-text {
+            color: #ffff00;
+            font-size: 6px;
+            line-height: 1.5;
+            font-weight: 400;
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+        
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.4);
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: inset 0 0 40px rgba(0, 255, 0, 0.6), 0 0 30px rgba(0, 255, 0, 0.8);
+            }
+        }
+        
+        @keyframes pulse-opacity {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Custom size inputs */
+        .custom-inputs {
+            display: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        .custom-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .custom-input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 2px solid #00ff00;
+            background: #000;
+            padding: 0;
+            flex: 1;
+        }
+        
+        .custom-input-wrapper input[type="number"] {
+            border: none;
+            padding: 8px;
+            margin: 0;
+            background: transparent;
+            text-align: center;
+            width: 100px;
+            flex: 1;
+        }
+        
+        .custom-input-wrapper input[type="number"]:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        
+        .custom-control-btn {
+            background: #001a00;
+            border: none;
+            color: #00ff00;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            transition: all 0.1s;
+        }
+        
+        .custom-control-btn:hover {
+            background: #003300;
+        }
+        
+        .custom-control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .size-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: #001a00;
+            outline: none;
+            margin: 10px 0;
+            border: 1px solid #00ff00;
+        }
+        
+        .size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #00ff00;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+        
+        .size-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #00ff00;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+        
+        .size-value-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 7px;
+            color: #66ff66;
+            margin-top: 5px;
+        }
+
         label {
             display: block;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            font-weight: 300;
-            color: #ffffff;
+            font-size: 7px;
+            color: #00ff00;
+            margin-bottom: 0.3rem;
             letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
+            font-weight: 400;
         }
 
-        /* Inputs - зелёная рамка с пульсацией */
         input[type="email"],
         input[type="text"],
         input[type="number"] {
             width: 100%;
-            padding: 12px;
+            padding: 8px;
             background: #000;
             border: 2px solid #00ff00;
             color: #00ff00;
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 7px;
+            margin-bottom: 0.5rem;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+        }
+
+        input::selection {
+            background: #00ff00;
+            color: #000;
+        }
+
+        input::-moz-selection {
+            background: #00ff00;
+            color: #000;
         }
 
         input:focus {
             outline: none;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4),
-                        0 0 6px rgba(0, 255, 0, 0.3),
-                        0 0 9px rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
         }
 
-        /* Options grid - больше пространства */
-        .options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0 3rem 0;
-        }
-
-        /* Option cards - как terminal borders */
-        .option {
-            padding: 1.5rem;
-            border: 2px solid #00ff00;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #000;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4),
-                        0 0 6px rgba(0, 255, 0, 0.3),
-                        0 0 9px rgba(0, 255, 0, 0.2);
-        }
-
-        .option:hover {
-            background: #001100;
-            box-shadow: 0 0 5px rgba(0, 255, 0, 0.6),
-                        0 0 10px rgba(0, 255, 0, 0.4),
-                        0 0 15px rgba(0, 255, 0, 0.3);
-        }
-
-        .option.selected {
-            background: #002200;
-            border-color: #44ff44;
-            box-shadow: 0 0 8px rgba(0, 255, 0, 1),
-                        0 0 16px rgba(0, 255, 0, 0.8),
-                        0 0 24px rgba(0, 255, 0, 0.6);
-        }
-
-        /* Option title - жирный зелёный */
-        .option-title {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: #00ff00;
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-        }
-
-        /* Option detail - маленький, светлее */
-        .option-detail {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            font-weight: 700;
-            color: #66ff66;
-            letter-spacing: 0.5px;
-        }
-
-        /* Vibe checkboxes - маленькие карточки */
-        .vibe-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0 3rem 0;
-        }
-
-        .vibe-option {
-            padding: 1rem;
-            border: 2px solid #00ff00;
-            text-align: center;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 700;
-            color: #66ff66;
-            background: #000;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4),
-                        0 0 6px rgba(0, 255, 0, 0.3),
-                        0 0 9px rgba(0, 255, 0, 0.2);
-        }
-
-        .vibe-option:hover {
-            background: #001100;
-        }
-
-        .vibe-option.selected {
-            background: #002200;
-            border-color: #44ff44;
-            box-shadow: 0 0 8px rgba(0, 255, 0, 1);
-        }
-
-        /* Price display - большой, белый, яркий */
+        /* Price display with ghostcoin */
         .price-display {
             text-align: center;
-            margin: 3rem 0;
-            padding: 2rem;
+            margin: 0.8rem 0;
+            padding: 0.4rem 0.6rem;
             border: 2px solid #00ff00;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4),
-                        0 0 6px rgba(0, 255, 0, 0.3),
-                        0 0 9px rgba(0, 255, 0, 0.2);
+            display: inline-block;
+            margin-left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .price-coin {
+            margin-bottom: 0.3rem;
+        }
+
+        .price-coin img {
+            width: 40px;
+            height: auto;
+            image-rendering: pixelated;
         }
 
         .price-label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            font-weight: 300;
-            color: #ffffff;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
+            font-size: 5px;
+            color: #66ff66;
+            margin-bottom: 0.3rem;
+            font-weight: 400;
         }
 
         .price-value {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 32px;
-            color: #ffffff;
-            text-shadow: 0 0 4px rgba(255, 255, 255, 0.8),
-                         0 0 8px rgba(0, 255, 0, 0.6),
-                         0 0 16px rgba(0, 255, 0, 0.4);
+            font-size: 12px;
+            color: #00ff00;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
+            font-weight: 400;
         }
 
-        /* Submit button - как console-button */
+        /* Crypto selector */
+        .crypto-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+        
+        .crypto-option {
+            padding: 0.5rem 1rem;
+            border: 2px solid #00ff00;
+            background: #000;
+            color: #00ff00;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .crypto-option:hover {
+            background: #001a00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+        
+        .crypto-option.selected {
+            background: #003300;
+            box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+        
+        .crypto-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #00ff00;
+            color: #000;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+        
+        .crypto-details {
+            margin-top: 0.3rem;
+            font-size: 6px;
+            color: #66ff66;
+        }
+
+        /* Wallet info */
+        .wallet-box {
+            margin: 0.8rem 0;
+            padding: 0.6rem;
+            border: 2px solid #00ff00;
+            background: rgba(0, 0, 0, 0.5);
+            font-size: 7px;
+            backdrop-filter: blur(5px);
+        }
+
+        .wallet-label {
+            color: #66ff66;
+            margin-bottom: 0.3rem;
+            font-weight: 400;
+        }
+
+        .wallet-address {
+            color: #00ff00;
+            word-break: break-all;
+            line-height: 1.5;
+            font-weight: 400;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            background: #001a00;
+            padding: 0.5rem;
+            border: 1px solid #00ff00;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+        
+        .copy-button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 0.3rem 0.5rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .copy-button:hover {
+            background: #44ff44;
+        }
+        
+        .copy-button:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        .copy-button.copied {
+            background: #44ff44;
+            color: #000;
+        }
+
+        /* Submit button */
         button[type="submit"] {
             width: 100%;
             background: #000000;
-            border: 3px solid #00ff00;
-            color: #ffffff;
-            padding: 1rem 2rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 300;
-            letter-spacing: 2px;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 0.7rem;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
             cursor: pointer;
-            margin-top: 2rem;
-            box-shadow: 0 0 4px rgba(0, 255, 0, 0.6),
-                        0 0 8px rgba(0, 255, 0, 0.4),
-                        0 0 12px rgba(0, 255, 0, 0.2);
-            text-shadow: 0 0 2px #ffffff, 0 0 4px #ffffff;
-            transition: all 0.2s ease;
+            margin-top: 0.8rem;
+            transition: all 0.2s;
+            font-weight: 400;
         }
 
         button[type="submit"]:hover {
-            background: #001100;
-            color: #00ff00;
-            box-shadow: 0 0 8px rgba(0, 255, 0, 1),
-                        0 0 16px rgba(0, 255, 0, 0.8),
-                        0 0 24px rgba(0, 255, 0, 0.6);
-            text-shadow: 0 0 3px #00ff00, 0 0 6px #00ff00;
+            background: #003300;
+            box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.4);
         }
 
         button[type="submit"]:active {
-            background: #002200;
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
 
         /* Success message */
@@ -288,247 +857,426 @@
             padding: 3rem;
             border: 2px solid #00ff00;
             margin-top: 3rem;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4),
-                        0 0 6px rgba(0, 255, 0, 0.3),
-                        0 0 9px rgba(0, 255, 0, 0.2);
         }
 
         .success-title {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 24px;
-            color: #ffffff;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 4px rgba(255, 255, 255, 0.8),
-                         0 0 8px rgba(0, 255, 0, 0.6);
-        }
-
-        .success-text {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-            font-weight: 300;
-            color: #ffffff;
-            line-height: 1.8;
-        }
-
-        .order-id {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: #00ff00;
-            margin: 1.5rem 0;
-        }
-
-        /* Wallet address - terminal style */
-        .wallet-info {
-            margin: 2rem 0;
-            padding: 1rem;
-            border: 2px solid #00ff00;
-            background: #000;
-            box-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
-        }
-
-        .wallet-label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            font-weight: 700;
-            color: #66ff66;
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-        }
-
-        .wallet-address {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 12px;
-            font-weight: 700;
-            color: #00ff00;
-            word-break: break-all;
-        }
-
-        /* FAQ - маленький текст */
-        .faq {
-            margin-top: 4rem;
-            padding-top: 3rem;
-            border-top: 1px solid rgba(0, 255, 0, 0.3);
-        }
-
-        .faq-title {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 14px;
-            font-weight: 700;
-            color: #00ff00;
-            margin-bottom: 1.5rem;
-            letter-spacing: 2px;
-        }
-
-        .faq-item {
+            font-size: 20px;
             margin-bottom: 2rem;
         }
 
-        .faq-question {
-            font-family: 'Share Tech Mono', monospace;
+        .success-text {
+            font-size: 10px;
+            line-height: 2;
+            color: #66ff66;
+        }
+
+        .order-id {
             font-size: 12px;
-            font-weight: 300;
-            color: #ffffff;
+            color: #00ff00;
+            margin: 2rem 0;
+        }
+
+        /* FAQ */
+        .faq {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        /* Form validation styles */
+        .input-error {
+            border-color: #ff0000 !important;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .error-message {
+            color: #ff0000;
+            font-size: 6px;
+            margin-top: -0.4rem;
             margin-bottom: 0.5rem;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+            animation: blink 0.5s ease-in-out;
+        }
+        
+        .validation-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+        }
+        
+        .validation-indicator.valid {
+            color: #00ff00;
+        }
+        
+        .validation-indicator.invalid {
+            color: #ff0000;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+
+        .faq-title {
+            font-size: 8px;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            font-weight: 400;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-question {
+            font-size: 6px;
+            margin-bottom: 0.5rem;
+            color: #00ff00;
+            font-weight: 400;
         }
 
         .faq-answer {
-            font-family: 'IBM Plex Mono', 'Share Tech Mono', monospace;
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 5px;
             color: #66ff66;
             line-height: 1.6;
+            font-weight: 400;
         }
 
+        /* Progress indicator */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #001a00;
+            z-index: 1000;
+            border-bottom: 1px solid #00ff00;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00 0%, #44ff88 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .progress-steps {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 1001;
+            background: #000;
+            padding: 0.5rem 1rem;
+            border: 1px solid #00ff00;
+            font-size: 6px;
+        }
+        
+        .progress-step {
+            color: #003300;
+            transition: all 0.3s;
+        }
+        
+        .progress-step.active {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .progress-step.completed {
+            color: #44ff88;
+        }
+        
+        .progress-step.completed::before {
+            content: '✓ ';
+        }
+        
         /* Mobile */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 28px;
-                letter-spacing: 2px;
-            }
-
-            .price-value {
-                font-size: 24px;
-            }
-
-            .options {
+            .size-grid {
                 grid-template-columns: 1fr;
             }
 
-            .vibe-options {
+            .vibe-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .format-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                font-size: 10px;
+            }
+
+            .price-value {
+                font-size: 18px;
             }
         }
 
         @media (max-width: 480px) {
-            h1 {
-                font-size: 24px;
-                letter-spacing: 1px;
-            }
-
             .container {
                 padding: 2rem 1rem;
+            }
+
+            nav {
+                font-size: 8px;
+            }
+
+            .section-header {
+                font-size: 9px;
+            }
+
+            .vibe-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Animated Header GIF -->
-    <div style="text-align: center; margin-bottom: 1rem;">
-        <img id="orderGif" src="/components/Order.GIF" alt="ORDER" style="max-width: 600px; width: 100%; height: auto; image-rendering: pixelated;">
-    </div>
-    <p class="subtitle">Commission custom generative art piece</p>
+<!-- SVG Canvas for connection lines -->
+<svg id="lineCanvas"></svg>
 
-    <!-- Navigation -->
-    <nav>
+<!-- Audio elements -->
+<audio id="clickSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiS1/LNeSsFJHfH8N2QQAoUXrTp66hVFAqEBAA=" type="audio/wav">
+</audio>
+
+<audio id="hoverSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRhwCAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YfgBAAAAAAEA/v8CAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA//8BAP//AAABAP//AQD//wAAAQD//wEA//8AAAAA" type="audio/wav">
+</audio>
+
+<audio id="successSound" preload="auto">
+    <source src="data:audio/wav;base64,UklGRoQEAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YWAEAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+cYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4SEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgY5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+eAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA" type="audio/wav">
+</audio>
+
+<!-- Audio toggle button -->
+<button class="audio-toggle muted" id="audioToggle" title="Toggle Sound" style="color: #ff0000;">♪</button>
+
+<!-- Top Navigation Bar -->
+<div class="top-nav">
+    <div class="top-nav-logo">GHOSTLINE</div>
+    <div class="top-nav-links">
         <a href="/">HOME</a>
+        <a href="/stream.html">LIVE STREAM</a>
         <a href="/gallery.html">GALLERY</a>
-        <a href="/stream.html">STREAM</a>
-    </nav>
+    </div>
+    <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE
+    </div>
+</div>
+
+<div class="container">
+    <!-- Animated Header -->
+    <div class="header-gif">
+        <img id="orderGif" src="components/Order.GIF" alt="ORDER">
+    </div>
+    <div class="green-line"></div>
 
     <!-- Order Form -->
     <form id="orderForm">
 
-        <!-- Size Selection -->
-        <h2>01. SIZE</h2>
-        <div class="options">
-            <div class="option" data-size="small" data-price="0.05">
+        <!-- SIZE -->
+        <div class="section-header">[01. SIZE]<span class="cursor"></span></div>
+        <div class="size-grid">
+            <div class="size-option" data-size="small" data-price="140">
                 <input type="radio" name="size" value="small" style="display:none;">
-                <div class="option-title">SMALL</div>
-                <div class="option-detail">30×30 cm • 0.05 ETH</div>
+                <div class="size-title">SMALL</div>
+                <div class="size-detail">30×30 cm<br>$140</div>
             </div>
-            <div class="option" data-size="medium" data-price="0.1">
+            <div class="size-option" data-size="medium" data-price="390">
                 <input type="radio" name="size" value="medium" style="display:none;">
-                <div class="option-title">MEDIUM</div>
-                <div class="option-detail">50×50 cm • 0.1 ETH</div>
+                <div class="size-title">MEDIUM</div>
+                <div class="size-detail">50×50 cm<br>$390</div>
             </div>
-            <div class="option" data-size="large" data-price="0.2">
+            <div class="size-option" data-size="large" data-price="1000">
                 <input type="radio" name="size" value="large" style="display:none;">
-                <div class="option-title">LARGE</div>
-                <div class="option-detail">80×80 cm • 0.2 ETH</div>
+                <div class="size-title">LARGE</div>
+                <div class="size-detail">80×80 cm<br>$1000</div>
             </div>
-            <div class="option" data-size="custom" data-price="0">
+            <div class="size-option" data-size="custom" data-price="0">
                 <input type="radio" name="size" value="custom" style="display:none;">
-                <div class="option-title">CUSTOM</div>
-                <div class="option-detail">10-200 cm</div>
+                <div class="size-title">CUSTOM</div>
+                <div class="size-detail">10-200 cm</div>
             </div>
         </div>
 
-        <!-- Custom size inputs (hidden by default) -->
-        <div id="customSizeInputs" style="display:none; margin-bottom: 3rem;">
+        <!-- Custom size inputs -->
+        <div id="customSizeInputs" class="custom-inputs">
             <label>WIDTH (CM)</label>
-            <input type="number" id="customWidth" placeholder="10-200" min="10" max="200">
+            <div class="custom-input-group">
+                <div class="custom-input-wrapper">
+                    <button class="custom-control-btn" onclick="adjustSize('width', -10)">-</button>
+                    <input type="number" id="customWidth" placeholder="10-200" min="10" max="200" value="50">
+                    <button class="custom-control-btn" onclick="adjustSize('width', 10)">+</button>
+                </div>
+            </div>
+            <input type="range" class="size-slider" id="widthSlider" min="10" max="200" value="50">
+            <div class="size-value-display">
+                <span>10cm</span>
+                <span id="widthDisplay">50cm</span>
+                <span>200cm</span>
+            </div>
 
             <label>HEIGHT (CM)</label>
-            <input type="number" id="customHeight" placeholder="10-200" min="10" max="200">
+            <div class="custom-input-group">
+                <div class="custom-input-wrapper">
+                    <button class="custom-control-btn" onclick="adjustSize('height', -10)">-</button>
+                    <input type="number" id="customHeight" placeholder="10-200" min="10" max="200" value="50">
+                    <button class="custom-control-btn" onclick="adjustSize('height', 10)">+</button>
+                </div>
+            </div>
+            <input type="range" class="size-slider" id="heightSlider" min="10" max="200" value="50">
+            <div class="size-value-display">
+                <span>10cm</span>
+                <span id="heightDisplay">50cm</span>
+                <span>200cm</span>
+            </div>
         </div>
 
-        <!-- Vibe Selection -->
-        <h2>02. VIBE (OPTIONAL)</h2>
-        <div class="vibe-options">
-            <div class="vibe-option" data-vibe="Cosmic">
-                <input type="checkbox" value="Cosmic" style="display:none;">
-                COSMIC
+        <!-- VIBE -->
+        <div class="section-header">[02. VIBE (OPTIONAL)]<span class="cursor"></span></div>
+        <div class="vibe-grid">
+            <div class="vibe-option">
+                <input type="checkbox" value="Buddhism" style="display:none;">
+                BUDDHISM
             </div>
-            <div class="vibe-option" data-vibe="Organic">
-                <input type="checkbox" value="Organic" style="display:none;">
-                ORGANIC
+            <div class="vibe-option">
+                <input type="checkbox" value="Angels" style="display:none;">
+                ANGELS
             </div>
-            <div class="vibe-option" data-vibe="Geometric">
-                <input type="checkbox" value="Geometric" style="display:none;">
-                GEOMETRIC
+            <div class="vibe-option">
+                <input type="checkbox" value="Nature" style="display:none;">
+                NATURE
             </div>
-            <div class="vibe-option" data-vibe="Dark">
-                <input type="checkbox" value="Dark" style="display:none;">
-                DARK
+            <div class="vibe-option">
+                <input type="checkbox" value="Japanese" style="display:none;">
+                JAPANESE
             </div>
-            <div class="vibe-option" data-vibe="Psychedelic">
-                <input type="checkbox" value="Psychedelic" style="display:none;">
-                PSYCHEDELIC
-            </div>
-            <div class="vibe-option" data-vibe="Minimal">
+            <div class="vibe-option">
                 <input type="checkbox" value="Minimal" style="display:none;">
                 MINIMAL
             </div>
-        </div>
-
-        <!-- Format Selection -->
-        <h2>03. FORMAT</h2>
-        <div class="options" style="grid-template-columns: repeat(2, 1fr);">
-            <div class="option" data-format="rolled">
-                <input type="radio" name="format" value="rolled" style="display:none;">
-                <div class="option-title">ROLLED</div>
-                <div class="option-detail">Included</div>
-            </div>
-            <div class="option" data-format="stretched">
-                <input type="radio" name="format" value="stretched" style="display:none;">
-                <div class="option-title">STRETCHED</div>
-                <div class="option-detail">+ Shipping</div>
+            <div class="vibe-option" id="randomVibe">
+                <input type="checkbox" value="Random" style="display:none;">
+                RANDOM
             </div>
         </div>
 
-        <!-- Price Display -->
+        <!-- FORMAT -->
+        <div class="section-header">[03. FORMAT]<span class="cursor"></span></div>
+        <div class="format-container" style="position: relative;">
+            <div class="format-grid">
+                <div class="format-option" data-format="rolled">
+                    <input type="radio" name="format" value="rolled" style="display:none;">
+                    <div class="format-title">ROLLED</div>
+                    <div class="format-detail">Shipping in tube</div>
+                </div>
+                <div class="format-option" data-format="stretched" id="stretchedOption">
+                    <input type="radio" name="format" value="stretched" style="display:none;">
+                    <div class="format-title">STRETCHED</div>
+                    <div class="format-detail">More expensive shipping</div>
+                </div>
+            </div>
+
+            <!-- Attention box (positioned relative to STRETCHED) -->
+            <div id="attentionBox">
+                <div class="attention-header">
+                    <div class="warning-triangle"></div>
+                    <div>ATTENTION</div>
+                </div>
+                <div class="attention-text">
+                    SHIPPING COST MAY BE EXPENSIVE<br><br>
+                    CALCULATED SEPARATELY<br><br>
+                    (Price + Logistics)
+                </div>
+            </div>
+        </div>
+
+        <!-- PRICE -->
         <div class="price-display">
+            <div class="price-coin">
+                <img src="ghostcoin.gif" alt="GHOSTCOIN">
+            </div>
             <div class="price-label">TOTAL PRICE</div>
-            <div class="price-value"><span id="totalPrice">0.000</span> ETH</div>
+            <div class="price-value"><span id="totalPrice">0</span> ETH</div>
         </div>
 
-        <!-- Payment Info -->
-        <h2>04. PAYMENT</h2>
-        <div class="wallet-info">
-            <div class="wallet-label">NETWORK: ETHEREUM MAINNET</div>
-            <div class="wallet-address">0x2451A14572F67C587eEfca42C1F4C414FA2ca6a</div>
+        <!-- PAYMENT -->
+        <div class="section-header">[04. PAYMENT]<span class="cursor"></span></div>
+        
+        <!-- Crypto selector -->
+        <div class="crypto-selector">
+            <div class="crypto-option selected" data-crypto="ETH">
+                <div>ETHEREUM</div>
+                <div class="crypto-details">ETH MAINNET</div>
+            </div>
+            <div class="crypto-option" data-crypto="BTC">
+                <div>BITCOIN</div>
+                <div class="crypto-details">BTC NETWORK</div>
+            </div>
+            <div class="crypto-option" data-crypto="USDT">
+                <div>USDT</div>
+                <div class="crypto-details">TRC-20</div>
+            </div>
+        </div>
+
+        <!-- Wallet addresses for each crypto -->
+        <div class="wallet-box" id="wallet-ETH">
+            <div class="wallet-label">ETHEREUM MAINNET ADDRESS:</div>
+            <div class="wallet-address">
+                <span id="address-ETH">0x2451A14572F67C587eEfca42C1F4C414FA2ca6a</span>
+                <button class="copy-button" onclick="copyAddress('ETH')">COPY</button>
+            </div>
+        </div>
+
+        <div class="wallet-box" id="wallet-BTC" style="display: none;">
+            <div class="wallet-label">BITCOIN ADDRESS:</div>
+            <div class="wallet-address">
+                <span id="address-BTC">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d</span>
+                <button class="copy-button" onclick="copyAddress('BTC')">COPY</button>
+            </div>
+        </div>
+
+        <div class="wallet-box" id="wallet-USDT" style="display: none;">
+            <div class="wallet-label">USDT (TRC-20) ADDRESS:</div>
+            <div class="wallet-address">
+                <span id="address-USDT">0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B</span>
+                <button class="copy-button" onclick="copyAddress('USDT')">COPY</button>
+            </div>
         </div>
 
         <label>YOUR EMAIL</label>
-        <input type="email" id="email" placeholder="your@email.com" required>
+        <div class="input-wrapper">
+            <input type="email" id="email" placeholder="your@email.com">
+            <span class="validation-indicator" id="emailIndicator"></span>
+        </div>
+        <div class="error-message" id="emailError">Please enter a valid email address</div>
 
         <label>TRANSACTION HASH</label>
-        <input type="text" id="txHash" placeholder="Paste TX hash after payment" required>
+        <div class="input-wrapper">
+            <input type="text" id="txHash" placeholder="0x... (66 characters)">
+            <span class="validation-indicator" id="txIndicator"></span>
+        </div>
+        <div class="error-message" id="txError">Transaction hash must be 66 characters starting with 0x</div>
 
-        <!-- Submit -->
+        <!-- SUBMIT -->
         <button type="submit">PLACE ORDER</button>
 
     </form>
@@ -536,9 +1284,9 @@
     <!-- Success Message -->
     <div id="successMessage" class="success-message">
         <div class="success-title">ORDER PLACED</div>
-        <p class="success-text">Your order has been received and is being processed.</p>
+        <p class="success-text">Your order has been received<br>and is being processed</p>
         <div class="order-id">Order ID: <span id="orderId"></span></div>
-        <p class="success-text">You will receive confirmation email shortly.</p>
+        <p class="success-text">You will receive confirmation<br>email shortly</p>
     </div>
 
     <!-- FAQ -->
@@ -547,30 +1295,303 @@
 
         <div class="faq-item">
             <div class="faq-question">How long does it take?</div>
-            <div class="faq-answer">1-14 hours after payment confirmation</div>
+            <div class="faq-answer">
+                1-24 hours after payment confirmation.<br>
+                Each piece is created individually<br>
+                and requires time for experimentation.
+            </div>
         </div>
 
         <div class="faq-item">
             <div class="faq-question">What do I get?</div>
-            <div class="faq-answer">High-res PNG + physical print (shipped worldwide)</div>
+            <div class="faq-answer">
+                Physical print shipped worldwide.<br>
+                Each artwork is unique and hand-assembled<br>
+                through layered composition process.<br>
+                Digital files not included.
+            </div>
         </div>
 
         <div class="faq-item">
             <div class="faq-question">Can I request changes?</div>
-            <div class="faq-answer">Each piece is unique and generated once. No revisions.</div>
+            <div class="faq-answer">
+                No. Each piece is unique and created once.<br>
+                The process involves exploration and<br>
+                improvisation - no revisions possible.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">What is the art about?</div>
+            <div class="faq-answer">
+                Experiment. Search. Science. Philosophy.<br>
+                Physical manifestation of digital signals.<br>
+                Not purely generative - human-guided process.
+            </div>
         </div>
     </div>
 
 </div>
 
 <script>
-    let basePrice = 0;
+    let basePriceUSD = 0; // Store price in USD
     let selectedVibes = [];
+    let attentionOriginalText = ''; // Store original attention text
+    let soundEnabled = false; // Sound OFF by default
+    let selectedCrypto = 'ETH'; // Selected cryptocurrency
+    window.currentTotalUSD = 0; // Global total in USD for easy access
+    let cryptoWasSelected = true; // Track if user selected crypto (true by default since ETH is selected)
+    
+    // Sound system
+    const sounds = {
+        click: document.getElementById('clickSound'),
+        hover: document.getElementById('hoverSound'),
+        success: document.getElementById('successSound')
+    };
+    
+    // Play sound function
+    function playSound(soundName) {
+        if (soundEnabled && sounds[soundName]) {
+            sounds[soundName].currentTime = 0;
+            sounds[soundName].volume = 0.3;
+            sounds[soundName].play().catch(e => console.log('Sound play failed:', e));
+        }
+    }
+    
+    // Audio toggle button
+    document.getElementById('audioToggle').addEventListener('click', function() {
+        soundEnabled = !soundEnabled;
+        this.classList.toggle('muted', !soundEnabled);
+        this.style.color = soundEnabled ? '#00ff00' : '#ff0000';
+        localStorage.setItem('soundEnabled', soundEnabled);
+        if (soundEnabled) playSound('click');
+    });
+
+    // Load saved sound preference
+    const savedSoundPref = localStorage.getItem('soundEnabled');
+    if (savedSoundPref !== null) {
+        soundEnabled = savedSoundPref === 'true';
+    } else {
+        soundEnabled = false; // Default OFF
+    }
+    const audioToggle = document.getElementById('audioToggle');
+    audioToggle.classList.toggle('muted', !soundEnabled);
+    audioToggle.style.color = soundEnabled ? '#00ff00' : '#ff0000';
+    
+    // Add sound effects to all interactive elements
+    function addSoundEffects() {
+        // Click sounds for options
+        document.querySelectorAll('.size-option, .vibe-option, .format-option, button, .custom-control-btn').forEach(element => {
+            element.addEventListener('click', () => playSound('click'));
+        });
+        
+        // Hover sounds for options
+        document.querySelectorAll('.size-option, .vibe-option, .format-option, button, a').forEach(element => {
+            element.addEventListener('mouseenter', () => playSound('hover'));
+        });
+    }
+
+    // Function to draw lines connecting selected blocks in sequence
+    function drawConnectionLines() {
+        const svg = document.getElementById('lineCanvas');
+
+        // Remove only green connection lines and dots, keep yellow attention line
+        const paths = svg.querySelectorAll('path');
+        paths.forEach(path => {
+            if (path.getAttribute('id') !== 'attentionLine') {
+                path.remove();
+            }
+        });
+        
+        // Remove all connection dots
+        const circles = svg.querySelectorAll('circle');
+        circles.forEach(circle => circle.remove());
+
+        let delay = 0;
+        let previousElement = null;
+        const connections = [];
+
+        // 1. SIZE block
+        const selectedSize = document.querySelector('.size-option.selected');
+        if (selectedSize) {
+            previousElement = selectedSize;
+        }
+
+        // 2. VIBE block(s) - connect to previous
+        const selectedVibes = document.querySelectorAll('.vibe-option.selected');
+        if (selectedVibes.length > 0) {
+            // Sort vibes by their horizontal position to connect in visual order
+            const vibesArray = Array.from(selectedVibes).sort((a, b) => {
+                return a.getBoundingClientRect().left - b.getBoundingClientRect().left;
+            });
+            
+            if (previousElement) {
+                // Connect SIZE to first VIBE (leftmost)
+                connections.push({from: previousElement, to: vibesArray[0], delay: delay});
+                delay += 300;
+            }
+            
+            // Connect between multiple VIBEs if selected (left to right)
+            for (let i = 0; i < vibesArray.length - 1; i++) {
+                connections.push({from: vibesArray[i], to: vibesArray[i+1], delay: delay});
+                delay += 300;
+            }
+            
+            // For next connection, use the rightmost vibe
+            previousElement = vibesArray[vibesArray.length - 1];
+        }
+
+        // 3. FORMAT block - connect to previous
+        const selectedFormat = document.querySelector('.format-option.selected');
+        if (selectedFormat) {
+            if (previousElement) {
+                connections.push({from: previousElement, to: selectedFormat, delay: delay});
+                delay += 300;
+            }
+            previousElement = selectedFormat;
+        }
+
+        // 4. PRICE block - connect from format to price
+        const priceBox = document.querySelector('.price-display');
+        if (priceBox && previousElement) {
+            connections.push({from: previousElement, to: priceBox, delay: delay});
+            delay += 300;
+            previousElement = priceBox;
+        }
+
+        // 5. CRYPTO SELECTOR - connect to selected crypto option (only if user clicked it)
+        const selectedCryptoOption = document.querySelector('.crypto-option.selected');
+        if (selectedCryptoOption && previousElement && cryptoWasSelected) {
+            connections.push({from: previousElement, to: selectedCryptoOption, delay: delay});
+            delay += 300;
+            previousElement = selectedCryptoOption;
+
+            // 6. PLACE ORDER button - connect from crypto to button (only if crypto was selected)
+            const submitButton = document.querySelector('button[type="submit"]');
+            if (submitButton && previousElement) {
+                connections.push({from: previousElement, to: submitButton, delay: delay});
+            }
+        }
+
+        // Draw all connections
+        connections.forEach(conn => {
+            drawConnectionBetween(conn.from, conn.to, svg, conn.delay);
+        });
+    }
+
+    function drawConnectionBetween(fromElement, toElement, svg, delay) {
+        const fromRect = fromElement.getBoundingClientRect();
+        const toRect = toElement.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        // Adjust coordinates relative to SVG
+        const startX = fromRect.left + fromRect.width / 2 - svgRect.left;
+        const startY = fromRect.bottom - svgRect.top;
+        const endX = toRect.left + toRect.width / 2 - svgRect.left;
+        const endY = toRect.top - svgRect.top;
+
+        drawOrthogonalLine(startX, startY, endX, endY, svg, delay);
+    }
+
+    function drawOrthogonalLine(startX, startY, targetX, targetY, svg, delay) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        
+        // Create more sophisticated path routing
+        let pathData;
+        
+        // Vertical gap between elements
+        const verticalGap = 15;
+        const horizontalOffset = 20;
+        
+        // Check if this is a horizontal connection (between vibes)
+        const isHorizontal = Math.abs(startY - targetY) < 20;
+        
+        if (isHorizontal) {
+            // Horizontal connection between vibes - create arc or straight line
+            if (Math.abs(startX - targetX) < 150) {
+                // Close vibes - straight line
+                pathData = `M ${startX} ${startY} L ${targetX} ${targetY}`;
+            } else {
+                // Far vibes - create slight arc
+                const midX = (startX + targetX) / 2;
+                const arcHeight = 30;
+                pathData = `M ${startX} ${startY} Q ${midX} ${startY - arcHeight} ${targetX} ${targetY}`;
+            }
+        } else if (Math.abs(startX - targetX) < 50) {
+            // Elements are vertically aligned - straight vertical line with gaps
+            pathData = `M ${startX} ${startY + 5} L ${startX} ${targetY - 5}`;
+        } else {
+            // Elements need horizontal routing
+            const midY = startY + (targetY - startY) / 2;
+            
+            // Create stepped path for better visual
+            if (targetY - startY > 100) {
+                // Large vertical distance - use clean steps
+                const step1Y = startY + 40;
+                pathData = `M ${startX} ${startY + 5} L ${startX} ${step1Y} L ${targetX} ${step1Y} L ${targetX} ${targetY - 5}`;
+            } else {
+                // Small vertical distance - simple routing
+                pathData = `M ${startX} ${startY + 5} L ${startX} ${midY} L ${targetX} ${midY} L ${targetX} ${targetY - 5}`;
+            }
+        }
+
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', '#00ff00');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('opacity', '0.8');
+        
+        // Calculate path length for animation
+        svg.appendChild(path);
+        const pathLength = path.getTotalLength();
+        
+        path.setAttribute('stroke-dasharray', pathLength);
+        path.setAttribute('stroke-dashoffset', pathLength);
+        
+        // Add glow effect
+        path.setAttribute('filter', 'drop-shadow(0 0 3px #00ff00)');
+
+        // Animate the line drawing with delay
+        setTimeout(() => {
+            path.style.transition = `stroke-dashoffset 0.4s ease-out`;
+            path.style.strokeDashoffset = '0';
+            
+            // Add dots at connection points after line is drawn
+            setTimeout(() => {
+                // Start dot
+                const startDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                startDot.setAttribute('cx', startX);
+                startDot.setAttribute('cy', startY);
+                startDot.setAttribute('r', '3');
+                startDot.setAttribute('fill', '#00ff00');
+                startDot.setAttribute('opacity', '0');
+                svg.appendChild(startDot);
+                
+                // End dot
+                const endDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                endDot.setAttribute('cx', targetX);
+                endDot.setAttribute('cy', targetY);
+                endDot.setAttribute('r', '3');
+                endDot.setAttribute('fill', '#00ff00');
+                endDot.setAttribute('opacity', '0');
+                svg.appendChild(endDot);
+                
+                // Animate dots appearing
+                startDot.style.transition = 'opacity 0.3s ease-in';
+                endDot.style.transition = 'opacity 0.3s ease-in';
+                
+                setTimeout(() => {
+                    startDot.style.opacity = '1';
+                    endDot.style.opacity = '1';
+                }, 50);
+            }, 350);
+        }, delay);
+    }
 
     // Size selection
-    document.querySelectorAll('.option[data-size]').forEach(option => {
+    document.querySelectorAll('.size-option').forEach(option => {
         option.addEventListener('click', function() {
-            document.querySelectorAll('.option[data-size]').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('.size-option').forEach(o => o.classList.remove('selected'));
             this.classList.add('selected');
             this.querySelector('input').checked = true;
 
@@ -579,68 +1600,438 @@
 
             if (size === 'custom') {
                 customInputs.style.display = 'block';
-                basePrice = 0;
-                updateTotalPrice();
+                // Initialize with default values
+                document.getElementById('customWidth').value = 50;
+                document.getElementById('customHeight').value = 50;
+                document.getElementById('widthSlider').value = 50;
+                document.getElementById('heightSlider').value = 50;
+                document.getElementById('widthDisplay').textContent = '50cm';
+                document.getElementById('heightDisplay').textContent = '50cm';
+                calculateCustomPrice();
             } else {
                 customInputs.style.display = 'none';
-                basePrice = parseFloat(this.dataset.price);
+                basePriceUSD = parseFloat(this.dataset.price); // This is already in USD
                 updateTotalPrice();
             }
+
+            drawConnectionLines();
+            updateProgress();
+            saveFormState(); // Save state when size changes
         });
+    });
+
+    // Function to adjust custom size with buttons
+    function adjustSize(dimension, change) {
+        const input = dimension === 'width' ? document.getElementById('customWidth') : document.getElementById('customHeight');
+        const slider = dimension === 'width' ? document.getElementById('widthSlider') : document.getElementById('heightSlider');
+        const display = dimension === 'width' ? document.getElementById('widthDisplay') : document.getElementById('heightDisplay');
+        
+        let newValue = parseInt(input.value || 50) + change;
+        newValue = Math.max(10, Math.min(200, newValue)); // Clamp between 10 and 200
+        
+        input.value = newValue;
+        slider.value = newValue;
+        display.textContent = newValue + 'cm';
+        
+        calculateCustomPrice();
+    }
+    
+    // Sync sliders with inputs
+    document.getElementById('widthSlider').addEventListener('input', function() {
+        document.getElementById('customWidth').value = this.value;
+        document.getElementById('widthDisplay').textContent = this.value + 'cm';
+        calculateCustomPrice();
+    });
+    
+    document.getElementById('heightSlider').addEventListener('input', function() {
+        document.getElementById('customHeight').value = this.value;
+        document.getElementById('heightDisplay').textContent = this.value + 'cm';
+        calculateCustomPrice();
+    });
+    
+    // Sync inputs with sliders
+    document.getElementById('customWidth').addEventListener('input', function() {
+        const value = Math.max(10, Math.min(200, this.value || 50));
+        document.getElementById('widthSlider').value = value;
+        document.getElementById('widthDisplay').textContent = value + 'cm';
+        calculateCustomPrice();
+    });
+    
+    document.getElementById('customHeight').addEventListener('input', function() {
+        const value = Math.max(10, Math.min(200, this.value || 50));
+        document.getElementById('heightSlider').value = value;
+        document.getElementById('heightDisplay').textContent = value + 'cm';
+        calculateCustomPrice();
     });
 
     // Custom size calculation
     function calculateCustomPrice() {
-        const width = parseFloat(document.getElementById('customWidth').value) || 0;
-        const height = parseFloat(document.getElementById('customHeight').value) || 0;
+        const width = parseFloat(document.getElementById('customWidth').value) || 50;
+        const height = parseFloat(document.getElementById('customHeight').value) || 50;
 
         if (width >= 10 && width <= 200 && height >= 10 && height <= 200) {
-            const area = (width * height) / 10000; // Convert to m²
-            basePrice = 0.03 + (area * 0.15); // Base + area price
+            // Formula: (width × height / 6400) × 1000
+            // This gives us the price in USD (80×80 = 6400, and that equals $1000)
+            const area = width * height;
+            basePriceUSD = (area / 6400) * 1000;
             updateTotalPrice();
         }
     }
 
-    document.getElementById('customWidth').addEventListener('input', calculateCustomPrice);
-    document.getElementById('customHeight').addEventListener('input', calculateCustomPrice);
+    // Random color generator for vibe selection
+    function getRandomVibeColor() {
+        const colors = [
+            { bg: '#1a0033', border: '#8844ff', glow: 'rgba(136, 68, 255, 0.3)' },   // Purple
+            { bg: '#331a00', border: '#ff8844', glow: 'rgba(255, 136, 68, 0.3)' },   // Orange
+            { bg: '#00331a', border: '#44ff88', glow: 'rgba(68, 255, 136, 0.3)' },   // Cyan
+            { bg: '#330019', border: '#ff4488', glow: 'rgba(255, 68, 136, 0.3)' },   // Pink
+            { bg: '#1a3300', border: '#88ff44', glow: 'rgba(136, 255, 68, 0.3)' },   // Lime
+            { bg: '#001933', border: '#4488ff', glow: 'rgba(68, 136, 255, 0.3)' }    // Blue
+        ];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
 
-    // Vibe selection
+    // Initialize RANDOM vibe as selected by default - REMOVED for cleaner start
+    // selectedVibes.push('Random');
+    // const randomVibe = document.getElementById('randomVibe');
+    // const randomColor = getRandomVibeColor();
+    // randomVibe.style.background = randomColor.bg;
+    // randomVibe.style.borderColor = randomColor.border;
+    // randomVibe.style.boxShadow = `inset 0 0 20px ${randomColor.glow}`;
+
+    // Vibe selection (max 2)
     document.querySelectorAll('.vibe-option').forEach(option => {
         option.addEventListener('click', function() {
-            this.classList.toggle('selected');
             const checkbox = this.querySelector('input');
+
+            // If trying to select and already have 2 selected, do nothing
+            if (!checkbox.checked && selectedVibes.length >= 2) {
+                return;
+            }
+
+            this.classList.toggle('selected');
             checkbox.checked = !checkbox.checked;
 
             const vibe = checkbox.value;
             if (checkbox.checked) {
                 selectedVibes.push(vibe);
+                // Apply random color
+                const color = getRandomVibeColor();
+                this.style.background = color.bg;
+                this.style.borderColor = color.border;
+                this.style.boxShadow = `inset 0 0 20px ${color.glow}`;
             } else {
                 selectedVibes = selectedVibes.filter(v => v !== vibe);
+                // Reset to default
+                this.style.background = '#000';
+                this.style.borderColor = '#00ff00';
+                this.style.boxShadow = 'none';
             }
             updateTotalPrice();
+            drawConnectionLines();
+            updateProgress();
+            saveFormState(); // Save state when vibes change
         });
     });
 
     // Format selection
-    document.querySelectorAll('.option[data-format]').forEach(option => {
+    document.querySelectorAll('.format-option').forEach(option => {
         option.addEventListener('click', function() {
-            document.querySelectorAll('.option[data-format]').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('.format-option').forEach(o => o.classList.remove('selected'));
             this.classList.add('selected');
             this.querySelector('input').checked = true;
+
+            // Show/hide attention box for STRETCHED
+            const attentionBox = document.getElementById('attentionBox');
+            const svg = document.getElementById('lineCanvas');
+
+            if (this.dataset.format === 'stretched') {
+                // Remove existing attention line if any
+                const existingLine = document.getElementById('attentionLine');
+                if (existingLine) existingLine.remove();
+                
+                // Show attention box
+                attentionBox.style.display = 'block';
+                
+                // Draw animated dashed line from STRETCHED to attention box
+                setTimeout(() => {
+                    const rect = this.getBoundingClientRect();
+                    const formatContainer = document.querySelector('.format-container');
+                    const containerRect = formatContainer.getBoundingClientRect();
+                    const svgRect = svg.getBoundingClientRect();
+                    
+                    // Force attention box to recalculate position
+                    attentionBox.style.display = 'block';
+                    attentionBox.style.opacity = '0';
+                    const boxRect = attentionBox.getBoundingClientRect();
+                    
+                    // Hide the text initially
+                    const attentionText = document.querySelector('.attention-text');
+                    if (!attentionOriginalText) {
+                        attentionOriginalText = attentionText.textContent;
+                    }
+                    attentionText.style.visibility = 'hidden';
+                    
+                    // Calculate positions relative to SVG
+                    const startX = rect.right - svgRect.left;
+                    const startY = rect.top + rect.height / 2 - svgRect.top;
+                    
+                    // End position - center of attention box top edge
+                    const endX = boxRect.left + boxRect.width / 2 - svgRect.left;
+                    const endY = boxRect.top - svgRect.top;
+                    
+                    // Create path that goes right first, then DOWN at 90 degrees to center of box
+                    const midX = startX + 200; // Go 200px to the right first (increased for new position)
+                    
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    // Path goes: right from button → then down to center of box top
+                    const pathData = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+                    
+                    path.setAttribute('d', pathData);
+                    path.setAttribute('stroke', '#ffff00'); // Yellow color
+                    path.setAttribute('stroke-width', '2');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke-dasharray', '6 6');
+                    path.setAttribute('id', 'attentionLine');
+                    path.setAttribute('opacity', '0');
+                    
+                    svg.appendChild(path);
+                    
+                    // Calculate path length for animation
+                    const pathLength = path.getTotalLength();
+                    path.setAttribute('stroke-dashoffset', pathLength);
+                    
+                    // Animate line drawing
+                    setTimeout(() => {
+                        path.style.transition = 'stroke-dashoffset 0.8s ease-out, opacity 0.3s ease-in';
+                        path.style.strokeDashoffset = '0';
+                        path.style.opacity = '1';
+                        path.style.filter = 'drop-shadow(0 0 4px #ffff00)';
+                        
+                        // After line is drawn, start arcade-style blinking animation
+                        setTimeout(() => {
+                            // Apply arcade blink animation
+                            attentionBox.style.animation = 'arcade-blink 0.8s ease-out forwards';
+                            attentionBox.style.transformOrigin = 'top center';
+                            attentionBox.style.opacity = '1';
+                            
+                            // After arcade animation, add the pulsing border and start typewriter
+                            setTimeout(() => {
+                                attentionBox.classList.add('visible');
+                                
+                                // Now show the text area and start typewriter effect
+                                const attentionText = document.querySelector('.attention-text');
+                                attentionText.style.visibility = 'visible';
+                                attentionText.textContent = '';
+                                
+                                let charIndex = 0;
+                                const typewriterInterval = setInterval(() => {
+                                    if (charIndex < attentionOriginalText.length) {
+                                        attentionText.textContent += attentionOriginalText[charIndex];
+                                        charIndex++;
+                                    } else {
+                                        clearInterval(typewriterInterval);
+                                    }
+                                }, 25); // Speed of typing
+                            }, 800);
+                        }, 600);
+                    }, 100);
+                    
+                    // Add pulsing animation to the line
+                    setTimeout(() => {
+                        path.style.animation = 'pulse-opacity 2s ease-in-out infinite';
+                    }, 1000);
+                }, 100);
+            } else {
+                // Hide attention box and remove line
+                attentionBox.style.animation = 'arcade-blink 0.5s ease-in reverse';
+                attentionBox.classList.remove('visible');
+                
+                // Restore original text for next time
+                const attentionText = document.querySelector('.attention-text');
+                if (attentionOriginalText) {
+                    attentionText.textContent = attentionOriginalText;
+                    attentionText.style.visibility = 'hidden'; // Hide text again
+                }
+                
+                setTimeout(() => {
+                    attentionBox.style.display = 'none';
+                    attentionBox.style.animation = ''; // Reset animation
+                    attentionBox.style.opacity = '0';
+                    attentionBox.style.transform = 'translateX(-50%) scale(1)'; // Reset transform
+                }, 500);
+                
+                const existingLine = document.getElementById('attentionLine');
+                if (existingLine) {
+                    existingLine.style.transition = 'opacity 0.3s ease-out';
+                    existingLine.style.opacity = '0';
+                    setTimeout(() => {
+                        existingLine.remove();
+                    }, 300);
+                }
+            }
+
+            drawConnectionLines();
         });
     });
 
     // Update total price
     function updateTotalPrice() {
-        const vibeBonus = selectedVibes.length * 0.02; // +0.02 ETH per vibe
-        const total = basePrice + vibeBonus;
-        document.getElementById('totalPrice').textContent = total.toFixed(3);
+        // Calculate vibe bonus in USD - $50 per non-Random vibe
+        const nonRandomVibes = selectedVibes.filter(v => v !== 'Random');
+        const vibeBonusUSD = nonRandomVibes.length * 50;
+        const totalUSD = basePriceUSD + vibeBonusUSD;
+
+        // Store total USD for price display
+        window.currentTotalUSD = totalUSD;
+
+        // Update price display based on selected crypto
+        updatePriceDisplay();
+    }
+
+    // Update price display based on selected crypto
+    function updatePriceDisplay() {
+        const priceElement = document.querySelector('.price-value');
+        const totalUSD = window.currentTotalUSD || 0;
+
+        if (selectedCrypto === 'BTC') {
+            // BTC conversion: USD / 50000
+            const btcPrice = (totalUSD / 50000).toFixed(6);
+            priceElement.innerHTML = `<span id="totalPrice">${btcPrice}</span> BTC`;
+        } else if (selectedCrypto === 'USDT') {
+            // USDT is 1:1 with USD
+            const usdtPrice = totalUSD.toFixed(2);
+            priceElement.innerHTML = `<span id="totalPrice">${usdtPrice}</span> USDT`;
+        } else {
+            // ETH conversion: USD / 2500
+            const ethPrice = (totalUSD / 2500).toFixed(4);
+            priceElement.innerHTML = `<span id="totalPrice">${ethPrice}</span> ETH`;
+        }
+    }
+    
+    // Progress indicator management
+    function updateProgress() {
+        let progress = 0;
+        let currentStep = 0;
+        
+        // Reset all steps
+        document.querySelectorAll('.progress-step').forEach(step => {
+            step.classList.remove('active', 'completed');
+        });
+        
+        // Check SIZE (25%)
+        if (document.querySelector('input[name="size"]:checked')) {
+            progress += 25;
+            document.getElementById('step1').classList.add('completed');
+            currentStep = 1;
+        } else {
+            document.getElementById('step1').classList.add('active');
+        }
+        
+        // Check VIBE (25%) - optional, always marked as completed if size is done
+        if (currentStep >= 1) {
+            progress += 25;
+            document.getElementById('step2').classList.add('completed');
+            currentStep = 2;
+        }
+        
+        // Check FORMAT (25%)
+        if (document.querySelector('input[name="format"]:checked')) {
+            progress += 25;
+            document.getElementById('step3').classList.add('completed');
+            currentStep = 3;
+        } else if (currentStep >= 2) {
+            document.getElementById('step3').classList.add('active');
+        }
+        
+        // Check PAYMENT (25%)
+        const email = document.getElementById('email').value;
+        const txHash = document.getElementById('txHash').value;
+        
+        if (currentStep >= 3) {
+            if (validateEmail(email) && validateTxHash(txHash)) {
+                progress += 25;
+                document.getElementById('step4').classList.add('completed');
+            } else {
+                document.getElementById('step4').classList.add('active');
+                // Partial progress
+                if (validateEmail(email)) progress += 12.5;
+                if (txHash.length > 0) progress += 12.5;
+            }
+        }
+        
+        // Update progress bar
+        const progressFill = document.getElementById('progressFill');
+        progressFill.style.width = progress + '%';
+        
+        // Add effects based on progress
+        if (progress === 100) {
+            progressFill.style.background = 'linear-gradient(90deg, #00ff00 0%, #88ffcc 100%)';
+            progressFill.style.boxShadow = '0 0 30px #00ff00, inset 0 0 10px rgba(255,255,255,0.3)';
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.style.animation = 'pulse 1s ease-in-out infinite';
+        } else if (progress >= 75) {
+            progressFill.style.background = 'linear-gradient(90deg, #00ff00 0%, #44ff88 100%)';
+            progressFill.style.boxShadow = '0 0 20px #00ff00';
+        } else if (progress >= 50) {
+            progressFill.style.background = 'linear-gradient(90deg, #00cc00 0%, #00ff00 100%)';
+            progressFill.style.boxShadow = '0 0 15px #00ff00';
+        } else {
+            progressFill.style.background = '#00ff00';
+            progressFill.style.boxShadow = '0 0 10px #00ff00';
+        }
+    }
+    
+    // Save form state to localStorage
+    function saveFormState() {
+        const formState = {
+            size: document.querySelector('input[name="size"]:checked')?.value,
+            customWidth: document.getElementById('customWidth')?.value,
+            customHeight: document.getElementById('customHeight')?.value, 
+            vibes: selectedVibes,
+            format: document.querySelector('input[name="format"]:checked')?.value,
+            email: document.getElementById('email')?.value,
+            timestamp: Date.now()
+        };
+        localStorage.setItem('ghostlineFormState', JSON.stringify(formState));
+    }
+    
+    // Load form state from localStorage
+    function loadFormState() {
+        const savedState = localStorage.getItem('ghostlineFormState');
+        if (!savedState) return false;
+        
+        try {
+            const formState = JSON.parse(savedState);
+            
+            // Check if saved state is not too old (24 hours)
+            if (Date.now() - formState.timestamp > 24 * 60 * 60 * 1000) {
+                localStorage.removeItem('ghostlineFormState');
+                return false;
+            }
+            
+            // Restore email first (doesn't trigger events)
+            if (formState.email) {
+                document.getElementById('email').value = formState.email;
+            }
+            
+            return formState; // Return state for manual restoration after page load
+            
+        } catch (e) {
+            console.error('Failed to load form state:', e);
+            localStorage.removeItem('ghostlineFormState');
+            return false;
+        }
     }
 
     // Form submission
     document.getElementById('orderForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('🚀 Form submitted - starting order process');
+        
+        // Validate form first
+        if (!validateForm()) {
+            return;
+        }
 
         const formData = {
             size: document.querySelector('input[name="size"]:checked').value,
@@ -651,7 +2042,8 @@
             format: document.querySelector('input[name="format"]:checked').value,
             email: document.getElementById('email').value,
             txHash: document.getElementById('txHash').value,
-            totalPrice: document.getElementById('totalPrice').textContent,
+            totalPrice: document.getElementById('totalPrice').textContent + ' ' + selectedCrypto,
+            totalPriceUSD: window.currentTotalUSD.toFixed(2) + ' USD',
             timestamp: new Date().toISOString()
         };
 
@@ -671,25 +2063,11 @@
         };
 
         // Send email
-        console.log('📧 Email params breakdown:');
-        console.log('  order_id:', emailParams.order_id);
-        console.log('  timestamp:', emailParams.timestamp);
-        console.log('  size:', emailParams.size);
-        console.log('  custom_width:', emailParams.custom_width);
-        console.log('  custom_height:', emailParams.custom_height);
-        console.log('  vibes:', emailParams.vibes);
-        console.log('  format:', emailParams.format);
-        console.log('  total_price:', emailParams.total_price);
-        console.log('  customer_email:', emailParams.customer_email);
-        console.log('  tx_hash:', emailParams.tx_hash);
-        console.log('Full emailParams object:', emailParams);
         try {
-            const emailResponse = await emailjs.send('service_1ni4wkp', 'template_5vvlo2b', emailParams);
-            console.log('✓ Email sent successfully:', emailResponse);
+            await emailjs.send('service_1ni4wkp', 'template_5vvlo2b', emailParams);
+            console.log('✓ Email sent');
         } catch (error) {
-            console.error('❌ Email error:', error);
-            console.error('Error details:', error.text, error.status);
-            alert('Email failed to send: ' + error.text);
+            console.error('Email error:', error);
         }
 
         // Send to Google Sheets
@@ -718,33 +2096,621 @@
         }
 
         // Show success
+        playSound('success');
         document.getElementById('orderForm').style.display = 'none';
         document.getElementById('successMessage').style.display = 'block';
         document.getElementById('orderId').textContent = orderId;
     });
 
-    // Freeze GIF on last frame after one loop
-    // GIF plays once (3-4 seconds), then we freeze it
-    const gif = document.getElementById('orderGif');
-    let frozen = false;
+    // Replace GIF with static last frame after 2.9 seconds
+    setTimeout(function() {
+        document.getElementById('orderGif').src = 'components/ORDERlast_frame.png';
+    }, 2900);
 
-    // Wait for GIF to load
-    gif.addEventListener('load', function() {
-        // After 3.5 seconds (duration of one loop), freeze the GIF
+    // Copy wallet address function
+    function copyAddress(crypto) {
+        const addressElement = document.getElementById(`address-${crypto}`);
+        const address = addressElement.textContent;
+
+        navigator.clipboard.writeText(address).then(() => {
+            playSound('success');
+
+            // Update button text
+            const button = addressElement.nextElementSibling;
+            button.classList.add('copied');
+            button.textContent = 'COPIED!';
+
+            // Draw line from crypto selector to wallet box
+            drawCopyLine(crypto);
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                button.classList.remove('copied');
+                button.textContent = 'COPY';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = address;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            playSound('success');
+            const button = addressElement.nextElementSibling;
+            button.classList.add('copied');
+            button.textContent = 'COPIED!';
+
+            // Draw line from crypto selector to wallet box
+            drawCopyLine(crypto);
+
+            setTimeout(() => {
+                button.classList.remove('copied');
+                button.textContent = 'COPY';
+            }, 2000);
+        });
+    }
+
+    // Draw line from crypto selector to copy button
+    function drawCopyLine(crypto) {
+        const svg = document.getElementById('lineCanvas');
+        const cryptoOption = document.querySelector('.crypto-option.selected');
+        const walletBox = document.getElementById(`wallet-${crypto}`);
+
+        if (!cryptoOption || !walletBox) return;
+
+        // Remove previous copy line if exists
+        const existingCopyLine = document.getElementById('copyLine');
+        if (existingCopyLine) existingCopyLine.remove();
+
+        const fromRect = cryptoOption.getBoundingClientRect();
+        const toRect = walletBox.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        const startX = fromRect.left + fromRect.width / 2 - svgRect.left;
+        const startY = fromRect.bottom - svgRect.top;
+        const endX = toRect.left + toRect.width / 2 - svgRect.left;
+        const endY = toRect.top - svgRect.top;
+
+        // Create vertical line
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const pathData = `M ${startX} ${startY} L ${startX} ${endY - 20} L ${endX} ${endY - 20} L ${endX} ${endY}`;
+
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', '#00ff00');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('opacity', '0');
+        path.setAttribute('id', 'copyLine');
+        path.setAttribute('filter', 'drop-shadow(0 0 5px #00ff00)');
+
+        svg.appendChild(path);
+
+        // Animate line
+        const pathLength = path.getTotalLength();
+        path.setAttribute('stroke-dasharray', pathLength);
+        path.setAttribute('stroke-dashoffset', pathLength);
+
         setTimeout(() => {
-            if (!frozen) {
-                frozen = true;
-                // Create canvas to capture last frame
-                const canvas = document.createElement('canvas');
-                canvas.width = gif.naturalWidth;
-                canvas.height = gif.naturalHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(gif, 0, 0);
+            path.style.transition = 'stroke-dashoffset 0.5s ease-out, opacity 0.3s ease-in';
+            path.style.strokeDashoffset = '0';
+            path.style.opacity = '0.8';
 
-                // Replace GIF with static image
-                gif.src = canvas.toDataURL('image/png');
+            // Fade out after 2 seconds
+            setTimeout(() => {
+                path.style.transition = 'opacity 0.5s ease-out';
+                path.style.opacity = '0';
+                setTimeout(() => path.remove(), 500);
+            }, 2000);
+        }, 50);
+    }
+
+    // Create floating pixels (fireflies)
+    function createPixels() {
+        const pixelCount = 30;
+        for (let i = 0; i < pixelCount; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+
+            // Random starting position
+            pixel.style.left = Math.random() * window.innerWidth + 'px';
+            pixel.style.top = Math.random() * window.innerHeight + 'px';
+
+            // Random animation duration and delay
+            const duration = 10 + Math.random() * 20; // 10-30s
+            const delay = Math.random() * 5; // 0-5s delay
+
+            pixel.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+
+            document.body.appendChild(pixel);
+        }
+    }
+
+    // Create explosion pixels at a specific point
+    function createExplosionPixels(x, y) {
+        const pixelCount = 20;
+        for (let i = 0; i < pixelCount; i++) {
+            const pixel = document.createElement('div');
+            pixel.style.position = 'absolute';
+            pixel.style.width = '4px';
+            pixel.style.height = '4px';
+            pixel.style.background = '#00ff00';
+            pixel.style.boxShadow = '0 0 10px #00ff00';
+            pixel.style.left = x + 'px';
+            pixel.style.top = y + 'px';
+            pixel.style.pointerEvents = 'none';
+            pixel.style.zIndex = '999';
+
+            const angle = (Math.PI * 2 * i) / pixelCount;
+            const velocity = 100 + Math.random() * 100;
+            const vx = Math.cos(angle) * velocity;
+            const vy = Math.sin(angle) * velocity;
+
+            document.body.appendChild(pixel);
+
+            let posX = x;
+            let posY = y;
+            let opacity = 1;
+            const startTime = Date.now();
+
+            const animate = () => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                if (elapsed > 1) {
+                    pixel.remove();
+                    return;
+                }
+
+                posX += vx * 0.016;
+                posY += vy * 0.016;
+                opacity = 1 - elapsed;
+
+                pixel.style.left = posX + 'px';
+                pixel.style.top = posY + 'px';
+                pixel.style.opacity = opacity;
+
+                requestAnimationFrame(animate);
+            };
+
+            animate();
+        }
+    }
+
+    // Draw line to email input when valid email is entered
+    function drawLineToEmail() {
+        const svg = document.getElementById('lineCanvas');
+        const walletBox = document.querySelector('.wallet-box[style*="display: block"], .wallet-box:not([style*="display: none"])');
+        const emailInput = document.getElementById('email');
+
+        if (!walletBox || !emailInput) return;
+
+        // Remove previous email line if exists
+        const existingLine = document.getElementById('emailLine');
+        if (existingLine) existingLine.remove();
+
+        const fromRect = walletBox.getBoundingClientRect();
+        const toRect = emailInput.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        const startX = fromRect.left + fromRect.width / 2 - svgRect.left;
+        const startY = fromRect.bottom - svgRect.top;
+        const endX = toRect.left + toRect.width / 2 - svgRect.left;
+        const endY = toRect.top - svgRect.top;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const pathData = `M ${startX} ${startY} L ${startX} ${startY + 30} L ${endX} ${startY + 30} L ${endX} ${endY}`;
+
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', '#00ff00');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('opacity', '0');
+        path.setAttribute('id', 'emailLine');
+        path.setAttribute('filter', 'drop-shadow(0 0 3px #00ff00)');
+
+        svg.appendChild(path);
+
+        const pathLength = path.getTotalLength();
+        path.setAttribute('stroke-dasharray', pathLength);
+        path.setAttribute('stroke-dashoffset', pathLength);
+
+        setTimeout(() => {
+            path.style.transition = 'stroke-dashoffset 0.5s ease-out, opacity 0.3s ease-in';
+            path.style.strokeDashoffset = '0';
+            path.style.opacity = '0.8';
+
+            checkCircuitComplete();
+        }, 50);
+    }
+
+    // Draw line to transaction hash input when valid hash is entered
+    function drawLineToTxHash() {
+        const svg = document.getElementById('lineCanvas');
+        const emailInput = document.getElementById('email');
+        const txHashInput = document.getElementById('txHash');
+
+        if (!emailInput || !txHashInput) return;
+
+        // Remove previous tx line if exists
+        const existingLine = document.getElementById('txLine');
+        if (existingLine) existingLine.remove();
+
+        const fromRect = emailInput.getBoundingClientRect();
+        const toRect = txHashInput.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        const startX = fromRect.left + fromRect.width / 2 - svgRect.left;
+        const startY = fromRect.bottom - svgRect.top;
+        const endX = toRect.left + toRect.width / 2 - svgRect.left;
+        const endY = toRect.top - svgRect.top;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const pathData = `M ${startX} ${startY} L ${endX} ${endY}`;
+
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', '#00ff00');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('opacity', '0');
+        path.setAttribute('id', 'txLine');
+        path.setAttribute('filter', 'drop-shadow(0 0 3px #00ff00)');
+
+        svg.appendChild(path);
+
+        const pathLength = path.getTotalLength();
+        path.setAttribute('stroke-dasharray', pathLength);
+        path.setAttribute('stroke-dashoffset', pathLength);
+
+        setTimeout(() => {
+            path.style.transition = 'stroke-dashoffset 0.5s ease-out, opacity 0.3s ease-in';
+            path.style.strokeDashoffset = '0';
+            path.style.opacity = '0.8';
+
+            checkCircuitComplete();
+        }, 50);
+    }
+
+    // Draw line from tx hash to submit button
+    function drawLineToSubmit() {
+        const svg = document.getElementById('lineCanvas');
+        const txHashInput = document.getElementById('txHash');
+        const submitButton = document.querySelector('button[type="submit"]');
+
+        if (!txHashInput || !submitButton) return;
+
+        // Remove previous submit line if exists
+        const existingLine = document.getElementById('submitLine');
+        if (existingLine) existingLine.remove();
+
+        const fromRect = txHashInput.getBoundingClientRect();
+        const toRect = submitButton.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        const startX = fromRect.left + fromRect.width / 2 - svgRect.left;
+        const startY = fromRect.bottom - svgRect.top;
+        const endX = toRect.left + toRect.width / 2 - svgRect.left;
+        const endY = toRect.top - svgRect.top;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const pathData = `M ${startX} ${startY} L ${startX} ${startY + 20} L ${endX} ${startY + 20} L ${endX} ${endY}`;
+
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', '#00ff00');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('opacity', '0');
+        path.setAttribute('id', 'submitLine');
+        path.setAttribute('filter', 'drop-shadow(0 0 3px #00ff00)');
+
+        svg.appendChild(path);
+
+        const pathLength = path.getTotalLength();
+        path.setAttribute('stroke-dasharray', pathLength);
+        path.setAttribute('stroke-dashoffset', pathLength);
+
+        setTimeout(() => {
+            path.style.transition = 'stroke-dashoffset 0.5s ease-out, opacity 0.3s ease-in';
+            path.style.strokeDashoffset = '0';
+            path.style.opacity = '0.8';
+
+            checkCircuitComplete();
+        }, 50);
+    }
+
+    // Check if circuit is complete and trigger celebration
+    let circuitCompleted = false;
+    function checkCircuitComplete() {
+        if (circuitCompleted) return;
+
+        const hasEmail = document.getElementById('emailLine');
+        const hasTx = document.getElementById('txLine');
+        const hasSubmit = document.getElementById('submitLine');
+
+        if (hasEmail && hasTx && hasSubmit) {
+            circuitCompleted = true;
+            celebrateCircuitComplete();
+        }
+    }
+
+    // Celebration when circuit is complete
+    function celebrateCircuitComplete() {
+        playSound('success');
+
+        // Pulse all lines
+        const svg = document.getElementById('lineCanvas');
+        const allPaths = svg.querySelectorAll('path');
+        allPaths.forEach(path => {
+            if (path.id !== 'attentionLine') {
+                path.style.animation = 'pulse-opacity 1s ease-in-out 3';
             }
-        }, 3500); // Adjust timing based on GIF duration
+        });
+
+        // Create explosions at key points
+        const submitButton = document.querySelector('button[type="submit"]');
+        if (submitButton) {
+            const rect = submitButton.getBoundingClientRect();
+            createExplosionPixels(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }
+
+        // Make submit button pulse
+        const btn = document.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.style.animation = 'pulse 1s ease-in-out 3';
+        }
+    }
+
+    // Form validation functions
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email.toLowerCase());
+    }
+    
+    function validateTxHash(hash) {
+        // Ethereum transaction hash: 66 characters, starts with 0x, followed by 64 hex characters
+        const re = /^0x[a-fA-F0-9]{64}$/;
+        return re.test(hash);
+    }
+    
+    function showError(inputId, errorId, show = true) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        
+        if (show) {
+            input.classList.add('input-error');
+            error.classList.add('show');
+            playSound('click'); // Error sound
+        } else {
+            input.classList.remove('input-error');
+            error.classList.remove('show');
+        }
+    }
+    
+    function updateValidationIndicator(indicatorId, isValid) {
+        const indicator = document.getElementById(indicatorId);
+        if (isValid) {
+            indicator.textContent = '✓';
+            indicator.className = 'validation-indicator valid';
+        } else if (isValid === false) {
+            indicator.textContent = '✗';
+            indicator.className = 'validation-indicator invalid';
+        } else {
+            indicator.textContent = '';
+            indicator.className = 'validation-indicator';
+        }
+    }
+    
+    // Real-time email validation
+    document.getElementById('email').addEventListener('input', function() {
+        const isValid = this.value.length > 0 ? validateEmail(this.value) : null;
+        updateValidationIndicator('emailIndicator', isValid);
+        if (this.value.length > 0 && !isValid) {
+            showError('email', 'emailError', true);
+        } else {
+            showError('email', 'emailError', false);
+        }
+
+        // Draw line when valid email is entered
+        if (isValid) {
+            drawLineToEmail();
+        }
+
+        saveFormState();
+        updateProgress();
+    });
+    
+    // Real-time transaction hash validation
+    document.getElementById('txHash').addEventListener('input', function() {
+        // Auto-format: remove spaces and convert to lowercase
+        this.value = this.value.trim().toLowerCase();
+
+        const isValid = this.value.length > 0 ? validateTxHash(this.value) : null;
+        updateValidationIndicator('txIndicator', isValid);
+
+        // Show character count
+        if (this.value.length > 0 && this.value.length !== 66) {
+            document.getElementById('txError').textContent =
+                `Transaction hash must be 66 characters (currently ${this.value.length})`;
+            showError('txHash', 'txError', true);
+        } else if (this.value.length === 66 && !isValid) {
+            document.getElementById('txError').textContent =
+                'Invalid format: must start with 0x followed by 64 hexadecimal characters';
+            showError('txHash', 'txError', true);
+        } else {
+            document.getElementById('txError').textContent =
+                'Transaction hash must be 66 characters starting with 0x';
+            showError('txHash', 'txError', false);
+        }
+
+        // Draw lines when valid tx hash is entered
+        if (isValid) {
+            drawLineToTxHash();
+            drawLineToSubmit();
+        }
+
+        updateProgress();
+    });
+    
+    // Paste event handler for transaction hash
+    document.getElementById('txHash').addEventListener('paste', function(e) {
+        setTimeout(() => {
+            // Auto-clean pasted content
+            this.value = this.value.trim().toLowerCase();
+            // Trigger validation
+            this.dispatchEvent(new Event('input'));
+        }, 10);
+    });
+    
+    // Form submission with validation
+    function validateForm() {
+        let isValid = true;
+        let firstError = null;
+
+        // Check if size is selected
+        if (!document.querySelector('input[name="size"]:checked')) {
+            firstError = firstError || 'SIZE';
+            isValid = false;
+        }
+
+        // Check if format is selected
+        if (!document.querySelector('input[name="format"]:checked')) {
+            firstError = firstError || 'FORMAT';
+            isValid = false;
+        }
+
+        // Validate email
+        const email = document.getElementById('email').value;
+        if (!email || !validateEmail(email)) {
+            showError('email', 'emailError', true);
+            firstError = firstError || 'EMAIL';
+            isValid = false;
+        }
+
+        // Validate transaction hash
+        const txHash = document.getElementById('txHash').value;
+        if (!txHash || !validateTxHash(txHash)) {
+            showError('txHash', 'txError', true);
+            firstError = firstError || 'TRANSACTION HASH';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            playSound('click'); // Error sound
+
+            // Scroll to first error
+            if (firstError === 'SIZE') {
+                document.querySelector('.size-grid').scrollIntoView({behavior: 'smooth', block: 'center'});
+            } else if (firstError === 'FORMAT') {
+                document.querySelector('.format-grid').scrollIntoView({behavior: 'smooth', block: 'center'});
+            } else if (firstError === 'EMAIL') {
+                document.getElementById('email').focus();
+                document.getElementById('email').scrollIntoView({behavior: 'smooth', block: 'center'});
+            } else if (firstError === 'TRANSACTION HASH') {
+                document.getElementById('txHash').focus();
+                document.getElementById('txHash').scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+        }
+
+        return isValid;
+    }
+    
+    // Initialize pixels on page load
+    createPixels();
+    
+    // Initialize sound effects
+    addSoundEffects();
+    
+    // Set default selections for demo
+    window.addEventListener('load', () => {
+        // Crypto currency selector
+        document.querySelectorAll('.crypto-option').forEach(option => {
+            option.addEventListener('click', function() {
+                playSound('click');
+
+                // Update selection
+                document.querySelectorAll('.crypto-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+
+                // Get selected crypto
+                selectedCrypto = this.dataset.crypto;
+
+                // Mark that crypto was selected by user
+                cryptoWasSelected = true;
+
+                // Show corresponding wallet
+                document.querySelectorAll('.wallet-box').forEach(wallet => {
+                    wallet.style.display = 'none';
+                });
+                document.getElementById(`wallet-${selectedCrypto}`).style.display = 'block';
+
+                // Update price display
+                updatePriceDisplay();
+
+                // Draw connection lines
+                drawConnectionLines();
+
+                // Save state
+                saveFormState();
+            });
+        });
+        
+        // Try to load saved state first
+        const savedState = loadFormState();
+        
+        if (savedState && savedState.size) {
+            // Restore saved state
+            setTimeout(() => {
+                // Restore size
+                const sizeOption = document.querySelector(`.size-option[data-size="${savedState.size}"]`);
+                if (sizeOption) {
+                    sizeOption.click();
+                    
+                    // Restore custom dimensions
+                    if (savedState.size === 'custom') {
+                        document.getElementById('customWidth').value = savedState.customWidth || 50;
+                        document.getElementById('customHeight').value = savedState.customHeight || 50;
+                        document.getElementById('widthSlider').value = savedState.customWidth || 50;
+                        document.getElementById('heightSlider').value = savedState.customHeight || 50;
+                        document.getElementById('widthDisplay').textContent = (savedState.customWidth || 50) + 'cm';
+                        document.getElementById('heightDisplay').textContent = (savedState.customHeight || 50) + 'cm';
+                        calculateCustomPrice();
+                    }
+                }
+                
+                // Restore format
+                if (savedState.format) {
+                    const formatOption = document.querySelector(`.format-option[data-format="${savedState.format}"]`);
+                    if (formatOption) formatOption.click();
+                }
+                
+                updateTotalPrice();
+                updateProgress();
+                drawConnectionLines();
+            }, 100);
+        } else {
+            // Don't select defaults - let user start fresh
+            /*
+            const firstSize = document.querySelector('.size-option[data-size="small"]');
+            if (firstSize && !document.querySelector('.size-option.selected')) {
+                firstSize.classList.add('selected');
+                firstSize.querySelector('input').checked = true;
+                basePriceUSD = parseFloat(firstSize.dataset.price);
+            }
+            
+            const firstFormat = document.querySelector('.format-option[data-format="rolled"]');
+            if (firstFormat && !document.querySelector('.format-option.selected')) {
+                firstFormat.classList.add('selected');
+                firstFormat.querySelector('input').checked = true;
+            }
+            */
+            
+            // Initialize with 0 prices
+            updateTotalPrice();
+            updateProgress();
+            setTimeout(() => {
+                drawConnectionLines();
+            }, 200);
+        }
     });
 </script>
 
