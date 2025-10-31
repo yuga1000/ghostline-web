@@ -574,7 +574,11 @@
 <div class="container mx-auto px-4 pb-8">
     <!-- Title -->
     <div class="text-center mb-6">
-        <h1 class="pixel-text text-3xl mb-4">GALLERY</h1>
+        <div class="flex items-center justify-center gap-4 mb-4">
+            <img src="components/Yuga.GIF" alt="Yuga" style="width: 60px; height: 60px; image-rendering: pixelated;">
+            <h1 class="pixel-text text-3xl">GALLERY</h1>
+            <img src="components/Yuga.GIF" alt="Yuga" style="width: 60px; height: 60px; image-rendering: pixelated;">
+        </div>
     </div>
 
 
@@ -713,15 +717,6 @@ async function loadGallery() {
             galleryItems = [
                 {
                     id: 1,
-                    title: 'Yuga',
-                    url: 'components/Yuga.GIF?v=' + Date.now(),
-                    category: 'latest',
-                    status: 'available',
-                    description: 'Digital artwork',
-                    size: '40×40 cm'
-                },
-                {
-                    id: 2,
                     title: 'Test Artwork 1',
                     url: 'pages/2Large.jpeg?v=' + Date.now(),
                     category: 'latest',
@@ -730,7 +725,7 @@ async function loadGallery() {
                     size: '40×40 cm'
                 },
                 {
-                    id: 3,
+                    id: 2,
                     title: 'Test Artwork 2',
                     url: 'components/3scene-terminator-draw.gif.gif?v=' + Date.now(),
                     category: 'series',
@@ -739,7 +734,7 @@ async function loadGallery() {
                     size: '30×30 cm'
                 },
                 {
-                    id: 4,
+                    id: 3,
                     title: 'Test Artwork 3',
                     url: 'plate_noisemask.GIF?v=' + Date.now(),
                     category: 'rare',
