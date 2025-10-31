@@ -372,6 +372,11 @@ padding: 0.5rem;
             </div>
 
             <div class="compact-input">
+                <label>SIZE</label>
+                <input type="text" id="size" class="admin-input w-full" placeholder="40×40 cm">
+            </div>
+
+            <div class="compact-input">
                 <label>CATEGORY</label>
                 <select id="category" class="admin-input w-full">
                     <option value="latest" selected>LATEST</option>
@@ -569,6 +574,7 @@ padding: 0.5rem;
             status: document.getElementById('status').value,
             category: document.getElementById('category').value,
             price: parsedPrice,
+            size: document.getElementById('size').value.trim() || null,
             url: currentImageData
         };
         if (editingId) {
@@ -628,8 +634,9 @@ padding: 0.5rem;
             document.getElementById('description').value = artwork.description || '';
             document.getElementById('status').value = artwork.status || 'available';
             document.getElementById('price').value = artwork.price || '';
+            document.getElementById('size').value = artwork.size || '';
             document.getElementById('category').value = artwork.category || 'latest';
-            
+
             if (artwork.url) {
                 currentImageData = artwork.url;
                 currentImageFilename = artwork.url.split('/').pop();
@@ -637,7 +644,7 @@ padding: 0.5rem;
                 document.getElementById('uploadText').classList.add('hidden');
                 document.getElementById('imagePreviewContainer').classList.remove('hidden');
             }
-            
+
             document.getElementById('formTitle').textContent = 'EDIT ARTWORK';
             document.getElementById('saveButton').textContent = 'UPDATE';
         }
@@ -688,6 +695,7 @@ padding: 0.5rem;
                         <div class="text-xs text-green-400">
                             ${artwork.category || 'latest'} • ${artwork.price ? artwork.price + ' ETH' : 'No price'}
                         </div>
+                        ${artwork.size ? `<div class="text-xs text-green-500 mt-1">📐 ${artwork.size}</div>` : ''}
                         ${artwork.description ? `<div class="text-xs text-green-600 mt-1">${artwork.description.substring(0, 50)}${artwork.description.length > 50 ? '...' : ''}</div>` : ''}
                     </div>
                     
