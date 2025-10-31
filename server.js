@@ -13,6 +13,9 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const ADMIN_SLUG = process.env.ADMIN_SLUG || 'admin';
 const ADMIN_IP_ALLOW = (process.env.ADMIN_IP_ALLOW || '').split(',').map(s => s.trim()).filter(Boolean);
 
+// Trust Railway proxy
+app.set('trust proxy', 1);
+
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
