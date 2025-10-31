@@ -70,10 +70,139 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'logged_out' });
 });
 
-// Hide admin entry under secret slug and protect direct file access
-app.get(`/${ADMIN_SLUG}`, requireAdmin, (req, res) => {
+// Hide admin entry under secret slug - show login form if not authenticated
+app.get(`/${ADMIN_SLUG}`, (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-  res.sendFile(path.join(__dirname, 'admin.html'));
+
+  // Check if already authenticated
+  const token = req.signedCookies && req.signedCookies.gl_admin;
+  if (token) {
+    try {
+      const [ts, sig] = token.split('.');
+      const h = crypto.createHmac('sha256', SESSION_SECRET).update(ts).digest('hex');
+      const age = Date.now() - Number(ts);
+      if (h === sig && age < 24 * 60 * 60 * 1000) {
+        // Valid token - show admin panel
+        return res.sendFile(path.join(__dirname, 'admin.html'));
+      }
+    } catch (e) {
+      // Invalid token - clear it and show login
+      res.clearCookie('gl_admin', { path: '/' });
+    }
+  }
+
+  // Not authenticated - show login form
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            border: 2px solid #00ff00;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            margin: 0 0 30px 0;
+            font-size: 24px;
+        }
+        input {
+            background: #000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 12px;
+            width: 100%;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+        }
+        button {
+            background: #000;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            width: 100%;
+        }
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .error {
+            color: #ff0000;
+            margin-top: 20px;
+            display: none;
+        }
+        label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>[GHOSTLINE_ADMIN]</h1>
+        <form id="loginForm">
+            <input type="password" id="password" placeholder="Enter password" required autofocus>
+            <label>
+                <input type="checkbox" id="remember">
+                <span>Remember for 30 days</span>
+            </label>
+            <button type="submit">LOGIN</button>
+            <div class="error" id="error">Invalid password</div>
+        </form>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const error = document.getElementById('error');
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password, remember })
+                });
+
+                if (res.ok) {
+                    window.location.reload();
+                } else {
+                    error.style.display = 'block';
+                }
+            } catch (err) {
+                error.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+  `);
 });
 
 app.use((req, res, next) => {
