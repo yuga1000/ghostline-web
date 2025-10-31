@@ -133,7 +133,16 @@
         text-shadow: 0 0 2px #00ff00;
         animation: symbolFlicker 1.5s infinite;
     }
-    
+
+    .artwork-size {
+        color: #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        text-align: center;
+        margin-top: 4px;
+        opacity: 0.8;
+    }
+
     .ghost-coin {
         width: 20px;
         height: 20px;
@@ -708,7 +717,8 @@ async function loadGallery() {
                     url: 'pages/2Large.jpeg?v=' + Date.now(),
                     category: 'latest',
                     status: 'available',
-                    description: 'Test artwork for gallery functionality'
+                    description: 'Test artwork for gallery functionality',
+                    size: '40×40 cm'
                 },
                 {
                     id: 2,
@@ -716,7 +726,8 @@ async function loadGallery() {
                     url: 'components/3scene-terminator-draw.gif.gif?v=' + Date.now(),
                     category: 'series',
                     status: 'available',
-                    description: 'Another test artwork'
+                    description: 'Another test artwork',
+                    size: '30×30 cm'
                 },
                 {
                     id: 3,
@@ -724,7 +735,8 @@ async function loadGallery() {
                     url: 'plate_noisemask.GIF?v=' + Date.now(),
                     category: 'rare',
                     status: 'sold',
-                    description: 'Sold test artwork'
+                    description: 'Sold test artwork',
+                    size: '50×50 cm'
                 }
             ];
             localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
@@ -784,6 +796,7 @@ function renderGallery() {
                     <span class="artwork-symbol" data-index="${index}-3">░</span>
                     <span class="artwork-symbol" data-index="${index}-4">▖</span>
                 </div>
+                ${item.size ? `<div class="artwork-size">${item.size}</div>` : ''}
             </div>
         </div>
     `).join('');
