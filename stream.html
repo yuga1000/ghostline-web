@@ -220,6 +220,9 @@
         overflow-x: hidden;
         padding-right: 4px;
         scroll-behavior: smooth;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
     }
 
     /* Custom scrollbar for webkit browsers */
@@ -1120,7 +1123,7 @@ function addLogLine(text, className = 'log-info') {
 
         // Typewriter effect - type one character at a time
         let charIndex = 0;
-        const typeSpeed = 270; // milliseconds per character (slowed down 18x for cinematic effect)
+        const typeSpeed = 135; // milliseconds per character (2x faster)
 
         function typeNextChar() {
             if (charIndex < message.length) {
