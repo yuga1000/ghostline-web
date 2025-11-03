@@ -82,16 +82,21 @@ app.post('/api/logs', (req, res) => {
   // Check Bearer token
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    console.log('[Logs API] Missing or invalid Authorization header');
+    return res.status(401).json({ error: 'Unauthorized - missing Bearer token' });
   }
 
   const token = authHeader.substring(7); // Remove 'Bearer '
+  console.log('[Logs API] Received token:', token);
+  console.log('[Logs API] Expected token:', LOG_STREAM_PASSWORD);
+
   if (token !== LOG_STREAM_PASSWORD) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized - invalid token' });
   }
 
   // Store log
   const logEvent = req.body;
+  console.log('[Logs API] Storing log:', logEvent.message);
   recentLogs.push(logEvent);
   if (recentLogs.length > MAX_LOGS) {
     recentLogs.shift(); // Remove oldest
