@@ -995,7 +995,9 @@ let ws = {
 
 // Handle incoming log message
 function handleLogMessage(data) {
-    const { message, timestamp, level, metadata } = data;
+    // Handle both 'message' and 'content' fields (content is from server logs)
+    const message = data.message || data.content;
+    const { timestamp, level, metadata } = data;
 
     // Update pipeline name if provided
     if (metadata && metadata.pipeline) {
