@@ -114,6 +114,11 @@ app.get('/api/logs', (req, res) => {
   res.json({ logs: recentLogs });
 });
 
+// Test endpoint to verify deployment
+app.get('/api/test-deployment', (req, res) => {
+  res.json({ status: 'ok', message: 'Deployment verified', timestamp: new Date().toISOString() });
+});
+
 // Hide admin entry under secret slug - show login form if not authenticated
 app.get(`/${ADMIN_SLUG}`, (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
