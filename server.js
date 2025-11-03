@@ -87,10 +87,13 @@ app.post('/api/logs', (req, res) => {
   }
 
   const token = authHeader.substring(7); // Remove 'Bearer '
-  console.log('[Logs API] Received token:', token);
-  console.log('[Logs API] Expected token:', LOG_STREAM_PASSWORD);
+  console.log('[Logs API] Received token:', JSON.stringify(token));
+  console.log('[Logs API] Expected token:', JSON.stringify(LOG_STREAM_PASSWORD));
+  console.log('[Logs API] Token length:', token.length, 'vs', LOG_STREAM_PASSWORD.length);
+  console.log('[Logs API] Tokens match:', token === LOG_STREAM_PASSWORD);
 
   if (token !== LOG_STREAM_PASSWORD) {
+    console.log('[Logs API] Token mismatch - rejecting request');
     return res.status(401).json({ error: 'Unauthorized - invalid token' });
   }
 
