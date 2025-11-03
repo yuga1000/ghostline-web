@@ -1030,10 +1030,10 @@ function handleLogMessage(data) {
         case 'dim': logClass = 'log-dim'; break;
     }
 
-    // Add log line with timestamp if provided
-    const logText = timestamp ? `[${timestamp}] ${content}` : content;
+    // Content already includes timestamp from server, use as-is
+    const logText = content;
 
-    // Add to queue instead of showing immediately (for 300ms animation)
+    // Add to queue with small delay for sequential appearance (200ms between logs)
     logQueue.push({ text: logText, className: logClass });
     processLogQueue();
 }
@@ -1085,8 +1085,8 @@ function processLogQueue() {
         const { text, className } = logQueue.shift();
         addLogLine(text, className);
 
-        // Process next log after 100ms (reduced from 300ms)
-        setTimeout(processNext, 100);
+        // Process next log after 200ms for smooth sequential appearance
+        setTimeout(processNext, 200);
     }
 
     processNext();
@@ -1096,13 +1096,9 @@ function processLogQueue() {
 function addLogLine(text, className = 'log-info') {
     const logContent = document.getElementById('agent-log-content');
 
-    // Parse the log format: [HH:MM:SS.mmm] ICON message
-    // Remove timestamp if present (format: [12:28:48] or [12:28:48.206])
-    let cleanText = text.replace(/^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\]\s*/, '');
-
-    // Remove ALL emoji (keep only ASCII special chars like ▓⟡✓✗)
-    // This regex matches emoji ranges while preserving ASCII special chars
-    cleanText = cleanText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+    // Keep timestamp and icons - just remove emoji
+    // Remove ALL emoji (keep ASCII special chars like ▓⟡✓✗ and timestamps)
+    let cleanText = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
 
     // Extract icon and message
     let icon = '';
