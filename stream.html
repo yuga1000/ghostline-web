@@ -1085,8 +1085,8 @@ function processLogQueue() {
         const { text, className } = logQueue.shift();
         addLogLine(text, className);
 
-        // Process next log after 200ms for smooth sequential appearance
-        setTimeout(processNext, 200);
+        // Process next log after 400ms for smooth sequential appearance (slower, more visible)
+        setTimeout(processNext, 400);
     }
 
     processNext();
