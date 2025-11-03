@@ -108,8 +108,9 @@ app.post('/api/logs', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Get recent logs (for stream.html)
+// Get recent logs (for stream.html) - GET endpoint
 app.get('/api/logs', (req, res) => {
+  console.log('[Logs API] GET request - returning', recentLogs.length, 'logs');
   res.json({ logs: recentLogs });
 });
 
