@@ -934,12 +934,21 @@ function initWebSocket() {
 // Fetch logs from server via HTTP
 async function fetchLogs() {
     try {
-        const response = await fetch('/api/logs');
+        // IMPORTANT: Use full Railway URL for cross-origin requests
+        const API_URL = 'https://ghostline-web-production-7bc6.up.railway.app/api/logs';
+
+        console.log('[Polling] Fetching logs from:', API_URL);
+        const response = await fetch(API_URL);
+
+        console.log('[Polling] Response status:', response.status);
+
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('[Polling] Received data:', data);
+
         const logs = data.logs || [];
 
         // Process new logs only
@@ -976,7 +985,18 @@ async function fetchLogs() {
 
     } catch (error) {
         console.error('[Polling] Error fetching logs:', error);
-        // Don't show error in UI, just keep placeholder
+        console.error('[Polling] Error details:', {
+            message: error.message,
+            stack: error.stack,
+            type: error.constructor.name
+        });
+
+        // Show error in terminal for debugging (only first time)
+        if (!window.pollingErrorShown) {
+            window.pollingErrorShown = true;
+            addLogLine(`✗ Connection error: ${error.message}`, 'log-error');
+            addLogLine(`  Check browser console for details`, 'log-dim');
+        }
     }
 }
 

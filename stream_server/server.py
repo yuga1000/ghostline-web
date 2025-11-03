@@ -136,7 +136,9 @@ async def handle_log_post(request):
         print(f"[HTTP] ❌ UNAUTHORIZED from {request.remote}")
         print(f"[HTTP]    Got:      '{auth_header}'")
         print(f"[HTTP]    Expected: 'Bearer {AUTH_PASSWORD}'")
-        return web.json_response({'error': 'Unauthorized'}, status=401)
+        response = web.json_response({'error': 'Unauthorized'}, status=401)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
     try:
         # Parse JSON body
@@ -164,7 +166,9 @@ async def handle_log_post(request):
 
         print(f"[HTTP] ✓ Broadcast complete")
 
-        return web.json_response({'status': 'ok'})
+        response = web.json_response({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
 
     except json.JSONDecodeError:
         print(f"[HTTP] ❌ Invalid JSON from {request.remote}")
@@ -177,16 +181,35 @@ async def handle_log_post(request):
 async def handle_get_logs(request):
     """Handle HTTP GET /api/logs - retrieve recent logs for polling"""
     print(f"[HTTP] GET /api/logs from {request.remote} - returning {len(recent_logs)} logs")
-    return web.json_response({'logs': recent_logs})
+
+    # CORS headers for ghostline.live
+    response = web.json_response({'logs': recent_logs})
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+
+    return response
 
 
 async def handle_health(request):
     """Health check endpoint"""
-    return web.json_response({
+    response = web.json_response({
         'status': 'ok',
         'clients': len(clients),
         'server': 'Ghostline Stream Server'
     })
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+async def handle_cors_preflight(request):
+    """Handle CORS preflight OPTIONS requests"""
+    response = web.Response()
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Max-Age'] = '3600'
+    return response
 
 
 def create_app():
@@ -197,7 +220,9 @@ def create_app():
     app.router.add_get('/ws', handle_websocket)  # WebSocket endpoint
     app.router.add_post('/api/logs', handle_log_post)  # HTTP POST for logs
     app.router.add_get('/api/logs', handle_get_logs)  # HTTP GET for recent logs
+    app.router.add_options('/api/logs', handle_cors_preflight)  # CORS preflight
     app.router.add_get('/health', handle_health)  # Health check
+    app.router.add_options('/health', handle_cors_preflight)  # CORS preflight
 
     return app
 
