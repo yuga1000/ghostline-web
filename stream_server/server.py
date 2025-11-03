@@ -19,6 +19,10 @@ AUTH_PASSWORD = os.environ.get('STREAM_PASSWORD', 'ghostline2025')
 # Store connected WebSocket clients
 clients: Set = set()
 
+# Store recent logs (last 100)
+recent_logs: list = []
+MAX_LOGS = 100
+
 # Rate limiting: Track connections per IP
 connection_tracker: Dict[str, list] = defaultdict(list)
 MAX_CONNECTIONS_PER_IP = 5  # Max 5 concurrent connections per IP
@@ -149,6 +153,12 @@ async def handle_log_post(request):
 
         # Convert to frontend format and broadcast
         message = convert_event_to_frontend_format(event)
+
+        # Store in recent logs
+        recent_logs.append(message)
+        if len(recent_logs) > MAX_LOGS:
+            recent_logs.pop(0)
+
         print(f"[HTTP] Broadcasting to {len(clients)} clients...")
         await broadcast_log(message)
 
@@ -162,6 +172,12 @@ async def handle_log_post(request):
     except Exception as e:
         print(f"[HTTP] ❌ Error: {type(e).__name__}: {e}")
         return web.json_response({'error': str(e)}, status=500)
+
+
+async def handle_get_logs(request):
+    """Handle HTTP GET /api/logs - retrieve recent logs for polling"""
+    print(f"[HTTP] GET /api/logs from {request.remote} - returning {len(recent_logs)} logs")
+    return web.json_response({'logs': recent_logs})
 
 
 async def handle_health(request):
@@ -180,6 +196,7 @@ def create_app():
     # Routes
     app.router.add_get('/ws', handle_websocket)  # WebSocket endpoint
     app.router.add_post('/api/logs', handle_log_post)  # HTTP POST for logs
+    app.router.add_get('/api/logs', handle_get_logs)  # HTTP GET for recent logs
     app.router.add_get('/health', handle_health)  # Health check
 
     return app
@@ -194,6 +211,7 @@ if __name__ == '__main__':
     print(f"Server: http://0.0.0.0:{port}")
     print(f"  GET  /ws        - WebSocket (frontend clients)")
     print(f"  POST /api/logs  - Receive logs (Bearer token required)")
+    print(f"  GET  /api/logs  - Retrieve recent logs (HTTP polling)")
     print(f"  GET  /health    - Health check")
     print(f"Auth: Bearer {AUTH_PASSWORD[:5]}***")
     print(f"Waiting for connections...")
