@@ -73,6 +73,38 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'logged_out' });
 });
 
+// Log streaming endpoint for Ghostline Agent
+const LOG_STREAM_PASSWORD = process.env.LOG_STREAM_PASSWORD || 'Gho$tline_2025!';
+const recentLogs = []; // Keep last 100 logs in memory
+const MAX_LOGS = 100;
+
+app.post('/api/logs', (req, res) => {
+  // Check Bearer token
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.substring(7); // Remove 'Bearer '
+  if (token !== LOG_STREAM_PASSWORD) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Store log
+  const logEvent = req.body;
+  recentLogs.push(logEvent);
+  if (recentLogs.length > MAX_LOGS) {
+    recentLogs.shift(); // Remove oldest
+  }
+
+  res.json({ status: 'ok' });
+});
+
+// Get recent logs (for stream.html)
+app.get('/api/logs', (req, res) => {
+  res.json({ logs: recentLogs });
+});
+
 // Hide admin entry under secret slug - show login form if not authenticated
 app.get(`/${ADMIN_SLUG}`, (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');

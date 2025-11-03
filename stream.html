@@ -906,122 +906,106 @@ let inactivityCheckInterval = null;
 let logQueue = [];
 let isProcessingQueue = false;
 
-// Initialize WebSocket connection
+// Initialize connection (HTTP polling instead of WebSocket)
+let pollingInterval = null;
+let lastLogIndex = 0;
+
 function initWebSocket() {
-    // Close existing connection if any
-    if (ws) {
-        ws.close();
+    // Clear existing polling if any
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
     }
 
-    // Connect to WebSocket server (Railway)
-    ws = new WebSocket('wss://ghostline-web-production-7bc6.up.railway.app/ws');
+    console.log('[Polling] Starting HTTP polling for logs...');
+    isConnected = true;
+    lastLogTime = Date.now();
+    updateStatus('STANDBY', false);
 
-    ws.onopen = () => {
-        console.log('[WS] Connected to agent terminal stream');
-        isConnected = true;
-        lastLogTime = Date.now();
-        updateStatus('STANDBY', false);  // Start as STANDBY until first log
+    // Start uptime counter
+    startUptimeCounter();
 
-        // DON'T clear placeholder here - wait for actual logs
-        // Placeholder will be cleared in onmessage when first log arrives
+    // Poll for logs every 2 seconds
+    pollingInterval = setInterval(fetchLogs, 2000);
 
-        // Clear reconnect interval if exists
-        if (reconnectInterval) {
-            clearInterval(reconnectInterval);
-            reconnectInterval = null;
-        }
-
-        // Start uptime counter (but don't set startTime yet)
-        startUptimeCounter();
-
-        // Start inactivity check (show placeholder if no logs for 10 seconds)
-        if (inactivityCheckInterval) {
-            clearInterval(inactivityCheckInterval);
-        }
-        inactivityCheckInterval = setInterval(() => {
-            const timeSinceLastLog = Date.now() - lastLogTime;
-            const secondsSinceLastLog = Math.floor(timeSinceLastLog / 1000);
-
-            // Debug: log time since last log
-            if (secondsSinceLastLog >= 5) {
-                console.log(`[Inactivity Check] ${secondsSinceLastLog}s since last log`);
-            }
-
-            if (timeSinceLastLog > 10000) {
-                console.log('[WS] No logs for 10s - agent appears offline, showing placeholder');
-                showPlaceholder();
-                updateStatus('STANDBY', false);
-                startTime = null;
-            }
-        }, 2000); // Check every 2 seconds
-    };
-
-    ws.onmessage = (event) => {
-        // Update last log time (agent is active)
-        lastLogTime = Date.now();
-
-        // Show log content if placeholder is visible
-        const noiseMask = document.getElementById('agent-noise-mask');
-        const logContent = document.getElementById('agent-log-content');
-        if (noiseMask.style.display !== 'none') {
-            clearPlaceholder();
-            updateStatus('STREAMING', true);
-            if (!startTime) {
-                startTime = Date.now();
-            }
-        }
-
-        try {
-            const data = JSON.parse(event.data);
-            handleLogMessage(data);
-        } catch (e) {
-            // If not JSON, treat as plain text log
-            addLogLine(event.data, 'log-info');
-        }
-    };
-
-    ws.onerror = (error) => {
-        console.error('[WS] Error:', error);
-        // Don't show error in UI, just keep placeholder
-    };
-
-    ws.onclose = () => {
-        console.log('[WS] Disconnected from agent terminal stream');
-        isConnected = false;
-        updateStatus('STANDBY', false);
-        startTime = null;
-
-        // Clear inactivity check interval
-        if (inactivityCheckInterval) {
-            clearInterval(inactivityCheckInterval);
-            inactivityCheckInterval = null;
-        }
-
-        // Show placeholder instead of error messages
-        showPlaceholder();
-
-        // Attempt to reconnect every 5 seconds
-        if (!reconnectInterval) {
-            reconnectInterval = setInterval(() => {
-                console.log('[WS] Attempting to reconnect...');
-                initWebSocket();
-            }, 5000);
-        }
-    };
+    // Fetch immediately
+    fetchLogs();
 }
+
+// Fetch logs from server via HTTP
+async function fetchLogs() {
+    try {
+        const response = await fetch('/api/logs');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const logs = data.logs || [];
+
+        // Process new logs only
+        const newLogs = logs.slice(lastLogIndex);
+        if (newLogs.length > 0) {
+            lastLogTime = Date.now();
+
+            // Show log content if placeholder is visible
+            const noiseMask = document.getElementById('agent-noise-mask');
+            if (noiseMask && noiseMask.style.display !== 'none') {
+                clearPlaceholder();
+                updateStatus('STREAMING', true);
+                if (!startTime) {
+                    startTime = Date.now();
+                }
+            }
+
+            // Handle each new log
+            newLogs.forEach(log => {
+                handleLogMessage(log);
+            });
+
+            lastLogIndex = logs.length;
+        }
+
+        // Check for inactivity
+        const timeSinceLastLog = Date.now() - lastLogTime;
+        if (timeSinceLastLog > 10000) {
+            console.log('[Polling] No new logs for 10s - agent appears offline');
+            showPlaceholder();
+            updateStatus('STANDBY', false);
+            startTime = null;
+        }
+
+    } catch (error) {
+        console.error('[Polling] Error fetching logs:', error);
+        // Don't show error in UI, just keep placeholder
+    }
+}
+
+// Dummy WebSocket object for compatibility
+let ws = {
+    close: () => {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    },
+    readyState: 1 // OPEN
+};
+
+// Old WebSocket handlers removed - now using HTTP polling above
 
 // Handle incoming log message
 function handleLogMessage(data) {
-    const { type, content, timestamp, level, metadata } = data;
+    const { message, timestamp, level, metadata } = data;
 
     // Update pipeline name if provided
     if (metadata && metadata.pipeline) {
         document.getElementById('agent-pipeline-name').textContent = metadata.pipeline;
     }
 
-    // Determine log class based on level
+    // Determine log class based on level (convert to lowercase for matching)
     let logClass = 'log-info';
-    switch (level) {
+    const levelLower = (level || 'INFO').toLowerCase();
+    switch (levelLower) {
         case 'success': logClass = 'log-success'; break;
         case 'warning': logClass = 'log-warning'; break;
         case 'error': logClass = 'log-error'; break;
@@ -1030,8 +1014,15 @@ function handleLogMessage(data) {
         case 'dim': logClass = 'log-dim'; break;
     }
 
-    // Add log line with timestamp if provided
-    const logText = timestamp ? `[${timestamp}] ${content}` : content;
+    // Format timestamp if it's a number (Unix timestamp)
+    let timeStr = '';
+    if (timestamp) {
+        const date = new Date(timestamp * 1000); // Convert to milliseconds
+        timeStr = `[${date.toLocaleTimeString()}]`;
+    }
+
+    // Add log line with timestamp
+    const logText = timeStr ? `${timeStr} ${message}` : message;
 
     // Add to queue instead of showing immediately (for 300ms animation)
     logQueue.push({ text: logText, className: logClass });
