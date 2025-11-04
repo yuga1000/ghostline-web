@@ -234,9 +234,12 @@
 
     // Show pet reaction bubble based on log content
     function showPetReaction(level, logText) {
+        console.log('[Pet] showPetReaction called with:', level, logText.substring(0, 50));
+
         // Don't show reactions too frequently (max 1 per 5 seconds)
         const now = Date.now();
         if (window.lastPetReaction && now - window.lastPetReaction < 5000) {
+            console.log('[Pet] Skipping reaction - too soon (cooldown)');
             return;
         }
         window.lastPetReaction = now;
@@ -270,21 +273,31 @@
         }
 
         if (message) {
+            console.log('[Pet] Showing bubble:', message);
             const petCard = document.getElementById('pet-card-feed');
-            if (!petCard) return;
+            if (!petCard) {
+                console.error('[Pet] pet-card-feed not found!');
+                return;
+            }
 
             // Remove old bubble if exists
             const oldBubble = petCard.querySelector('.pet-bubble');
-            if (oldBubble) oldBubble.remove();
+            if (oldBubble) {
+                console.log('[Pet] Removing old bubble');
+                oldBubble.remove();
+            }
 
             // Create new bubble
             const bubble = document.createElement('div');
             bubble.className = 'pet-bubble';
             bubble.textContent = message;
             petCard.appendChild(bubble);
+            console.log('[Pet] Bubble added to DOM');
 
             // Remove after animation
             setTimeout(() => bubble.remove(), 2000);
+        } else {
+            console.log('[Pet] No matching keywords for reaction');
         }
     }
 
