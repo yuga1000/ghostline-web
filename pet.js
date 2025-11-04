@@ -29,6 +29,33 @@
 
         // Hook into log message handler
         hookIntoLogs();
+
+        // Start inactivity monitor
+        startInactivityMonitor();
+    }
+
+    // Track last activity time
+    let lastActivityTime = Date.now();
+    let inactivityTimer = null;
+
+    function startInactivityMonitor() {
+        // Check every 30 seconds
+        inactivityTimer = setInterval(() => {
+            const timeSinceActivity = Date.now() - lastActivityTime;
+            const pet = document.getElementById('pixel-pet');
+
+            if (!pet) return;
+
+            // If 5 minutes (300000ms) of inactivity, fade to 10% opacity
+            if (timeSinceActivity > 300000) {
+                pet.style.transition = 'opacity 2s ease';
+                pet.style.opacity = '0.1';
+                console.log('[Pet] Pet sleeping due to inactivity');
+            } else {
+                // Active - full opacity
+                pet.style.opacity = '1';
+            }
+        }, 30000); // Check every 30 seconds
     }
 
     function addPetCard() {
@@ -135,6 +162,12 @@
     function updatePetState(level, logText) {
         const pet = document.getElementById('pixel-pet');
         if (!pet) return;
+
+        // Update activity time
+        lastActivityTime = Date.now();
+
+        // Restore full opacity when active
+        pet.style.opacity = '1';
 
         // Clear pet placeholder when first log arrives
         clearPetPlaceholder();
