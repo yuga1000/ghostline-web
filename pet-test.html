@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Animation Test</title>
+    <link rel="stylesheet" href="pet.css">
+    <style>
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 40px;
+            text-align: center;
+        }
+        .pet-container {
+            display: inline-block;
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            padding: 60px;
+            margin: 20px;
+            position: relative;
+        }
+        .controls {
+            margin: 30px 0;
+        }
+        button {
+            background: #000;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        button.active {
+            background: #00ff00;
+            color: #000;
+        }
+        .info {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 PET ANIMATION TEST</h1>
+    <p class="info">Click buttons to test different animations</p>
+
+    <div class="pet-container">
+        <div class="pixel-pet idle" id="test-pet" style="position: relative; transform: scale(3);">
+            <!-- Row 1: Top of head -->
+            <div class="pet-row">
+                <div class="pet-pixel"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel"></div>
+            </div>
+            <!-- Row 2: Eyes row -->
+            <div class="pet-row">
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel eye" id="test-eye-left"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel eye" id="test-eye-right"></div>
+                <div class="pet-pixel pink"></div>
+            </div>
+            <!-- Row 3: Body -->
+            <div class="pet-row">
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel pink"></div>
+            </div>
+            <!-- Row 4: Legs -->
+            <div class="pet-row">
+                <div class="pet-pixel"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel"></div>
+                <div class="pet-pixel pink"></div>
+                <div class="pet-pixel"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="setState('idle')" id="btn-idle">🟢 IDLE (breathing)</button>
+        <button onclick="setState('thinking')" id="btn-thinking">🤔 THINKING (wiggle)</button>
+        <button onclick="setState('happy')" id="btn-happy">🎉 HAPPY (bounce)</button>
+        <button onclick="setState('excited')" id="btn-excited">🔥 EXCITED (shake)</button>
+        <button onclick="setState('sad')" id="btn-sad">😰 SAD (tremble)</button>
+        <button onclick="setState('active')" id="btn-active">⚡ ACTIVE (pulse)</button>
+    </div>
+
+    <div class="controls">
+        <h3 style="color: #00ff00;">Special Animations:</h3>
+        <button onclick="triggerSpecial('white-eyes')">👀 WHITE EYES</button>
+        <button onclick="triggerSpecial('legs-spread')">🦵 LEGS SPREAD</button>
+        <button onclick="triggerSpecial('legs-grow')">📏 LEGS GROW (2x)</button>
+        <button onclick="triggerSpecial('squat')">⬇️ SQUAT</button>
+        <button onclick="triggerSpecial('horns-grow')">👹 HORNS GROW</button>
+        <button onclick="triggerSpecial('arms-wave')">👋 ARMS WAVE</button>
+    </div>
+
+    <div class="info" id="current-state">Current: IDLE</div>
+    <div class="info" id="frame-counter">Frame: 0</div>
+
+    <script>
+        const pet = document.getElementById('test-pet');
+        const leftEye = document.getElementById('test-eye-left');
+        const rightEye = document.getElementById('test-eye-right');
+        const frameCounter = document.getElementById('frame-counter');
+        const currentStateText = document.getElementById('current-state');
+
+        let frame = 0;
+        let currentState = 'idle';
+        let specialAnimation = null;
+        let specialAnimationFrame = 0;
+
+        // Random special animations (every 5 seconds, 30% chance)
+        setInterval(() => {
+            if (currentState === 'idle' && Math.random() < 0.3) {
+                const animations = ['white-eyes', 'legs-spread', 'legs-grow', 'arms-wave', 'squat', 'horns-grow'];
+                specialAnimation = animations[Math.floor(Math.random() * animations.length)];
+                specialAnimationFrame = 0;
+                console.log('Special animation:', specialAnimation);
+
+                // Stop after 2 seconds
+                setTimeout(() => {
+                    specialAnimation = null;
+                }, 2000);
+            }
+        }, 5000);
+
+        // Animation loop (10fps)
+        setInterval(() => {
+            frame++;
+            frameCounter.textContent = `Frame: ${frame}`;
+
+            // Handle special animations
+            if (specialAnimation) {
+                specialAnimationFrame++;
+                handleSpecialAnimation();
+                return; // Skip normal animations
+            }
+
+            const isIdle = currentState === 'idle';
+            const isThinking = currentState === 'thinking';
+            const isHappy = currentState === 'happy';
+            const isSad = currentState === 'sad';
+            const isActive = currentState === 'active';
+            const isExcited = currentState === 'excited';
+
+            // Idle breathing animation
+            if (isIdle) {
+                const breathe = Math.round(Math.sin(frame / 5) * 3);
+                pet.style.transform = `scale(3) translateY(${breathe}px)`;
+            }
+
+            // Thinking wiggle - BIGGER movements
+            else if (isThinking) {
+                const wiggle = Math.round(Math.sin(frame / 2) * 10);
+                const tilt = Math.round(Math.sin(frame / 2) * 8);
+                pet.style.transform = `scale(3) translateX(${wiggle}px) rotate(${tilt}deg)`;
+            }
+
+            // Happy bounce - MUCH BIGGER
+            else if (isHappy) {
+                const bounce = Math.round(Math.abs(Math.sin(frame / 1.5)) * 25);
+                const rotate = Math.round(Math.sin(frame / 1.5) * 15);
+                pet.style.transform = `scale(3) translateY(${-bounce}px) rotate(${rotate}deg)`;
+            }
+
+            // Excited shake - INTENSE
+            else if (isExcited) {
+                const shake = Math.round(Math.sin(frame * 2) * 15);
+                const rotate = Math.round(Math.sin(frame * 2) * 20);
+                pet.style.transform = `scale(3) translateX(${shake}px) rotate(${rotate}deg)`;
+            }
+
+            // Sad shake - VISIBLE
+            else if (isSad) {
+                const shake = Math.round(Math.sin(frame * 1.5) * 8);
+                const shiver = Math.round(Math.sin(frame * 2) * 5);
+                pet.style.transform = `scale(3) translateX(${shake}px) rotate(${shiver}deg)`;
+            }
+
+            // Active pulse - STRONGER
+            else if (isActive) {
+                const pulse = Math.round(Math.sin(frame / 2) * 8);
+                pet.style.transform = `scale(3) translateY(${-pulse}px)`;
+            }
+
+        }, 100); // 10fps
+
+        // Eye blinking
+        setInterval(() => {
+            if (Math.random() < 0.1) {
+                leftEye.style.height = '2px';
+                leftEye.style.marginTop = '3px';
+                rightEye.style.height = '2px';
+                rightEye.style.marginTop = '3px';
+
+                setTimeout(() => {
+                    leftEye.style.height = '8px';
+                    leftEye.style.marginTop = '0';
+                    rightEye.style.height = '8px';
+                    rightEye.style.marginTop = '0';
+                }, 100);
+            }
+        }, 1000);
+
+        function handleSpecialAnimation() {
+            const rows = pet.querySelectorAll('.pet-row');
+            const allPixels = pet.querySelectorAll('.pet-pixel');
+
+            if (specialAnimation === 'white-eyes') {
+                // Белые глаза
+                leftEye.style.background = '#fff';
+                rightEye.style.background = '#fff';
+
+                // Return to normal after animation ends
+                if (specialAnimationFrame > 15) {
+                    leftEye.style.background = '#000';
+                    rightEye.style.background = '#000';
+                }
+            }
+
+            else if (specialAnimation === 'legs-spread') {
+                // Ножки разъезжаются в стороны
+                const legRow = rows[3]; // Row 4 - legs
+                const legPixels = legRow.querySelectorAll('.pet-pixel');
+
+                if (specialAnimationFrame < 10) {
+                    // Spread legs wider
+                    legRow.style.transform = 'scaleX(1.5)';
+                } else {
+                    legRow.style.transform = 'scaleX(1)';
+                }
+            }
+
+            else if (specialAnimation === 'legs-grow') {
+                // Ноги удлиняются - добавляем пиксели
+                const legRow = rows[3];
+                const legPixels = legRow.querySelectorAll('.pet-pixel.pink');
+
+                if (specialAnimationFrame < 10) {
+                    legPixels.forEach(leg => {
+                        leg.style.height = '16px'; // 2 pixels tall
+                    });
+                } else {
+                    legPixels.forEach(leg => {
+                        leg.style.height = '8px'; // Back to normal
+                    });
+                }
+            }
+
+            else if (specialAnimation === 'squat') {
+                // Приседает - тело опускается
+                const squat = specialAnimationFrame < 8 ? specialAnimationFrame : 16 - specialAnimationFrame;
+                pet.style.transform = `scale(3) translateY(${squat}px)`;
+            }
+
+            else if (specialAnimation === 'horns-grow') {
+                // Рога вырастают на голове
+                const headRow = rows[0];
+
+                if (!headRow.querySelector('.horn-left')) {
+                    // Add horns
+                    const hornLeft = document.createElement('div');
+                    hornLeft.className = 'pet-pixel pink horn-left';
+                    hornLeft.style.position = 'absolute';
+                    hornLeft.style.left = '-8px';
+                    hornLeft.style.top = '-8px';
+                    headRow.style.position = 'relative';
+                    headRow.appendChild(hornLeft);
+
+                    const hornRight = document.createElement('div');
+                    hornRight.className = 'pet-pixel pink horn-right';
+                    hornRight.style.position = 'absolute';
+                    hornRight.style.right = '-8px';
+                    hornRight.style.top = '-8px';
+                    headRow.appendChild(hornRight);
+                }
+
+                // Grow horns progressively
+                const hornLeft = headRow.querySelector('.horn-left');
+                const hornRight = headRow.querySelector('.horn-right');
+                if (hornLeft && hornRight && specialAnimationFrame < 10) {
+                    const grow = Math.min(specialAnimationFrame, 3);
+                    hornLeft.style.height = `${8 * (grow + 1)}px`;
+                    hornRight.style.height = `${8 * (grow + 1)}px`;
+                }
+
+                // Remove horns after animation
+                if (specialAnimationFrame > 18) {
+                    const horns = headRow.querySelectorAll('.horn-left, .horn-right');
+                    horns.forEach(horn => horn.remove());
+                }
+            }
+
+            else if (specialAnimation === 'arms-wave') {
+                // Руки вырастают и машут (добавляем пиксели по бокам)
+                const bodyRow = rows[2]; // Row 3 - body
+                const wave = Math.round(Math.sin(specialAnimationFrame / 3) * 2);
+
+                // Create temporary arm pixels
+                if (!bodyRow.querySelector('.arm-left')) {
+                    const armLeft = document.createElement('div');
+                    armLeft.className = 'pet-pixel pink arm-left';
+                    armLeft.style.position = 'absolute';
+                    armLeft.style.left = '-8px';
+                    bodyRow.style.position = 'relative';
+                    bodyRow.appendChild(armLeft);
+
+                    const armRight = document.createElement('div');
+                    armRight.className = 'pet-pixel pink arm-right';
+                    armRight.style.position = 'absolute';
+                    armRight.style.right = '-8px';
+                    bodyRow.appendChild(armRight);
+                }
+
+                // Wave arms up and down (pixel movement)
+                const armLeft = bodyRow.querySelector('.arm-left');
+                const armRight = bodyRow.querySelector('.arm-right');
+                if (armLeft && armRight) {
+                    armLeft.style.top = `${wave * 8}px`;
+                    armRight.style.top = `${-wave * 8}px`;
+                }
+
+                // Remove arms after animation
+                if (specialAnimationFrame > 18) {
+                    const arms = bodyRow.querySelectorAll('.arm-left, .arm-right');
+                    arms.forEach(arm => arm.remove());
+                }
+            }
+
+            // Gentle idle breathing during special animations (except squat)
+            if (specialAnimation !== 'squat') {
+                const breathe = Math.round(Math.sin(specialAnimationFrame / 5) * 2);
+                pet.style.transform = `scale(3) translateY(${breathe}px)`;
+            }
+        }
+
+        function setState(state) {
+            currentState = state;
+            frame = 0; // Reset frame for smooth transition
+
+            // Update pet classes
+            pet.className = `pixel-pet ${state}`;
+
+            // Update button states
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${state}`).classList.add('active');
+
+            // Update state text
+            const stateNames = {
+                'idle': '🟢 IDLE (breathing)',
+                'thinking': '🤔 THINKING (wiggle)',
+                'happy': '🎉 HAPPY (bounce)',
+                'excited': '🔥 EXCITED (shake)',
+                'sad': '😰 SAD (tremble)',
+                'active': '⚡ ACTIVE (pulse)'
+            };
+            currentStateText.textContent = `Current: ${stateNames[state]}`;
+        }
+
+        function triggerSpecial(animation) {
+            specialAnimation = animation;
+            specialAnimationFrame = 0;
+            console.log('Manual trigger:', animation);
+
+            // Stop after 2 seconds
+            setTimeout(() => {
+                specialAnimation = null;
+            }, 2000);
+        }
+
+        // Initialize
+        setState('idle');
+    </script>
+</body>
+</html>

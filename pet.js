@@ -358,6 +358,10 @@
         }
     }
 
+    // Special animation state
+    let specialAnimation = null;
+    let specialAnimationFrame = 0;
+
     // Add random idle animations to make pet feel more alive
     function startIdleVariations() {
         setInterval(() => {
@@ -367,16 +371,17 @@
             // Only add variations if pet is in idle state
             if (!pet.classList.contains('idle')) return;
 
-            // Random chance for variation (20%)
-            if (Math.random() < 0.2) {
-                const variations = ['look-around', 'stretch', 'curious'];
-                const variation = variations[Math.floor(Math.random() * variations.length)];
+            // Random chance for special animation (30%)
+            if (Math.random() < 0.3) {
+                const animations = ['white-eyes', 'legs-spread', 'legs-grow', 'arms-wave', 'squat', 'horns-grow'];
+                specialAnimation = animations[Math.floor(Math.random() * animations.length)];
+                specialAnimationFrame = 0;
+                console.log('[Pet] Special animation:', specialAnimation);
 
-                // Temporarily add variation class
-                pet.classList.add(variation);
+                // Stop after 2 seconds
                 setTimeout(() => {
-                    pet.classList.remove(variation);
-                }, 1500);
+                    specialAnimation = null;
+                }, 2000);
             }
         }, 8000); // Check every 8 seconds
     }
@@ -401,6 +406,13 @@
             // Debug: log every 50 frames (5 seconds)
             if (frame % 50 === 0) {
                 console.log('[Pet Animation] Frame:', frame, 'Classes:', pet.className);
+            }
+
+            // Handle special animations first
+            if (specialAnimation) {
+                specialAnimationFrame++;
+                handleSpecialAnimation(pet);
+                return; // Skip normal animations
             }
 
             // Get current state
@@ -477,6 +489,116 @@
             }
 
         }, 16);
+    }
+
+    function handleSpecialAnimation(pet) {
+        const rows = pet.querySelectorAll('.pet-row');
+        const leftEye = document.getElementById('pet-eye-left');
+        const rightEye = document.getElementById('pet-eye-right');
+
+        if (specialAnimation === 'white-eyes') {
+            leftEye.style.background = '#fff';
+            rightEye.style.background = '#fff';
+            if (specialAnimationFrame > 15) {
+                leftEye.style.background = '#000';
+                rightEye.style.background = '#000';
+            }
+        }
+
+        else if (specialAnimation === 'legs-spread') {
+            const legRow = rows[3];
+            if (specialAnimationFrame < 10) {
+                legRow.style.transform = 'scaleX(1.5)';
+            } else {
+                legRow.style.transform = 'scaleX(1)';
+            }
+        }
+
+        else if (specialAnimation === 'legs-grow') {
+            const legRow = rows[3];
+            const legPixels = legRow.querySelectorAll('.pet-pixel.pink');
+            if (specialAnimationFrame < 10) {
+                legPixels.forEach(leg => leg.style.height = '16px');
+            } else {
+                legPixels.forEach(leg => leg.style.height = '8px');
+            }
+        }
+
+        else if (specialAnimation === 'squat') {
+            const squat = specialAnimationFrame < 8 ? specialAnimationFrame : 16 - specialAnimationFrame;
+            pet.style.transform = `scale(3) translateY(${squat}px)`;
+        }
+
+        else if (specialAnimation === 'horns-grow') {
+            const headRow = rows[0];
+            if (!headRow.querySelector('.horn-left')) {
+                const hornLeft = document.createElement('div');
+                hornLeft.className = 'pet-pixel pink horn-left';
+                hornLeft.style.position = 'absolute';
+                hornLeft.style.left = '-8px';
+                hornLeft.style.top = '-8px';
+                headRow.style.position = 'relative';
+                headRow.appendChild(hornLeft);
+
+                const hornRight = document.createElement('div');
+                hornRight.className = 'pet-pixel pink horn-right';
+                hornRight.style.position = 'absolute';
+                hornRight.style.right = '-8px';
+                hornRight.style.top = '-8px';
+                headRow.appendChild(hornRight);
+            }
+
+            const hornLeft = headRow.querySelector('.horn-left');
+            const hornRight = headRow.querySelector('.horn-right');
+            if (hornLeft && hornRight && specialAnimationFrame < 10) {
+                const grow = Math.min(specialAnimationFrame, 3);
+                hornLeft.style.height = `${8 * (grow + 1)}px`;
+                hornRight.style.height = `${8 * (grow + 1)}px`;
+            }
+
+            if (specialAnimationFrame > 18) {
+                const horns = headRow.querySelectorAll('.horn-left, .horn-right');
+                horns.forEach(horn => horn.remove());
+            }
+        }
+
+        else if (specialAnimation === 'arms-wave') {
+            const bodyRow = rows[2];
+            const wave = Math.round(Math.sin(specialAnimationFrame / 3) * 2);
+
+            if (!bodyRow.querySelector('.arm-left')) {
+                const armLeft = document.createElement('div');
+                armLeft.className = 'pet-pixel pink arm-left';
+                armLeft.style.position = 'absolute';
+                armLeft.style.left = '-8px';
+                bodyRow.style.position = 'relative';
+                bodyRow.appendChild(armLeft);
+
+                const armRight = document.createElement('div');
+                armRight.className = 'pet-pixel pink arm-right';
+                armRight.style.position = 'absolute';
+                armRight.style.right = '-8px';
+                bodyRow.appendChild(armRight);
+            }
+
+            const armLeft = bodyRow.querySelector('.arm-left');
+            const armRight = bodyRow.querySelector('.arm-right');
+            if (armLeft && armRight) {
+                armLeft.style.top = `${wave * 8}px`;
+                armRight.style.top = `${-wave * 8}px`;
+            }
+
+            if (specialAnimationFrame > 18) {
+                const arms = bodyRow.querySelectorAll('.arm-left, .arm-right');
+                arms.forEach(arm => arm.remove());
+            }
+        }
+
+        // Gentle breathing during special animations (except squat)
+        if (specialAnimation !== 'squat') {
+            const breathe = Math.round(Math.sin(specialAnimationFrame / 5) * 2);
+            pet.style.transform = `scale(3) translateY(${breathe}px)`;
+        }
     }
 
     function blinkEyes(leftEye, rightEye, duration) {
