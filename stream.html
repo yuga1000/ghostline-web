@@ -1024,6 +1024,11 @@ function handleLogMessage(data) {
     // Add to queue with small delay for sequential appearance (200ms between logs)
     logQueue.push({ text: logText, className: logClass });
     processLogQueue();
+
+    // Notify pet about new log
+    if (window.petModule && window.petModule.onLogReceived) {
+        window.petModule.onLogReceived(level, content);
+    }
 }
 
 // Show placeholder (when not connected)

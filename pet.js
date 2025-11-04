@@ -498,7 +498,11 @@
     // Export functions to global scope if needed
     window.petModule = {
         showPetPlaceholder: showPetPlaceholder,
-        clearPetPlaceholder: clearPetPlaceholder
+        clearPetPlaceholder: clearPetPlaceholder,
+        onLogReceived: function(level, content) {
+            console.log('[Pet] onLogReceived called:', level, content.substring(0, 50));
+            updatePetState(level, content);
+        }
     };
 
     console.log('[Pet] Pet module loaded');
