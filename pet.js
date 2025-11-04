@@ -125,29 +125,48 @@
     }
 
     function hookIntoLogs() {
-        // Store original handleLogMessage function
-        const originalHandleLogMessage = window.handleLogMessage;
+        // Try multiple times to hook into logs (wait for main script to load)
+        let attempts = 0;
+        const maxAttempts = 10;
 
-        if (!originalHandleLogMessage) {
-            console.warn('[Pet] Could not find handleLogMessage function, will try periodic checking');
-            // Fallback: check for new logs periodically
-            setInterval(checkForLogs, 1000);
-            return;
+        function tryHook() {
+            attempts++;
+            console.log(`[Pet] Attempt ${attempts} to hook into logs...`);
+
+            const originalHandleLogMessage = window.handleLogMessage;
+
+            if (originalHandleLogMessage) {
+                // Override handleLogMessage to intercept logs
+                window.handleLogMessage = function(data) {
+                    console.log('[Pet] Log intercepted:', data);
+
+                    // Call original function first
+                    originalHandleLogMessage.call(this, data);
+
+                    // Then update pet
+                    const { content, level } = data;
+                    if (content && level) {
+                        console.log('[Pet] Updating pet state for level:', level);
+                        updatePetState(level, content);
+                    }
+                };
+
+                console.log('[Pet] ✓ Successfully hooked into log message handler');
+                return true;
+            } else {
+                console.warn(`[Pet] handleLogMessage not found yet (attempt ${attempts}/${maxAttempts})`);
+
+                if (attempts < maxAttempts) {
+                    setTimeout(tryHook, 500);
+                } else {
+                    console.error('[Pet] Failed to hook into logs after 10 attempts, using fallback');
+                    setInterval(checkForLogs, 1000);
+                }
+                return false;
+            }
         }
 
-        // Override handleLogMessage to intercept logs
-        window.handleLogMessage = function(data) {
-            // Call original function first
-            originalHandleLogMessage.call(this, data);
-
-            // Then update pet
-            const { content, level } = data;
-            if (content && level) {
-                updatePetState(level, content);
-            }
-        };
-
-        console.log('[Pet] Hooked into log message handler');
+        tryHook();
     }
 
     function checkForLogs() {
