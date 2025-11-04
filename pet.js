@@ -87,7 +87,7 @@
                 <!-- Noise mask placeholder (shown when no logs) -->
                 <div class="noise-mask" id="pet-noise-mask"></div>
                 <!-- Pixel Pet Agent -->
-                <div class="pixel-pet idle" id="pixel-pet" style="position: relative; transform: scale(2);">
+                <div class="pixel-pet idle" id="pixel-pet" style="position: relative; transform: scale(1);">
                     <!-- Row 1: Top of head -->
                     <div class="pet-row">
                         <div class="pet-pixel"></div>
@@ -426,41 +426,41 @@
             // Idle breathing animation - snap to pixels
             if (isIdle) {
                 const breathe = Math.round(Math.sin(frame / 5) * 3); // Snap to integer pixels
-                pet.style.transform = `scale(2) translateY(${breathe}px)`;
+                pet.style.transform = `scale(1) translateY(${breathe}px)`;
             }
 
             // Thinking wiggle - BIGGER movements
             else if (isThinking) {
                 const wiggle = Math.round(Math.sin(frame / 2) * 10);
                 const tilt = Math.round(Math.sin(frame / 2) * 8);
-                pet.style.transform = `scale(2) translateX(${wiggle}px) rotate(${tilt}deg)`;
+                pet.style.transform = `scale(1) translateX(${wiggle}px) rotate(${tilt}deg)`;
             }
 
             // Happy bounce - MUCH BIGGER
             else if (isHappy) {
                 const bounce = Math.round(Math.abs(Math.sin(frame / 1.5)) * 25);
                 const rotate = Math.round(Math.sin(frame / 1.5) * 15);
-                pet.style.transform = `scale(2) translateY(${-bounce}px) rotate(${rotate}deg)`;
+                pet.style.transform = `scale(1) translateY(${-bounce}px) rotate(${rotate}deg)`;
             }
 
             // Excited shake - INTENSE
             else if (isExcited) {
                 const shake = Math.round(Math.sin(frame * 2) * 15);
                 const rotate = Math.round(Math.sin(frame * 2) * 20);
-                pet.style.transform = `scale(2) translateX(${shake}px) rotate(${rotate}deg)`;
+                pet.style.transform = `scale(1) translateX(${shake}px) rotate(${rotate}deg)`;
             }
 
             // Sad shake - VISIBLE
             else if (isSad) {
                 const shake = Math.round(Math.sin(frame * 1.5) * 8);
                 const shiver = Math.round(Math.sin(frame * 2) * 5);
-                pet.style.transform = `scale(2) translateX(${shake}px) rotate(${shiver}deg)`;
+                pet.style.transform = `scale(1) translateX(${shake}px) rotate(${shiver}deg)`;
             }
 
             // Active pulse - STRONGER
             else if (isActive) {
                 const pulse = Math.round(Math.sin(frame / 2) * 8);
-                pet.style.transform = `scale(2) translateY(${-pulse}px)`;
+                pet.style.transform = `scale(1) translateY(${-pulse}px)`;
             }
 
         }, 100); // 10fps for retro pixel animation
@@ -526,7 +526,7 @@
 
         else if (specialAnimation === 'squat') {
             const squat = specialAnimationFrame < 8 ? specialAnimationFrame : 16 - specialAnimationFrame;
-            pet.style.transform = `scale(2) translateY(${squat}px)`;
+            pet.style.transform = `scale(1) translateY(${squat}px)`;
         }
 
         else if (specialAnimation === 'horns-grow') {
@@ -597,7 +597,7 @@
         // Gentle breathing during special animations (except squat)
         if (specialAnimation !== 'squat') {
             const breathe = Math.round(Math.sin(specialAnimationFrame / 5) * 2);
-            pet.style.transform = `scale(2) translateY(${breathe}px)`;
+            pet.style.transform = `scale(1) translateY(${breathe}px)`;
         }
     }
 
