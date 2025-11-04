@@ -1068,7 +1068,7 @@ function clearPlaceholder() {
     logContent.style.display = 'block';
 }
 
-// Process log queue with 100ms delay between logs (faster streaming)
+// Process log queue with delay between logs
 function processLogQueue() {
     if (isProcessingQueue || logQueue.length === 0) {
         return;
@@ -1083,17 +1083,19 @@ function processLogQueue() {
         }
 
         const { text, className } = logQueue.shift();
-        addLogLine(text, className);
 
-        // Process next log after 400ms for smooth sequential appearance (slower, more visible)
-        setTimeout(processNext, 400);
+        // Add log and wait for completion before processing next
+        addLogLine(text, className, () => {
+            // Wait 400ms after log is fully displayed before showing next one
+            setTimeout(processNext, 400);
+        });
     }
 
     processNext();
 }
 
 // Add a log line to the terminal with typewriter effect
-function addLogLine(text, className = 'log-info') {
+function addLogLine(text, className = 'log-info', onComplete) {
     const logContent = document.getElementById('agent-log-content');
 
     // Keep timestamp and icons - just remove emoji
@@ -1129,34 +1131,41 @@ function addLogLine(text, className = 'log-info') {
         logLine.appendChild(iconSpan);
         logLine.appendChild(messageSpan);
 
-        // Append to log content
+        // Append to log content FIRST
         logContent.appendChild(logLine);
+
+        // Scroll to show the new log line immediately
+        logContent.scrollTop = logContent.scrollHeight;
 
         // Typewriter effect - type one character at a time
         let charIndex = 0;
-        const typeSpeed = 30; // milliseconds per character (faster for better UX)
+        const typeSpeed = 20; // milliseconds per character (faster)
 
         function typeNextChar() {
             if (charIndex < message.length) {
                 messageSpan.textContent += message[charIndex];
                 charIndex++;
-                logContent.scrollTop = logContent.scrollHeight;
                 setTimeout(typeNextChar, typeSpeed);
             } else {
                 // Remove typing cursor when done
                 logLine.classList.remove('typing');
+                // Call completion callback
+                if (onComplete) onComplete();
             }
         }
 
         typeNextChar();
     } else {
-        // No icon - just show message
+        // No icon - just show message instantly
         logLine.textContent = message;
         logContent.appendChild(logLine);
-    }
 
-    // Auto-scroll to bottom
-    logContent.scrollTop = logContent.scrollHeight;
+        // Scroll to show the new log line
+        logContent.scrollTop = logContent.scrollHeight;
+
+        // Call completion callback immediately
+        if (onComplete) onComplete();
+    }
 
     // Keep only last 100 lines to prevent memory issues
     while (logContent.children.length > 100) {
