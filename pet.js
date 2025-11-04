@@ -417,37 +417,37 @@
                 pet.style.transform = `scale(3) translateY(${breathe}px)`;
             }
 
-            // Thinking wiggle
+            // Thinking wiggle - BIGGER movements
             else if (isThinking) {
-                const wiggle = Math.round(Math.sin(frame / 3) * 4);
-                const tilt = Math.round(Math.sin(frame / 3) * 3);
+                const wiggle = Math.round(Math.sin(frame / 2) * 10);
+                const tilt = Math.round(Math.sin(frame / 2) * 8);
                 pet.style.transform = `scale(3) translateX(${wiggle}px) rotate(${tilt}deg)`;
             }
 
-            // Happy bounce
+            // Happy bounce - MUCH BIGGER
             else if (isHappy) {
-                const bounce = Math.round(Math.abs(Math.sin(frame / 2)) * 12);
-                const rotate = Math.round(Math.sin(frame / 2) * 8);
+                const bounce = Math.round(Math.abs(Math.sin(frame / 1.5)) * 25);
+                const rotate = Math.round(Math.sin(frame / 1.5) * 15);
                 pet.style.transform = `scale(3) translateY(${-bounce}px) rotate(${rotate}deg)`;
             }
 
-            // Excited shake
+            // Excited shake - INTENSE
             else if (isExcited) {
-                const shake = Math.round(Math.sin(frame) * 6);
-                const rotate = Math.round(Math.sin(frame) * 12);
+                const shake = Math.round(Math.sin(frame * 2) * 15);
+                const rotate = Math.round(Math.sin(frame * 2) * 20);
                 pet.style.transform = `scale(3) translateX(${shake}px) rotate(${rotate}deg)`;
             }
 
-            // Sad shake
+            // Sad shake - VISIBLE
             else if (isSad) {
-                const shake = Math.round(Math.sin(frame) * 3);
-                const shiver = Math.round(Math.sin(frame * 1.5) * 2);
+                const shake = Math.round(Math.sin(frame * 1.5) * 8);
+                const shiver = Math.round(Math.sin(frame * 2) * 5);
                 pet.style.transform = `scale(3) translateX(${shake}px) rotate(${shiver}deg)`;
             }
 
-            // Active pulse
+            // Active pulse - STRONGER
             else if (isActive) {
-                const pulse = Math.round(Math.sin(frame / 3) * 4);
+                const pulse = Math.round(Math.sin(frame / 2) * 8);
                 pet.style.transform = `scale(3) translateY(${-pulse}px)`;
             }
 
