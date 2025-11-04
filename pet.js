@@ -44,7 +44,7 @@
         petCard.className = 'terminal-border robot-card';
         petCard.innerHTML = `
             <div class="pixel-font text-xs mb-2 flex justify-between">
-                <span>[PET]</span>
+                <span>[AGENT_PET]</span>
                 <span><span class="status-online" id="status4"></span></span>
             </div>
             <div class="video-feed h-40 terminal-border relative" id="pet-card-feed" style="display: flex; align-items: center; justify-content: center; background: #0a0a0a;">
