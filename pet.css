@@ -1,0 +1,129 @@
+/* ==================== PIXEL PET STYLES ==================== */
+
+/* Pet container */
+.pixel-pet {
+    display: inline-block;
+    position: relative;
+}
+
+/* Pet pixel grid */
+.pet-row {
+    display: flex;
+    gap: 0;
+    height: 8px;
+}
+
+.pet-pixel {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+}
+
+/* Colors */
+.pet-pixel.pink {
+    background: #00ff00; /* Green by default (terminal style) */
+    transition: background 0.3s ease;
+}
+
+/* Active state - pink when logs are streaming */
+.pixel-pet.active .pet-pixel.pink,
+.pixel-pet.thinking .pet-pixel.pink,
+.pixel-pet.happy .pet-pixel.pink,
+.pixel-pet.sad .pet-pixel.pink {
+    background: #cd5c5c; /* Pink when active */
+}
+
+.pet-pixel.eye {
+    background: #000;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes blink-eyes {
+    0%, 92%, 96%, 100% { height: 8px; }
+    94% { height: 2px; margin-top: 3px; }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0px) scale(1); }
+    50% { transform: translateY(-10px) scale(1.05); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0px); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+/* States */
+.pixel-pet.idle {
+    animation: float 3s ease-in-out infinite;
+}
+
+.pixel-pet.idle .pet-pixel.eye {
+    animation: blink-eyes 4s infinite;
+}
+
+.pixel-pet.thinking {
+    animation: wiggle 1s ease-in-out infinite;
+}
+
+.pixel-pet.happy {
+    animation: bounce 0.6s ease-in-out 3;
+}
+
+.pixel-pet.sad {
+    animation: shake 0.5s ease-in-out 2;
+}
+
+.pixel-pet.active {
+    animation: float 2s ease-in-out infinite;
+}
+
+.pixel-pet.sleeping {
+    animation: float 4s ease-in-out infinite;
+    opacity: 0.6;
+}
+
+.pixel-pet.sleeping .pet-pixel.eye {
+    height: 2px;
+    margin-top: 3px;
+}
+
+/* Speech bubble for reactions - TERMINAL STYLE */
+.pet-bubble {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #00ff00;
+    padding: 4px 8px;
+    border: 2px solid #00ff00;
+    border-radius: 0; /* Square, no rounded corners */
+    font-size: 9px;
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    animation: bubble-pop 2s ease-out;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    z-index: 100;
+}
+
+@keyframes bubble-pop {
+    0% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.5); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0px) scale(1); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(0px) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-5px) scale(0.8); }
+}
