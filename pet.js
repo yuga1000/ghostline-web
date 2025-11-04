@@ -32,6 +32,15 @@
 
         // Start inactivity monitor
         startInactivityMonitor();
+
+        // Start idle animation variations
+        startIdleVariations();
+
+        // Start programmatic animations with delay to ensure DOM is ready
+        setTimeout(() => {
+            console.log('[Pet] Attempting to start animations...');
+            startProgrammaticAnimations();
+        }, 500);
     }
 
     // Track last activity time
@@ -78,7 +87,7 @@
                 <!-- Noise mask placeholder (shown when no logs) -->
                 <div class="noise-mask" id="pet-noise-mask"></div>
                 <!-- Pixel Pet Agent -->
-                <div class="pixel-pet idle" id="pixel-pet" style="position: relative; transform: scale(3); animation: float 3s ease-in-out infinite;">
+                <div class="pixel-pet idle" id="pixel-pet" style="position: relative; transform: scale(3);">
                     <!-- Row 1: Top of head -->
                     <div class="pet-row">
                         <div class="pet-pixel"></div>
@@ -192,10 +201,17 @@
         clearPetPlaceholder();
 
         // Remove all state classes
-        pet.classList.remove('idle', 'thinking', 'happy', 'active', 'sad', 'sleeping');
+        pet.classList.remove('idle', 'thinking', 'happy', 'active', 'sad', 'sleeping', 'excited');
 
         // Parse log text and show reaction bubble
         showPetReaction(level, logText);
+
+        // Determine if this is an exciting log (multiple keywords or important events)
+        const lowerLog = logText.toLowerCase();
+        const isExciting = lowerLog.includes('complete') ||
+                          lowerLog.includes('success') ||
+                          lowerLog.includes('generated') ||
+                          lowerLog.includes('launching');
 
         // Set state based on log level
         switch(level) {
@@ -207,11 +223,24 @@
                 }, 2000);
                 break;
             case 'success':
-                pet.classList.add('happy');
-                setTimeout(() => {
-                    pet.classList.remove('happy');
-                    pet.classList.add('idle');
-                }, 1800);
+                // Use excited animation for extra-special success logs
+                if (isExciting) {
+                    pet.classList.add('excited');
+                    setTimeout(() => {
+                        pet.classList.remove('excited');
+                        pet.classList.add('happy');
+                        setTimeout(() => {
+                            pet.classList.remove('happy');
+                            pet.classList.add('idle');
+                        }, 800);
+                    }, 800);
+                } else {
+                    pet.classList.add('happy');
+                    setTimeout(() => {
+                        pet.classList.remove('happy');
+                        pet.classList.add('idle');
+                    }, 1800);
+                }
                 break;
             case 'error':
                 pet.classList.add('sad');
@@ -225,7 +254,7 @@
                 setTimeout(() => {
                     pet.classList.remove('active');
                     pet.classList.add('idle');
-                }, 1000);
+                }, 1500);
                 break;
             default:
                 pet.classList.add('idle');
@@ -290,6 +319,18 @@
             // Create new bubble
             const bubble = document.createElement('div');
             bubble.className = 'pet-bubble';
+
+            // Add level-specific styling
+            if (level === 'success') {
+                bubble.classList.add('success');
+            } else if (level === 'error') {
+                bubble.classList.add('error');
+            } else if (level === 'thinking') {
+                bubble.classList.add('thinking');
+            } else if (level === 'action') {
+                bubble.classList.add('action');
+            }
+
             bubble.textContent = message;
             petCard.appendChild(bubble);
             console.log('[Pet] Bubble added to DOM');
@@ -317,6 +358,143 @@
         }
     }
 
+    // Add random idle animations to make pet feel more alive
+    function startIdleVariations() {
+        setInterval(() => {
+            const pet = document.getElementById('pixel-pet');
+            if (!pet) return;
+
+            // Only add variations if pet is in idle state
+            if (!pet.classList.contains('idle')) return;
+
+            // Random chance for variation (20%)
+            if (Math.random() < 0.2) {
+                const variations = ['look-around', 'stretch', 'curious'];
+                const variation = variations[Math.floor(Math.random() * variations.length)];
+
+                // Temporarily add variation class
+                pet.classList.add(variation);
+                setTimeout(() => {
+                    pet.classList.remove(variation);
+                }, 1500);
+            }
+        }, 8000); // Check every 8 seconds
+    }
+
+    // Programmatic animations using JavaScript (more reliable than CSS)
+    function startProgrammaticAnimations() {
+        const pet = document.getElementById('pixel-pet');
+        if (!pet) {
+            console.error('[Pet Animation] ✗ Pet element not found!');
+            return;
+        }
+
+        console.log('[Pet Animation] ✓ Starting animation loop...');
+
+        let frame = 0;
+        let eyeBlinkCounter = 0;
+
+        // Main animation loop (10fps for retro pixel feel)
+        const animationInterval = setInterval(() => {
+            frame++;
+
+            // Debug: log every 50 frames (5 seconds)
+            if (frame % 50 === 0) {
+                console.log('[Pet Animation] Frame:', frame, 'Classes:', pet.className);
+            }
+
+            // Get current state
+            const isIdle = pet.classList.contains('idle');
+            const isThinking = pet.classList.contains('thinking');
+            const isHappy = pet.classList.contains('happy');
+            const isSad = pet.classList.contains('sad');
+            const isActive = pet.classList.contains('active');
+            const isExcited = pet.classList.contains('excited');
+
+            // Idle breathing animation - snap to pixels
+            if (isIdle) {
+                const breathe = Math.round(Math.sin(frame / 5) * 3); // Snap to integer pixels
+                pet.style.transform = `scale(3) translateY(${breathe}px)`;
+            }
+
+            // Thinking wiggle
+            else if (isThinking) {
+                const wiggle = Math.round(Math.sin(frame / 3) * 4);
+                const tilt = Math.round(Math.sin(frame / 3) * 3);
+                pet.style.transform = `scale(3) translateX(${wiggle}px) rotate(${tilt}deg)`;
+            }
+
+            // Happy bounce
+            else if (isHappy) {
+                const bounce = Math.round(Math.abs(Math.sin(frame / 2)) * 12);
+                const rotate = Math.round(Math.sin(frame / 2) * 8);
+                pet.style.transform = `scale(3) translateY(${-bounce}px) rotate(${rotate}deg)`;
+            }
+
+            // Excited shake
+            else if (isExcited) {
+                const shake = Math.round(Math.sin(frame) * 6);
+                const rotate = Math.round(Math.sin(frame) * 12);
+                pet.style.transform = `scale(3) translateX(${shake}px) rotate(${rotate}deg)`;
+            }
+
+            // Sad shake
+            else if (isSad) {
+                const shake = Math.round(Math.sin(frame) * 3);
+                const shiver = Math.round(Math.sin(frame * 1.5) * 2);
+                pet.style.transform = `scale(3) translateX(${shake}px) rotate(${shiver}deg)`;
+            }
+
+            // Active pulse
+            else if (isActive) {
+                const pulse = Math.round(Math.sin(frame / 3) * 4);
+                pet.style.transform = `scale(3) translateY(${-pulse}px)`;
+            }
+
+        }, 100); // 10fps for retro pixel animation
+
+        // Eye blinking animation
+        const leftEye = document.getElementById('pet-eye-left');
+        const rightEye = document.getElementById('pet-eye-right');
+
+        setInterval(() => {
+            eyeBlinkCounter++;
+
+            // Blink every 4 seconds for idle
+            if (pet.classList.contains('idle') && eyeBlinkCounter % 240 === 0) {
+                blinkEyes(leftEye, rightEye, 100);
+            }
+
+            // Faster blink for active
+            if (pet.classList.contains('active') && eyeBlinkCounter % 120 === 0) {
+                blinkEyes(leftEye, rightEye, 100);
+            }
+
+            // Double blink for thinking
+            if (pet.classList.contains('thinking') && eyeBlinkCounter % 120 === 0) {
+                blinkEyes(leftEye, rightEye, 80);
+                setTimeout(() => blinkEyes(leftEye, rightEye, 80), 150);
+            }
+
+        }, 16);
+    }
+
+    function blinkEyes(leftEye, rightEye, duration) {
+        if (!leftEye || !rightEye) return;
+
+        leftEye.style.height = '2px';
+        leftEye.style.marginTop = '3px';
+        rightEye.style.height = '2px';
+        rightEye.style.marginTop = '3px';
+
+        setTimeout(() => {
+            leftEye.style.height = '8px';
+            leftEye.style.marginTop = '0';
+            rightEye.style.height = '8px';
+            rightEye.style.marginTop = '0';
+        }, duration);
+    }
+
     // Export functions to global scope if needed
     window.petModule = {
         showPetPlaceholder: showPetPlaceholder,
@@ -324,4 +502,26 @@
     };
 
     console.log('[Pet] Pet module loaded');
+
+    // Visual confirmation that module loaded
+    setTimeout(() => {
+        const pet = document.getElementById('pixel-pet');
+        const mood = document.getElementById('pet-mood');
+
+        if (pet && mood) {
+            console.log('[Pet] ✓ Pet element found, animations should be running');
+            console.log('[Pet] Current classes:', pet.className);
+            console.log('[Pet] Current transform:', pet.style.transform);
+
+            // Visual indicator
+            mood.textContent = 'ANIMATED ✓';
+            mood.style.color = '#00ff00';
+        } else {
+            console.error('[Pet] ✗ Pet element NOT found!');
+            if (mood) {
+                mood.textContent = 'ERROR ✗';
+                mood.style.color = '#ff0000';
+            }
+        }
+    }, 2000);
 })();
