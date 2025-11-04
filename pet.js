@@ -447,9 +447,16 @@
 
                 // Random jump or gravity change
                 const action = Math.random();
-                if (action < 0.6) {
+                if (action < 0.4) {
                     // Normal jump
                     velocityY = -8; // Jump up
+                    gravity = 'floor';
+                } else if (action < 0.6) {
+                    // Walk on floor (no jump, just horizontal movement)
+                    gravity = 'walk-floor';
+                    velocityY = 0;
+                    petY = 0; // Stay on ground
+                    velocityX = Math.round((Math.random() - 0.5) * 6); // Faster horizontal
                 } else if (action < 0.75) {
                     // Switch to ceiling
                     gravity = 'ceiling';
@@ -476,6 +483,18 @@
                     petY = 0;
                     velocityY = 0;
                     velocityX *= 0.9; // Friction
+                }
+            } else if (gravity === 'walk-floor') {
+                // Walking on floor - no vertical movement, just horizontal
+                petY = 0; // Always on ground
+                petX += velocityX;
+                velocityX *= 0.98; // Slow friction
+
+                // Add leg wiggle animation
+                const legRow = pet.querySelector('.pet-row:nth-child(4)');
+                if (legRow && frame % 5 === 0) {
+                    const legWiggle = Math.sin(frame / 2) > 0 ? 1 : -1;
+                    legRow.style.transform = `translateX(${legWiggle}px)`;
                 }
             } else if (gravity === 'ceiling') {
                 velocityY -= 1; // Reverse gravity
