@@ -43,9 +43,11 @@
         }, 500);
     }
 
-    // Track last activity time
+    // Track last activity time and opacity
     let lastActivityTime = Date.now();
     let inactivityTimer = null;
+    let petOpacity = 0.2; // Start almost transparent
+    let targetOpacity = 0.2; // Target opacity for smooth transitions
 
     function startInactivityMonitor() {
         // Check every 30 seconds
@@ -55,14 +57,12 @@
 
             if (!pet) return;
 
-            // If 5 minutes (300000ms) of inactivity, fade to 10% opacity
-            if (timeSinceActivity > 300000) {
-                pet.style.transition = 'opacity 2s ease';
-                pet.style.opacity = '0.1';
-                console.log('[Pet] Pet sleeping due to inactivity');
+            // Fade to transparent when no logs (after 30 seconds)
+            if (timeSinceActivity > 30000) {
+                targetOpacity = 0.15; // Almost transparent
+                console.log('[Pet] Pet fading due to inactivity');
             } else {
-                // Active - full opacity
-                pet.style.opacity = '1';
+                targetOpacity = 1.0; // Fully visible
             }
         }, 30000); // Check every 30 seconds
     }
@@ -194,8 +194,8 @@
         // Update activity time
         lastActivityTime = Date.now();
 
-        // Restore full opacity when active
-        pet.style.opacity = '1';
+        // Make pet fully visible when log arrives
+        targetOpacity = 1.0;
 
         // Clear pet placeholder when first log arrives
         clearPetPlaceholder();
@@ -373,15 +373,16 @@
 
             // Random chance for special animation (30%)
             if (Math.random() < 0.3) {
-                const animations = ['white-eyes', 'legs-spread', 'legs-grow', 'arms-wave', 'squat', 'horns-grow'];
+                const animations = ['white-eyes', 'legs-spread', 'legs-grow', 'arms-wave', 'squat', 'horns-grow', 'walk'];
                 specialAnimation = animations[Math.floor(Math.random() * animations.length)];
                 specialAnimationFrame = 0;
                 console.log('[Pet] Special animation:', specialAnimation);
 
-                // Stop after 2 seconds
+                // Walking animation is longer (4 seconds)
+                const duration = specialAnimation === 'walk' ? 4000 : 2000;
                 setTimeout(() => {
                     specialAnimation = null;
-                }, 2000);
+                }, duration);
             }
         }, 8000); // Check every 8 seconds
     }
@@ -399,13 +400,31 @@
         let frame = 0;
         let eyeBlinkCounter = 0;
 
+        // Free movement variables (pet can move around screen)
+        let petX = 0; // Center of container
+        let petY = 0; // Center of container
+        let velocityX = 0;
+        let velocityY = 0;
+        let gravity = 'floor'; // 'floor', 'ceiling', 'wall-left', 'wall-right'
+        let jumpTimer = 0;
+        const container = pet.parentElement;
+        const containerWidth = container ? container.offsetWidth : 300;
+        const containerHeight = container ? container.offsetHeight : 160;
+        const petSize = 40; // 5x8 pixels
+
         // Main animation loop (10fps for retro pixel feel)
         const animationInterval = setInterval(() => {
             frame++;
 
+            // Smooth opacity transition
+            if (Math.abs(petOpacity - targetOpacity) > 0.01) {
+                petOpacity += (targetOpacity - petOpacity) * 0.1;
+                pet.style.opacity = petOpacity.toFixed(2);
+            }
+
             // Debug: log every 50 frames (5 seconds)
             if (frame % 50 === 0) {
-                console.log('[Pet Animation] Frame:', frame, 'Classes:', pet.className);
+                console.log('[Pet Animation] Frame:', frame, 'Classes:', pet.className, 'Opacity:', petOpacity.toFixed(2));
             }
 
             // Handle special animations first
@@ -415,6 +434,75 @@
                 return; // Skip normal animations
             }
 
+            // Free movement system (10 frame pixel-perfect motion)
+            // Pet randomly jumps and moves around, sometimes on ceiling/walls
+            jumpTimer++;
+
+            // Random jump every 3-5 seconds (30-50 frames)
+            if (jumpTimer > 30 + Math.random() * 20) {
+                jumpTimer = 0;
+
+                // Random horizontal velocity
+                velocityX = Math.round((Math.random() - 0.5) * 4); // -2 to +2 pixels per frame
+
+                // Random jump or gravity change
+                const action = Math.random();
+                if (action < 0.6) {
+                    // Normal jump
+                    velocityY = -8; // Jump up
+                } else if (action < 0.75) {
+                    // Switch to ceiling
+                    gravity = 'ceiling';
+                    velocityY = 8; // "Fall" to ceiling
+                } else if (action < 0.85) {
+                    // Crawl on wall
+                    gravity = Math.random() < 0.5 ? 'wall-left' : 'wall-right';
+                    velocityY = Math.round((Math.random() - 0.5) * 6);
+                } else {
+                    // Return to floor
+                    gravity = 'floor';
+                    velocityY = 0;
+                }
+            }
+
+            // Apply gravity and movement
+            if (gravity === 'floor') {
+                velocityY += 1; // Gravity pulls down
+                petY += velocityY;
+                petX += velocityX;
+
+                // Floor collision
+                if (petY >= 0) {
+                    petY = 0;
+                    velocityY = 0;
+                    velocityX *= 0.9; // Friction
+                }
+            } else if (gravity === 'ceiling') {
+                velocityY -= 1; // Reverse gravity
+                petY += velocityY;
+                petX += velocityX;
+
+                // Ceiling collision
+                const maxY = -(containerHeight - petSize);
+                if (petY <= maxY) {
+                    petY = maxY;
+                    velocityY = 0;
+                    velocityX *= 0.9;
+                }
+            } else if (gravity === 'wall-left') {
+                petX = -(containerWidth / 2 - petSize);
+                petY += velocityY;
+                velocityY *= 0.95;
+            } else if (gravity === 'wall-right') {
+                petX = containerWidth / 2 - petSize;
+                petY += velocityY;
+                velocityY *= 0.95;
+            }
+
+            // Clamp position to container bounds
+            petX = Math.max(-(containerWidth / 2 - petSize / 2), Math.min(containerWidth / 2 - petSize / 2, petX));
+            petY = Math.max(-(containerHeight - petSize), Math.min(0, petY));
+
             // Get current state
             const isIdle = pet.classList.contains('idle');
             const isThinking = pet.classList.contains('thinking');
@@ -423,45 +511,52 @@
             const isActive = pet.classList.contains('active');
             const isExcited = pet.classList.contains('excited');
 
-            // Idle breathing animation - snap to pixels
-            if (isIdle) {
-                const breathe = Math.round(Math.sin(frame / 5) * 3); // Snap to integer pixels
-                pet.style.transform = `scale(1) translateY(${breathe}px)`;
-            }
+            // Apply free movement position + state animations
+            let animX = Math.round(petX);
+            let animY = Math.round(petY);
+            let rotate = 0;
+            let scaleX = 1;
+            let scaleY = 1;
 
-            // Thinking wiggle - BIGGER movements
-            else if (isThinking) {
+            // Add state-based animation on top of movement
+            if (isIdle) {
+                const breathe = Math.round(Math.sin(frame / 5) * 3);
+                animY += breathe;
+            } else if (isThinking) {
                 const wiggle = Math.round(Math.sin(frame / 2) * 10);
                 const tilt = Math.round(Math.sin(frame / 2) * 8);
-                pet.style.transform = `scale(1) translateX(${wiggle}px) rotate(${tilt}deg)`;
-            }
-
-            // Happy bounce - MUCH BIGGER
-            else if (isHappy) {
+                animX += wiggle;
+                rotate = tilt;
+            } else if (isHappy) {
                 const bounce = Math.round(Math.abs(Math.sin(frame / 1.5)) * 25);
-                const rotate = Math.round(Math.sin(frame / 1.5) * 15);
-                pet.style.transform = `scale(1) translateY(${-bounce}px) rotate(${rotate}deg)`;
-            }
-
-            // Excited shake - INTENSE
-            else if (isExcited) {
+                const rotateAnim = Math.round(Math.sin(frame / 1.5) * 15);
+                animY -= bounce;
+                rotate = rotateAnim;
+            } else if (isExcited) {
                 const shake = Math.round(Math.sin(frame * 2) * 15);
-                const rotate = Math.round(Math.sin(frame * 2) * 20);
-                pet.style.transform = `scale(1) translateX(${shake}px) rotate(${rotate}deg)`;
-            }
-
-            // Sad shake - VISIBLE
-            else if (isSad) {
+                const rotateAnim = Math.round(Math.sin(frame * 2) * 20);
+                animX += shake;
+                rotate = rotateAnim;
+            } else if (isSad) {
                 const shake = Math.round(Math.sin(frame * 1.5) * 8);
                 const shiver = Math.round(Math.sin(frame * 2) * 5);
-                pet.style.transform = `scale(1) translateX(${shake}px) rotate(${shiver}deg)`;
+                animX += shake;
+                rotate = shiver;
+            } else if (isActive) {
+                const pulse = Math.round(Math.sin(frame / 2) * 8);
+                animY -= pulse;
             }
 
-            // Active pulse - STRONGER
-            else if (isActive) {
-                const pulse = Math.round(Math.sin(frame / 2) * 8);
-                pet.style.transform = `scale(1) translateY(${-pulse}px)`;
+            // Flip sprite when on ceiling or moving left
+            if (gravity === 'ceiling') {
+                scaleY = -1;
             }
+            if (velocityX < 0) {
+                scaleX = -1;
+            }
+
+            // Apply final transform
+            pet.style.transform = `scale(${scaleX}, ${scaleY}) translate(${animX}px, ${animY}px) rotate(${rotate}deg)`;
 
         }, 100); // 10fps for retro pixel animation
 
@@ -594,8 +689,41 @@
             }
         }
 
-        // Gentle breathing during special animations (except squat)
-        if (specialAnimation !== 'squat') {
+        else if (specialAnimation === 'walk') {
+            // South Park style walking - just slide left/right with leg wiggle
+            const container = pet.parentElement;
+            const containerWidth = container ? container.offsetWidth : 300;
+            const petWidth = 32; // Approximate pet width
+            const walkDistance = containerWidth - petWidth - 40; // Leave margin
+
+            // Walk from left to right and back
+            const progress = specialAnimationFrame / 40; // 40 frames = 4 seconds
+            let xPos;
+            let direction;
+
+            if (progress < 0.5) {
+                // Walk right
+                xPos = (progress * 2) * walkDistance - walkDistance/2;
+                direction = 1;
+            } else {
+                // Walk left
+                xPos = ((1 - (progress - 0.5) * 2)) * walkDistance - walkDistance/2;
+                direction = -1;
+            }
+
+            // Flip sprite when walking left
+            const scaleX = direction === -1 ? -1 : 1;
+
+            // Leg wiggle animation (alternate legs)
+            const legRow = rows[3];
+            const legWiggle = Math.sin(specialAnimationFrame / 2) > 0 ? 1 : -1;
+            legRow.style.transform = `translateX(${legWiggle}px)`;
+
+            pet.style.transform = `scale(1) scaleX(${scaleX}) translateX(${Math.round(xPos)}px)`;
+        }
+
+        // Gentle breathing during special animations (except squat and walk)
+        if (specialAnimation !== 'squat' && specialAnimation !== 'walk') {
             const breathe = Math.round(Math.sin(specialAnimationFrame / 5) * 2);
             pet.style.transform = `scale(1) translateY(${breathe}px)`;
         }
