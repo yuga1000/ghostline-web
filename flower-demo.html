@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Animation Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="agent-pet.css?v=15">
+    <style>
+        body {
+            background: #000000;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            border: 2px solid #ff00ff;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #ff00ff;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .animated-section {
+            border: 3px solid #ff00ff;
+            padding: 30px;
+            background: #110011;
+            margin-bottom: 40px;
+        }
+
+        .animated-section h2 {
+            text-align: center;
+            margin: 0 0 20px 0;
+            color: #ff00ff;
+            font-size: 24px;
+        }
+
+        .pet-display {
+            width: 100%;
+            height: 350px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: #000000;
+            border: 2px solid #ff00ff;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .description {
+            text-align: center;
+            margin-top: 20px;
+            color: #ff00ff;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: #001100;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+            color: #00ff00;
+        }
+
+        .info-box ul {
+            margin: 10px 0;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌸 FLOWER ANIMATION - РАСТЕТ ПО ПИКСЕЛЯМ</h1>
+
+    <div class="demo-container">
+        <div class="info-box">
+            <h3>Как работает анимация цветка:</h3>
+            <ul>
+                <li><strong>ВАЖНО:</strong> Никакого scale! Только HEIGHT меняется у ног (8px → 24px)</li>
+                <li><strong>Фазы 1-2:</strong> Тело поднимается вверх (translateY: 0 → -4px)</li>
+                <li><strong>Фаза 3:</strong> Ноги удлиняются до 12px, начинают раздвигаться</li>
+                <li><strong>Фаза 4:</strong> Ноги 16px, руки превращаются в ветки (width: 4px → 6px)</li>
+                <li><strong>Фаза 5:</strong> Ноги 20px, широкие ветки (8px)</li>
+                <li><strong>Фаза 6:</strong> Полное цветение! Ноги 24px, глаза прямоугольные</li>
+            </ul>
+            <p style="color: #ff00ff; margin-top: 15px;">
+                ⬇️ Смотри анимацию ниже - 12-секундный цикл роста!
+            </p>
+        </div>
+
+        <div class="animated-section">
+            <h2>🌸 АНИМИРОВАННЫЙ ЦВЕТОК</h2>
+            <div class="pet-display">
+                <div class="pet flower active stage-4">
+                    <div class="pet-body-container">
+                        <div class="pet-arms">
+                            <div class="pixel arm"></div>
+                            <div class="pet-body">
+                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                            </div>
+                            <div class="pixel arm"></div>
+                        </div>
+                    </div>
+                    <div class="pet-legs">
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                        <div class="pixel leg"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="description">
+                ⬆️ Смотри как:<br>
+                • Тело поднимается вверх (translateY)<br>
+                • Ноги растут по HEIGHT (8px → 12px → 16px → 20px → 24px)<br>
+                • Ноги раздвигаются в стороны (translateX)<br>
+                • Руки превращаются в ветки (width растет)<br>
+                <br>
+                <strong style="color: #ff00ff;">12-секундный цикл, полностью БЕЗ SCALE!</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Flower demo loaded. Watch the 12-second growth cycle!');
+        console.log('Pet should be growing from creature to flower...');
+    </script>
+</body>
+</html>

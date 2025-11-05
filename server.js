@@ -115,6 +115,59 @@ app.get('/api/logs', (req, res) => {
   res.json({ logs: recentLogs });
 });
 
+// Agent status endpoint - checks if agent is in cooldown based on recent logs
+app.get('/api/agent-status', (req, res) => {
+  console.log('[Agent Status API] Checking agent status from recent logs');
+
+  let status = 'idle'; // idle, working, cooldown
+  let cooldownMinutes = 0;
+  let cooldownStartTime = null;
+
+  // Check recent logs for cooldown messages
+  for (let i = recentLogs.length - 1; i >= 0; i--) {
+    const log = recentLogs[i];
+    const message = log.message || '';
+
+    // Check for cooldown message: "Cooldown period: X minutes before next iteration..."
+    const cooldownMatch = message.match(/Cooldown period: (\d+) minutes/i);
+    if (cooldownMatch) {
+      status = 'cooldown';
+      cooldownMinutes = parseInt(cooldownMatch[1]);
+      cooldownStartTime = log.timestamp;
+      console.log('[Agent Status API] Found cooldown:', cooldownMinutes, 'minutes at', cooldownStartTime);
+      break;
+    }
+
+    // Check for working indicators
+    if (message.includes('GLVSF Image') || message.includes('Vercept is') || message.includes('Starting')) {
+      status = 'working';
+      console.log('[Agent Status API] Found working indicator');
+      break;
+    }
+  }
+
+  // If we found cooldown, calculate remaining time
+  let remainingMinutes = 0;
+  if (status === 'cooldown' && cooldownStartTime) {
+    const elapsed = (Date.now() - new Date(cooldownStartTime).getTime()) / 1000 / 60; // minutes
+    remainingMinutes = Math.max(0, cooldownMinutes - elapsed);
+
+    // If cooldown expired, change status to idle
+    if (remainingMinutes <= 0) {
+      status = 'idle';
+      console.log('[Agent Status API] Cooldown expired');
+    }
+  }
+
+  console.log('[Agent Status API] Returning status:', status, 'remaining:', remainingMinutes);
+
+  res.json({
+    status,
+    cooldownMinutes: Math.ceil(remainingMinutes),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Test endpoint to verify deployment
 app.get('/api/test-deployment', (req, res) => {
   res.json({ status: 'ok', message: 'Deployment verified', timestamp: new Date().toISOString() });

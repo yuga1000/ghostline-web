@@ -2257,6 +2257,40 @@ function detectRestPeriod(logText) {
     return false;
 }
 
+// Check agent status on page load and auto-trigger flower if in cooldown
+async function checkInitialAgentStatus() {
+    console.log('[Agent Status] Checking initial status...');
+
+    try {
+        const response = await fetch('/api/agent-status');
+        const data = await response.json();
+
+        console.log('[Agent Status] Server status:', data.status, 'cooldown minutes:', data.cooldownMinutes);
+
+        if (data.status === 'cooldown' && data.cooldownMinutes > 0) {
+            console.log('[Agent Status] Agent is in cooldown! Auto-triggering flower mode');
+
+            // Wake up pet if sleeping
+            if (!petIsAwake) {
+                wakeUpPet();
+            }
+
+            // Trigger flower mode for remaining cooldown time
+            const remainingMs = data.cooldownMinutes * 60 * 1000;
+            transformToFlower();
+
+            // Also start the REST countdown display
+            startRestCountdown(data.cooldownMinutes);
+        } else if (data.status === 'working') {
+            console.log('[Agent Status] Agent is working - pet should wake up soon');
+        } else {
+            console.log('[Agent Status] Agent is idle');
+        }
+    } catch (error) {
+        console.error('[Agent Status] Failed to check status:', error);
+    }
+}
+
 // Initialize pet - load state and start sleeping
 window.addEventListener('DOMContentLoaded', () => {
     const pet = document.getElementById('agent-pet');
@@ -2272,6 +2306,11 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         console.log('[Pet] Initialized - Stage:', petStage, 'Logs:', petLogCount);
+
+        // Check if agent is in cooldown and auto-trigger flower mode
+        setTimeout(() => {
+            checkInitialAgentStatus();
+        }, 1000); // Wait 1 second after page load to check status
     }
 });
 
