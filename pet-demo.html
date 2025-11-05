@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Pet - Animation Demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="agent-pet.css?v=8">
+    <link rel="stylesheet" href="agent-pet.css?v=10">
     <style>
         body {
             background: #000000;
@@ -138,20 +138,21 @@
 
     <script>
         const animations = [
-            { name: 'sleeping', label: 'Sleeping', desc: 'Спит (зеленый, ноги спрятаны)' },
-            { name: 'idle', label: 'Idle', desc: 'Стоит спокойно (дыхание)' },
-            { name: 'walking', label: 'Walking', desc: 'Идет (ноги чередуются)' },
-            { name: 'running', label: 'Running', desc: 'Бежит горизонтально' },
-            { name: 'jumping', label: 'Jumping', desc: 'Высокие прыжки' },
-            { name: 'dancing', label: 'Dancing', desc: 'Танцует' },
-            { name: 'spinning', label: 'Spinning', desc: 'Кружится' },
-            { name: 'waving', label: 'Waving', desc: 'Машет руками' },
-            { name: 'playing', label: 'Playing', desc: 'Играет на спине' },
-            { name: 'blinking', label: 'Blinking', desc: 'Моргает' },
-            { name: 'transforming', label: 'Transforming', desc: 'Превращается' },
-            { name: 'hunting', label: 'Tongue Hunt', desc: 'Охота с языком!' },
-            { name: 'excited-bounce', label: 'Excited Bounce', desc: 'Радостные прыжки' },
-            { name: 'shaking', label: 'Shaking', desc: 'Трясется' }
+            { name: 'sleeping', label: 'Sleeping (Stage 1)', desc: 'Спит (зеленый, ноги спрятаны)', stage: 1 },
+            { name: 'idle', label: 'Idle (Stage 2)', desc: 'Стоит спокойно (дыхание)', stage: 2 },
+            { name: 'walking', label: 'Walking (Stage 2)', desc: 'Идет (ноги чередуются)', stage: 2 },
+            { name: 'running', label: 'Running (Stage 3)', desc: 'Бежит горизонтально', stage: 3 },
+            { name: 'jumping', label: 'Jumping (Stage 3)', desc: 'Высокие прыжки', stage: 3 },
+            { name: 'dancing', label: 'Dancing (Stage 3)', desc: 'Танцует', stage: 3 },
+            { name: 'spinning', label: 'Spinning (Stage 3)', desc: 'Кружится', stage: 3 },
+            { name: 'waving', label: 'Waving (Stage 2)', desc: 'Машет руками', stage: 2 },
+            { name: 'playing', label: 'Playing (Stage 2)', desc: 'Играет на спине', stage: 2 },
+            { name: 'blinking', label: 'Blinking (Stage 2)', desc: 'Моргает', stage: 2 },
+            { name: 'transforming', label: 'Transforming (Stage 3)', desc: 'Превращается', stage: 3 },
+            { name: 'hunting', label: 'Tongue Hunt (Stage 3)', desc: 'Охота с языком!', stage: 3 },
+            { name: 'excited-bounce', label: 'Excited Bounce (Stage 3)', desc: 'Радостные прыжки', stage: 3 },
+            { name: 'shaking', label: 'Shaking (Stage 2)', desc: 'Трясется', stage: 2 },
+            { name: 'flower', label: 'Flower (Stage 4)', desc: 'Цветок распускается!', stage: 4 }
         ];
 
         const grid = document.getElementById('demo-grid');
@@ -163,7 +164,7 @@
                 <h2>${anim.label}</h2>
                 <p>${anim.desc}</p>
                 <div class="pet-container-demo">
-                    <div class="pet ${anim.name} active stage-2" id="pet-${anim.name}">
+                    <div class="pet ${anim.name} active stage-${anim.stage}" id="pet-${anim.name}">
                         <div class="pet-body-container">
                             <div class="pet-arms">
                                 <div class="pixel arm"></div>

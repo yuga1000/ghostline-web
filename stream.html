@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- Agent Pet Styles -->
-    <link rel="stylesheet" href="agent-pet.css?v=9">
+    <link rel="stylesheet" href="agent-pet.css?v=10">
     <style>
         body {
             background: #000000;
@@ -1834,7 +1834,7 @@ function triggerPetAnimation(animation, duration) {
 
     // Remove all animation classes
     pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'sleeping', 'playing',
-                         'running', 'jumping', 'spinning', 'transforming', 'hunting', 'excited-bounce', 'shaking');
+                         'running', 'jumping', 'spinning', 'transforming', 'hunting', 'excited-bounce', 'shaking', 'flower');
 
     // Add new animation
     pet.classList.add(animation);
@@ -1864,7 +1864,8 @@ function triggerPetAnimation(animation, duration) {
         'transforming': 'Transforming...',
         'hunting': 'Hunting pixels',
         'excited-bounce': 'So excited!',
-        'shaking': 'Shaking!'
+        'shaking': 'Shaking!',
+        'flower': 'Resting as flower'
     };
     stateText.textContent = moodTexts[animation] || 'Active';
 
