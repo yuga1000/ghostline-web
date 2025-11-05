@@ -143,19 +143,19 @@
     animation: roaming-pet-bounce 2.25s step-end infinite;
 }
 
-.roaming-pet.walking .roaming-pet-legs:first-child .roaming-pixel.leg:nth-child(1) {
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(1) {
     animation: roaming-leg-step-1 1.6s step-end infinite;
 }
 
-.roaming-pet.walking .roaming-pet-legs:first-child .roaming-pixel.leg:nth-child(3) {
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(3) {
     animation: roaming-leg-step-2 1.6s step-end infinite;
 }
 
-.roaming-pet.walking .roaming-pet-legs:first-child .roaming-pixel.leg:nth-child(5) {
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(5) {
     animation: roaming-leg-step-3 1.6s step-end infinite;
 }
 
-.roaming-pet.walking .roaming-pet-legs:first-child .roaming-pixel.leg:nth-child(7) {
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(7) {
     animation: roaming-leg-step-4 1.6s step-end infinite;
 }
 
@@ -283,4 +283,144 @@
 
 .roaming-pet.sleeping .roaming-pet-legs {
     opacity: 0;
+}
+
+/* ===== GROWING ANIMATION (like a plant) ===== */
+.roaming-pet.growing .roaming-pet-body-container {
+    animation: plant-grow 3s step-end forwards;
+}
+
+@keyframes plant-grow {
+    /* Stage 1: normal size */
+    0% { transform: translateY(0px) scaleY(1); }
+    24% { transform: translateY(0px) scaleY(1); }
+    /* Stage 2: grow +1 pixel */
+    25% { transform: translateY(-3px) scaleY(1.25); }
+    49% { transform: translateY(-3px) scaleY(1.25); }
+    /* Stage 3: grow +2 pixels */
+    50% { transform: translateY(-6px) scaleY(1.5); }
+    74% { transform: translateY(-6px) scaleY(1.5); }
+    /* Stage 4: grow +3 pixels (fully grown) */
+    75% { transform: translateY(-9px) scaleY(1.75); }
+    100% { transform: translateY(-9px) scaleY(1.75); }
+}
+
+/* Arms spread when fully grown */
+.roaming-pet.growing .roaming-pet-arms {
+    animation: arms-spread 3s step-end forwards;
+}
+
+@keyframes arms-spread {
+    0% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(3px); }
+    100% { transform: translateX(3px); }
+}
+
+.roaming-pet.growing .roaming-pet-arms .roaming-pixel.arm:first-child {
+    animation: arm-left-spread 3s step-end forwards;
+}
+
+@keyframes arm-left-spread {
+    0% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(-3px); }
+}
+
+.roaming-pet.growing .roaming-pet-arms .roaming-pixel.arm:last-child {
+    animation: arm-right-spread 3s step-end forwards;
+}
+
+@keyframes arm-right-spread {
+    0% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(3px); }
+    100% { transform: translateX(3px); }
+}
+
+/* Antennae pixels that appear from head */
+.roaming-pet-antenna {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: inherit;
+    opacity: 0;
+    top: -6px;
+    left: 50%;
+    margin-left: -1.5px;
+}
+
+.roaming-pet.growing .roaming-pet-antenna {
+    animation: antenna-grow 3s step-end forwards;
+}
+
+@keyframes antenna-grow {
+    0% { opacity: 0; transform: translateY(0px); }
+    74% { opacity: 0; transform: translateY(0px); }
+    75% { opacity: 1; transform: translateY(0px); }
+    87% { opacity: 1; transform: translateY(0px); }
+    88% { opacity: 1; transform: translateY(-3px); }
+    100% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* Shrinking back animation */
+.roaming-pet.shrinking .roaming-pet-body-container {
+    animation: plant-shrink 2s step-end forwards;
+}
+
+@keyframes plant-shrink {
+    0% { transform: translateY(-9px) scaleY(1.75); }
+    32% { transform: translateY(-9px) scaleY(1.75); }
+    33% { transform: translateY(-6px) scaleY(1.5); }
+    65% { transform: translateY(-6px) scaleY(1.5); }
+    66% { transform: translateY(-3px) scaleY(1.25); }
+    99% { transform: translateY(-3px) scaleY(1.25); }
+    100% { transform: translateY(0px) scaleY(1); }
+}
+
+.roaming-pet.shrinking .roaming-pet-arms {
+    animation: arms-close 2s step-end forwards;
+}
+
+@keyframes arms-close {
+    0% { transform: translateX(3px); }
+    32% { transform: translateX(3px); }
+    33% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-arms .roaming-pixel.arm:first-child {
+    animation: arm-left-close 2s step-end forwards;
+}
+
+@keyframes arm-left-close {
+    0% { transform: translateX(-3px); }
+    32% { transform: translateX(-3px); }
+    33% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-arms .roaming-pixel.arm:last-child {
+    animation: arm-right-close 2s step-end forwards;
+}
+
+@keyframes arm-right-close {
+    0% { transform: translateX(3px); }
+    32% { transform: translateX(3px); }
+    33% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-antenna {
+    animation: antenna-shrink 2s step-end forwards;
+}
+
+@keyframes antenna-shrink {
+    0% { opacity: 1; transform: translateY(-3px); }
+    32% { opacity: 1; transform: translateY(-3px); }
+    33% { opacity: 1; transform: translateY(0px); }
+    65% { opacity: 1; transform: translateY(0px); }
+    66% { opacity: 0; transform: translateY(0px); }
+    100% { opacity: 0; transform: translateY(0px); }
 }

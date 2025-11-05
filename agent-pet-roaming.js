@@ -12,12 +12,12 @@
 
     // Movement targets on index.html
     const targets = [
-        { id: 'logo', name: 'logo', animations: ['playing', 'idle', 'waving'], walkEdges: false },
-        { id: 'galleryBtn', name: 'gallery', animations: ['waving', 'idle', 'playing'], walkEdges: true },
-        { id: 'streamBtn', name: 'stream', animations: ['waving', 'idle', 'playing'], walkEdges: true },
-        { id: 'orderBtn', name: 'order', animations: ['waving', 'idle', 'playing'], walkEdges: true },
-        { id: 'socialToggle', name: 'social', animations: ['waving', 'idle'], walkEdges: true },
-        { id: 'titleContainer', name: 'title', animations: ['idle', 'waving'], walkEdges: false }
+        { id: 'logo', name: 'logo', animations: ['playing', 'idle', 'waving', 'growing'], walkEdges: false },
+        { id: 'galleryBtn', name: 'gallery', animations: ['waving', 'idle', 'playing', 'growing'], walkEdges: true },
+        { id: 'streamBtn', name: 'stream', animations: ['waving', 'idle', 'playing', 'growing'], walkEdges: true },
+        { id: 'orderBtn', name: 'order', animations: ['waving', 'idle', 'playing', 'growing'], walkEdges: true },
+        { id: 'socialToggle', name: 'social', animations: ['waving', 'idle', 'growing'], walkEdges: true },
+        { id: 'titleContainer', name: 'title', animations: ['idle', 'waving', 'growing'], walkEdges: false }
     ];
 
     // Create pet HTML structure (8x4 body, 3px pixels)
@@ -29,6 +29,8 @@
         container.innerHTML = `
             <div class="roaming-pet active idle" id="roaming-pet">
                 <div class="roaming-pet-body-container">
+                    <!-- Antenna pixels (hidden by default) -->
+                    <div class="roaming-pet-antenna roaming-pixel body"></div>
                     <div class="roaming-pet-arms">
                         <div class="roaming-pixel arm"></div>
                         <div class="roaming-pet-body">
@@ -106,8 +108,14 @@
         const pet = document.getElementById('roaming-pet');
         if (!pet) return;
 
+        // Special handling for growing animation
+        if (animation === 'growing') {
+            performGrowingAnimation();
+            return;
+        }
+
         // Remove all animation classes
-        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping');
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking');
 
         // Remove state classes
         pet.classList.remove('active', 'sleeping');
@@ -124,6 +132,40 @@
         currentAnimation = animation;
 
         console.log('[Roaming Pet] Animation:', animation);
+    }
+
+    // Perform growing animation sequence
+    function performGrowingAnimation() {
+        const pet = document.getElementById('roaming-pet');
+        if (!pet) return;
+
+        console.log('[Roaming Pet] Growing like a plant...');
+
+        // Remove other animations
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'shrinking');
+
+        // Start growing
+        pet.classList.add('growing');
+        currentAnimation = 'growing';
+
+        // After growing completes (3s), hold for 2-3 seconds
+        setTimeout(() => {
+            console.log('[Roaming Pet] Fully grown, holding...');
+
+            // After holding, start shrinking back
+            setTimeout(() => {
+                console.log('[Roaming Pet] Shrinking back...');
+                pet.classList.remove('growing');
+                pet.classList.add('shrinking');
+                currentAnimation = 'shrinking';
+
+                // After shrinking completes (2s), return to idle
+                setTimeout(() => {
+                    pet.classList.remove('shrinking');
+                    setAnimation('idle');
+                }, 2000);
+            }, 2000 + Math.random() * 1000);
+        }, 3000);
     }
 
     // Go to sleep
