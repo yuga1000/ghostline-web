@@ -1519,6 +1519,28 @@ function wakeUpPet() {
     petIsAwake = true;
     petAnimationState = 'idle';
 
+    // Remove inline styles from sleeping state
+    const bodyPixels = pet.querySelectorAll('.pixel.body');
+    const armPixels = pet.querySelectorAll('.pixel.arm');
+    const legPixels = pet.querySelectorAll('.pixel.leg');
+    const eyePixels = pet.querySelectorAll('.pixel.eye');
+
+    bodyPixels.forEach(p => {
+        p.style.background = '';
+        p.style.boxShadow = '';
+    });
+    armPixels.forEach(p => {
+        p.style.background = '';
+        p.style.boxShadow = '';
+    });
+    legPixels.forEach(p => {
+        p.style.background = '';
+        p.style.boxShadow = '';
+    });
+    eyePixels.forEach(p => {
+        p.style.height = '';
+    });
+
     // Hide sleep mask
     if (sleepMask) {
         sleepMask.classList.remove('visible');
