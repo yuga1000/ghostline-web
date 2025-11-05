@@ -984,6 +984,16 @@ function handleLogMessage(data) {
         document.getElementById('agent-pipeline-name').textContent = metadata.pipeline;
     }
 
+    // Check for IMAGE level messages to display in pet window
+    if (level === 'IMAGE' && metadata) {
+        const imageUrl = metadata.image_url || metadata.catbox_url || metadata.url;
+        const filename = metadata.filename || 'image.png';
+        
+        if (imageUrl && imageUrl.startsWith('http')) {
+            displayPetImage(imageUrl, filename);
+        }
+    }
+
     // Determine log class based on level
     let logClass = 'log-info';
     switch (level) {
@@ -993,6 +1003,7 @@ function handleLogMessage(data) {
         case 'thinking': logClass = 'log-thinking'; break;
         case 'action': logClass = 'log-action'; break;
         case 'dim': logClass = 'log-dim'; break;
+        case 'IMAGE': logClass = 'log-success'; break; // IMAGE logs shown as success
     }
 
     // Add log line with timestamp if provided
@@ -1001,6 +1012,92 @@ function handleLogMessage(data) {
     // Add to queue instead of showing immediately (for 300ms animation)
     logQueue.push({ text: logText, className: logClass });
     processLogQueue();
+}
+
+// Display image in pet window
+function displayPetImage(imageUrl, filename) {
+    console.log('[Pet] Displaying image:', filename, imageUrl);
+    
+    // Get or create pet image window
+    let petWindow = document.getElementById('pet-image-window');
+    if (!petWindow) {
+        const petFeed = document.getElementById('pet-feed');
+        if (!petFeed) return;
+        
+        petWindow = document.createElement('div');
+        petWindow.id = 'pet-image-window';
+        petWindow.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #000;
+            border: 2px solid #00ff00;
+            padding: 5px;
+            max-width: 180px;
+            z-index: 20;
+            display: none;
+        `;
+        
+        const label = document.createElement('div');
+        label.className = 'pet-image-label';
+        label.style.cssText = `
+            color: #00ff00;
+            font-size: 10px;
+            margin-bottom: 5px;
+            font-family: 'Share Tech Mono', monospace;
+        `;
+        label.textContent = 'New: loading...';
+        
+        const img = document.createElement('img');
+        img.id = 'pet-image-preview';
+        img.style.cssText = `
+            width: 100%;
+            height: auto;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        `;
+        
+        petWindow.appendChild(label);
+        petWindow.appendChild(img);
+        petFeed.appendChild(petWindow);
+    }
+    
+    // Update image
+    const img = document.getElementById('pet-image-preview');
+    const label = document.querySelector('.pet-image-label');
+    
+    if (img) {
+        img.src = imageUrl;
+        img.alt = filename;
+    }
+    
+    if (label) {
+        label.textContent = `New: ${filename}`;
+    }
+    
+    // Show window with fade in
+    petWindow.style.display = 'block';
+    setTimeout(() => {
+        petWindow.style.opacity = '1';
+    }, 10);
+    
+    // Update pet mood
+    const petMood = document.getElementById('pet-mood');
+    if (petMood) {
+        petMood.textContent = 'Showing Art';
+    }
+    
+    // Hide after 30 seconds
+    setTimeout(() => {
+        petWindow.style.opacity = '0';
+        setTimeout(() => {
+            petWindow.style.display = 'none';
+            if (petMood) {
+                petMood.textContent = 'Sleeping... ZZZ';
+            }
+        }, 500);
+    }, 30000);
 }
 
 // Show placeholder (when not connected)
