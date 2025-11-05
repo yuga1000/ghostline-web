@@ -247,12 +247,37 @@
 
 /* ===== SLEEPING ANIMATION ===== */
 .pet.sleeping .pet-body-container {
-    animation: none;
+    /* Breathing animation while sleeping */
+    animation: sleep-breathing 3s step-end infinite;
     transform: translateY(8px) !important;
 }
 
+@keyframes sleep-breathing {
+    /* Breathe in - expand by 0.5px (scale slightly) */
+    0% { transform: translateY(8px) scale(1); }
+    49% { transform: translateY(8px) scale(1); }
+    /* Breathe out - expand more */
+    50% { transform: translateY(8px) scale(1.05); }
+    99% { transform: translateY(8px) scale(1.05); }
+    100% { transform: translateY(8px) scale(1); }
+}
+
+/* Sleeping eyes - thin slits instead of full open */
 .pet.sleeping .pixel.eye {
-    opacity: 0;
+    /* Make eyes into thin slits (2px height -> 1px height) */
+    height: 1px;
+    animation: eye-flutter 4s step-end infinite;
+}
+
+@keyframes eye-flutter {
+    /* Eyes mostly closed, occasionally flutter */
+    0% { opacity: 0.6; }
+    79% { opacity: 0.6; }
+    /* Brief flutter */
+    80% { opacity: 0.3; }
+    84% { opacity: 0.3; }
+    85% { opacity: 0.6; }
+    100% { opacity: 0.6; }
 }
 
 .pet.sleeping .pet-legs {
