@@ -1514,6 +1514,7 @@ function wakeUpPet() {
     const pet = document.getElementById('agent-pet');
     const sleepMask = document.getElementById('pet-sleep-mask');
 
+    console.log('⏰ Waking up - before:', pet.className);
     pet.classList.remove('sleeping');
     pet.classList.add('active', 'idle');
     petIsAwake = true;
@@ -1525,6 +1526,7 @@ function wakeUpPet() {
     const legPixels = pet.querySelectorAll('.pixel.leg');
     const eyePixels = pet.querySelectorAll('.pixel.eye');
 
+    console.log('⏰ Clearing inline styles - body pixels:', bodyPixels.length);
     bodyPixels.forEach(p => {
         p.style.background = '';
         p.style.boxShadow = '';
@@ -1540,6 +1542,11 @@ function wakeUpPet() {
     eyePixels.forEach(p => {
         p.style.height = '';
     });
+
+    if (bodyPixels.length > 0) {
+        console.log('⏰ First body pixel after clear:', bodyPixels[0].style.background, bodyPixels[0].style.boxShadow);
+    }
+    console.log('⏰ Waking up - after:', pet.className);
 
     // Hide sleep mask
     if (sleepMask) {
@@ -1584,8 +1591,10 @@ function goToSleep() {
         clearTimeout(petAnimationTimer);
     }
 
+    console.log('🛌 Going to sleep - before:', pet.className);
     pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy', 'active');
     pet.classList.add('sleeping');
+    console.log('🛌 Going to sleep - after:', pet.className);
     toy.style.opacity = '0';
     petIsAwake = false;
     petAnimationState = 'sleeping';
@@ -1596,6 +1605,7 @@ function goToSleep() {
     const legPixels = pet.querySelectorAll('.pixel.leg');
     const eyePixels = pet.querySelectorAll('.pixel.eye');
 
+    console.log('🛌 Setting inline styles - body pixels:', bodyPixels.length);
     bodyPixels.forEach(p => {
         p.style.background = '#00ff00';
         p.style.boxShadow = '0 0 2px #00ff00';
@@ -1611,6 +1621,11 @@ function goToSleep() {
     eyePixels.forEach(p => {
         p.style.height = '1px';
     });
+
+    // Verify first body pixel has green color
+    if (bodyPixels.length > 0) {
+        console.log('🛌 First body pixel style:', bodyPixels[0].style.background, bodyPixels[0].style.boxShadow);
+    }
 
     // Show sleep mask
     if (sleepMask) {
