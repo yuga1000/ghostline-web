@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- Agent Pet Styles -->
-    <link rel="stylesheet" href="agent-pet.css?v=13">
+    <link rel="stylesheet" href="agent-pet.css?v=14">
     <style>
         body {
             background: #000000;
@@ -1383,6 +1383,10 @@ let petIsAwake = false;
 let lastAnimationTime = 0;
 const ANIMATION_COOLDOWN = 3000; // 3 seconds between animations
 
+// Pet wall position tracking
+let petWallPosition = 'bottom'; // 'bottom', 'left', 'top', 'right'
+let petIsMovingToWall = false;
+
 // Log thresholds for growth
 const STAGE_THRESHOLDS = {
     1: 0,    // Stage 1: 0+ logs
@@ -1676,6 +1680,9 @@ function wakeUpPet() {
 
     // FIX: Start idle animation loop for active pet
     startIdleAnimationLoop();
+
+    // Start wall movement loop
+    startWallMovementLoop();
 }
 
 function goToSleep() {
@@ -1690,6 +1697,17 @@ function goToSleep() {
 
     // FIX: Stop idle animation loop when going to sleep
     stopIdleAnimationLoop();
+
+    // Stop wall movement loop
+    stopWallMovementLoop();
+
+    // Return pet to bottom wall when sleeping
+    const petDisplay = document.querySelector('.pet-display-inline');
+    if (petDisplay) {
+        petDisplay.classList.remove('wall-left', 'wall-top', 'wall-right');
+        petDisplay.classList.add('wall-bottom');
+        petWallPosition = 'bottom';
+    }
 
     console.log('🛌 Going to sleep - before:', pet.className);
     pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy', 'active');
@@ -1954,6 +1972,89 @@ function stopIdleAnimationLoop() {
     if (idleAnimationInterval) {
         clearInterval(idleAnimationInterval);
         idleAnimationInterval = null;
+    }
+}
+
+// ===== PET WALL MOVEMENT SYSTEM =====
+function moveToWall(targetWall) {
+    if (petIsMovingToWall) {
+        console.log('[Pet Movement] Already moving to wall, skipping');
+        return;
+    }
+
+    const petDisplay = document.querySelector('.pet-display-inline');
+    if (!petDisplay) return;
+
+    console.log(`[Pet Movement] Moving from ${petWallPosition} to ${targetWall}`);
+
+    petIsMovingToWall = true;
+
+    // Remove old wall class
+    petDisplay.classList.remove('wall-bottom', 'wall-left', 'wall-top', 'wall-right');
+
+    // Add transition
+    petDisplay.style.transition = 'all 1.5s step-end';
+
+    // Add new wall class
+    petDisplay.classList.add(`wall-${targetWall}`);
+
+    // Update position
+    petWallPosition = targetWall;
+
+    // After transition, allow next movement
+    setTimeout(() => {
+        petIsMovingToWall = false;
+        petDisplay.style.transition = '';
+        console.log(`[Pet Movement] Arrived at ${targetWall}`);
+    }, 1500);
+}
+
+function randomWallMovement() {
+    if (petIsMovingToWall) return;
+
+    // Pick a random wall different from current
+    const walls = ['bottom', 'left', 'top', 'right'];
+    const availableWalls = walls.filter(w => w !== petWallPosition);
+    const targetWall = availableWalls[Math.floor(Math.random() * availableWalls.length)];
+
+    // Trigger running animation while moving
+    triggerPetAnimation('running', 2000);
+
+    // Move to new wall
+    setTimeout(() => {
+        moveToWall(targetWall);
+    }, 500);
+}
+
+// Add wall movement to idle loop
+let wallMovementInterval = null;
+
+function startWallMovementLoop() {
+    // Clear existing
+    if (wallMovementInterval) {
+        clearInterval(wallMovementInterval);
+    }
+
+    console.log('[Pet Movement] Starting wall movement loop');
+
+    // Random wall movement every 15-30 seconds
+    wallMovementInterval = setInterval(() => {
+        if (!petIsAwake) {
+            console.log('[Pet Movement] Skipping - pet is sleeping');
+            return;
+        }
+
+        // 50% chance to move to a different wall
+        if (Math.random() < 0.5) {
+            randomWallMovement();
+        }
+    }, 15000 + Math.random() * 15000); // 15-30 seconds
+}
+
+function stopWallMovementLoop() {
+    if (wallMovementInterval) {
+        clearInterval(wallMovementInterval);
+        wallMovementInterval = null;
     }
 }
 

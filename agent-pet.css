@@ -18,6 +18,46 @@
     overflow: hidden;
 }
 
+/* Pet wall positions */
+.pet-display-inline.wall-bottom {
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.pet-display-inline.wall-left {
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 8px;
+    padding-bottom: 0;
+}
+
+.pet-display-inline.wall-top {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
+    padding-bottom: 0;
+}
+
+.pet-display-inline.wall-right {
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    padding-bottom: 0;
+}
+
+/* Pet rotation for walls */
+.pet-display-inline.wall-left .pet {
+    transform: rotate(90deg);
+}
+
+.pet-display-inline.wall-top .pet {
+    transform: rotate(180deg);
+}
+
+.pet-display-inline.wall-right .pet {
+    transform: rotate(-90deg);
+}
+
 /* Sleeping noise mask overlay */
 .pet-sleep-mask {
     position: absolute;
