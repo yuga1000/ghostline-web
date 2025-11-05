@@ -651,7 +651,7 @@
                                 <div id="falling-stars-container"></div>
                                 <!-- Toy pixel (shows when playing) -->
                                 <div class="pet-toy-pixel" id="pet-toy"></div>
-                                <div class="pet active sleeping stage-1" id="agent-pet">
+                                <div class="pet sleeping stage-1" id="agent-pet">
                                     <!-- Body container (animated) -->
                                     <div class="pet-body-container">
                                         <!-- Arms row (with body top) -->
@@ -1507,7 +1507,7 @@ function wakeUpPet() {
     const sleepMask = document.getElementById('pet-sleep-mask');
 
     pet.classList.remove('sleeping');
-    pet.classList.add('idle');
+    pet.classList.add('active', 'idle');
     petIsAwake = true;
     petAnimationState = 'idle';
 
@@ -1554,7 +1554,7 @@ function goToSleep() {
         clearTimeout(petAnimationTimer);
     }
 
-    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy');
+    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy', 'active');
     pet.classList.add('sleeping');
     toy.style.opacity = '0';
     petIsAwake = false;
