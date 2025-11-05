@@ -651,6 +651,11 @@
                                 <div id="falling-stars-container"></div>
                                 <!-- Toy pixel (shows when playing) -->
                                 <div class="pet-toy-pixel" id="pet-toy"></div>
+                                <!-- Image preview window -->
+                                <div class="pet-image-window" id="pet-image-window">
+                                    <div class="pet-image-label">NEW IMAGE!</div>
+                                    <img id="pet-image-preview" src="" alt="Generated Image" />
+                                </div>
                                 <div class="pet sleeping stage-1" id="agent-pet">
                                     <!-- Body container (animated) -->
                                     <div class="pet-body-container">
@@ -1220,6 +1225,9 @@ function addLogLine(text, className = 'log-info', onComplete) {
 
     // ===== AGENT PET LOGIC =====
     updatePetOnLog(className, text);
+
+    // ===== IMAGE DETECTION LOGIC =====
+    detectAndShowImage(text);
 }
 
 // Update status indicator
@@ -1685,6 +1693,86 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log('[Pet] Initialized - Stage:', petStage, 'Logs:', petLogCount);
     }
 });
+
+// ===== IMAGE DETECTION AND DISPLAY =====
+let imageDisplayTimer = null;
+
+function detectAndShowImage(logText) {
+    // Pattern matching for image paths
+    // Look for common patterns:
+    // - "Saved to: /path/to/image.png"
+    // - "Generated: image.jpg"
+    // - Any path ending in .png, .jpg, .jpeg, .gif, .webp
+    const imagePatterns = [
+        /(?:saved to:|generated:|output:|created:)\s*([^\s]+\.(?:png|jpg|jpeg|gif|webp))/i,
+        /([\/\w\-\.]+\.(?:png|jpg|jpeg|gif|webp))/i,
+        /(?:image|file|photo):\s*([^\s]+\.(?:png|jpg|jpeg|gif|webp))/i
+    ];
+
+    let imagePath = null;
+
+    // Try each pattern
+    for (const pattern of imagePatterns) {
+        const match = logText.match(pattern);
+        if (match) {
+            imagePath = match[1];
+            break;
+        }
+    }
+
+    // If we found an image path, display it
+    if (imagePath) {
+        console.log('[Image Display] Detected image:', imagePath);
+        showImagePreview(imagePath);
+
+        // Make pet excited about the new image!
+        if (petIsAwake) {
+            const pet = document.getElementById('agent-pet');
+            pet.classList.add('excited');
+            triggerPetAnimation('dancing', 3000);
+            setTimeout(() => {
+                pet.classList.remove('excited');
+            }, 3000);
+        } else {
+            // Wake up pet briefly to celebrate
+            wakeUpPet();
+            const pet = document.getElementById('agent-pet');
+            pet.classList.add('excited');
+            triggerPetAnimation('waving', 3000);
+            setTimeout(() => {
+                pet.classList.remove('excited');
+            }, 3000);
+        }
+    }
+}
+
+function showImagePreview(imagePath) {
+    const imageWindow = document.getElementById('pet-image-window');
+    const imagePreview = document.getElementById('pet-image-preview');
+
+    // Clear any existing timer
+    if (imageDisplayTimer) {
+        clearTimeout(imageDisplayTimer);
+    }
+
+    // Set image source
+    imagePreview.src = imagePath;
+
+    // Fade in with discrete animation
+    imageWindow.classList.remove('fade-out');
+    imageWindow.classList.add('fade-in');
+
+    // Hide after 7 seconds with fade out
+    imageDisplayTimer = setTimeout(() => {
+        imageWindow.classList.remove('fade-in');
+        imageWindow.classList.add('fade-out');
+
+        // Reset after fade out completes
+        setTimeout(() => {
+            imagePreview.src = '';
+        }, 800);
+    }, 7000);
+}
 
 </script>
 
