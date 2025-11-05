@@ -106,6 +106,7 @@
         <button onclick="triggerSpecial('squat')">⬇️ SQUAT</button>
         <button onclick="triggerSpecial('horns-grow')">👹 HORNS GROW</button>
         <button onclick="triggerSpecial('arms-wave')">👋 ARMS WAVE</button>
+        <button onclick="triggerSpecial('walk', 4000)">🚶 WALK (South Park)</button>
     </div>
 
     <div class="info" id="current-state">Current: IDLE</div>
@@ -371,15 +372,15 @@
             currentStateText.textContent = `Current: ${stateNames[state]}`;
         }
 
-        function triggerSpecial(animation) {
+        function triggerSpecial(animation, duration = 2000) {
             specialAnimation = animation;
             specialAnimationFrame = 0;
             console.log('Manual trigger:', animation);
 
-            // Stop after 2 seconds
+            // Stop after specified duration
             setTimeout(() => {
                 specialAnimation = null;
-            }, 2000);
+            }, duration);
         }
 
         // Initialize

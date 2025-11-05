@@ -1,0 +1,386 @@
+/* ==================== ARCADE TAMAGOTCHI STYLE ==================== */
+
+/* Arcade Cabinet Look */
+.tamagotchi-arcade-screen {
+    background: linear-gradient(135deg, #1a0033 0%, #000033 100%);
+    border: 8px solid #ff00ff;
+    border-radius: 20px;
+    box-shadow:
+        0 0 20px rgba(255, 0, 255, 0.5),
+        inset 0 0 20px rgba(0, 255, 255, 0.2);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Scanline effect */
+.tamagotchi-arcade-screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 255, 0.03) 0px,
+        rgba(0, 255, 255, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* CRT Screen Glow */
+.tamagotchi-arcade-screen::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 255, 255, 0.1) 0%,
+        transparent 60%
+    );
+    pointer-events: none;
+    animation: crt-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes crt-glow {
+    from { opacity: 0.5; }
+    to { opacity: 0.8; }
+}
+
+/* Arcade Title */
+.arcade-title {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 24px;
+    text-align: center;
+    background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow:
+        0 0 10px rgba(255, 0, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 0.6);
+    animation: neon-flicker 3s ease-in-out infinite;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+@keyframes neon-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow:
+            0 0 10px rgba(255, 0, 255, 0.8),
+            0 0 20px rgba(0, 255, 255, 0.6),
+            0 0 30px rgba(255, 0, 255, 0.4);
+    }
+    20%, 24%, 55% {
+        text-shadow: none;
+    }
+}
+
+/* Progress Bars - Arcade Style */
+.arcade-stat-bar {
+    position: relative;
+    height: 30px;
+    background: #000033;
+    border: 3px solid #00ffff;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+    box-shadow:
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.arcade-stat-label {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 10px;
+    color: #00ffff;
+    z-index: 2;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+    letter-spacing: 1px;
+}
+
+.arcade-stat-value {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 10px;
+    color: #ffffff;
+    z-index: 2;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+.arcade-stat-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg,
+        #ff0080 0%,
+        #ff00ff 25%,
+        #8000ff 50%,
+        #0080ff 75%,
+        #00ffff 100%
+    );
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+    animation: stat-pulse 2s ease-in-out infinite;
+}
+
+@keyframes stat-pulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 255, 0.8); }
+    50% { box-shadow: 0 0 25px rgba(0, 255, 255, 1); }
+}
+
+/* Special states for bars */
+.arcade-stat-fill.critical {
+    background: linear-gradient(90deg, #ff0000 0%, #ff4400 100%);
+    animation: critical-blink 0.5s ease-in-out infinite;
+}
+
+@keyframes critical-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.arcade-stat-fill.full {
+    background: linear-gradient(90deg, #00ff00 0%, #00ffaa 100%);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 1);
+}
+
+/* Arcade Buttons */
+.arcade-button {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 12px;
+    padding: 15px 25px;
+    background: linear-gradient(180deg, #ff00ff 0%, #8000ff 100%);
+    border: 4px solid #00ffff;
+    border-radius: 10px;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 0 15px rgba(255, 0, 255, 0.6),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+    overflow: hidden;
+}
+
+.arcade-button:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 25px rgba(255, 0, 255, 1),
+        inset 0 -4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.arcade-button:active {
+    transform: translateY(2px);
+    box-shadow:
+        0 0 10px rgba(255, 0, 255, 0.4),
+        inset 0 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Button glow effect */
+.arcade-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.5s;
+}
+
+.arcade-button:hover::before {
+    left: 100%;
+}
+
+/* Specific button colors */
+.arcade-button.feed {
+    background: linear-gradient(180deg, #00ff00 0%, #008800 100%);
+    border-color: #88ff88;
+}
+
+.arcade-button.play {
+    background: linear-gradient(180deg, #0088ff 0%, #0044aa 100%);
+    border-color: #88ccff;
+}
+
+.arcade-button.sleep {
+    background: linear-gradient(180deg, #8800ff 0%, #440088 100%);
+    border-color: #cc88ff;
+}
+
+.arcade-button.heal {
+    background: linear-gradient(180deg, #ff0044 0%, #880022 100%);
+    border-color: #ff8888;
+}
+
+/* Pet Display Area - LCD Screen Effect */
+.arcade-pet-screen {
+    background: #9ba65c; /* Classic Tamagotchi green */
+    border: 6px solid #444444;
+    border-radius: 15px;
+    padding: 20px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+        inset 0 0 30px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(155, 166, 92, 0.5);
+}
+
+/* LCD Pixel Effect */
+.arcade-pet-screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            rgba(0, 0, 0, 0.05) 1px,
+            transparent 2px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            rgba(0, 0, 0, 0.05) 1px,
+            transparent 2px
+        );
+    pointer-events: none;
+}
+
+/* Tamagotchi Sprite Container */
+.tamagotchi-sprite {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    width: 128px;
+    height: 128px;
+    filter:
+        contrast(1.2)
+        drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    animation: sprite-float 3s ease-in-out infinite;
+}
+
+@keyframes sprite-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Age Counter - Digital Display */
+.arcade-age-display {
+    background: #000000;
+    border: 3px solid #ff00ff;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'DS-Digital', 'Courier New', monospace;
+    font-size: 24px;
+    color: #00ff00;
+    text-align: center;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+    box-shadow:
+        0 0 15px rgba(255, 0, 255, 0.5),
+        inset 0 0 10px rgba(0, 0, 0, 0.8);
+    letter-spacing: 3px;
+}
+
+/* Mood Indicator - Neon Sign */
+.arcade-mood-sign {
+    background: #000000;
+    border: 4px solid #00ffff;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow:
+        0 0 20px rgba(0, 255, 255, 0.6),
+        inset 0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+.arcade-mood-text {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 16px;
+    background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: mood-glow 2s ease-in-out infinite;
+}
+
+@keyframes mood-glow {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(255, 0, 255, 0.8));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(0, 255, 255, 1));
+    }
+}
+
+/* Particle effects (optional) */
+@keyframes star-twinkle {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+.arcade-star {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 50%;
+    animation: star-twinkle 2s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .arcade-title {
+        font-size: 16px;
+    }
+
+    .arcade-button {
+        font-size: 10px;
+        padding: 10px 15px;
+    }
+
+    .tamagotchi-sprite {
+        width: 96px;
+        height: 96px;
+    }
+}
+
+/* Print .arcade-button helper classes */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+@media (max-width: 500px) {
+    .button-grid {
+        grid-template-columns: 1fr;
+    }
+}

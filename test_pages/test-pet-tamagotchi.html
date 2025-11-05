@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamagotchi Pet Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+        .test-panel {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            border: 2px solid #00ff00;
+        }
+        .stat-bar {
+            height: 20px;
+            background: #333;
+            border: 1px solid #00ff00;
+            position: relative;
+            margin: 5px 0;
+        }
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h1 class="text-2xl mb-4">🎮 Tamagotchi Pet Test Panel</h1>
+
+        <!-- Stats Display -->
+        <div class="mb-6">
+            <h2 class="text-lg mb-2">Live Stats:</h2>
+            <div>
+                <label>Hunger: <span id="hunger-val">100</span></label>
+                <div class="stat-bar"><div class="stat-fill" id="hunger-bar" style="width: 100%"></div></div>
+            </div>
+            <div>
+                <label>Happiness: <span id="happy-val">100</span></label>
+                <div class="stat-bar"><div class="stat-fill" id="happy-bar" style="width: 100%"></div></div>
+            </div>
+            <div>
+                <label>Energy: <span id="energy-val">100</span></label>
+                <div class="stat-bar"><div class="stat-fill" id="energy-bar" style="width: 100%"></div></div>
+            </div>
+            <div>
+                <label>Health: <span id="health-val">100</span></label>
+                <div class="stat-bar"><div class="stat-fill" id="health-bar" style="width: 100%"></div></div>
+            </div>
+            <div class="mt-2">
+                <label>Age: <span id="age-val">0</span> minutes</label>
+            </div>
+            <div>
+                <label>Status: <span id="alive-val">ALIVE</span></label>
+            </div>
+        </div>
+
+        <!-- Test Buttons -->
+        <div class="mb-6">
+            <h2 class="text-lg mb-2">Test Actions:</h2>
+            <button onclick="simulateLog('success', 'Image generated successfully')"
+                    class="px-4 py-2 bg-green-700 rounded mr-2 mb-2">
+                ✅ Success Log
+            </button>
+            <button onclick="simulateLog('error', 'Failed to connect')"
+                    class="px-4 py-2 bg-red-700 rounded mr-2 mb-2">
+                ❌ Error Log
+            </button>
+            <button onclick="simulateLog('thinking', 'Processing data...')"
+                    class="px-4 py-2 bg-blue-700 rounded mr-2 mb-2">
+                🤔 Thinking Log
+            </button>
+            <button onclick="simulateLog('action', 'Launching Vy app')"
+                    class="px-4 py-2 bg-purple-700 rounded mr-2 mb-2">
+                ⚡ Action Log
+            </button>
+        </div>
+
+        <!-- Time Controls -->
+        <div class="mb-6">
+            <h2 class="text-lg mb-2">Time Manipulation:</h2>
+            <button onclick="speedUpTime(60)" class="px-4 py-2 bg-yellow-700 rounded mr-2">
+                ⏩ +1 Minute
+            </button>
+            <button onclick="speedUpTime(300)" class="px-4 py-2 bg-yellow-700 rounded mr-2">
+                ⏩⏩ +5 Minutes
+            </button>
+            <button onclick="speedUpTime(1800)" class="px-4 py-2 bg-yellow-700 rounded mr-2">
+                ⏩⏩⏩ +30 Minutes
+            </button>
+        </div>
+
+        <!-- Reset -->
+        <div>
+            <button onclick="resetPet()" class="px-4 py-2 bg-red-900 rounded">
+                🔄 Reset Pet (Clear localStorage)
+            </button>
+        </div>
+    </div>
+
+    <!-- Pet Display Area -->
+    <div class="video-grid flex flex-wrap gap-4 p-4"></div>
+
+    <!-- Load Pet Script -->
+    <script src="pet.js"></script>
+
+    <script>
+        // Update visual stats every second
+        setInterval(() => {
+            if (window.petModule) {
+                const stats = window.petModule.getStats();
+
+                document.getElementById('hunger-val').textContent = Math.round(stats.hunger);
+                document.getElementById('happy-val').textContent = Math.round(stats.happiness);
+                document.getElementById('energy-val').textContent = Math.round(stats.energy);
+                document.getElementById('health-val').textContent = Math.round(stats.health);
+                document.getElementById('age-val').textContent = Math.floor(stats.age / 60);
+                document.getElementById('alive-val').textContent = stats.alive ? 'ALIVE ✨' : 'DEAD 💀';
+
+                document.getElementById('hunger-bar').style.width = stats.hunger + '%';
+                document.getElementById('happy-bar').style.width = stats.happiness + '%';
+                document.getElementById('energy-bar').style.width = stats.energy + '%';
+                document.getElementById('health-bar').style.width = stats.health + '%';
+
+                // Color coding
+                document.getElementById('alive-val').style.color = stats.alive ? '#00ff00' : '#ff0000';
+            }
+        }, 500);
+
+        // Simulate log message
+        function simulateLog(level, content) {
+            if (window.petModule) {
+                console.log('[Test] Simulating log:', level, content);
+                window.petModule.onLogReceived(level, content);
+            }
+        }
+
+        // Speed up time (simulate time passing)
+        function speedUpTime(seconds) {
+            if (window.petModule) {
+                const stats = window.petModule.getStats();
+
+                // Manually apply degradation
+                stats.hunger = Math.max(0, stats.hunger - (seconds * 0.05));
+                stats.happiness = Math.max(0, stats.happiness - (seconds * 0.03));
+                stats.energy = Math.max(0, stats.energy - (seconds * 0.02));
+                stats.age += seconds;
+
+                if (stats.hunger < 30 || stats.happiness < 30) {
+                    stats.health = Math.max(0, stats.health - (seconds * 0.1));
+                }
+
+                console.log('[Test] Fast-forwarded', seconds, 'seconds');
+                console.log('[Test] New stats:', stats);
+            }
+        }
+
+        // Reset pet
+        function resetPet() {
+            localStorage.removeItem('ghostline-pet-stats');
+            location.reload();
+        }
+
+        console.log('[Test] Tamagotchi test panel loaded');
+        console.log('[Test] Use buttons above to test pet interactions');
+        console.log('[Test] Check browser console for pet logs');
+    </script>
+</body>
+</html>

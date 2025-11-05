@@ -716,6 +716,10 @@
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>MOOD: <span id="pet-state-text">Sleeping... ZZZ</span></div>
                         <div>STAGE: <span id="pet-stage-text">1</span> / 4</div>
+                        <div id="rest-countdown-container" style="display: none;">
+                            <span style="color: #ffaa00;">REST: </span>
+                            <span id="rest-countdown-text">--:--</span>
+                        </div>
                     </div>
                 </div>
 
@@ -973,7 +977,9 @@ function initWebSocket() {
     ws = new WebSocket('wss://ghostline-web-production-7bc6.up.railway.app/ws');
 
     ws.onopen = () => {
-        console.log('[WS] Connected to agent terminal stream');
+        console.log('[WS] ✓ Connected to agent terminal stream');
+        console.log('[WS] URL:', ws.url);
+        console.log('[WS] ReadyState:', ws.readyState);
         isConnected = true;
         lastLogTime = Date.now();
         updateStatus('STANDBY', false);  // Start as STANDBY until first log
@@ -1013,13 +1019,19 @@ function initWebSocket() {
     };
 
     ws.onmessage = (event) => {
+        const receiveTime = Date.now();
+
         // Update last log time (agent is active)
-        lastLogTime = Date.now();
+        lastLogTime = receiveTime;
+
+        console.log('[WS] ⬇ Message received at', new Date(receiveTime).toISOString());
+        console.log('[WS] Data length:', event.data.length, 'bytes');
 
         // Show log content if placeholder is visible
         const noiseMask = document.getElementById('agent-noise-mask');
         const logContent = document.getElementById('agent-log-content');
         if (noiseMask.style.display !== 'none') {
+            console.log('[WS] First log received - clearing placeholder');
             clearPlaceholder();
             updateStatus('STREAMING', true);
             if (!startTime) {
@@ -1029,8 +1041,16 @@ function initWebSocket() {
 
         try {
             const data = JSON.parse(event.data);
+            console.log('[WS] Parsed message:', {
+                type: data.type,
+                level: data.level,
+                content: data.content ? data.content.substring(0, 50) + '...' : 'N/A',
+                timestamp: data.timestamp
+            });
             handleLogMessage(data);
         } catch (e) {
+            console.error('[WS] Failed to parse message:', e);
+            console.error('[WS] Raw data:', event.data.substring(0, 200));
             // If not JSON, treat as plain text log
             addLogLine(event.data, 'log-info');
         }
@@ -1231,6 +1251,15 @@ function addLogLine(text, className = 'log-info', onComplete) {
     // Keep only last 100 lines to prevent memory issues
     while (logContent.children.length > 100) {
         logContent.removeChild(logContent.firstChild);
+    }
+
+    // ===== REST COUNTDOWN DETECTION =====
+    const isRestPeriod = detectRestPeriod(text);
+
+    // If entering rest, stop showing countdown when agent wakes up
+    if (!isRestPeriod && text.includes('VERCEPT') && text.includes('PHASE')) {
+        // Agent is active - stop countdown if running
+        stopRestCountdown();
     }
 
     // ===== AGENT PET LOGIC =====
@@ -1744,6 +1773,8 @@ function triggerPetAnimation(animation, duration) {
     const stateText = document.getElementById('pet-state-text');
     const toy = document.getElementById('pet-toy');
 
+    console.log(`[Pet Animation] Triggering: ${animation} for ${duration}ms`);
+
     // Clear existing timer
     if (petAnimationTimer) {
         clearTimeout(petAnimationTimer);
@@ -1755,6 +1786,8 @@ function triggerPetAnimation(animation, duration) {
     // Add new animation
     pet.classList.add(animation);
     petAnimationState = animation;
+
+    console.log(`[Pet Animation] Applied classes:`, pet.className);
 
     // Show/hide toy pixel
     if (animation === 'playing') {
@@ -1794,14 +1827,24 @@ function startIdleAnimationLoop() {
         clearInterval(idleAnimationInterval);
     }
 
+    console.log('[Pet Animation] Starting idle animation loop');
+
     // Trigger random idle animations every 5-10 seconds
     idleAnimationInterval = setInterval(() => {
-        if (!petIsAwake || petAnimationState !== 'idle') {
-            return; // Skip if pet is sleeping or already animating
+        if (!petIsAwake) {
+            console.log('[Pet Animation] Skipping - pet is sleeping');
+            return;
+        }
+
+        if (petAnimationState !== 'idle') {
+            console.log('[Pet Animation] Skipping - pet is already animating:', petAnimationState);
+            return;
         }
 
         // Random chance to trigger an animation
         const rand = Math.random();
+
+        console.log('[Pet Animation] Idle loop tick - rand:', rand.toFixed(2));
 
         if (rand < 0.3) {
             // 30% - breathing/blinking (already animated by CSS)
@@ -1812,6 +1855,8 @@ function startIdleAnimationLoop() {
         } else if (rand < 0.65) {
             // 15% - walking
             triggerPetAnimation('walking', 3000);
+        } else {
+            console.log('[Pet Animation] Staying in idle');
         }
         // 35% - stay in idle (breathing continues via CSS)
     }, 5000 + Math.random() * 5000); // Random interval 5-10 seconds
@@ -1822,6 +1867,142 @@ function stopIdleAnimationLoop() {
         clearInterval(idleAnimationInterval);
         idleAnimationInterval = null;
     }
+}
+
+// ===== COUNTDOWN TIMER & FLOWER TRANSFORMATION =====
+let restCountdownEndTime = null;
+let restCountdownInterval = null;
+let isInFlowerMode = false;
+
+// Start rest countdown (called when agent enters rest period)
+function startRestCountdown(durationSeconds) {
+    const container = document.getElementById('rest-countdown-container');
+    const countdownText = document.getElementById('rest-countdown-text');
+
+    restCountdownEndTime = Date.now() + (durationSeconds * 1000);
+    container.style.display = 'block';
+
+    console.log('[Countdown] Starting rest countdown:', durationSeconds, 'seconds');
+
+    // Clear existing interval
+    if (restCountdownInterval) {
+        clearInterval(restCountdownInterval);
+    }
+
+    // Transform pet into flower mode
+    if (!isInFlowerMode) {
+        transformToFlower();
+    }
+
+    // Update countdown every second
+    restCountdownInterval = setInterval(() => {
+        const remaining = Math.max(0, Math.floor((restCountdownEndTime - Date.now()) / 1000));
+
+        if (remaining <= 0) {
+            // Countdown finished - agent cycle starting
+            clearInterval(restCountdownInterval);
+            restCountdownInterval = null;
+            container.style.display = 'none';
+            countdownText.textContent = '--:--';
+
+            console.log('[Countdown] Rest period ended - agent cycle starting');
+
+            // Transform back from flower
+            if (isInFlowerMode) {
+                transformFromFlower();
+            }
+        } else {
+            // Update display
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            countdownText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+}
+
+// Stop rest countdown (agent became active)
+function stopRestCountdown() {
+    if (restCountdownInterval) {
+        clearInterval(restCountdownInterval);
+        restCountdownInterval = null;
+    }
+
+    const container = document.getElementById('rest-countdown-container');
+    const countdownText = document.getElementById('rest-countdown-text');
+
+    container.style.display = 'none';
+    countdownText.textContent = '--:--';
+
+    // Transform back from flower if needed
+    if (isInFlowerMode) {
+        transformFromFlower();
+    }
+}
+
+// Transform pet into flower (growing animation)
+function transformToFlower() {
+    const pet = document.getElementById('agent-pet');
+    const stateText = document.getElementById('pet-state-text');
+
+    console.log('[Pet] Transforming to flower mode');
+
+    isInFlowerMode = true;
+
+    // Go to sleep first (green color)
+    if (!pet.classList.contains('sleeping')) {
+        goToSleep();
+    }
+
+    // Apply growing animation (legs grow, arms spread, stage 4)
+    pet.classList.remove('stage-1', 'stage-2', 'stage-3');
+    pet.classList.add('stage-4');
+
+    // Update stage text
+    const stageText = document.getElementById('pet-stage-text');
+    stageText.textContent = '4 (BLOOM)';
+
+    stateText.textContent = 'Blooming... 🌸';
+
+    console.log('[Pet] Flower transformation complete');
+}
+
+// Transform pet back from flower (shrinking animation)
+function transformFromFlower() {
+    const pet = document.getElementById('agent-pet');
+    const stateText = document.getElementById('pet-state-text');
+    const stageText = document.getElementById('pet-stage-text');
+
+    console.log('[Pet] Transforming from flower mode');
+
+    isInFlowerMode = false;
+
+    // Return to saved stage
+    pet.classList.remove('stage-4');
+    pet.classList.add('stage-' + petStage);
+    stageText.textContent = petStage;
+
+    // Pet will wake up when next log arrives
+    stateText.textContent = 'Resting...';
+
+    console.log('[Pet] Returned to normal mode - stage', petStage);
+}
+
+// Detect rest period from logs (vercept cooldown messages)
+function detectRestPeriod(logText) {
+    // Pattern: "Cooldown period: X minutes before next iteration..."
+    const cooldownPattern = /Cooldown period: (\d+) minutes/i;
+    const match = logText.match(cooldownPattern);
+
+    if (match) {
+        const minutes = parseInt(match[1]);
+        const seconds = minutes * 60;
+
+        console.log('[Pet] Detected rest period:', minutes, 'minutes');
+        startRestCountdown(seconds);
+        return true;
+    }
+
+    return false;
 }
 
 // Initialize pet - load state and start sleeping
@@ -1855,17 +2036,38 @@ function detectAndShowImage(logText) {
     let imagePath = null;
     let imageFilename = null;
 
-    // Pattern 1: Check for "IMAGE GENERATED" marker followed by filename on next line
+    // Pattern 1: Check for "IMAGE GENERATED" marker with filename in same message
     // This matches the actual log format from run_vercept_workflow_python_fixed.py line 480-481
     if (logText.includes('IMAGE GENERATED')) {
         console.log('[Image Display] Found IMAGE GENERATED marker');
-        // The filename should be in the NEXT log message, so we'll need to buffer this
-        window.expectingImageFilename = true;
-        return;
+
+        // FIX: Parse filename from the SAME multiline message
+        // Format: "╔══ IMAGE GENERATED ══╗\nfilename.png\nCompleted in..."
+        const lines = logText.split('\n');
+
+        // Look for filename on second line (after the box drawing)
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            const filenamePattern = /^([a-zA-Z0-9_\-]+\.png)$/i;
+            const match = line.match(filenamePattern);
+
+            if (match && !line.includes('╔') && !line.includes('Completed')) {
+                imageFilename = match[1];
+                console.log('[Image Display] Found filename in same message:', imageFilename);
+                break;
+            }
+        }
+
+        // If we found it, continue to display logic below
+        // If not found, set flag for next message (fallback)
+        if (!imageFilename) {
+            window.expectingImageFilename = true;
+            return;
+        }
     }
 
-    // Pattern 2: If we're expecting a filename, check if this line looks like a filename
-    if (window.expectingImageFilename) {
+    // Pattern 2: If we're expecting a filename from previous message, check this line
+    if (window.expectingImageFilename && !imageFilename) {
         // Match common filename patterns from GLVSF_Images folder
         const filenamePattern = /([a-zA-Z0-9_\-]+_\d{8}_\d{6}\.png|[a-zA-Z0-9_\-]+\.png)/i;
         const match = logText.match(filenamePattern);
@@ -1972,7 +2174,7 @@ function showImagePreview(imagePath) {
 
 </script>
 
-<script src="manual-modal.js"></script>
+<!-- manual-modal.js moved to test_pages -->
 
 <!-- Pixel Pet Module - DISABLED, using integrated pet instead -->
 <!-- <script src="pet.js?v=1762247417"></script> -->
