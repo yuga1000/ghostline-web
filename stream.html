@@ -1907,40 +1907,46 @@ function startIdleAnimationLoop() {
 
         console.log('[Pet Animation] Idle loop tick - rand:', rand.toFixed(2));
 
-        if (rand < 0.12) {
-            // 12% - blinking
+        if (rand < 0.10) {
+            // 10% - blinking
             triggerPetAnimation('blinking', 2000);
-        } else if (rand < 0.24) {
-            // 12% - waving
+        } else if (rand < 0.20) {
+            // 10% - waving
             triggerPetAnimation('waving', 2500);
-        } else if (rand < 0.34) {
+        } else if (rand < 0.30) {
             // 10% - walking
             triggerPetAnimation('walking', 3000);
-        } else if (rand < 0.42) {
-            // 8% - running (бег!)
+        } else if (rand < 0.38) {
+            // 8% - dancing (танцует!)
+            triggerPetAnimation('dancing', 3000);
+        } else if (rand < 0.45) {
+            // 7% - running (бег!)
             triggerPetAnimation('running', 3500);
-        } else if (rand < 0.49) {
+        } else if (rand < 0.52) {
             // 7% - jumping (прыжки!)
             triggerPetAnimation('jumping', 2500);
-        } else if (rand < 0.55) {
+        } else if (rand < 0.58) {
             // 6% - spinning (кружится!)
             triggerPetAnimation('spinning', 2500);
-        } else if (rand < 0.60) {
-            // 5% - transforming (превращается!)
+        } else if (rand < 0.64) {
+            // 6% - transforming (превращается!)
             triggerPetAnimation('transforming', 3000);
-        } else if (rand < 0.65) {
+        } else if (rand < 0.69) {
             // 5% - hunting (охотится!)
             startHuntingAnimation();
-        } else if (rand < 0.69) {
+        } else if (rand < 0.73) {
             // 4% - excited bounce
             triggerPetAnimation('excited-bounce', 2000);
-        } else if (rand < 0.72) {
+        } else if (rand < 0.76) {
             // 3% - playing
             triggerPetAnimation('playing', 3000);
+        } else if (rand < 0.78) {
+            // 2% - flower (blooming!)
+            triggerPetAnimation('flower', 12000); // 12 seconds for idle flower
         } else {
             console.log('[Pet Animation] Staying in idle');
         }
-        // 28% - stay in idle (breathing continues via CSS)
+        // 22% - stay in idle (breathing continues via CSS)
     }, 5000 + Math.random() * 5000); // Random interval 5-10 seconds
 }
 
@@ -2091,12 +2097,15 @@ function transformToFlower() {
 
     isInFlowerMode = true;
 
-    // Go to sleep first (green color)
-    if (!pet.classList.contains('sleeping')) {
-        goToSleep();
+    // Wake up pet if sleeping - flower is an ACTIVE animation!
+    if (!petIsAwake) {
+        wakeUpPet();
     }
 
-    // Apply growing animation (legs grow, arms spread, stage 4)
+    // Trigger flower animation (5 minutes = 300 seconds во время cooldown!)
+    triggerPetAnimation('flower', 300000); // 5 minutes = 300,000ms
+
+    // Apply stage 4 for bloom
     pet.classList.remove('stage-1', 'stage-2', 'stage-3');
     pet.classList.add('stage-4');
 
