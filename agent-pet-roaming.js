@@ -13,11 +13,11 @@
     // Movement targets on index.html
     const targets = [
         { id: 'logo', name: 'logo', animations: ['playing', 'idle', 'waving', 'growing'], walkEdges: false, preferGrowing: true },
-        { id: 'galleryBtn', name: 'gallery', animations: ['waving', 'idle', 'playing'], walkEdges: true, preferGrowing: false },
-        { id: 'streamBtn', name: 'stream', animations: ['waving', 'idle', 'playing'], walkEdges: true, preferGrowing: false },
-        { id: 'orderBtn', name: 'order', animations: ['waving', 'idle', 'playing'], walkEdges: true, preferGrowing: false },
-        { id: 'socialToggle', name: 'social', animations: ['waving', 'idle'], walkEdges: true, preferGrowing: false },
-        { id: 'titleContainer', name: 'title', animations: ['idle', 'waving', 'growing'], walkEdges: false, preferGrowing: true }
+        { id: 'galleryBtn', name: 'gallery', animations: ['waving', 'idle', 'playing', 'waving'], walkEdges: true, preferGrowing: false },
+        { id: 'streamBtn', name: 'stream', animations: ['waving', 'idle', 'playing', 'waving'], walkEdges: true, preferGrowing: false },
+        { id: 'orderBtn', name: 'order', animations: ['waving', 'idle', 'playing', 'waving'], walkEdges: true, preferGrowing: false },
+        { id: 'socialToggle', name: 'social', animations: ['waving', 'idle', 'waving'], walkEdges: true, preferGrowing: false },
+        { id: 'titleContainer', name: 'title', animations: ['idle', 'waving', 'growing', 'waving'], walkEdges: false, preferGrowing: true }
     ];
 
     // Create pet HTML structure (8x4 body, 3px pixels)
@@ -121,7 +121,7 @@
         }
 
         // Remove all animation classes
-        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking', 'jumping');
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking', 'jumping', 'dancing');
 
         // Remove state classes
         pet.classList.remove('active', 'sleeping');
@@ -148,7 +148,7 @@
         console.log('[Roaming Pet] Jumping!');
 
         // Remove other animations
-        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking');
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking', 'dancing');
 
         // Add jumping
         pet.classList.add('jumping');
@@ -169,7 +169,7 @@
         console.log('[Roaming Pet] Growing like a plant...');
 
         // Remove other animations
-        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'shrinking');
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'shrinking', 'dancing');
 
         // Start growing
         pet.classList.add('growing');
@@ -664,12 +664,27 @@
             // Check if still awake
             if (isSleeping) return;
 
+            // 20% chance to just do animation without moving
+            if (Math.random() < 0.2) {
+                console.log('[Roaming Pet] Doing animation in place');
+                const randomAnims = ['waving', 'blinking', 'dancing', 'growing', 'playing'];
+                const anim = randomAnims[Math.floor(Math.random() * randomAnims.length)];
+                setAnimation(anim);
+
+                // Hold for 3-5 seconds then return to idle
+                setTimeout(() => {
+                    setAnimation('idle');
+                    scheduleNextMove();
+                }, 3000 + Math.random() * 2000);
+                return;
+            }
+
             const target = getRandomTarget();
             if (target) {
                 currentTarget = target;
 
-                // 50% chance to jump, 50% to walk
-                if (Math.random() < 0.5) {
+                // 30% chance to jump, 70% to walk (more walking!)
+                if (Math.random() < 0.3) {
                     jumpToTarget(target);
                 } else {
                     moveToTarget(target);

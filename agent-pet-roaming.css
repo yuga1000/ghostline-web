@@ -199,6 +199,23 @@
     100% { opacity: 1; }
 }
 
+/* ===== DANCING ANIMATION ===== */
+.roaming-pet.dancing .roaming-pet-body-container {
+    animation: roaming-pet-bounce 2.25s step-end infinite;
+}
+
+.roaming-pet.dancing .roaming-pet-legs {
+    animation: roaming-legs-dance 1.5s step-end infinite;
+}
+
+@keyframes roaming-legs-dance {
+    0% { transform: translateX(0px); }
+    49% { transform: translateX(0px); }
+    50% { transform: translateX(2px); }
+    99% { transform: translateX(2px); }
+    100% { transform: translateX(0px); }
+}
+
 /* ===== ARM WAVE ANIMATION ===== */
 .roaming-pet.waving .roaming-pet-arms .roaming-pixel.arm {
     animation: roaming-arm-wave 1.2s step-end infinite;
