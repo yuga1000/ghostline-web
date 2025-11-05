@@ -268,6 +268,11 @@ app.use((req, res, next) => {
   return next();
 });
 
+// Serve generated images from Ghostline_art_module
+const GENERATED_IMAGES_PATH = path.join(__dirname, '..', '..', 'Documents', 'Ghostline_art_module', 'art_outputs', 'generated', 'GLVSF_Images');
+app.use('/generated-images', express.static(GENERATED_IMAGES_PATH));
+console.log('[Server] Serving generated images from:', GENERATED_IMAGES_PATH);
+
 app.use(express.static(__dirname));
 
 app.listen(PORT, () => {

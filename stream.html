@@ -1592,6 +1592,9 @@ function wakeUpPet() {
 
     const stateText = document.getElementById('pet-state-text');
     stateText.textContent = 'Watching logs...';
+
+    // FIX: Start idle animation loop for active pet
+    startIdleAnimationLoop();
 }
 
 function goToSleep() {
@@ -1603,6 +1606,9 @@ function goToSleep() {
     if (petAnimationTimer) {
         clearTimeout(petAnimationTimer);
     }
+
+    // FIX: Stop idle animation loop when going to sleep
+    stopIdleAnimationLoop();
 
     console.log('🛌 Going to sleep - before:', pet.className);
     pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy', 'active');
@@ -1779,6 +1785,45 @@ function triggerPetAnimation(animation, duration) {
     }, duration);
 }
 
+// FIX: Idle animation loop - triggers random animations while pet is awake
+let idleAnimationInterval = null;
+
+function startIdleAnimationLoop() {
+    // Clear existing interval if any
+    if (idleAnimationInterval) {
+        clearInterval(idleAnimationInterval);
+    }
+
+    // Trigger random idle animations every 5-10 seconds
+    idleAnimationInterval = setInterval(() => {
+        if (!petIsAwake || petAnimationState !== 'idle') {
+            return; // Skip if pet is sleeping or already animating
+        }
+
+        // Random chance to trigger an animation
+        const rand = Math.random();
+
+        if (rand < 0.3) {
+            // 30% - breathing/blinking (already animated by CSS)
+            triggerPetAnimation('blinking', 2000);
+        } else if (rand < 0.5) {
+            // 20% - waving
+            triggerPetAnimation('waving', 2500);
+        } else if (rand < 0.65) {
+            // 15% - walking
+            triggerPetAnimation('walking', 3000);
+        }
+        // 35% - stay in idle (breathing continues via CSS)
+    }, 5000 + Math.random() * 5000); // Random interval 5-10 seconds
+}
+
+function stopIdleAnimationLoop() {
+    if (idleAnimationInterval) {
+        clearInterval(idleAnimationInterval);
+        idleAnimationInterval = null;
+    }
+}
+
 // Initialize pet - load state and start sleeping
 window.addEventListener('DOMContentLoaded', () => {
     const pet = document.getElementById('agent-pet');
@@ -1801,31 +1846,56 @@ window.addEventListener('DOMContentLoaded', () => {
 let imageDisplayTimer = null;
 
 function detectAndShowImage(logText) {
-    // Pattern matching for image paths
-    // Look for common patterns:
-    // - "Saved to: /path/to/image.png"
-    // - "Generated: image.jpg"
-    // - Any path ending in .png, .jpg, .jpeg, .gif, .webp
-    const imagePatterns = [
-        /(?:saved to:|generated:|output:|created:)\s*([^\s]+\.(?:png|jpg|jpeg|gif|webp))/i,
-        /([\/\w\-\.]+\.(?:png|jpg|jpeg|gif|webp))/i,
-        /(?:image|file|photo):\s*([^\s]+\.(?:png|jpg|jpeg|gif|webp))/i
-    ];
+    // FIX: Updated pattern matching for actual vercept log format
+    // Looking for patterns like:
+    // - "╔══ IMAGE GENERATED ══╗"
+    // - "Angel_20251105_105409.png"
+    // - Filename patterns from GLVSF_Images folder
 
     let imagePath = null;
+    let imageFilename = null;
 
-    // Try each pattern
-    for (const pattern of imagePatterns) {
-        const match = logText.match(pattern);
+    // Pattern 1: Check for "IMAGE GENERATED" marker followed by filename on next line
+    // This matches the actual log format from run_vercept_workflow_python_fixed.py line 480-481
+    if (logText.includes('IMAGE GENERATED')) {
+        console.log('[Image Display] Found IMAGE GENERATED marker');
+        // The filename should be in the NEXT log message, so we'll need to buffer this
+        window.expectingImageFilename = true;
+        return;
+    }
+
+    // Pattern 2: If we're expecting a filename, check if this line looks like a filename
+    if (window.expectingImageFilename) {
+        // Match common filename patterns from GLVSF_Images folder
+        const filenamePattern = /([a-zA-Z0-9_\-]+_\d{8}_\d{6}\.png|[a-zA-Z0-9_\-]+\.png)/i;
+        const match = logText.match(filenamePattern);
         if (match) {
-            imagePath = match[1];
-            break;
+            imageFilename = match[1];
+            window.expectingImageFilename = false;
+            console.log('[Image Display] Found filename after IMAGE GENERATED:', imageFilename);
         }
     }
 
-    // If we found an image path, display it
-    if (imagePath) {
-        console.log('[Image Display] Detected image:', imagePath);
+    // Pattern 3: Direct filename detection in any log
+    // Match filenames like: "Angel_20251105_105409.png" or "glvsf_resonant_ascent.png"
+    const directPattern = /([a-zA-Z0-9_\-]+(?:_\d{8}_\d{6})?\.png)/i;
+    const directMatch = logText.match(directPattern);
+    if (directMatch && !imageFilename) {
+        // Only use if it looks like a generated image filename (not a path to source)
+        const potentialFilename = directMatch[1];
+        // Exclude reference images from GLVSF_REFS
+        if (!logText.includes('GLVSF_REFS') && !logText.includes('ref_current')) {
+            imageFilename = potentialFilename;
+            console.log('[Image Display] Found filename via direct pattern:', imageFilename);
+        }
+    }
+
+    // If we found a filename, construct the full path
+    if (imageFilename) {
+        // FIX: Use web server route (server.js serves generated images at /generated-images/)
+        imagePath = `/generated-images/${imageFilename}`;
+
+        console.log('[Image Display] Constructed image path:', imagePath);
         showImagePreview(imagePath);
 
         // Make pet excited about the new image!
@@ -1858,14 +1928,36 @@ function showImagePreview(imagePath) {
         clearTimeout(imageDisplayTimer);
     }
 
+    console.log('[Image Display] Setting image source to:', imagePath);
+
+    // FIX: Handle image loading with error fallback
+    imagePreview.onerror = () => {
+        console.error('[Image Display] Failed to load image:', imagePath);
+        const filename = imagePath.split('/').pop();
+
+        // Show filename in label if image fails to load
+        console.error('[Image Display] Image not accessible. Showing filename instead.');
+        imagePreview.style.display = 'none';
+        const label = imageWindow.querySelector('.pet-image-label');
+        if (label) {
+            label.textContent = `New: ${filename}`;
+        }
+    };
+
+    imagePreview.onload = () => {
+        console.log('[Image Display] Image loaded successfully!');
+        imagePreview.style.display = 'block';
+    };
+
     // Set image source
     imagePreview.src = imagePath;
+    imagePreview.style.display = 'block';
 
     // Fade in with discrete animation
     imageWindow.classList.remove('fade-out');
     imageWindow.classList.add('fade-in');
 
-    // Hide after 7 seconds with fade out
+    // FIX: Longer display time - 5 minutes instead of 7 seconds
     imageDisplayTimer = setTimeout(() => {
         imageWindow.classList.remove('fade-in');
         imageWindow.classList.add('fade-out');
@@ -1873,8 +1965,9 @@ function showImagePreview(imagePath) {
         // Reset after fade out completes
         setTimeout(() => {
             imagePreview.src = '';
+            imagePreview.style.display = 'block';
         }, 800);
-    }, 7000);
+    }, 300000); // 5 minutes = 300000ms
 }
 
 </script>
