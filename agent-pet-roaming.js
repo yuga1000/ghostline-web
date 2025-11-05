@@ -721,7 +721,14 @@
         console.log('[Roaming Pet] Page ready, creating pet...');
 
         // Create pet
-        createPetHTML();
+        const container = createPetHTML();
+
+        // Set random initial position
+        const randomX = 20 + Math.random() * (window.innerWidth - 100);
+        const randomY = 20 + Math.random() * (window.innerHeight - 100);
+        container.style.left = randomX + 'px';
+        container.style.top = randomY + 'px';
+        console.log('[Roaming Pet] Starting at random position:', randomX, randomY);
 
         // Start blinking (works for both awake and asleep)
         startBlinking();
