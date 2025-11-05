@@ -20,7 +20,8 @@ app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
 }));
-app.use(express.json());
+// Increase payload limit to 10MB for base64-encoded images
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser(SESSION_SECRET));
 
 // Basic rate limits (adjust as needed)

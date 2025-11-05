@@ -1304,6 +1304,52 @@ function startUptimeCounter() {
 window.addEventListener('DOMContentLoaded', () => {
     console.log('[Agent Terminal] Initializing WebSocket connection...');
     initWebSocket();
+
+    // FALLBACK: Poll HTTP API for logs if WebSocket fails (for testing base64 images)
+    let lastProcessedLogIndex = 0;
+
+    function startHttpPolling() {
+        console.log('[HTTP Polling] Starting fallback polling for /api/logs');
+
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/logs');
+                const data = await response.json();
+
+                if (data.logs && data.logs.length > lastProcessedLogIndex) {
+                    console.log('[HTTP Polling] Found', data.logs.length - lastProcessedLogIndex, 'new logs');
+
+                    // Process new logs
+                    for (let i = lastProcessedLogIndex; i < data.logs.length; i++) {
+                        const logEvent = data.logs[i];
+                        console.log('[HTTP Polling] Processing log:', logEvent);
+
+                        // Clear placeholder on first log
+                        if (lastProcessedLogIndex === 0) {
+                            clearPlaceholder();
+                        }
+
+                        // Add log line
+                        if (logEvent.content || logEvent.message) {
+                            addLogLine(logEvent.content || logEvent.message, 'log-info');
+                        }
+                    }
+
+                    lastProcessedLogIndex = data.logs.length;
+                }
+            } catch (e) {
+                console.error('[HTTP Polling] Error:', e);
+            }
+        }, 5000); // Poll every 5 seconds
+    }
+
+    // Start HTTP polling after 3 seconds if WebSocket doesn't connect
+    setTimeout(() => {
+        if (!isConnected) {
+            console.log('[HTTP Polling] WebSocket not connected, starting HTTP fallback');
+            startHttpPolling();
+        }
+    }, 3000);
 });
 
 // Handle visibility change (mobile/tablet switching tabs)
@@ -2045,9 +2091,18 @@ function detectAndShowImage(logText) {
         // Format: "╔══ IMAGE GENERATED ══╗\nfilename.png\nCompleted in..."
         const lines = logText.split('\n');
 
-        // Look for filename on second line (after the box drawing)
+        // Look for filename and optional base64 data
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
+
+            // Check for base64 data URL
+            if (line.startsWith('data:image/png;base64,')) {
+                imagePath = line; // Use base64 directly
+                console.log('[Image Display] Found base64 image data:', line.substring(0, 50) + '...');
+                break;
+            }
+
+            // Check for filename
             const filenamePattern = /^([a-zA-Z0-9_\-]+\.png)$/i;
             const match = line.match(filenamePattern);
 
@@ -2060,7 +2115,7 @@ function detectAndShowImage(logText) {
 
         // If we found it, continue to display logic below
         // If not found, set flag for next message (fallback)
-        if (!imageFilename) {
+        if (!imageFilename && !imagePath) {
             window.expectingImageFilename = true;
             return;
         }
@@ -2092,12 +2147,15 @@ function detectAndShowImage(logText) {
         }
     }
 
-    // If we found a filename, construct the full path
-    if (imageFilename) {
+    // If we found a filename or base64 data, show the image
+    if (imageFilename && !imagePath) {
         // FIX: Use web server route (server.js serves generated images at /generated-images/)
         imagePath = `/generated-images/${imageFilename}`;
-
         console.log('[Image Display] Constructed image path:', imagePath);
+    }
+
+    if (imagePath) {
+        console.log('[Image Display] Showing image:', imagePath.substring(0, 100) + '...');
         showImagePreview(imagePath);
 
         // Make pet excited about the new image!
