@@ -1449,8 +1449,23 @@ function checkStageUpgrade(logText) {
                 // Update text
                 stageText.textContent = petStage;
 
+                // Add special color for level up!
+                // Alternate between cyan and pink
+                if (petStage % 2 === 0) {
+                    pet.classList.add('excited');
+                    pet.classList.remove('happy');
+                } else {
+                    pet.classList.add('happy');
+                    pet.classList.remove('excited');
+                }
+
                 // Celebrate!
                 triggerPetAnimation('dancing', 4000);
+
+                // Return to normal color after dance
+                setTimeout(() => {
+                    pet.classList.remove('excited', 'happy');
+                }, 4000);
 
                 // Show growth message
                 showGrowthMessage(petStage);
@@ -1489,6 +1504,27 @@ function wakeUpPet() {
     pet.classList.add('idle');
     petIsAwake = true;
     petAnimationState = 'idle';
+
+    // Random chance for different wake-up colors
+    const rand = Math.random();
+    if (rand < 0.7) {
+        // 70% - normal orange
+        pet.classList.remove('excited', 'happy');
+    } else if (rand < 0.85) {
+        // 15% - excited cyan
+        pet.classList.add('excited');
+        pet.classList.remove('happy');
+        setTimeout(() => {
+            pet.classList.remove('excited');
+        }, 2000);
+    } else {
+        // 15% - happy pink
+        pet.classList.add('happy');
+        pet.classList.remove('excited');
+        setTimeout(() => {
+            pet.classList.remove('happy');
+        }, 2000);
+    }
 
     const stateText = document.getElementById('pet-state-text');
     stateText.textContent = 'Watching logs...';

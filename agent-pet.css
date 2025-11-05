@@ -56,13 +56,31 @@
     background: transparent;
 }
 
-/* Active state (orange) */
+/* Active state (bright orange-yellow) */
 .pet.active .pixel.body {
-    background: #ff8844;
-    box-shadow: 0 0 2px #ff8844;
+    background: #ffbb00;
+    box-shadow: 0 0 3px #ffbb00;
 }
 
-/* Inactive state (green) */
+/* Sleeping state (green) */
+.pet.sleeping .pixel.body {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+/* Excited state (cyan/blue) - for special moments */
+.pet.excited .pixel.body {
+    background: #00ffff;
+    box-shadow: 0 0 3px #00ffff;
+}
+
+/* Happy state (pink cyberpunk) */
+.pet.happy .pixel.body {
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
+}
+
+/* Inactive state (green) - fallback */
 .pet.inactive .pixel.body {
     background: #00ff00;
     box-shadow: 0 0 2px #00ff00;
@@ -77,8 +95,23 @@
 }
 
 .pet.active .pixel.arm {
-    background: #ff8844;
-    box-shadow: 0 0 2px #ff8844;
+    background: #ffbb00;
+    box-shadow: 0 0 3px #ffbb00;
+}
+
+.pet.sleeping .pixel.arm {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.pet.excited .pixel.arm {
+    background: #00ffff;
+    box-shadow: 0 0 3px #00ffff;
+}
+
+.pet.happy .pixel.arm {
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
 }
 
 .pet.inactive .pixel.arm {
@@ -91,8 +124,23 @@
 }
 
 .pet.active .pixel.leg {
-    background: #ff8844;
-    box-shadow: 0 0 2px #ff8844;
+    background: #ffbb00;
+    box-shadow: 0 0 3px #ffbb00;
+}
+
+.pet.sleeping .pixel.leg {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.pet.excited .pixel.leg {
+    background: #00ffff;
+    box-shadow: 0 0 3px #00ffff;
+}
+
+.pet.happy .pixel.leg {
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
 }
 
 .pet.inactive .pixel.leg {
