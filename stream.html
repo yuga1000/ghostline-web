@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- Agent Pet Styles -->
-    <link rel="stylesheet" href="agent-pet.css?v=8">
+    <link rel="stylesheet" href="agent-pet.css?v=9">
     <style>
         body {
             background: #000000;
@@ -1438,11 +1438,11 @@ function updatePetOnLog(logType, logText = '') {
         wakeUpPet();
     }
 
-    // Reset awake timer - pet stays awake while logs are coming
+    // Reset awake timer - pet stays awake during entire Vercept cycle (120 minutes)
     clearTimeout(petAwakeTimer);
     petAwakeTimer = setTimeout(() => {
         goToSleep();
-    }, 10000);
+    }, 120 * 60 * 1000); // 120 minutes = 7,200,000ms
 
     // Update progress bar
     updateProgressBar();
