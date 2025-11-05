@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- Agent Pet Styles -->
-    <link rel="stylesheet" href="agent-pet.css?v=7">
+    <link rel="stylesheet" href="agent-pet.css?v=8">
     <style>
         body {
             background: #000000;
@@ -651,6 +651,8 @@
                                 <div id="falling-stars-container"></div>
                                 <!-- Toy pixel (shows when playing) -->
                                 <div class="pet-toy-pixel" id="pet-toy"></div>
+                                <!-- Tongue for hunting (shoots out like chameleon) -->
+                                <div class="pet-tongue" id="pet-tongue"></div>
                                 <!-- Sleep pixels (shows when sleeping) -->
                                 <div class="pet-sleep-pixels" id="pet-sleep-pixels">
                                     <div class="sleep-pixel"></div>
@@ -1948,64 +1950,65 @@ function stopIdleAnimationLoop() {
     }
 }
 
-// ===== HUNTING ANIMATION WITH PREY PIXELS =====
+// ===== HUNTING ANIMATION WITH TONGUE (CHAMELEON STYLE) =====
 function startHuntingAnimation() {
     const pet = document.getElementById('agent-pet');
     const petDisplay = pet.closest('.pet-display-inline');
+    const tongue = document.getElementById('pet-tongue');
 
-    console.log('[Pet Animation] Starting hunting with prey pixels!');
+    console.log('[Pet Animation] Starting tongue hunt (chameleon style)!');
 
-    // Trigger hunting animation
-    triggerPetAnimation('hunting', 5000);
+    // Keep pet still (no hunting animation, just tongue shoots)
+    triggerPetAnimation('idle', 5000);
 
-    // Create 3 prey pixels
-    const preyPixels = [];
-    for (let i = 0; i < 3; i++) {
-        const prey = document.createElement('div');
-        prey.className = 'prey-pixel';
+    // Create target pixel (floating on the side)
+    const prey = document.createElement('div');
+    prey.className = 'prey-pixel';
+    prey.style.cssText = 'position: absolute; width: 4px; height: 4px; background: #00ff00; box-shadow: 0 0 4px #00ff00; z-index: 5;';
 
-        // Random flight path
-        const startX = Math.random() * 80 - 40;
-        const startY = Math.random() * -30 - 10;
-        prey.style.setProperty('--start-x', `${startX}px`);
-        prey.style.setProperty('--start-y', `${startY}px`);
+    // Random side (left or right)
+    const direction = Math.random() < 0.5 ? 'right' : 'left';
+    const xPos = direction === 'right' ? '70%' : '30%';
+    const yPos = '40%';
 
-        prey.style.setProperty('--mid1-x', `${startX + (Math.random() * 20 - 10)}px`);
-        prey.style.setProperty('--mid1-y', `${startY + (Math.random() * 10 - 5)}px`);
+    prey.style.left = xPos;
+    prey.style.top = yPos;
 
-        prey.style.setProperty('--mid2-x', `${startX + (Math.random() * 30 - 15)}px`);
-        prey.style.setProperty('--mid2-y', `${startY + (Math.random() * 15 - 7)}px`);
+    petDisplay.appendChild(prey);
 
-        prey.style.setProperty('--mid3-x', `${startX + (Math.random() * 40 - 20)}px`);
-        prey.style.setProperty('--mid3-y', `${startY + (Math.random() * 20 - 10)}px`);
+    console.log(`[Pet Animation] Target pixel spawned on ${direction} side`);
 
-        prey.style.setProperty('--mid4-x', `${startX + (Math.random() * 30 - 15)}px`);
-        prey.style.setProperty('--mid4-y', `${startY + (Math.random() * 15 - 7)}px`);
-
-        prey.style.setProperty('--mid5-x', `${startX + (Math.random() * 20 - 10)}px`);
-        prey.style.setProperty('--mid5-y', `${startY + (Math.random() * 10 - 5)}px`);
-
-        prey.style.setProperty('--mid6-x', `${startX + (Math.random() * 15 - 7)}px`);
-        prey.style.setProperty('--mid6-y', `${startY + (Math.random() * 8 - 4)}px`);
-
-        prey.style.setProperty('--end-x', `${startX}px`);
-        prey.style.setProperty('--end-y', `${startY}px`);
-
-        petDisplay.appendChild(prey);
-        preyPixels.push(prey);
-
-        // Activate with delay
-        setTimeout(() => {
-            prey.classList.add('active');
-        }, i * 500);
-    }
-
-    // Remove prey pixels after animation
+    // After 500ms - shoot tongue!
     setTimeout(() => {
-        preyPixels.forEach(prey => {
+        console.log('[Pet Animation] Shooting tongue!');
+
+        // Add shooting animation to tongue
+        tongue.classList.remove('shooting-left', 'shooting-right');
+        tongue.classList.add(`shooting-${direction}`);
+
+        // After 300ms (when tongue reaches pixel) - make pixel start moving toward pet
+        setTimeout(() => {
+            console.log('[Pet Animation] Tongue caught pixel!');
+            prey.style.transition = 'all 0.6s step-end';
+            prey.style.left = '50%';
+            prey.style.top = '50%';
+            prey.style.opacity = '1';
+        }, 300);
+
+        // After 700ms total - pixel disappears (absorbed)
+        setTimeout(() => {
+            console.log('[Pet Animation] Pixel absorbed!');
+            prey.style.opacity = '0';
+        }, 700);
+
+        // After 1200ms - clean up
+        setTimeout(() => {
+            tongue.classList.remove('shooting-left', 'shooting-right');
             prey.remove();
-        });
-    }, 5000);
+            console.log('[Pet Animation] Tongue hunt complete!');
+        }, 1200);
+
+    }, 500);
 }
 
 // ===== COUNTDOWN TIMER & FLOWER TRANSFORMATION =====
