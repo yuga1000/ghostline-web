@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <!-- Agent Pet Styles -->
-    <link rel="stylesheet" href="agent-pet.css?v=6">
+    <link rel="stylesheet" href="agent-pet.css?v=7">
     <style>
         body {
             background: #000000;
@@ -1470,7 +1470,9 @@ function updatePetOnLog(logType, logText = '') {
     // Determine log importance
     if (logType === 'log-success' && keywords.exciting.some(kw => lowerText.includes(kw))) {
         shouldAnimate = true;
-        animation = 'dancing';
+        // Random celebration animation
+        const celebrations = ['dancing', 'excited-bounce', 'jumping', 'spinning'];
+        animation = celebrations[Math.floor(Math.random() * celebrations.length)];
         duration = 3000;
     } else if (logType === 'log-success') {
         shouldAnimate = Math.random() < 0.3; // 30% for regular success
@@ -1478,11 +1480,13 @@ function updatePetOnLog(logType, logText = '') {
         duration = 2000;
     } else if (logType === 'log-error') {
         shouldAnimate = true;
-        animation = 'blinking';
+        // Shake on errors!
+        animation = Math.random() < 0.6 ? 'shaking' : 'blinking';
         duration = 1500;
     } else if (logType === 'log-action' && keywords.working.some(kw => lowerText.includes(kw))) {
         shouldAnimate = Math.random() < 0.25; // 25%
-        animation = 'walking';
+        // Random work animation
+        animation = Math.random() < 0.5 ? 'walking' : 'running';
         duration = 2500;
     } else if (logType === 'log-thinking') {
         shouldAnimate = Math.random() < 0.2; // 20%
@@ -1827,7 +1831,8 @@ function triggerPetAnimation(animation, duration) {
     }
 
     // Remove all animation classes
-    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'sleeping', 'playing');
+    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'sleeping', 'playing',
+                         'running', 'jumping', 'spinning', 'transforming', 'hunting', 'excited-bounce', 'shaking');
 
     // Add new animation
     pet.classList.add(animation);
@@ -1850,7 +1855,14 @@ function triggerPetAnimation(animation, duration) {
         'waving': 'Celebrating!',
         'blinking': 'Thinking...',
         'sleeping': 'Resting...',
-        'playing': 'Playing with toy'
+        'playing': 'Playing with toy',
+        'running': 'Running!',
+        'jumping': 'Jumping!',
+        'spinning': 'Spinning around',
+        'transforming': 'Transforming...',
+        'hunting': 'Hunting pixels',
+        'excited-bounce': 'So excited!',
+        'shaking': 'Shaking!'
     };
     stateText.textContent = moodTexts[animation] || 'Active';
 
@@ -1892,19 +1904,40 @@ function startIdleAnimationLoop() {
 
         console.log('[Pet Animation] Idle loop tick - rand:', rand.toFixed(2));
 
-        if (rand < 0.3) {
-            // 30% - breathing/blinking (already animated by CSS)
+        if (rand < 0.12) {
+            // 12% - blinking
             triggerPetAnimation('blinking', 2000);
-        } else if (rand < 0.5) {
-            // 20% - waving
+        } else if (rand < 0.24) {
+            // 12% - waving
             triggerPetAnimation('waving', 2500);
-        } else if (rand < 0.65) {
-            // 15% - walking
+        } else if (rand < 0.34) {
+            // 10% - walking
             triggerPetAnimation('walking', 3000);
+        } else if (rand < 0.42) {
+            // 8% - running (бег!)
+            triggerPetAnimation('running', 3500);
+        } else if (rand < 0.49) {
+            // 7% - jumping (прыжки!)
+            triggerPetAnimation('jumping', 2500);
+        } else if (rand < 0.55) {
+            // 6% - spinning (кружится!)
+            triggerPetAnimation('spinning', 2500);
+        } else if (rand < 0.60) {
+            // 5% - transforming (превращается!)
+            triggerPetAnimation('transforming', 3000);
+        } else if (rand < 0.65) {
+            // 5% - hunting (охотится!)
+            startHuntingAnimation();
+        } else if (rand < 0.69) {
+            // 4% - excited bounce
+            triggerPetAnimation('excited-bounce', 2000);
+        } else if (rand < 0.72) {
+            // 3% - playing
+            triggerPetAnimation('playing', 3000);
         } else {
             console.log('[Pet Animation] Staying in idle');
         }
-        // 35% - stay in idle (breathing continues via CSS)
+        // 28% - stay in idle (breathing continues via CSS)
     }, 5000 + Math.random() * 5000); // Random interval 5-10 seconds
 }
 
@@ -1913,6 +1946,66 @@ function stopIdleAnimationLoop() {
         clearInterval(idleAnimationInterval);
         idleAnimationInterval = null;
     }
+}
+
+// ===== HUNTING ANIMATION WITH PREY PIXELS =====
+function startHuntingAnimation() {
+    const pet = document.getElementById('agent-pet');
+    const petDisplay = pet.closest('.pet-display-inline');
+
+    console.log('[Pet Animation] Starting hunting with prey pixels!');
+
+    // Trigger hunting animation
+    triggerPetAnimation('hunting', 5000);
+
+    // Create 3 prey pixels
+    const preyPixels = [];
+    for (let i = 0; i < 3; i++) {
+        const prey = document.createElement('div');
+        prey.className = 'prey-pixel';
+
+        // Random flight path
+        const startX = Math.random() * 80 - 40;
+        const startY = Math.random() * -30 - 10;
+        prey.style.setProperty('--start-x', `${startX}px`);
+        prey.style.setProperty('--start-y', `${startY}px`);
+
+        prey.style.setProperty('--mid1-x', `${startX + (Math.random() * 20 - 10)}px`);
+        prey.style.setProperty('--mid1-y', `${startY + (Math.random() * 10 - 5)}px`);
+
+        prey.style.setProperty('--mid2-x', `${startX + (Math.random() * 30 - 15)}px`);
+        prey.style.setProperty('--mid2-y', `${startY + (Math.random() * 15 - 7)}px`);
+
+        prey.style.setProperty('--mid3-x', `${startX + (Math.random() * 40 - 20)}px`);
+        prey.style.setProperty('--mid3-y', `${startY + (Math.random() * 20 - 10)}px`);
+
+        prey.style.setProperty('--mid4-x', `${startX + (Math.random() * 30 - 15)}px`);
+        prey.style.setProperty('--mid4-y', `${startY + (Math.random() * 15 - 7)}px`);
+
+        prey.style.setProperty('--mid5-x', `${startX + (Math.random() * 20 - 10)}px`);
+        prey.style.setProperty('--mid5-y', `${startY + (Math.random() * 10 - 5)}px`);
+
+        prey.style.setProperty('--mid6-x', `${startX + (Math.random() * 15 - 7)}px`);
+        prey.style.setProperty('--mid6-y', `${startY + (Math.random() * 8 - 4)}px`);
+
+        prey.style.setProperty('--end-x', `${startX}px`);
+        prey.style.setProperty('--end-y', `${startY}px`);
+
+        petDisplay.appendChild(prey);
+        preyPixels.push(prey);
+
+        // Activate with delay
+        setTimeout(() => {
+            prey.classList.add('active');
+        }, i * 500);
+    }
+
+    // Remove prey pixels after animation
+    setTimeout(() => {
+        preyPixels.forEach(prey => {
+            prey.remove();
+        });
+    }, 5000);
 }
 
 // ===== COUNTDOWN TIMER & FLOWER TRANSFORMATION =====
