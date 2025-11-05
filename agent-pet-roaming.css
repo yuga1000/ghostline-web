@@ -245,7 +245,8 @@
 /* ===== PLAYING ANIMATION (on back) ===== */
 .roaming-pet.playing .roaming-pet-body-container {
     animation: none;
-    transform: translateY(6px) scaleY(-1) !important;
+    /* Move down to ground - legs will appear above */
+    transform: translateY(6px) !important;
 }
 
 .roaming-pet.playing .roaming-pet-legs {
@@ -266,19 +267,23 @@
 
 /* ===== SLEEPING ANIMATION ===== */
 .roaming-pet.sleeping .roaming-pet-body-container {
-    /* Breathing animation while sleeping */
-    animation: roaming-sleep-breathing 3s step-end infinite;
+    /* No scale/rotation - just position */
     transform: translateY(6px) !important;
 }
 
-@keyframes roaming-sleep-breathing {
-    /* Breathe in - expand by 0.5px (scale slightly) */
-    0% { transform: translateY(6px) scale(1); }
-    49% { transform: translateY(6px) scale(1); }
-    /* Breathe out - expand more */
-    50% { transform: translateY(6px) scale(1.05); }
-    99% { transform: translateY(6px) scale(1.05); }
-    100% { transform: translateY(6px) scale(1); }
+/* Discrete breathing - pixels pulse */
+.roaming-pet.sleeping .roaming-pixel.body {
+    animation: roaming-sleep-breathing-pulse 3s step-end infinite;
+}
+
+@keyframes roaming-sleep-breathing-pulse {
+    /* Normal brightness */
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    /* Slightly dimmed (breathing in) */
+    50% { opacity: 0.7; }
+    99% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
 /* Sleeping eyes - thin slits instead of full open */
@@ -309,16 +314,16 @@
 }
 
 @keyframes jump-arc {
-    /* 8 fps = 4 frames for 0.5s jump */
-    0% { transform: translateY(0px) scaleY(1); }
-    24% { transform: translateY(0px) scaleY(0.8); } /* Squat down */
-    25% { transform: translateY(-12px) scaleY(1); } /* Jump up */
-    49% { transform: translateY(-12px) scaleY(1); }
-    50% { transform: translateY(-18px) scaleY(1.1); } /* Apex */
-    74% { transform: translateY(-18px) scaleY(1.1); }
-    75% { transform: translateY(-6px) scaleY(1); } /* Coming down */
-    99% { transform: translateY(-6px) scaleY(1); }
-    100% { transform: translateY(0px) scaleY(1); } /* Land */
+    /* 8 fps = 4 frames for 0.5s jump - no scale, just discrete height changes */
+    0% { transform: translateY(0px); }
+    24% { transform: translateY(0px); } /* Ready */
+    25% { transform: translateY(-12px); } /* Jump up */
+    49% { transform: translateY(-12px); }
+    50% { transform: translateY(-18px); } /* Apex */
+    74% { transform: translateY(-18px); }
+    75% { transform: translateY(-6px); } /* Coming down */
+    99% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); } /* Land */
 }
 
 /* Legs tuck up during jump */
@@ -341,18 +346,19 @@
 }
 
 @keyframes plant-grow {
+    /* Discrete growth - just move up, no scale */
     /* Stage 1: normal size */
-    0% { transform: translateY(0px) scaleY(1); }
-    24% { transform: translateY(0px) scaleY(1); }
+    0% { transform: translateY(0px); }
+    24% { transform: translateY(0px); }
     /* Stage 2: grow +1 pixel */
-    25% { transform: translateY(-3px) scaleY(1.25); }
-    49% { transform: translateY(-3px) scaleY(1.25); }
+    25% { transform: translateY(-3px); }
+    49% { transform: translateY(-3px); }
     /* Stage 3: grow +2 pixels */
-    50% { transform: translateY(-6px) scaleY(1.5); }
-    74% { transform: translateY(-6px) scaleY(1.5); }
+    50% { transform: translateY(-6px); }
+    74% { transform: translateY(-6px); }
     /* Stage 4: grow +3 pixels (fully grown) */
-    75% { transform: translateY(-9px) scaleY(1.75); }
-    100% { transform: translateY(-9px) scaleY(1.75); }
+    75% { transform: translateY(-9px); }
+    100% { transform: translateY(-9px); }
 }
 
 /* Arms spread when fully grown */
@@ -420,13 +426,14 @@
 }
 
 @keyframes plant-shrink {
-    0% { transform: translateY(-9px) scaleY(1.75); }
-    32% { transform: translateY(-9px) scaleY(1.75); }
-    33% { transform: translateY(-6px) scaleY(1.5); }
-    65% { transform: translateY(-6px) scaleY(1.5); }
-    66% { transform: translateY(-3px) scaleY(1.25); }
-    99% { transform: translateY(-3px) scaleY(1.25); }
-    100% { transform: translateY(0px) scaleY(1); }
+    /* Discrete shrinking - no scale */
+    0% { transform: translateY(-9px); }
+    32% { transform: translateY(-9px); }
+    33% { transform: translateY(-6px); }
+    65% { transform: translateY(-6px); }
+    66% { transform: translateY(-3px); }
+    99% { transform: translateY(-3px); }
+    100% { transform: translateY(0px); }
 }
 
 .roaming-pet.shrinking .roaming-pet-arms {

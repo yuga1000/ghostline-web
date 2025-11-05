@@ -354,19 +354,23 @@
 
 /* ===== SLEEPING ANIMATION ===== */
 .pet.sleeping .pet-body-container {
-    /* Breathing animation while sleeping */
-    animation: sleep-breathing 3s step-end infinite;
+    /* No scale/rotation - just position */
     transform: translateY(8px) !important;
 }
 
-@keyframes sleep-breathing {
-    /* Breathe in - expand by 0.5px (scale slightly) */
-    0% { transform: translateY(8px) scale(1); }
-    49% { transform: translateY(8px) scale(1); }
-    /* Breathe out - expand more */
-    50% { transform: translateY(8px) scale(1.05); }
-    99% { transform: translateY(8px) scale(1.05); }
-    100% { transform: translateY(8px) scale(1); }
+/* Discrete breathing - outer pixels pulse */
+.pet.sleeping .pixel.body {
+    animation: sleep-breathing-pulse 3s step-end infinite;
+}
+
+@keyframes sleep-breathing-pulse {
+    /* Normal brightness */
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    /* Slightly dimmed (breathing in) */
+    50% { opacity: 0.7; }
+    99% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
 /* Sleeping eyes - thin slits instead of full open */
@@ -399,11 +403,65 @@
     opacity: 0 !important;
 }
 
+/* Sleep Z's floating above pet */
+.pet-sleep-z {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    color: #00ff00;
+    text-shadow: 0 0 4px rgba(0, 255, 0, 0.8);
+    opacity: 0;
+    pointer-events: none;
+    bottom: 60%;
+    left: 50%;
+}
+
+#pet-sleep-z-1 {
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+#pet-sleep-z-2 {
+    font-size: 16px;
+    margin-left: 20px;
+}
+
+#pet-sleep-z-3 {
+    font-size: 20px;
+    margin-left: 30px;
+}
+
+/* Show Z's when sleeping */
+#agent-pet.sleeping ~ .pet-sleep-z {
+    animation: sleep-z-float 4s step-end infinite;
+}
+
+@keyframes sleep-z-float {
+    0% { opacity: 0; transform: translateY(0px); }
+    24% { opacity: 0; transform: translateY(0px); }
+    25% { opacity: 1; transform: translateY(0px); }
+    49% { opacity: 1; transform: translateY(0px); }
+    50% { opacity: 1; transform: translateY(-8px); }
+    74% { opacity: 1; transform: translateY(-8px); }
+    75% { opacity: 1; transform: translateY(-16px); }
+    99% { opacity: 1; transform: translateY(-16px); }
+    100% { opacity: 0; transform: translateY(-16px); }
+}
+
+/* Stagger the Z's */
+#pet-sleep-z-2 {
+    animation-delay: 1.3s;
+}
+
+#pet-sleep-z-3 {
+    animation-delay: 2.6s;
+}
+
 /* ===== PLAYING ANIMATION (on back with pixel toy) ===== */
 .pet.playing .pet-body-container {
     animation: none;
-    /* Flip upside down and move to ground */
-    transform: translateY(8px) scaleY(-1) !important;
+    /* Move down to ground - legs will appear above (no scaleY) */
+    transform: translateY(8px) !important;
 }
 
 .pet.playing .pet-legs {
