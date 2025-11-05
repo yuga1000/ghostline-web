@@ -112,10 +112,11 @@
     box-shadow: 0 0 3px #ffbb00;
 }
 
-/* Sleeping state (green) */
-.pet.sleeping .pixel.body {
-    background: #00ff00;
-    box-shadow: 0 0 2px #00ff00;
+/* Sleeping state (green) - higher specificity */
+.pet.sleeping .pixel.body,
+#agent-pet.sleeping .pixel.body {
+    background: #00ff00 !important;
+    box-shadow: 0 0 2px #00ff00 !important;
 }
 
 /* Excited state (cyan/blue) - for special moments */
@@ -149,9 +150,10 @@
     box-shadow: 0 0 3px #ffbb00;
 }
 
-.pet.sleeping .pixel.arm {
-    background: #00ff00;
-    box-shadow: 0 0 2px #00ff00;
+.pet.sleeping .pixel.arm,
+#agent-pet.sleeping .pixel.arm {
+    background: #00ff00 !important;
+    box-shadow: 0 0 2px #00ff00 !important;
 }
 
 .pet.excited .pixel.arm {
@@ -178,9 +180,10 @@
     box-shadow: 0 0 3px #ffbb00;
 }
 
-.pet.sleeping .pixel.leg {
-    background: #00ff00;
-    box-shadow: 0 0 2px #00ff00;
+.pet.sleeping .pixel.leg,
+#agent-pet.sleeping .pixel.leg {
+    background: #00ff00 !important;
+    box-shadow: 0 0 2px #00ff00 !important;
 }
 
 .pet.excited .pixel.leg {
@@ -361,10 +364,11 @@
 }
 
 /* Sleeping eyes - thin slits instead of full open */
-.pet.sleeping .pixel.eye {
-    /* Make eyes into thin slits (2px height -> 1px height) */
-    height: 1px;
-    animation: eye-flutter 4s step-end infinite;
+.pet.sleeping .pixel.eye,
+#agent-pet.sleeping .pixel.eye {
+    /* Make eyes into thin slits (4px height -> 1px height) */
+    height: 1px !important;
+    animation: eye-flutter 4s step-end infinite !important;
 }
 
 @keyframes eye-flutter {
