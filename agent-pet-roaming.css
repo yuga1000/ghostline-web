@@ -285,6 +285,38 @@
     opacity: 0;
 }
 
+/* ===== JUMPING ANIMATION (discrete arc jumps) ===== */
+.roaming-pet.jumping .roaming-pet-body-container {
+    animation: jump-arc 0.5s step-end 1;
+}
+
+@keyframes jump-arc {
+    /* 8 fps = 4 frames for 0.5s jump */
+    0% { transform: translateY(0px) scaleY(1); }
+    24% { transform: translateY(0px) scaleY(0.8); } /* Squat down */
+    25% { transform: translateY(-12px) scaleY(1); } /* Jump up */
+    49% { transform: translateY(-12px) scaleY(1); }
+    50% { transform: translateY(-18px) scaleY(1.1); } /* Apex */
+    74% { transform: translateY(-18px) scaleY(1.1); }
+    75% { transform: translateY(-6px) scaleY(1); } /* Coming down */
+    99% { transform: translateY(-6px) scaleY(1); }
+    100% { transform: translateY(0px) scaleY(1); } /* Land */
+}
+
+/* Legs tuck up during jump */
+.roaming-pet.jumping .roaming-pet-legs {
+    animation: legs-tuck 0.5s step-end 1;
+}
+
+@keyframes legs-tuck {
+    0% { transform: translateY(0px); opacity: 1; }
+    24% { transform: translateY(0px); opacity: 1; }
+    25% { transform: translateY(-3px); opacity: 0.5; } /* Tuck up */
+    74% { transform: translateY(-3px); opacity: 0.5; }
+    75% { transform: translateY(0px); opacity: 1; }
+    100% { transform: translateY(0px); opacity: 1; }
+}
+
 /* ===== GROWING ANIMATION (like a plant) ===== */
 .roaming-pet.growing .roaming-pet-body-container {
     animation: plant-grow 3s step-end forwards;

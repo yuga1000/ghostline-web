@@ -112,9 +112,11 @@
     box-shadow: 0 0 3px #ffbb00;
 }
 
-/* Sleeping state (green) - higher specificity */
+/* Sleeping state (green) - higher specificity, must override active */
 .pet.sleeping .pixel.body,
-#agent-pet.sleeping .pixel.body {
+#agent-pet.sleeping .pixel.body,
+.pet.active.sleeping .pixel.body,
+#agent-pet.active.sleeping .pixel.body {
     background: #00ff00 !important;
     box-shadow: 0 0 2px #00ff00 !important;
 }
@@ -151,7 +153,9 @@
 }
 
 .pet.sleeping .pixel.arm,
-#agent-pet.sleeping .pixel.arm {
+#agent-pet.sleeping .pixel.arm,
+.pet.active.sleeping .pixel.arm,
+#agent-pet.active.sleeping .pixel.arm {
     background: #00ff00 !important;
     box-shadow: 0 0 2px #00ff00 !important;
 }
@@ -181,7 +185,9 @@
 }
 
 .pet.sleeping .pixel.leg,
-#agent-pet.sleeping .pixel.leg {
+#agent-pet.sleeping .pixel.leg,
+.pet.active.sleeping .pixel.leg,
+#agent-pet.active.sleeping .pixel.leg {
     background: #00ff00 !important;
     box-shadow: 0 0 2px #00ff00 !important;
 }
@@ -365,9 +371,12 @@
 
 /* Sleeping eyes - thin slits instead of full open */
 .pet.sleeping .pixel.eye,
-#agent-pet.sleeping .pixel.eye {
+#agent-pet.sleeping .pixel.eye,
+.pet.active.sleeping .pixel.eye,
+#agent-pet.active.sleeping .pixel.eye {
     /* Make eyes into thin slits (4px height -> 1px height) */
     height: 1px !important;
+    background: #000000 !important;
     animation: eye-flutter 4s step-end infinite !important;
 }
 
@@ -382,8 +391,12 @@
     100% { opacity: 0.6; }
 }
 
-.pet.sleeping .pet-legs {
-    opacity: 0;
+/* Sleeping legs - must be hidden */
+.pet.sleeping .pet-legs,
+#agent-pet.sleeping .pet-legs,
+.pet.active.sleeping .pet-legs,
+#agent-pet.active.sleeping .pet-legs {
+    opacity: 0 !important;
 }
 
 /* ===== PLAYING ANIMATION (on back with pixel toy) ===== */

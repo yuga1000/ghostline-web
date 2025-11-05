@@ -12,12 +12,12 @@
 
     // Movement targets on index.html
     const targets = [
-        { id: 'logo', name: 'logo', animations: ['playing', 'idle', 'waving', 'growing'], walkEdges: false },
-        { id: 'galleryBtn', name: 'gallery', animations: ['waving', 'idle', 'playing', 'growing'], walkEdges: true },
-        { id: 'streamBtn', name: 'stream', animations: ['waving', 'idle', 'playing', 'growing'], walkEdges: true },
-        { id: 'orderBtn', name: 'order', animations: ['waving', 'idle', 'playing', 'growing'], walkEdges: true },
-        { id: 'socialToggle', name: 'social', animations: ['waving', 'idle', 'growing'], walkEdges: true },
-        { id: 'titleContainer', name: 'title', animations: ['idle', 'waving', 'growing'], walkEdges: false }
+        { id: 'logo', name: 'logo', animations: ['playing', 'idle', 'waving', 'growing'], walkEdges: false, preferGrowing: true },
+        { id: 'galleryBtn', name: 'gallery', animations: ['waving', 'idle', 'playing'], walkEdges: true, preferGrowing: false },
+        { id: 'streamBtn', name: 'stream', animations: ['waving', 'idle', 'playing'], walkEdges: true, preferGrowing: false },
+        { id: 'orderBtn', name: 'order', animations: ['waving', 'idle', 'playing'], walkEdges: true, preferGrowing: false },
+        { id: 'socialToggle', name: 'social', animations: ['waving', 'idle'], walkEdges: true, preferGrowing: false },
+        { id: 'titleContainer', name: 'title', animations: ['idle', 'waving', 'growing'], walkEdges: false, preferGrowing: true }
     ];
 
     // Create pet HTML structure (8x4 body, 3px pixels)
@@ -114,8 +114,14 @@
             return;
         }
 
+        // Special handling for jumping animation
+        if (animation === 'jumping') {
+            performJumpAnimation();
+            return;
+        }
+
         // Remove all animation classes
-        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking');
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking', 'jumping');
 
         // Remove state classes
         pet.classList.remove('active', 'sleeping');
@@ -132,6 +138,27 @@
         currentAnimation = animation;
 
         console.log('[Roaming Pet] Animation:', animation);
+    }
+
+    // Perform jump animation (single jump)
+    function performJumpAnimation() {
+        const pet = document.getElementById('roaming-pet');
+        if (!pet) return;
+
+        console.log('[Roaming Pet] Jumping!');
+
+        // Remove other animations
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'growing', 'shrinking');
+
+        // Add jumping
+        pet.classList.add('jumping');
+        currentAnimation = 'jumping';
+
+        // After jump completes (500ms), return to idle
+        setTimeout(() => {
+            pet.classList.remove('jumping');
+            setAnimation('idle');
+        }, 500);
     }
 
     // Perform growing animation sequence
@@ -238,8 +265,110 @@
         return target;
     }
 
-    // Walk along edge of element
-    function walkAlongEdge(target) {
+    // Walk along all 4 edges of element sequentially
+    function walkAllEdges(target) {
+        const container = document.getElementById('roaming-pet-container');
+        const targetElement = document.getElementById(target.id);
+
+        if (!container || !targetElement || !target.walkEdges) {
+            console.log('[Roaming Pet] Cannot walk edges');
+            return;
+        }
+
+        console.log('[Roaming Pet] Walking all edges of', target.name);
+
+        isMoving = true;
+        setAnimation('walking');
+
+        const targetRect = targetElement.getBoundingClientRect();
+        const margin = 10;
+
+        // Define all 4 edges in sequence: top -> right -> bottom -> left
+        const edgePath = [
+            { name: 'top', startX: targetRect.left + margin, startY: targetRect.top - margin, endX: targetRect.right - margin, endY: targetRect.top - margin },
+            { name: 'right', startX: targetRect.right + margin, startY: targetRect.top + margin, endX: targetRect.right + margin, endY: targetRect.bottom - margin },
+            { name: 'bottom', startX: targetRect.right - margin, startY: targetRect.bottom + margin, endX: targetRect.left + margin, endY: targetRect.bottom + margin },
+            { name: 'left', startX: targetRect.left - margin, startY: targetRect.bottom - margin, endX: targetRect.left - margin, endY: targetRect.top + margin }
+        ];
+
+        let currentEdgeIndex = 0;
+
+        function walkNextEdge() {
+            if (currentEdgeIndex >= edgePath.length) {
+                // Finished all edges
+                isMoving = false;
+
+                // Do random animation
+                const randomAnim = getRandomAnimation(target);
+                setAnimation(randomAnim);
+
+                // Hold for 2-5 seconds
+                const holdTime = 2000 + Math.random() * 3000;
+                setTimeout(() => {
+                    setAnimation('idle');
+                    scheduleNextMove();
+                }, holdTime);
+
+                return;
+            }
+
+            const edge = edgePath[currentEdgeIndex];
+            console.log('[Roaming Pet] Walking', edge.name, 'edge');
+
+            const startX = edge.startX;
+            const startY = edge.startY;
+            const endX = edge.endX;
+            const endY = edge.endY;
+
+            // Move to start of edge
+            container.style.left = startX + 'px';
+            container.style.top = startY + 'px';
+
+            // Walk along edge
+            setTimeout(() => {
+                const deltaX = endX - startX;
+                const deltaY = endY - startY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                const stepSize = 12;
+                const numSteps = Math.ceil(distance / stepSize);
+                const stepX = deltaX / numSteps;
+                const stepY = deltaY / numSteps;
+
+                let currentStep = 0;
+
+                if (moveInterval) {
+                    clearInterval(moveInterval);
+                }
+
+                moveInterval = setInterval(() => {
+                    if (currentStep >= numSteps) {
+                        clearInterval(moveInterval);
+                        moveInterval = null;
+
+                        // Move to next edge
+                        currentEdgeIndex++;
+                        setTimeout(walkNextEdge, 100);
+                        return;
+                    }
+
+                    const newX = startX + stepX * (currentStep + 1);
+                    const newY = startY + stepY * (currentStep + 1);
+
+                    container.style.left = newX + 'px';
+                    container.style.top = newY + 'px';
+
+                    currentStep++;
+                }, 125); // 8 fps
+            }, 100);
+        }
+
+        // Start walking first edge
+        walkNextEdge();
+    }
+
+    // Walk along single random edge of element
+    function walkSingleEdge(target) {
         const container = document.getElementById('roaming-pet-container');
         const targetElement = document.getElementById(target.id);
 
@@ -337,7 +466,77 @@
         }, 100);
     }
 
-    // Move to target with discrete steps
+    // Jump to target with discrete arc jumps
+    function jumpToTarget(target) {
+        const container = document.getElementById('roaming-pet-container');
+        const targetElement = document.getElementById(target.id);
+
+        if (!container || !targetElement) {
+            console.log('[Roaming Pet] Cannot jump - missing elements');
+            return;
+        }
+
+        isMoving = true;
+
+        // Get current and target positions
+        const containerRect = container.getBoundingClientRect();
+        const targetRect = targetElement.getBoundingClientRect();
+
+        const currentX = containerRect.left;
+        const currentY = containerRect.top;
+
+        // Target position: near the element but with random offset
+        const offsetX = (Math.random() - 0.5) * 100;
+        const offsetY = (Math.random() - 0.5) * 100;
+        const targetX = targetRect.left + targetRect.width / 2 + offsetX - 20;
+        const targetY = targetRect.top + targetRect.height / 2 + offsetY - 20;
+
+        console.log('[Roaming Pet] Jumping from', currentX, currentY, 'to', targetX, targetY);
+
+        // Calculate distance and number of jumps (60-80px per jump)
+        const deltaX = targetX - currentX;
+        const deltaY = targetY - currentY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        const jumpDistance = 60 + Math.random() * 20;
+        const numJumps = Math.ceil(distance / jumpDistance);
+        const jumpX = deltaX / numJumps;
+        const jumpY = deltaY / numJumps;
+
+        let currentJump = 0;
+
+        function performNextJump() {
+            if (currentJump >= numJumps) {
+                // Reached target
+                isMoving = false;
+                console.log('[Roaming Pet] Reached target:', target.name);
+
+                // Decide what to do at target
+                decideTargetAction(target);
+                return;
+            }
+
+            // Trigger jump animation
+            setAnimation('jumping');
+
+            // Move to next position during jump (discrete)
+            const newX = currentX + jumpX * (currentJump + 1);
+            const newY = currentY + jumpY * (currentJump + 1);
+
+            container.style.left = newX + 'px';
+            container.style.top = newY + 'px';
+
+            currentJump++;
+
+            // Wait for jump to complete (500ms) then do next jump
+            setTimeout(performNextJump, 600);
+        }
+
+        // Start first jump
+        performNextJump();
+    }
+
+    // Move to target with discrete walking steps
     function moveToTarget(target) {
         const container = document.getElementById('roaming-pet-container');
         const targetElement = document.getElementById(target.id);
@@ -364,7 +563,7 @@
         const targetX = targetRect.left + targetRect.width / 2 + offsetX - 20;
         const targetY = targetRect.top + targetRect.height / 2 + offsetY - 20;
 
-        console.log('[Roaming Pet] Moving from', currentX, currentY, 'to', targetX, targetY);
+        console.log('[Roaming Pet] Walking from', currentX, currentY, 'to', targetX, targetY);
 
         // Calculate distance and steps
         const deltaX = targetX - currentX;
@@ -394,26 +593,8 @@
 
                 console.log('[Roaming Pet] Reached target:', target.name);
 
-                // 50% chance to walk along edge if target supports it
-                if (target.walkEdges && Math.random() < 0.5) {
-                    console.log('[Roaming Pet] Will walk along edge');
-                    setTimeout(() => {
-                        walkAlongEdge(target);
-                    }, 500);
-                    return;
-                }
-
-                // Otherwise do random animation
-                const randomAnim = getRandomAnimation(target);
-                setAnimation(randomAnim);
-
-                // Hold animation for 2-5 seconds
-                const holdTime = 2000 + Math.random() * 3000;
-                setTimeout(() => {
-                    setAnimation('idle');
-                    scheduleNextMove();
-                }, holdTime);
-
+                // Decide what to do at target
+                decideTargetAction(target);
                 return;
             }
 
@@ -426,6 +607,49 @@
 
             currentStep++;
         }, 125); // 8 fps
+    }
+
+    // Decide what action to perform at target
+    function decideTargetAction(target) {
+        // Priority for growing on logo/title
+        if (target.preferGrowing && Math.random() < 0.7) {
+            // 70% chance to grow on logo/title
+            console.log('[Roaming Pet] Growing at', target.name);
+            setAnimation('growing');
+            // Growing animation handles its own completion
+            return;
+        }
+
+        // Edge walking on buttons
+        if (target.walkEdges) {
+            const rand = Math.random();
+            if (rand < 0.4) {
+                // 40% chance to walk all 4 edges
+                console.log('[Roaming Pet] Walking all edges');
+                setTimeout(() => {
+                    walkAllEdges(target);
+                }, 500);
+                return;
+            } else if (rand < 0.7) {
+                // 30% chance to walk single edge
+                console.log('[Roaming Pet] Walking single edge');
+                setTimeout(() => {
+                    walkSingleEdge(target);
+                }, 500);
+                return;
+            }
+        }
+
+        // Otherwise do random animation
+        const randomAnim = getRandomAnimation(target);
+        setAnimation(randomAnim);
+
+        // Hold animation for 2-5 seconds
+        const holdTime = 2000 + Math.random() * 3000;
+        setTimeout(() => {
+            setAnimation('idle');
+            scheduleNextMove();
+        }, holdTime);
     }
 
     // Schedule next movement
@@ -443,7 +667,13 @@
             const target = getRandomTarget();
             if (target) {
                 currentTarget = target;
-                moveToTarget(target);
+
+                // 50% chance to jump, 50% to walk
+                if (Math.random() < 0.5) {
+                    jumpToTarget(target);
+                } else {
+                    moveToTarget(target);
+                }
             } else {
                 // No targets, try again later
                 scheduleNextMove();
@@ -517,7 +747,13 @@
                     const target = getRandomTarget();
                     if (target) {
                         currentTarget = target;
-                        moveToTarget(target);
+
+                        // 50% chance to jump, 50% to walk
+                        if (Math.random() < 0.5) {
+                            jumpToTarget(target);
+                        } else {
+                            moveToTarget(target);
+                        }
                     }
                 }
             }, initialDelay);
