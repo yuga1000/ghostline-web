@@ -1568,6 +1568,28 @@ function goToSleep() {
     petIsAwake = false;
     petAnimationState = 'sleeping';
 
+    // Force green color with inline styles as backup
+    const bodyPixels = pet.querySelectorAll('.pixel.body');
+    const armPixels = pet.querySelectorAll('.pixel.arm');
+    const legPixels = pet.querySelectorAll('.pixel.leg');
+    const eyePixels = pet.querySelectorAll('.pixel.eye');
+
+    bodyPixels.forEach(p => {
+        p.style.background = '#00ff00';
+        p.style.boxShadow = '0 0 2px #00ff00';
+    });
+    armPixels.forEach(p => {
+        p.style.background = '#00ff00';
+        p.style.boxShadow = '0 0 2px #00ff00';
+    });
+    legPixels.forEach(p => {
+        p.style.background = '#00ff00';
+        p.style.boxShadow = '0 0 2px #00ff00';
+    });
+    eyePixels.forEach(p => {
+        p.style.height = '1px';
+    });
+
     // Show sleep mask
     if (sleepMask) {
         sleepMask.classList.add('visible');
