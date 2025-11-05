@@ -18,6 +18,56 @@
     overflow: hidden;
 }
 
+/* Sleeping noise mask overlay */
+.pet-sleep-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('plate_noisemask.GIF') center center;
+    background-size: cover;
+    opacity: 0;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 1s ease;
+}
+
+.pet-sleep-mask.visible {
+    opacity: 0.3;
+}
+
+/* Falling stars */
+.falling-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    box-shadow: 0 0 3px #ffffff;
+    opacity: 0;
+    z-index: 4;
+}
+
+@keyframes star-fall {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-40px, 30px);
+    }
+}
+
+.falling-star.active {
+    animation: star-fall 2s step-end 1 forwards;
+}
+
 .pet {
     display: flex;
     flex-direction: column;

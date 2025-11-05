@@ -645,6 +645,10 @@
                     <div class="video-feed h-40 terminal-border relative" id="pet-feed">
                         <div class="pet-container-inline">
                             <div class="pet-display-inline">
+                                <!-- Sleep mask (shows when sleeping) -->
+                                <div class="pet-sleep-mask" id="pet-sleep-mask"></div>
+                                <!-- Falling stars container -->
+                                <div id="falling-stars-container"></div>
                                 <!-- Toy pixel (shows when playing) -->
                                 <div class="pet-toy-pixel" id="pet-toy"></div>
                                 <div class="pet active sleeping stage-1" id="agent-pet">
@@ -1500,10 +1504,20 @@ function showGrowthMessage(stage) {
 
 function wakeUpPet() {
     const pet = document.getElementById('agent-pet');
+    const sleepMask = document.getElementById('pet-sleep-mask');
+
     pet.classList.remove('sleeping');
     pet.classList.add('idle');
     petIsAwake = true;
     petAnimationState = 'idle';
+
+    // Hide sleep mask
+    if (sleepMask) {
+        sleepMask.classList.remove('visible');
+    }
+
+    // Stop falling stars
+    stopFallingStars();
 
     // Random chance for different wake-up colors
     const rand = Math.random();
@@ -1533,20 +1547,79 @@ function wakeUpPet() {
 function goToSleep() {
     const pet = document.getElementById('agent-pet');
     const toy = document.getElementById('pet-toy');
+    const sleepMask = document.getElementById('pet-sleep-mask');
 
     // Clear any ongoing animation
     if (petAnimationTimer) {
         clearTimeout(petAnimationTimer);
     }
 
-    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing');
+    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy');
     pet.classList.add('sleeping');
     toy.style.opacity = '0';
     petIsAwake = false;
     petAnimationState = 'sleeping';
 
+    // Show sleep mask
+    if (sleepMask) {
+        sleepMask.classList.add('visible');
+    }
+
+    // Start occasional falling stars
+    startFallingStars();
+
     const stateText = document.getElementById('pet-state-text');
     stateText.textContent = 'Sleeping... ZZZ';
+}
+
+let fallingStarsInterval = null;
+
+function startFallingStars() {
+    // Clear existing interval
+    if (fallingStarsInterval) {
+        clearInterval(fallingStarsInterval);
+    }
+
+    // Create a falling star every 3-7 seconds while sleeping
+    fallingStarsInterval = setInterval(() => {
+        if (petIsAwake) {
+            stopFallingStars();
+            return;
+        }
+
+        createFallingStar();
+    }, 3000 + Math.random() * 4000);
+}
+
+function stopFallingStars() {
+    if (fallingStarsInterval) {
+        clearInterval(fallingStarsInterval);
+        fallingStarsInterval = null;
+    }
+}
+
+function createFallingStar() {
+    const container = document.getElementById('falling-stars-container');
+    if (!container) return;
+
+    const star = document.createElement('div');
+    star.className = 'falling-star';
+
+    // Random position in top area (horizon)
+    star.style.left = (20 + Math.random() * 60) + '%';
+    star.style.top = (10 + Math.random() * 30) + '%';
+
+    container.appendChild(star);
+
+    // Trigger animation
+    setTimeout(() => {
+        star.classList.add('active');
+    }, 10);
+
+    // Remove after animation
+    setTimeout(() => {
+        star.remove();
+    }, 2100);
 }
 
 function triggerPetAnimation(animation, duration) {
