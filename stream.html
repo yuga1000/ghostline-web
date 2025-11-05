@@ -651,10 +651,12 @@
                                 <div id="falling-stars-container"></div>
                                 <!-- Toy pixel (shows when playing) -->
                                 <div class="pet-toy-pixel" id="pet-toy"></div>
-                                <!-- Sleep Z's (shows when sleeping) -->
-                                <div class="pet-sleep-z" id="pet-sleep-z-1">Z</div>
-                                <div class="pet-sleep-z" id="pet-sleep-z-2">Z</div>
-                                <div class="pet-sleep-z" id="pet-sleep-z-3">Z</div>
+                                <!-- Sleep pixels (shows when sleeping) -->
+                                <div class="pet-sleep-pixels" id="pet-sleep-pixels">
+                                    <div class="sleep-pixel"></div>
+                                    <div class="sleep-pixel"></div>
+                                    <div class="sleep-pixel"></div>
+                                </div>
                                 <!-- Image preview window -->
                                 <div class="pet-image-window" id="pet-image-window">
                                     <div class="pet-image-label">NEW IMAGE!</div>
@@ -665,6 +667,8 @@
                                     <div class="pet-body-container">
                                         <!-- Arms row (with body top) -->
                                         <div class="pet-arms">
+                                            <!-- Extra left arm (shows on stage 4) -->
+                                            <div class="pixel arm arm-extra"></div>
                                             <!-- Left arm -->
                                             <div class="pixel arm"></div>
 
@@ -672,8 +676,8 @@
                                             <div class="pet-body">
                                                 <!-- Row 1 -->
                                                 <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
-                                                <!-- Row 2 -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                                <!-- Row 2 (extra eyes row for stage 4) -->
+                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye eye-extra"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye eye-extra"></div><div class="pixel body"></div><div class="pixel body"></div>
                                                 <!-- Row 3 (eyes row) -->
                                                 <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
                                                 <!-- Row 4 -->
@@ -686,6 +690,8 @@
 
                                             <!-- Right arm -->
                                             <div class="pixel arm"></div>
+                                            <!-- Extra right arm (shows on stage 4) -->
+                                            <div class="pixel arm arm-extra"></div>
                                         </div>
                                     </div>
 

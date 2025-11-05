@@ -224,6 +224,39 @@
     height: 20px; /* 5 pixels */
 }
 
+/* Extra arms and eyes - hidden by default */
+.pixel.arm-extra,
+.pixel.eye-extra {
+    opacity: 0;
+    width: 0;
+}
+
+/* Show extra features on stage 4 */
+.pet.stage-4 .pixel.arm-extra {
+    opacity: 1;
+    width: 4px;
+    animation: extra-arm-appear 0.5s step-end forwards;
+}
+
+.pet.stage-4 .pixel.eye-extra {
+    opacity: 1;
+    animation: extra-eye-appear 0.5s step-end forwards;
+}
+
+@keyframes extra-arm-appear {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes extra-eye-appear {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
 /* ===== IDLE BREATHING ANIMATION ===== */
 .pet.idle .pet-body-container {
     animation: pet-bounce 2.25s step-end infinite;
@@ -403,40 +436,45 @@
     opacity: 0 !important;
 }
 
-/* Sleep Z's floating above pet */
-.pet-sleep-z {
+/* Sleep pixels floating above pet */
+.pet-sleep-pixels {
     position: absolute;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 16px;
-    color: #00ff00;
-    text-shadow: 0 0 4px rgba(0, 255, 0, 0.8);
+    display: flex;
+    gap: 8px;
     opacity: 0;
     pointer-events: none;
     bottom: 60%;
     left: 50%;
+    transform: translateX(-50%);
 }
 
-#pet-sleep-z-1 {
-    font-size: 12px;
-    margin-left: 10px;
+.sleep-pixel {
+    width: 4px;
+    height: 4px;
+    background: #00ff00;
+    box-shadow: 0 0 3px #00ff00;
 }
 
-#pet-sleep-z-2 {
-    font-size: 16px;
-    margin-left: 20px;
+/* Show pixels when sleeping */
+#agent-pet.sleeping ~ .pet-sleep-pixels {
+    opacity: 1;
 }
 
-#pet-sleep-z-3 {
-    font-size: 20px;
-    margin-left: 30px;
+.sleep-pixel:nth-child(1) {
+    animation: sleep-pixel-float 3s step-end infinite;
 }
 
-/* Show Z's when sleeping */
-#agent-pet.sleeping ~ .pet-sleep-z {
-    animation: sleep-z-float 4s step-end infinite;
+.sleep-pixel:nth-child(2) {
+    animation: sleep-pixel-float 3s step-end infinite;
+    animation-delay: 1s;
 }
 
-@keyframes sleep-z-float {
+.sleep-pixel:nth-child(3) {
+    animation: sleep-pixel-float 3s step-end infinite;
+    animation-delay: 2s;
+}
+
+@keyframes sleep-pixel-float {
     0% { opacity: 0; transform: translateY(0px); }
     24% { opacity: 0; transform: translateY(0px); }
     25% { opacity: 1; transform: translateY(0px); }
@@ -446,15 +484,6 @@
     75% { opacity: 1; transform: translateY(-16px); }
     99% { opacity: 1; transform: translateY(-16px); }
     100% { opacity: 0; transform: translateY(-16px); }
-}
-
-/* Stagger the Z's */
-#pet-sleep-z-2 {
-    animation-delay: 1.3s;
-}
-
-#pet-sleep-z-3 {
-    animation-delay: 2.6s;
 }
 
 /* ===== PLAYING ANIMATION (on back with pixel toy) ===== */
