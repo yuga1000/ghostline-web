@@ -674,10 +674,10 @@
 
                                             <!-- Body (12x6 grid) -->
                                             <div class="pet-body">
-                                                <!-- Row 1 -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                                <!-- Row 1 (breathing layer - outer pixels appear/disappear) -->
+                                                <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
                                                 <!-- Row 2 (extra eyes row for stage 4) -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye eye-extra"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye eye-extra"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                                <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
                                                 <!-- Row 3 (eyes row) -->
                                                 <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
                                                 <!-- Row 4 -->
@@ -1563,8 +1563,11 @@ function wakeUpPet() {
         sleepMask.classList.remove('visible');
     }
 
-    // Stop falling stars
+    // Stop falling stars (sleep mode)
     stopFallingStars();
+
+    // Start occasional active stars (awake mode)
+    startActiveStars();
 
     // Random chance for different wake-up colors
     const rand = Math.random();
@@ -1642,7 +1645,8 @@ function goToSleep() {
         sleepMask.classList.add('visible');
     }
 
-    // Start occasional falling stars
+    // Stop active stars and start sleep falling stars
+    stopActiveStars();
     startFallingStars();
 
     const stateText = document.getElementById('pet-state-text');
@@ -1672,6 +1676,36 @@ function stopFallingStars() {
     if (fallingStarsInterval) {
         clearInterval(fallingStarsInterval);
         fallingStarsInterval = null;
+    }
+}
+
+// Active stars - occasional stars when awake
+let activeStarsInterval = null;
+
+function startActiveStars() {
+    // Clear existing interval
+    if (activeStarsInterval) {
+        clearInterval(activeStarsInterval);
+    }
+
+    // Create an occasional star every 10-20 seconds while awake
+    activeStarsInterval = setInterval(() => {
+        if (!petIsAwake) {
+            stopActiveStars();
+            return;
+        }
+
+        // 30% chance to create a star
+        if (Math.random() < 0.3) {
+            createFallingStar();
+        }
+    }, 10000 + Math.random() * 10000);
+}
+
+function stopActiveStars() {
+    if (activeStarsInterval) {
+        clearInterval(activeStarsInterval);
+        activeStarsInterval = null;
     }
 }
 
