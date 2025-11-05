@@ -719,21 +719,21 @@
     100% { opacity: 1; }
 }
 
-/* SPINNING - Кружится на месте */
+/* SPINNING - Кружится на месте (через rotateY вместо scaleX) */
 .pet.spinning {
     animation: pet-spin 2s step-end infinite;
 }
 
 @keyframes pet-spin {
-    0% { transform: scaleX(1); }
-    12% { transform: scaleX(0.8); }
-    25% { transform: scaleX(0.6); }
-    37% { transform: scaleX(0.4); }
-    50% { transform: scaleX(-0.4); }
-    62% { transform: scaleX(-0.6); }
-    75% { transform: scaleX(-0.8); }
-    87% { transform: scaleX(-1); }
-    100% { transform: scaleX(1); }
+    0% { transform: rotateY(0deg); }
+    12% { transform: rotateY(45deg); }
+    25% { transform: rotateY(90deg); }
+    37% { transform: rotateY(135deg); }
+    50% { transform: rotateY(180deg); }
+    62% { transform: rotateY(225deg); }
+    75% { transform: rotateY(270deg); }
+    87% { transform: rotateY(315deg); }
+    100% { transform: rotateY(360deg); }
 }
 
 /* TRANSFORM - Превращение (пульсация размера) */
