@@ -1054,131 +1054,163 @@
     100% { transform: translateX(0px); }
 }
 
-/* FLOWER - Цветок (ноги растут, тело поднимается) */
+/* FLOWER - Цветок (превращение из существа в растение, 6 фаз) */
 .pet.flower {
-    /* Pet stays centered */
+    /* Постепенная трансформация */
 }
 
-/* Тело поднимается вверх по мере роста */
+/* Фаза 1-2: Тело начинает подниматься */
 .pet.flower .pet-body-container {
-    animation: flower-body-rise 6s step-end infinite;
+    animation: flower-body-transform 12s step-end infinite;
 }
 
-@keyframes flower-body-rise {
-    /* Тело медленно поднимается вверх (6 шагов по 4px каждый) */
+@keyframes flower-body-transform {
+    /* Фаза 1: Базовая форма */
     0% { transform: translateY(0px); }
-    16% { transform: translateY(-4px); }
+    16% { transform: translateY(0px); }
+
+    /* Фаза 2: Чуть выше */
+    17% { transform: translateY(-4px); }
+    32% { transform: translateY(-4px); }
+
+    /* Фаза 3: Еще выше */
     33% { transform: translateY(-8px); }
+    48% { transform: translateY(-8px); }
+
+    /* Фаза 4: Продолжает подниматься */
     49% { transform: translateY(-12px); }
-    66% { transform: translateY(-16px); }
-    83% { transform: translateY(-20px); }
-    100% { transform: translateY(-24px); }
+    64% { transform: translateY(-12px); }
+
+    /* Фаза 5: Высоко */
+    65% { transform: translateY(-16px); }
+    80% { transform: translateY(-16px); }
+
+    /* Фаза 6: Максимальная высота */
+    81% { transform: translateY(-20px); }
+    100% { transform: translateY(-20px); }
 }
 
-/* Ноги растут по пикселю (увеличивается высота через height) */
-.pet.flower .pet-legs {
-    /* Container для ног */
-}
-
-/* Каждая нога растет индивидуально */
+/* Ноги растут и раздвигаются */
 .pet.flower .pixel.leg {
-    animation: leg-grow 6s step-end infinite;
+    animation: flower-leg-grow 12s step-end infinite;
 }
 
-@keyframes leg-grow {
-    /* Ноги растут от 4px до 28px (по 4px каждый шаг) */
-    0% { height: 4px; }
-    16% { height: 8px; }
+@keyframes flower-leg-grow {
+    /* Фаза 1-2: Короткие ноги */
+    0% { height: 8px; }
+    32% { height: 8px; }
+
+    /* Фаза 3: Ноги удлиняются (2 ряда пикселей) */
     33% { height: 12px; }
+    48% { height: 12px; }
+
+    /* Фаза 4: Еще длиннее (3-4 ряда) */
     49% { height: 16px; }
-    66% { height: 20px; }
-    83% { height: 24px; }
-    100% { height: 28px; }
+    64% { height: 16px; }
+
+    /* Фаза 5: Длинные с корнями */
+    65% { height: 20px; }
+    80% { height: 20px; }
+
+    /* Фаза 6: Максимальная длина */
+    81% { height: 24px; }
+    100% { height: 24px; }
 }
 
-/* Ноги раздвигаются в стороны (левые и правые) */
-.pet.flower .pet-legs .pixel.leg:nth-child(1) {
-    animation: leg-grow 6s step-end infinite, leg-spread-left-1 6s step-end infinite;
+/* Крайние ноги раздвигаются больше всего */
+.pet.flower .pet-legs .pixel.leg:nth-child(1),
+.pet.flower .pet-legs .pixel.leg:nth-child(8) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-outer 12s step-end infinite;
 }
 
-.pet.flower .pet-legs .pixel.leg:nth-child(2) {
-    animation: leg-grow 6s step-end infinite, leg-spread-left-2 6s step-end infinite;
-}
-
-.pet.flower .pet-legs .pixel.leg:nth-child(3) {
-    animation: leg-grow 6s step-end infinite, leg-spread-left-3 6s step-end infinite;
-}
-
-.pet.flower .pet-legs .pixel.leg:nth-child(4) {
-    animation: leg-grow 6s step-end infinite, leg-spread-left-4 6s step-end infinite;
-}
-
-.pet.flower .pet-legs .pixel.leg:nth-child(5) {
-    animation: leg-grow 6s step-end infinite, leg-spread-right-4 6s step-end infinite;
-}
-
-.pet.flower .pet-legs .pixel.leg:nth-child(6) {
-    animation: leg-grow 6s step-end infinite, leg-spread-right-3 6s step-end infinite;
-}
-
-.pet.flower .pet-legs .pixel.leg:nth-child(7) {
-    animation: leg-grow 6s step-end infinite, leg-spread-right-2 6s step-end infinite;
+@keyframes flower-spread-outer {
+    0% { transform: translateX(0px); }
+    32% { transform: translateX(0px); }
+    33% { transform: translateX(-2px); }
+    48% { transform: translateX(-2px); }
+    49% { transform: translateX(-4px); }
+    64% { transform: translateX(-4px); }
+    65% { transform: translateX(-6px); }
+    80% { transform: translateX(-6px); }
+    81% { transform: translateX(-8px); }
+    100% { transform: translateX(-8px); }
 }
 
 .pet.flower .pet-legs .pixel.leg:nth-child(8) {
-    animation: leg-grow 6s step-end infinite, leg-spread-right-1 6s step-end infinite;
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-outer-right 12s step-end infinite;
 }
 
-/* Левые ноги раздвигаются влево */
-@keyframes leg-spread-left-1 {
+@keyframes flower-spread-outer-right {
     0% { transform: translateX(0px); }
-    33% { transform: translateX(-2px); }
-    66% { transform: translateX(-4px); }
-    100% { transform: translateX(-6px); }
+    32% { transform: translateX(0px); }
+    33% { transform: translateX(2px); }
+    48% { transform: translateX(2px); }
+    49% { transform: translateX(4px); }
+    64% { transform: translateX(4px); }
+    65% { transform: translateX(6px); }
+    80% { transform: translateX(6px); }
+    81% { transform: translateX(8px); }
+    100% { transform: translateX(8px); }
 }
 
-@keyframes leg-spread-left-2 {
+/* Средние ноги раздвигаются меньше */
+.pet.flower .pet-legs .pixel.leg:nth-child(2),
+.pet.flower .pet-legs .pixel.leg:nth-child(7) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-mid 12s step-end infinite;
+}
+
+@keyframes flower-spread-mid {
     0% { transform: translateX(0px); }
-    33% { transform: translateX(-1px); }
-    66% { transform: translateX(-2px); }
+    48% { transform: translateX(0px); }
+    49% { transform: translateX(-2px); }
+    80% { transform: translateX(-2px); }
+    81% { transform: translateX(-4px); }
     100% { transform: translateX(-4px); }
 }
 
-@keyframes leg-spread-left-3 {
-    0% { transform: translateX(0px); }
-    66% { transform: translateX(-1px); }
-    100% { transform: translateX(-2px); }
+.pet.flower .pet-legs .pixel.leg:nth-child(7) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-mid-right 12s step-end infinite;
 }
 
-@keyframes leg-spread-left-4 {
+@keyframes flower-spread-mid-right {
     0% { transform: translateX(0px); }
-    100% { transform: translateX(0px); }
-}
-
-/* Правые ноги раздвигаются вправо */
-@keyframes leg-spread-right-1 {
-    0% { transform: translateX(0px); }
-    33% { transform: translateX(2px); }
-    66% { transform: translateX(4px); }
-    100% { transform: translateX(6px); }
-}
-
-@keyframes leg-spread-right-2 {
-    0% { transform: translateX(0px); }
-    33% { transform: translateX(1px); }
-    66% { transform: translateX(2px); }
+    48% { transform: translateX(0px); }
+    49% { transform: translateX(2px); }
+    80% { transform: translateX(2px); }
+    81% { transform: translateX(4px); }
     100% { transform: translateX(4px); }
 }
 
-@keyframes leg-spread-right-3 {
-    0% { transform: translateX(0px); }
-    66% { transform: translateX(1px); }
-    100% { transform: translateX(2px); }
+/* Руки расширяются как ветки на фазе 4-6 */
+.pet.flower .pixel.arm {
+    animation: flower-arms-branches 12s step-end infinite;
 }
 
-@keyframes leg-spread-right-4 {
-    0% { transform: translateX(0px); }
-    100% { transform: translateX(0px); }
+@keyframes flower-arms-branches {
+    0% { width: 4px; opacity: 1; }
+    48% { width: 4px; opacity: 1; }
+
+    /* Фаза 4: Руки становятся ветками */
+    49% { width: 6px; opacity: 1; }
+    64% { width: 6px; opacity: 1; }
+
+    /* Фаза 5-6: Широкие ветки */
+    65% { width: 8px; opacity: 1; }
+    100% { width: 8px; opacity: 1; }
+}
+
+/* Глаза превращаются в 4 черных прямоугольника на фазе 5 */
+.pet.flower .pixel.eye {
+    animation: flower-eyes-transform 12s step-end infinite;
+}
+
+@keyframes flower-eyes-transform {
+    0% { width: 4px; height: 4px; }
+    64% { width: 4px; height: 4px; }
+
+    /* Фаза 5: Глаза становятся прямоугольниками (4 штуки) */
+    65% { width: 3px; height: 6px; }
+    100% { width: 3px; height: 6px; }
 }
 
 /* Цвет цветка - розовый/фиолетовый */
