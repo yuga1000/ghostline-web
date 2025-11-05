@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flower Animation Demo</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="agent-pet.css?v=15">
+    <link rel="stylesheet" href="agent-pet.css?v=16">
     <style>
         body {
             background: #000000;
@@ -92,10 +92,10 @@
             <ul>
                 <li><strong>ВАЖНО:</strong> Никакого scale! Только HEIGHT меняется у ног (8px → 24px)</li>
                 <li><strong>Фазы 1-2:</strong> Тело поднимается вверх (translateY: 0 → -4px)</li>
-                <li><strong>Фаза 3:</strong> Ноги удлиняются до 12px, начинают раздвигаться</li>
-                <li><strong>Фаза 4:</strong> Ноги 16px, руки превращаются в ветки (width: 4px → 6px)</li>
-                <li><strong>Фаза 5:</strong> Ноги 20px, широкие ветки (8px)</li>
-                <li><strong>Фаза 6:</strong> Полное цветение! Ноги 24px, глаза прямоугольные</li>
+                <li><strong>Фаза 3:</strong> Появляется ПЕРВЫЙ РЯД короны цветка! (Row -1) + ноги 12px</li>
+                <li><strong>Фаза 4:</strong> Появляется ВТОРОЙ РЯД короны! (Row -2) + ноги 16px + ветки</li>
+                <li><strong>Фаза 5:</strong> Появляется ТРЕТИЙ РЯД короны! (Row -3) + ноги 20px</li>
+                <li><strong>Фаза 6:</strong> Полное цветение! Огромная корона + ноги 24px + глаза прямоугольные</li>
             </ul>
             <p style="color: #ff00ff; margin-top: 15px;">
                 ⬇️ Смотри анимацию ниже - 12-секундный цикл роста!
@@ -110,6 +110,13 @@
                         <div class="pet-arms">
                             <div class="pixel arm"></div>
                             <div class="pet-body">
+                                <!-- FLOWER CROWN - Row -3 (phase 5-6) -->
+                                <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div>
+                                <!-- FLOWER CROWN - Row -2 (phase 4-6) -->
+                                <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div>
+                                <!-- FLOWER CROWN - Row -1 (phase 3-6) -->
+                                <div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div>
+                                <!-- Original body rows -->
                                 <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
                                 <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
                                 <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
@@ -135,11 +142,13 @@
             <div class="description">
                 ⬆️ Смотри как:<br>
                 • Тело поднимается вверх (translateY)<br>
+                • КОРОНА ЦВЕТКА растет! (3 ряда пикселей появляются сверху по очереди)<br>
                 • Ноги растут по HEIGHT (8px → 12px → 16px → 20px → 24px)<br>
                 • Ноги раздвигаются в стороны (translateX)<br>
                 • Руки превращаются в ветки (width растет)<br>
                 <br>
-                <strong style="color: #ff00ff;">12-секундный цикл, полностью БЕЗ SCALE!</strong>
+                <strong style="color: #ff00ff;">12-секундный цикл, полностью БЕЗ SCALE!<br>
+                Новые пиксели добавляются как в твоих референсах!</strong>
             </div>
         </div>
     </div>
