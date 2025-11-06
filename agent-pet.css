@@ -1393,16 +1393,15 @@
 
 /* Roof appears above pet when sleeping */
 .pet-roof {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    margin-bottom: 6px;
     display: none;
     z-index: 10;
+    justify-content: center;
 }
 
 .pet.sleeping .pet-roof {
-    display: block;
+    display: flex;
 }
 
 /* Roof structure - simple horizontal bar */
