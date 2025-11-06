@@ -1312,3 +1312,79 @@
     background: #00ff00 !important;
     box-shadow: 0 0 3px #00ff00 !important;
 }
+
+/* ===== WIND SWAY ANIMATION FOR BLOOM (8 variants) ===== */
+/* Sway pattern: center -> right -> strong right -> center -> left -> strong left -> center -> subtle */
+
+.pet.sway-0 {
+    /* Center - neutral */
+    transform: translateX(0px);
+}
+
+.pet.sway-1 {
+    /* Slight right */
+    transform: translateX(2px);
+}
+
+.pet.sway-1 .pixel.flower-crown {
+    transform: translateX(1px);
+}
+
+.pet.sway-2 {
+    /* Strong right with droop */
+    transform: translateX(4px) translateY(1px);
+}
+
+.pet.sway-2 .pixel.flower-crown {
+    transform: translateX(3px) translateY(-1px);
+}
+
+.pet.sway-3 {
+    /* Return slight right */
+    transform: translateX(2px);
+}
+
+.pet.sway-3 .pixel.flower-crown {
+    transform: translateX(1px);
+}
+
+.pet.sway-4 {
+    /* Center - neutral */
+    transform: translateX(0px);
+}
+
+.pet.sway-5 {
+    /* Slight left */
+    transform: translateX(-2px);
+}
+
+.pet.sway-5 .pixel.flower-crown {
+    transform: translateX(-1px);
+}
+
+.pet.sway-6 {
+    /* Strong left with droop */
+    transform: translateX(-4px) translateY(1px);
+}
+
+.pet.sway-6 .pixel.flower-crown {
+    transform: translateX(-3px) translateY(-1px);
+}
+
+.pet.sway-7 {
+    /* Return slight left */
+    transform: translateX(-2px);
+}
+
+.pet.sway-7 .pixel.flower-crown {
+    transform: translateX(-1px);
+}
+
+/* Smooth transitions between sway states */
+.pet {
+    transition: transform 0.5s ease-in-out;
+}
+
+.pixel.flower-crown {
+    transition: transform 0.5s ease-in-out;
+}

@@ -1684,6 +1684,47 @@ function wakeUpPet() {
     const stateText = document.getElementById('pet-state-text');
     stateText.textContent = 'Watching logs...';
 
+    // === AUTONOMOUS WAKE-UP BEHAVIOR ===
+    // Randomly perform an action after waking up (especially visible on mobile)
+    setTimeout(() => {
+        const wakeUpBehaviors = [
+            () => {
+                // Excited jump
+                console.log('[Pet] Energetic wake-up - jumping!');
+                setPetAnimation('jumping', 2000);
+            },
+            () => {
+                // Happy dance
+                console.log('[Pet] Joyful wake-up - dancing!');
+                setPetAnimation('dancing', 3000);
+            },
+            () => {
+                // Wave hello
+                console.log('[Pet] Friendly wake-up - waving!');
+                setPetAnimation('waving', 2500);
+            },
+            () => {
+                // Spin around
+                console.log('[Pet] Dizzy wake-up - spinning!');
+                setPetAnimation('spinning', 2000);
+            },
+            () => {
+                // Play with toy
+                console.log('[Pet] Playful wake-up - playing!');
+                setPetAnimation('playing', 3000);
+            },
+            () => {
+                // Calm stretch - just idle
+                console.log('[Pet] Calm wake-up - stretching...');
+                // Already in idle, do nothing extra
+            }
+        ];
+
+        // Pick random behavior
+        const behavior = wakeUpBehaviors[Math.floor(Math.random() * wakeUpBehaviors.length)];
+        behavior();
+    }, 500); // Small delay after wake-up
+
     // FIX: Start idle animation loop for active pet
     startIdleAnimationLoop();
 
@@ -2195,12 +2236,15 @@ function stopRestCountdown() {
     }
 }
 
-// Transform pet into flower (growing animation)
+// Transform pet into flower (growing animation with stages)
+let growthInterval = null;
+let swayInterval = null;
 function transformToFlower() {
     const pet = document.getElementById('agent-pet');
     const stateText = document.getElementById('pet-state-text');
+    const stageText = document.getElementById('pet-stage-text');
 
-    console.log('[Pet] Transforming to flower mode');
+    console.log('[Pet] Starting flower growth sequence');
 
     isInFlowerMode = true;
 
@@ -2209,20 +2253,73 @@ function transformToFlower() {
         wakeUpPet();
     }
 
-    // Trigger flower animation (5 minutes = 300 seconds во время cooldown!)
-    triggerPetAnimation('flower', 300000); // 5 minutes = 300,000ms
+    // Clear any existing intervals
+    if (growthInterval) clearInterval(growthInterval);
+    if (swayInterval) clearInterval(swayInterval);
 
-    // Apply stage 4 for bloom
-    pet.classList.remove('stage-1', 'stage-2', 'stage-3');
-    pet.classList.add('stage-4');
+    // Growth stages: 1 → 2 → 3 → 4 (bloom)
+    let currentGrowthStage = 1;
+    const growthDurations = [1000, 1000, 1200, 1500]; // ms for each stage
 
-    // Update stage text
+    function growToNextStage() {
+        if (currentGrowthStage > 4) {
+            // Reached full bloom - start sway animation
+            console.log('[Pet] Full bloom reached - starting sway');
+            startFlowerSway();
+            return;
+        }
+
+        // Apply current stage
+        pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4');
+        pet.classList.add('stage-' + currentGrowthStage);
+        stageText.textContent = currentGrowthStage + ' (GROWING)';
+        stateText.textContent = 'Growing... 🌱';
+
+        console.log('[Pet] Growth stage', currentGrowthStage);
+
+        // Schedule next stage
+        setTimeout(() => {
+            currentGrowthStage++;
+            growToNextStage();
+        }, growthDurations[currentGrowthStage - 1]);
+    }
+
+    // Start growth sequence
+    growToNextStage();
+}
+
+// Wind sway animation for bloom phase
+function startFlowerSway() {
+    const pet = document.getElementById('agent-pet');
     const stageText = document.getElementById('pet-stage-text');
+    const stateText = document.getElementById('pet-state-text');
+
     stageText.textContent = '4 (BLOOM)';
+    stateText.textContent = 'Swaying in the wind... 🌸💨';
 
-    stateText.textContent = 'Blooming... 🌸';
+    // Trigger base flower animation
+    triggerPetAnimation('flower', 300000); // 5 minutes
 
-    console.log('[Pet] Flower transformation complete');
+    // Sway pattern: create subtle movement by toggling classes
+    let swayStep = 0;
+    // 8 sway variants cycling every 500ms
+    swayInterval = setInterval(() => {
+        // Remove all sway classes
+        pet.classList.remove('sway-0', 'sway-1', 'sway-2', 'sway-3',
+                            'sway-4', 'sway-5', 'sway-6', 'sway-7');
+        // Add current sway
+        pet.classList.add('sway-' + swayStep);
+        swayStep = (swayStep + 1) % 8;
+    }, 500);
+
+    // Stop sway after 5 minutes
+    setTimeout(() => {
+        if (swayInterval) {
+            clearInterval(swayInterval);
+            swayInterval = null;
+        }
+        console.log('[Pet] Sway animation complete');
+    }, 300000); // 5 minutes
 }
 
 // Transform pet back from flower (shrinking animation)
