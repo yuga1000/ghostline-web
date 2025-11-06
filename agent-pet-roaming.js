@@ -20,6 +20,11 @@
         { id: 'titleContainer', name: 'title', animations: ['idle', 'waving', 'growing', 'waving'], walkEdges: false, preferGrowing: true }
     ];
 
+    // Spider mode state
+    let spiderModeActive = false;
+    let lastSpiderModeTime = 0;
+    const SPIDER_MODE_COOLDOWN = 10 * 60 * 1000; // 10 minutes between spider sessions
+
     // Create pet HTML structure (8x4 body, 3px pixels)
     function createPetHTML() {
         const container = document.createElement('div');
@@ -105,6 +110,9 @@
 
     // Set animation
     function setAnimation(animation) {
+        // Block all animations during spider mode
+        if (spiderModeActive) return;
+
         const pet = document.getElementById('roaming-pet');
         if (!pet) return;
 
@@ -645,6 +653,9 @@
 
     // Jump to target with discrete arc jumps
     function jumpToTarget(target) {
+        // Block movement during spider mode
+        if (spiderModeActive) return;
+
         const container = document.getElementById('roaming-pet-container');
         const targetElement = document.getElementById(target.id);
 
@@ -715,6 +726,9 @@
 
     // Move to target with discrete walking steps
     function moveToTarget(target) {
+        // Block movement during spider mode
+        if (spiderModeActive) return;
+
         const container = document.getElementById('roaming-pet-container');
         const targetElement = document.getElementById(target.id);
 
@@ -831,7 +845,7 @@
 
     // Schedule next movement
     function scheduleNextMove() {
-        if (isMoving || isSleeping) return;
+        if (isMoving || isSleeping || spiderModeActive) return;
 
         // Random delay: 30-180 seconds
         const delay = 30000 + Math.random() * 150000;
@@ -902,8 +916,65 @@
         console.log('[Roaming Pet] Sleep cycle checker started');
     }
 
+    // Check if it's time for spider mode
+    function checkSpiderMode() {
+        if (isSleeping || spiderModeActive) return;
+
+        const now = Date.now();
+        const timeSinceLastSpider = now - lastSpiderModeTime;
+
+        // 20% chance to enter spider mode if cooldown passed
+        if (timeSinceLastSpider > SPIDER_MODE_COOLDOWN && Math.random() < 0.2) {
+            console.log('[Roaming Pet] Entering spider mode!');
+            enterSpiderMode();
+        }
+    }
+
+    function enterSpiderMode() {
+        if (!window.SpiderWebSystem) {
+            console.error('[Roaming Pet] Spider web system not loaded!');
+            return;
+        }
+
+        spiderModeActive = true;
+        lastSpiderModeTime = Date.now();
+
+        // Stop all movement
+        if (moveInterval) {
+            clearInterval(moveInterval);
+            moveInterval = null;
+        }
+        isMoving = false;
+
+        const pet = document.getElementById('roaming-pet');
+
+        // Keep green color, add spider form
+        pet.classList.remove('active');
+        pet.classList.add('spider-form');
+
+        window.SpiderWebSystem.start(pet);
+
+        // Spider mode lasts 30 minutes, then auto-ends
+        setTimeout(() => {
+            spiderModeActive = false;
+            pet.classList.remove('spider-form');
+            pet.classList.add('active');
+            console.log('[Roaming Pet] Spider mode ended, resuming normal behavior');
+        }, 30 * 60 * 1000);
+    }
+
+    // Start spider mode checker
+    function startSpiderModeChecker() {
+        // Check every 2 minutes if it's time for spider mode
+        setInterval(checkSpiderMode, 2 * 60 * 1000);
+        console.log('[Roaming Pet] Spider mode checker started');
+    }
+
     // Perform random instant action (for page load)
     function performRandomInstantAction() {
+        // Block during spider mode
+        if (spiderModeActive) return;
+
         console.log('[Roaming Pet] Performing random instant action on page load!');
 
         // Possible instant actions
@@ -968,6 +1039,17 @@
 
         // Start sleep cycle checker (checks if it's night time)
         startSleepCycleChecker();
+
+        // Start spider mode checker (checks if it's time to hunt)
+        startSpiderModeChecker();
+
+        // TEST: Auto-start spider mode after 5 seconds for testing
+        setTimeout(() => {
+            if (!spiderModeActive && !isSleeping) {
+                console.log('[Roaming Pet] AUTO-STARTING SPIDER MODE FOR TEST');
+                enterSpiderMode();
+            }
+        }, 5000);
 
         // If it's night, go to sleep immediately
         if (isNightTime()) {

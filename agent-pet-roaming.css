@@ -597,3 +597,77 @@
 .roaming-pet.flower-sway-6 .roaming-pet-antenna {
     transform: translateY(-6px) translateX(2px);
 }
+
+/* ===== SPIDER ON WEB MODE ===== */
+
+.roaming-pet.on-spider-web {
+    /* Spider is stationary on web, slightly smaller */
+    transform: scale(0.9);
+}
+
+.roaming-pet.on-spider-web .roaming-pet-body-container {
+    /* Subtle breathing while waiting */
+    animation: spider-wait-breathing 3s ease-in-out infinite;
+}
+
+@keyframes spider-wait-breathing {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* Spider legs spread out on web */
+.roaming-pet.on-spider-web .roaming-pixel.leg {
+    opacity: 1;
+}
+
+/* ===== SPIDER FORM (spread legs like spider) ===== */
+
+.roaming-pet.spider-form {
+    /* Stay green like spider */
+}
+
+.roaming-pet.spider-form .roaming-pixel.body {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+.roaming-pet.spider-form .roaming-pixel.arm {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+.roaming-pet.spider-form .roaming-pixel.leg {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+/* Spread arms wider like spider legs */
+.roaming-pet.spider-form .roaming-pet-arms .roaming-pixel.arm:first-child {
+    transform: translateX(-6px) translateY(-2px);
+}
+
+.roaming-pet.spider-form .roaming-pet-arms .roaming-pixel.arm:last-child {
+    transform: translateX(6px) translateY(-2px);
+}
+
+/* Make legs more visible and spread */
+.roaming-pet.spider-form .roaming-pixel.leg {
+    opacity: 1;
+}
+
+/* Spread legs horizontally like spider stance */
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(1) {
+    transform: translateX(-4px);
+}
+
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(2) {
+    transform: translateX(-2px);
+}
+
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(7) {
+    transform: translateX(2px);
+}
+
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(8) {
+    transform: translateX(4px);
+}
