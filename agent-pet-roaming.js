@@ -78,16 +78,16 @@
                     </div>
                 </div>
 
-                <!-- Legs (4 legs) -->
+                <!-- Legs (4 visible legs + 4 spacers for animation) -->
                 <div class="roaming-pet-legs">
                     <div class="roaming-pixel leg"></div>
-                    <div class="roaming-pixel leg" style="opacity: 0;"></div>
                     <div class="roaming-pixel leg"></div>
-                    <div class="roaming-pixel leg" style="opacity: 0;"></div>
                     <div class="roaming-pixel leg"></div>
-                    <div class="roaming-pixel leg" style="opacity: 0;"></div>
                     <div class="roaming-pixel leg"></div>
-                    <div class="roaming-pixel leg" style="opacity: 0;"></div>
+                    <div class="roaming-pixel leg"></div>
+                    <div class="roaming-pixel leg"></div>
+                    <div class="roaming-pixel leg"></div>
+                    <div class="roaming-pixel leg"></div>
                 </div>
             </div>
         `;
@@ -161,45 +161,153 @@
         }, 500);
     }
 
-    // Perform growing animation sequence
+    // ===== PERSISTENT FLOWER GROWTH SYSTEM =====
+    let flowerGrowthStage = 0; // 0=seed, 1-4=growing, 5=bloom, 6-13=sway variants
+    let flowerGrowthStartTime = 0;
+    let flowerSwayInterval = null;
+    const FLOWER_BLOOM_DURATION = 180000; // 3 minutes bloom time
+
+    // Load flower state from localStorage
+    function loadFlowerState() {
+        try {
+            const saved = localStorage.getItem('roaming-pet-flower-state');
+            if (saved) {
+                const state = JSON.parse(saved);
+                flowerGrowthStage = state.stage || 0;
+                flowerGrowthStartTime = state.startTime || 0;
+
+                // Check if bloom time expired
+                const elapsed = Date.now() - flowerGrowthStartTime;
+                if (flowerGrowthStage >= 5 && elapsed > FLOWER_BLOOM_DURATION) {
+                    // Bloom expired, reset to seed
+                    flowerGrowthStage = 0;
+                    flowerGrowthStartTime = 0;
+                    saveFlowerState();
+                }
+
+                console.log('[Roaming Pet] Loaded flower state - stage:', flowerGrowthStage);
+                return true;
+            }
+        } catch (e) {
+            console.error('[Roaming Pet] Failed to load flower state:', e);
+        }
+        return false;
+    }
+
+    // Save flower state to localStorage
+    function saveFlowerState() {
+        try {
+            localStorage.setItem('roaming-pet-flower-state', JSON.stringify({
+                stage: flowerGrowthStage,
+                startTime: flowerGrowthStartTime
+            }));
+        } catch (e) {
+            console.error('[Roaming Pet] Failed to save flower state:', e);
+        }
+    }
+
+    // Perform growing animation sequence (progressive stages with persistence)
     function performGrowingAnimation() {
         const pet = document.getElementById('roaming-pet');
         if (!pet) return;
 
-        console.log('[Roaming Pet] Growing like a plant...');
+        console.log('[Roaming Pet] Starting flower growth cycle - current stage:', flowerGrowthStage);
 
         // Remove other animations
         pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'shrinking', 'dancing');
 
-        // Start growing
-        pet.classList.add('growing');
-        currentAnimation = 'growing';
+        // If already in bloom, just continue swaying
+        if (flowerGrowthStage >= 5) {
+            console.log('[Roaming Pet] Already blooming - resuming sway');
+            applyFlowerStage(5);
+            startFlowerSway();
+            return;
+        }
 
-        // After growing completes (3s), hold for 2-3 seconds
-        setTimeout(() => {
-            console.log('[Roaming Pet] Fully grown, holding...');
-
-            // After holding, start shrinking back
-            setTimeout(() => {
-                console.log('[Roaming Pet] Shrinking back...');
-                pet.classList.remove('growing');
-                pet.classList.add('shrinking');
-                currentAnimation = 'shrinking';
-
-                // After shrinking completes (2s), return to idle
-                setTimeout(() => {
-                    pet.classList.remove('shrinking');
-                    setAnimation('idle');
-                }, 2000);
-            }, 2000 + Math.random() * 1000);
-        }, 3000);
+        // Start from current stage and grow progressively
+        flowerGrowthStartTime = Date.now();
+        saveFlowerState();
+        growToNextFlowerStage();
     }
 
-    // Go to sleep
+    function growToNextFlowerStage() {
+        const pet = document.getElementById('roaming-pet');
+        if (!pet) return;
+
+        if (flowerGrowthStage >= 5) {
+            // Reached full bloom
+            console.log('[Roaming Pet] Full bloom reached!');
+            applyFlowerStage(5);
+            saveFlowerState();
+            startFlowerSway();
+
+            // After 3 minutes, reset to seed for next cycle
+            setTimeout(() => {
+                console.log('[Roaming Pet] Bloom cycle complete - resetting to seed');
+                flowerGrowthStage = 0;
+                flowerGrowthStartTime = 0;
+                saveFlowerState();
+                if (flowerSwayInterval) {
+                    clearInterval(flowerSwayInterval);
+                    flowerSwayInterval = null;
+                }
+                pet.classList.remove('growing', 'flower-bloom', 'flower-sway');
+                setAnimation('idle');
+            }, FLOWER_BLOOM_DURATION);
+            return;
+        }
+
+        // Apply current stage
+        applyFlowerStage(flowerGrowthStage);
+        console.log('[Roaming Pet] Growth stage:', flowerGrowthStage);
+
+        // Schedule next stage
+        const stageDuration = [800, 800, 1000, 1200, 1500][flowerGrowthStage] || 1000;
+        setTimeout(() => {
+            flowerGrowthStage++;
+            saveFlowerState();
+            growToNextFlowerStage();
+        }, stageDuration);
+    }
+
+    function applyFlowerStage(stage) {
+        const pet = document.getElementById('roaming-pet');
+        if (!pet) return;
+
+        pet.classList.remove('flower-stage-0', 'flower-stage-1', 'flower-stage-2', 'flower-stage-3', 'flower-stage-4', 'flower-bloom');
+
+        if (stage < 5) {
+            pet.classList.add('growing', 'flower-stage-' + stage);
+        } else {
+            pet.classList.add('growing', 'flower-bloom');
+        }
+    }
+
+    function startFlowerSway() {
+        const pet = document.getElementById('roaming-pet');
+        if (!pet || flowerSwayInterval) return;
+
+        pet.classList.add('flower-sway');
+
+        let swayStep = 0;
+        flowerSwayInterval = setInterval(() => {
+            // Remove all sway classes
+            for (let i = 0; i < 8; i++) {
+                pet.classList.remove('flower-sway-' + i);
+            }
+            // Add current sway
+            pet.classList.add('flower-sway-' + swayStep);
+            swayStep = (swayStep + 1) % 8;
+        }, 500);
+
+        console.log('[Roaming Pet] Wind sway started');
+    }
+
+    // Go to sleep (transform into flower first)
     function goToSleep() {
         if (isSleeping) return;
 
-        console.log('[Roaming Pet] Going to sleep...');
+        console.log('[Roaming Pet] Going to sleep - transforming into flower...');
         isSleeping = true;
 
         // Stop any movement
@@ -209,22 +317,91 @@
         }
         isMoving = false;
 
-        // Set sleeping animation
-        setAnimation('sleeping');
+        // First transform into flower (growing animation)
+        const pet = document.getElementById('roaming-pet');
+        if (!pet) return;
+
+        // Start growing animation
+        pet.classList.remove('idle', 'walking', 'waving', 'blinking', 'playing', 'sleeping', 'shrinking', 'dancing');
+        pet.classList.add('active'); // Keep active state during growth
+        pet.classList.add('growing');
+        currentAnimation = 'growing';
+
+        console.log('[Roaming Pet] Growing into flower form...');
+
+        // After growing completes (3s), switch to sleeping state but keep flower form
+        setTimeout(() => {
+            console.log('[Roaming Pet] Fully grown flower - entering sleep state');
+
+            // Now transition to sleeping state (green color) but maintain flower form
+            pet.classList.remove('active');
+            pet.classList.add('sleeping');
+            // Keep 'growing' class to maintain the visual flower form with extended body/arms/antenna
+
+            // Don't shrink back - stay in flower form throughout sleep
+        }, 3000);
     }
 
-    // Wake up
+    // Wake up (shrink back from flower form)
     function wakeUp() {
         if (!isSleeping) return;
 
-        console.log('[Roaming Pet] Waking up!');
+        console.log('[Roaming Pet] Waking up - shrinking from flower form...');
         isSleeping = false;
 
-        // Set idle animation
-        setAnimation('idle');
+        const pet = document.getElementById('roaming-pet');
+        if (!pet) return;
 
-        // Schedule next move
-        scheduleNextMove();
+        // Start shrinking animation to return to normal form
+        pet.classList.remove('sleeping', 'growing');
+        pet.classList.add('active'); // Active state during shrinking
+        pet.classList.add('shrinking');
+        currentAnimation = 'shrinking';
+
+        console.log('[Roaming Pet] Shrinking back to normal form...');
+
+        // After shrinking completes (2s), perform random wake-up behavior
+        setTimeout(() => {
+            pet.classList.remove('shrinking');
+            console.log('[Roaming Pet] Wake up complete!');
+
+            // Random autonomous behavior after waking up
+            const wakeUpBehaviors = [
+                () => {
+                    // Immediately run to a random target
+                    console.log('[Roaming Pet] Energetic wake-up - running to explore!');
+                    moveToRandomTarget();
+                },
+                () => {
+                    // Jump excitedly
+                    console.log('[Roaming Pet] Excited wake-up - jumping!');
+                    performJumpAnimation();
+                    setTimeout(() => moveToRandomTarget(), 1000);
+                },
+                () => {
+                    // Start playing with pixel immediately
+                    console.log('[Roaming Pet] Playful wake-up - playing with pixel!');
+                    setAnimation('playing');
+                    setTimeout(() => moveToRandomTarget(), 3000);
+                },
+                () => {
+                    // Wave and then move
+                    console.log('[Roaming Pet] Friendly wake-up - waving!');
+                    setAnimation('waving');
+                    setTimeout(() => moveToRandomTarget(), 2000);
+                },
+                () => {
+                    // Calm wake-up - idle then move
+                    console.log('[Roaming Pet] Calm wake-up - stretching...');
+                    setAnimation('idle');
+                    setTimeout(() => moveToRandomTarget(), 1500);
+                }
+            ];
+
+            // Pick random behavior
+            const behavior = wakeUpBehaviors[Math.floor(Math.random() * wakeUpBehaviors.length)];
+            behavior();
+        }, 2000);
     }
 
     // Check sleep/wake cycle
@@ -725,6 +902,33 @@
         console.log('[Roaming Pet] Sleep cycle checker started');
     }
 
+    // Perform random instant action (for page load)
+    function performRandomInstantAction() {
+        console.log('[Roaming Pet] Performing random instant action on page load!');
+
+        // Possible instant actions
+        const actions = [
+            'waving',
+            'playing',
+            'dancing',
+            'jumping',
+            'growing',
+            'blinking'
+        ];
+
+        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+        console.log('[Roaming Pet] Instant action:', randomAction);
+
+        setAnimation(randomAction);
+
+        // Hold for 3-5 seconds, then return to idle
+        const holdTime = 3000 + Math.random() * 2000;
+        setTimeout(() => {
+            setAnimation('idle');
+            console.log('[Roaming Pet] Instant action complete, returned to idle');
+        }, holdTime);
+    }
+
     // Initialize pet when page loads
     function init() {
         // Wait for page to be ready
@@ -737,6 +941,20 @@
 
         // Create pet
         const container = createPetHTML();
+
+        // Load flower growth state
+        loadFlowerState();
+
+        // If pet was mid-bloom when user left, resume from that state
+        if (flowerGrowthStage > 0) {
+            console.log('[Roaming Pet] Resuming flower growth from stage:', flowerGrowthStage);
+            // Apply the saved stage immediately
+            applyFlowerStage(flowerGrowthStage);
+            // If in bloom, start swaying
+            if (flowerGrowthStage >= 5) {
+                startFlowerSway();
+            }
+        }
 
         // Set random initial position
         const randomX = 20 + Math.random() * (window.innerWidth - 100);
@@ -760,8 +978,15 @@
             // Start idle animation
             setAnimation('idle');
 
-            // Schedule first move after 5-10 seconds
-            const initialDelay = 5000 + Math.random() * 5000;
+            // PERFORM RANDOM ACTION IMMEDIATELY ON PAGE LOAD
+            setTimeout(() => {
+                if (!isSleeping) {
+                    performRandomInstantAction();
+                }
+            }, 500); // Small delay to ensure pet is fully loaded
+
+            // Schedule first move after 8-15 seconds (after instant action completes)
+            const initialDelay = 8000 + Math.random() * 7000;
             console.log('[Roaming Pet] First move in', Math.floor(initialDelay / 1000), 'seconds');
 
             setTimeout(() => {

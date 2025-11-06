@@ -39,8 +39,14 @@
 
 .roaming-pet-legs {
     display: flex;
-    gap: 0;
+    gap: 1px; /* Small gap to prevent leg overlap */
     justify-content: center;
+}
+
+/* Hide even-indexed legs by default (spacers for walking animation) */
+.roaming-pet-legs .roaming-pixel.leg:nth-child(even) {
+    opacity: 0;
+    width: 0; /* Don't take up space */
 }
 
 .roaming-pixel {
@@ -480,4 +486,114 @@
     65% { opacity: 1; transform: translateY(0px); }
     66% { opacity: 0; transform: translateY(0px); }
     100% { opacity: 0; transform: translateY(0px); }
+}
+
+/* ===== FLOWER GROWTH STAGES (Progressive) ===== */
+
+/* Stage 0: Seed - small */
+.roaming-pet.flower-stage-0 .roaming-pet-body-container {
+    transform: scale(0.8);
+}
+
+/* Stage 1: Sprout - slightly bigger */
+.roaming-pet.flower-stage-1 .roaming-pet-body-container {
+    transform: scale(0.9);
+}
+
+/* Stage 2: Young - growing */
+.roaming-pet.flower-stage-2 .roaming-pet-body-container {
+    transform: scale(1.0);
+}
+
+.roaming-pet.flower-stage-2 .roaming-pet-antenna {
+    opacity: 0.3;
+}
+
+/* Stage 3: Pre-bloom - antenna appears */
+.roaming-pet.flower-stage-3 .roaming-pet-body-container {
+    transform: scale(1.1);
+}
+
+.roaming-pet.flower-stage-3 .roaming-pet-antenna {
+    opacity: 0.6;
+}
+
+.roaming-pet.flower-stage-3 .roaming-pixel.body {
+    background: #ff69b4 !important;
+}
+
+/* Stage 4: Budding - almost bloomed */
+.roaming-pet.flower-stage-4 .roaming-pet-body-container {
+    transform: scale(1.2);
+}
+
+.roaming-pet.flower-stage-4 .roaming-pet-antenna {
+    opacity: 1;
+}
+
+.roaming-pet.flower-stage-4 .roaming-pixel.body {
+    background: #ff1493 !important;
+}
+
+/* Full Bloom - maximum size with petals */
+.roaming-pet.flower-bloom .roaming-pet-body-container {
+    transform: scale(1.3);
+}
+
+.roaming-pet.flower-bloom .roaming-pet-antenna {
+    opacity: 1;
+    transform: translateY(-6px);
+}
+
+.roaming-pet.flower-bloom .roaming-pixel.body {
+    background: #ff00ff !important;
+    box-shadow: 0 0 5px #ff00ff !important;
+}
+
+.roaming-pet.flower-bloom .roaming-pixel.arm {
+    background: #ff00ff !important;
+}
+
+/* ===== WIND SWAY ANIMATION (8 variants) ===== */
+
+.roaming-pet.flower-sway {
+    transition: transform 0.5s ease-in-out;
+}
+
+.roaming-pet.flower-sway-0 {
+    transform: translateX(0px);
+}
+
+.roaming-pet.flower-sway-1 {
+    transform: translateX(2px);
+}
+
+.roaming-pet.flower-sway-2 {
+    transform: translateX(4px) translateY(1px);
+}
+
+.roaming-pet.flower-sway-3 {
+    transform: translateX(2px);
+}
+
+.roaming-pet.flower-sway-4 {
+    transform: translateX(0px);
+}
+
+.roaming-pet.flower-sway-5 {
+    transform: translateX(-2px);
+}
+
+.roaming-pet.flower-sway-6 {
+    transform: translateX(-4px) translateY(1px);
+}
+
+.roaming-pet.flower-sway-7 {
+    transform: translateX(-2px);
+}
+
+/* Antenna sways more dramatically */
+.roaming-pet.flower-sway-2 .roaming-pet-antenna,
+.roaming-pet.flower-sway-6 .roaming-pet-antenna {
+    transform: translateY(-6px) translateX(2px);
 }
