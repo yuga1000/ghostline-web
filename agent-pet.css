@@ -1470,6 +1470,247 @@
     }
 }
 
+/* ===== STARS SYSTEM ===== */
+
+/* Stars container */
+.stars-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    display: none;
+}
+
+.stars-container.active {
+    display: block;
+}
+
+/* Static star - cross shape (+ pattern) */
+.star {
+    position: absolute;
+    width: 4.5px;
+    height: 4.5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1.5px);
+    grid-template-rows: repeat(3, 1.5px);
+}
+
+.star-pixel {
+    width: 1.5px;
+    height: 1.5px;
+    background: transparent;
+}
+
+.star-pixel.lit {
+    background: #ffff00;
+    box-shadow: 0 0 4px #ffff00;
+}
+
+/* Star cross pattern - center + 4 directions */
+.star .star-pixel:nth-child(2),  /* top */
+.star .star-pixel:nth-child(4),  /* left */
+.star .star-pixel:nth-child(5),  /* center */
+.star .star-pixel:nth-child(6),  /* right */
+.star .star-pixel:nth-child(8) { /* bottom */
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Twinkling animation */
+@keyframes star-twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.star.twinkling {
+    animation: star-twinkle 2s ease-in-out infinite;
+}
+
+/* Shooting star - moves diagonally */
+.shooting-star {
+    position: absolute;
+    z-index: 2;
+}
+
+/* Shooting star head (cross) */
+.shooting-star-head {
+    width: 4.5px;
+    height: 4.5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1.5px);
+    grid-template-rows: repeat(3, 1.5px);
+    position: relative;
+    z-index: 2;
+}
+
+.shooting-star-head .star-pixel:nth-child(2),
+.shooting-star-head .star-pixel:nth-child(4),
+.shooting-star-head .star-pixel:nth-child(5),
+.shooting-star-head .star-pixel:nth-child(6),
+.shooting-star-head .star-pixel:nth-child(8) {
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Shooting star trail - diagonal layout */
+.shooting-star-trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.trail-pixel {
+    position: absolute;
+    width: 1.5px;
+    height: 1.5px;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Diagonal trail positioning for downward shooting stars */
+.shooting-star.down .trail-pixel:nth-child(1) {
+    left: -3px;
+    top: -3px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(2) {
+    left: -6px;
+    top: -6px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(3) {
+    left: -9px;
+    top: -9px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(4) {
+    left: -12px;
+    top: -12px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(5) {
+    left: -15px;
+    top: -15px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(6) {
+    left: -18px;
+    top: -18px;
+}
+
+/* Diagonal trail positioning for upward shooting stars */
+.shooting-star.up .trail-pixel:nth-child(1) {
+    left: -3px;
+    top: 3px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(2) {
+    left: -6px;
+    top: 6px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(3) {
+    left: -9px;
+    top: 9px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(4) {
+    left: -12px;
+    top: 12px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(5) {
+    left: -15px;
+    top: 15px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(6) {
+    left: -18px;
+    top: 18px;
+}
+
+/* Diagonal movement animation */
+@keyframes shoot-diagonal-down {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(400px, 400px);
+        opacity: 0;
+    }
+}
+
+@keyframes shoot-diagonal-up {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(400px, -400px);
+        opacity: 0;
+    }
+}
+
+.shooting-star.down {
+    animation: shoot-diagonal-down 2s linear forwards;
+}
+
+.shooting-star.up {
+    animation: shoot-diagonal-up 2s linear forwards;
+}
+
+/* Burning effect (gets smaller and brighter) */
+@keyframes star-burn {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+        filter: brightness(3);
+    }
+}
+
+.shooting-star.burning {
+    animation: star-burn 0.5s ease-out forwards;
+}
+
+/* Bounce effect */
+@keyframes star-bounce {
+    0% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-20px, -20px);
+    }
+    100% {
+        transform: translate(-40px, -40px);
+        opacity: 0;
+    }
+}
+
+.shooting-star.bouncing {
+    animation: star-bounce 0.6s ease-out forwards;
+}
+
 /* ===== FRACTAL BRANCHES & PETALS SYSTEM ===== */
 
 /* Branches container - positioned absolutely around pet */

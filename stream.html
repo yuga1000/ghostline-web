@@ -644,6 +644,8 @@
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="pet-feed">
                         <div class="pet-container-inline">
+                            <!-- Stars container (for night sky) -->
+                            <div class="stars-container" id="stars-container"></div>
                             <!-- Rain container (for rain effect) -->
                             <div class="rain-container" id="rain-container"></div>
                             <div class="pet-display-inline">
@@ -2887,6 +2889,169 @@ function checkStreamSpiderMode() {
 
 // Check for spider web every 3 minutes during rest
 setInterval(checkStreamSpiderMode, 3 * 60 * 1000);
+
+// ===== STARS SYSTEM =====
+let starsActive = false;
+let shootingStarInterval = null;
+
+// Create static twinkling stars
+function createStaticStars() {
+    const container = document.getElementById('stars-container');
+    if (!container) return;
+
+    // Clear existing stars
+    container.innerHTML = '';
+
+    // Create 5-8 static stars at random positions
+    const numStars = 5 + Math.floor(Math.random() * 4);
+
+    for (let i = 0; i < numStars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star twinkling';
+
+        // Create cross pattern (9 pixels)
+        for (let j = 0; j < 9; j++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'star-pixel';
+            star.appendChild(pixel);
+        }
+
+        // Random position
+        star.style.left = (10 + Math.random() * 80) + '%';
+        star.style.top = (10 + Math.random() * 60) + '%';
+
+        // Random twinkle delay
+        star.style.animationDelay = Math.random() * 2 + 's';
+
+        container.appendChild(star);
+    }
+
+    console.log('[Stars] Created', numStars, 'static stars');
+}
+
+// Create shooting star with trail
+function createShootingStar() {
+    const container = document.getElementById('stars-container');
+    if (!container) return;
+
+    const shootingStar = document.createElement('div');
+    shootingStar.className = 'shooting-star';
+
+    // Random direction: down or up diagonal
+    const direction = Math.random() < 0.5 ? 'down' : 'up';
+    shootingStar.classList.add(direction);
+
+    // Star head (cross)
+    const head = document.createElement('div');
+    head.className = 'shooting-star-head';
+    for (let i = 0; i < 9; i++) {
+        const pixel = document.createElement('div');
+        pixel.className = 'star-pixel';
+        head.appendChild(pixel);
+    }
+    shootingStar.appendChild(head);
+
+    // Trail (4-6 pixels)
+    const trail = document.createElement('div');
+    trail.className = 'shooting-star-trail';
+    const trailLength = 4 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < trailLength; i++) {
+        const trailPixel = document.createElement('div');
+        trailPixel.className = 'trail-pixel';
+        trail.appendChild(trailPixel);
+    }
+    shootingStar.appendChild(trail);
+
+    // Random starting position
+    if (direction === 'down') {
+        shootingStar.style.left = (Math.random() * 30) + '%';
+        shootingStar.style.top = '0%';
+    } else {
+        shootingStar.style.left = (Math.random() * 30) + '%';
+        shootingStar.style.bottom = '0%';
+    }
+
+    container.appendChild(shootingStar);
+
+    console.log('[Stars] Shooting star created - direction:', direction);
+
+    // After animation, either burn or bounce
+    setTimeout(() => {
+        const fate = Math.random();
+        if (fate < 0.6) {
+            // 60% chance to burn
+            shootingStar.classList.remove('down', 'up');
+            shootingStar.classList.add('burning');
+            console.log('[Stars] Shooting star burning!');
+            setTimeout(() => shootingStar.remove(), 500);
+        } else {
+            // 40% chance to bounce
+            shootingStar.classList.remove('down', 'up');
+            shootingStar.classList.add('bouncing');
+            console.log('[Stars] Shooting star bouncing!');
+            setTimeout(() => shootingStar.remove(), 600);
+        }
+    }, 2000);
+}
+
+// Start stars system
+function startStars() {
+    if (starsActive) return;
+
+    console.log('[Stars] Starting night sky...');
+    starsActive = true;
+
+    const container = document.getElementById('stars-container');
+    container.classList.add('active');
+
+    // Create static stars
+    createStaticStars();
+
+    // Shooting stars appear rarely (every 8-15 seconds)
+    shootingStarInterval = setInterval(() => {
+        if (Math.random() < 0.7) { // 70% chance each interval
+            createShootingStar();
+        }
+    }, 8000 + Math.random() * 7000);
+}
+
+// Stop stars system
+function stopStars() {
+    if (!starsActive) return;
+
+    console.log('[Stars] Stopping night sky...');
+    starsActive = false;
+
+    if (shootingStarInterval) {
+        clearInterval(shootingStarInterval);
+        shootingStarInterval = null;
+    }
+
+    const container = document.getElementById('stars-container');
+    container.classList.remove('active');
+    container.innerHTML = '';
+}
+
+// Check if it's night time (10 PM - 6 AM)
+function isNightTime() {
+    const hour = new Date().getHours();
+    return hour >= 22 || hour < 6;
+}
+
+// Auto-start/stop stars based on time
+function checkStarsTime() {
+    if (isNightTime() && !starsActive) {
+        startStars();
+    } else if (!isNightTime() && starsActive) {
+        stopStars();
+    }
+}
+
+// Check every 5 minutes
+setInterval(checkStarsTime, 5 * 60 * 1000);
+
+// Check on page load
+setTimeout(checkStarsTime, 1000);
 
 </script>
 
