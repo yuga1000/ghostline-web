@@ -7,7 +7,7 @@
     // Configuration
     const CONFIG = {
         webDuration: 30 * 60 * 1000, // 30 minutes
-        weavingDuration: 120000, // 2 minutes to weave
+        weavingDuration: 15000, // 15 seconds to weave (8x faster!)
         preySpawnInterval: 15000, // Spawn prey every 15 seconds
         preyLifetime: 10000, // Prey lives 10 seconds
         escapeChance: 0.3, // 30% chance prey escapes if spider too slow
