@@ -1413,8 +1413,8 @@
 .roof-pixel {
     width: 3px;
     height: 3px;
-    background: #8B4513;
-    box-shadow: 0 0 2px #8B4513;
+    background: #ff8800;
+    box-shadow: 0 0 2px #ff8800;
 }
 
 /* Rain system */

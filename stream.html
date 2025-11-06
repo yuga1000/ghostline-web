@@ -1215,7 +1215,7 @@ function processLogQueue() {
 }
 
 // Add a log line to the terminal with typewriter effect
-function addLogLine(text, className = 'log-info', onComplete) {
+function addLogLine(text, className = 'log-info', onComplete, instant = false) {
     const logContent = document.getElementById('agent-log-content');
 
     // Keep timestamp and icons - just remove emoji
@@ -1236,7 +1236,7 @@ function addLogLine(text, className = 'log-info', onComplete) {
 
     // Create log line element
     const logLine = document.createElement('div');
-    logLine.className = `log-line ${className} typing`;
+    logLine.className = `log-line ${className}`;
 
     // Build HTML with icon and message separately
     if (icon) {
@@ -1246,7 +1246,6 @@ function addLogLine(text, className = 'log-info', onComplete) {
 
         const messageSpan = document.createElement('span');
         messageSpan.className = 'log-message';
-        messageSpan.textContent = ''; // Start empty for typewriter
 
         logLine.appendChild(iconSpan);
         logLine.appendChild(messageSpan);
@@ -1257,24 +1256,34 @@ function addLogLine(text, className = 'log-info', onComplete) {
         // Scroll to show the new log line immediately
         logContent.scrollTop = logContent.scrollHeight;
 
-        // Typewriter effect - type one character at a time
-        let charIndex = 0;
-        const typeSpeed = 20; // milliseconds per character (faster)
+        // Instant display or typewriter effect
+        if (instant) {
+            // Show instantly
+            messageSpan.textContent = message;
+            if (onComplete) onComplete();
+        } else {
+            // Typewriter effect
+            logLine.classList.add('typing');
+            messageSpan.textContent = ''; // Start empty for typewriter
 
-        function typeNextChar() {
-            if (charIndex < message.length) {
-                messageSpan.textContent += message[charIndex];
-                charIndex++;
-                setTimeout(typeNextChar, typeSpeed);
-            } else {
-                // Remove typing cursor when done
-                logLine.classList.remove('typing');
-                // Call completion callback
-                if (onComplete) onComplete();
+            let charIndex = 0;
+            const typeSpeed = 20; // milliseconds per character (faster)
+
+            function typeNextChar() {
+                if (charIndex < message.length) {
+                    messageSpan.textContent += message[charIndex];
+                    charIndex++;
+                    setTimeout(typeNextChar, typeSpeed);
+                } else {
+                    // Remove typing cursor when done
+                    logLine.classList.remove('typing');
+                    // Call completion callback
+                    if (onComplete) onComplete();
+                }
             }
-        }
 
-        typeNextChar();
+            typeNextChar();
+        }
     } else {
         // No icon - just show message instantly
         logLine.textContent = message;
@@ -1358,19 +1367,21 @@ window.addEventListener('DOMContentLoaded', () => {
                 if (data.logs && data.logs.length > lastProcessedLogIndex) {
                     console.log('[HTTP Polling] Found', data.logs.length - lastProcessedLogIndex, 'new logs');
 
+                    // Clear placeholder on first load
+                    if (lastProcessedLogIndex === 0 && data.logs.length > 0) {
+                        clearPlaceholder();
+                    }
+
                     // Process new logs
+                    const isFirstLoad = (lastProcessedLogIndex === 0);
+
                     for (let i = lastProcessedLogIndex; i < data.logs.length; i++) {
                         const logEvent = data.logs[i];
                         console.log('[HTTP Polling] Processing log:', logEvent);
 
-                        // Clear placeholder on first log
-                        if (lastProcessedLogIndex === 0) {
-                            clearPlaceholder();
-                        }
-
-                        // Add log line
+                        // Add log line - instant on first load, animated for new logs
                         if (logEvent.content || logEvent.message) {
-                            addLogLine(logEvent.content || logEvent.message, 'log-info');
+                            addLogLine(logEvent.content || logEvent.message, 'log-info', null, isFirstLoad);
                         }
                     }
 
