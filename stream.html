@@ -1389,6 +1389,52 @@ window.addEventListener('DOMContentLoaded', () => {
             startHttpPolling();
         }
     }, 3000);
+
+    // ===== IMAGE POLLING =====
+    let lastProcessedImageIndex = 0;
+
+    function startImagePolling() {
+        console.log('[Image Polling] Starting image polling for /api/images');
+
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/images');
+                const data = await response.json();
+
+                if (data.images && data.images.length > lastProcessedImageIndex) {
+                    console.log('[Image Polling] Found', data.images.length - lastProcessedImageIndex, 'new images');
+
+                    // Get the latest image
+                    const latestImage = data.images[data.images.length - 1];
+
+                    // Display image in pet window
+                    const imgElement = document.getElementById('pet-image-preview');
+                    const imgWindow = document.getElementById('pet-image-window');
+
+                    if (imgElement && latestImage.image_data) {
+                        imgElement.src = latestImage.image_data;
+                        imgWindow.style.display = 'block';
+                        console.log('[Image Polling] Displayed image:', latestImage.filename);
+
+                        // Hide after 30 seconds
+                        setTimeout(() => {
+                            imgWindow.style.display = 'none';
+                        }, 30000);
+                    }
+
+                    lastProcessedImageIndex = data.images.length;
+                }
+            } catch (e) {
+                console.error('[Image Polling] Error:', e);
+            }
+        }, 10000); // Poll every 10 seconds
+    }
+
+    // Start image polling after 5 seconds
+    setTimeout(() => {
+        console.log('[Image Polling] Starting image polling...');
+        startImagePolling();
+    }, 5000);
 });
 
 // Handle visibility change (mobile/tablet switching tabs)
