@@ -2218,8 +2218,12 @@ function startRestCountdown(durationSeconds) {
     }
 
     // Transform pet into flower mode
+    console.log('[REST] Cooldown started - duration:', durationSeconds, 'seconds');
+    console.log('[REST] Triggering flower transformation...');
     if (!isInFlowerMode) {
         transformToFlower();
+    } else {
+        console.log('[REST] Already in flower mode, skipping');
     }
 
     // Update countdown every second
@@ -2275,7 +2279,12 @@ function transformToFlower() {
     const stateText = document.getElementById('pet-state-text');
     const stageText = document.getElementById('pet-stage-text');
 
-    console.log('[Pet] Starting flower growth sequence');
+    console.log('═══════════════════════════════════════');
+    console.log('🌸 [Pet] STARTING FLOWER GROWTH! 🌸');
+    console.log('═══════════════════════════════════════');
+    console.log('[Pet] Pet element:', pet ? 'FOUND' : 'NOT FOUND');
+    console.log('[Pet] Is in flower mode already?', isInFlowerMode);
+    console.log('[Pet] Pet is awake?', petIsAwake);
 
     isInFlowerMode = true;
 
