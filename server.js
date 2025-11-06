@@ -78,6 +78,8 @@ app.post('/api/logout', (req, res) => {
 const LOG_STREAM_PASSWORD = process.env.LOG_STREAM_PASSWORD || 'Gho$tline_2025!';
 const recentLogs = []; // Keep last 100 logs in memory
 const MAX_LOGS = 100;
+const recentImages = []; // Keep last 10 images in memory
+const MAX_IMAGES = 10;
 
 app.post('/api/logs', (req, res) => {
   // Check Bearer token
@@ -113,6 +115,38 @@ app.post('/api/logs', (req, res) => {
 app.get('/api/logs', (req, res) => {
   console.log('[Logs API] GET request - returning', recentLogs.length, 'logs');
   res.json({ logs: recentLogs });
+});
+
+// Image streaming endpoint for Ghostline Agent
+app.post('/api/images', (req, res) => {
+  // Check Bearer token
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('[Images API] Missing or invalid Authorization header');
+    return res.status(401).json({ error: 'Unauthorized - missing Bearer token' });
+  }
+
+  const token = authHeader.substring(7);
+  if (token !== LOG_STREAM_PASSWORD) {
+    console.log('[Images API] Token mismatch - rejecting request');
+    return res.status(401).json({ error: 'Unauthorized - invalid token' });
+  }
+
+  // Store image
+  const imageEvent = req.body;
+  console.log('[Images API] Storing image:', imageEvent.filename);
+  recentImages.push(imageEvent);
+  if (recentImages.length > MAX_IMAGES) {
+    recentImages.shift(); // Remove oldest
+  }
+
+  res.json({ status: 'ok' });
+});
+
+// Get recent images (for stream.html) - GET endpoint
+app.get('/api/images', (req, res) => {
+  console.log('[Images API] GET request - returning', recentImages.length, 'images');
+  res.json({ images: recentImages });
 });
 
 // Agent status endpoint - checks if agent is in cooldown based on recent logs
