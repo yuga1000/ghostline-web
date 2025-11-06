@@ -644,6 +644,8 @@
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="pet-feed">
                         <div class="pet-container-inline">
+                            <!-- Rain container (for rain effect) -->
+                            <div class="rain-container" id="rain-container"></div>
                             <div class="pet-display-inline">
                                 <!-- Sleep mask (shows when sleeping) -->
                                 <div class="pet-sleep-mask" id="pet-sleep-mask"></div>
@@ -665,8 +667,33 @@
                                     <img id="pet-image-preview" src="" alt="Generated Image" />
                                 </div>
                                 <div class="pet sleeping stage-1" id="agent-pet">
+                                    <!-- Roof/shelter (shows when sleeping) -->
+                                    <div class="pet-roof" id="pet-roof">
+                                        <div class="roof-bar">
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                        </div>
+                                    </div>
                                     <!-- Body container (animated) -->
                                     <div class="pet-body-container">
+                                        <!-- Fractal branches container (for advanced bloom stages) -->
+                                        <div class="pet-branches" id="pet-branches"></div>
+                                        <!-- Petals container (for full bloom) -->
+                                        <div class="pet-petals" id="pet-petals"></div>
                                         <!-- Arms row (with body top) -->
                                         <div class="pet-arms">
                                             <!-- Extra left arm (shows on stage 4) -->
@@ -2257,12 +2284,22 @@ function transformToFlower() {
     if (growthInterval) clearInterval(growthInterval);
     if (swayInterval) clearInterval(swayInterval);
 
-    // Growth stages: 1 → 2 → 3 → 4 (bloom)
+    // 7-stage progressive growth system
+    // Stage 1: Seed
+    // Stage 2: Sprout
+    // Stage 3: Young
+    // Stage 4: Pre-Bloom (arms visible)
+    // Stage 5: Budding (fractal branches begin)
+    // Stage 6: Blooming (petals unfold)
+    // Stage 7: Full Bloom (wind sway)
     let currentGrowthStage = 1;
-    const growthDurations = [1000, 1000, 1200, 1500]; // ms for each stage
+    const growthDurations = [800, 800, 1000, 1000, 1200, 1500, 2000]; // ms for each stage
+
+    // Stage names for display
+    const stageNames = ['Seed', 'Sprout', 'Young', 'Pre-Bloom', 'Budding', 'Blooming', 'Full Bloom'];
 
     function growToNextStage() {
-        if (currentGrowthStage > 4) {
+        if (currentGrowthStage > 7) {
             // Reached full bloom - start sway animation
             console.log('[Pet] Full bloom reached - starting sway');
             startFlowerSway();
@@ -2270,12 +2307,32 @@ function transformToFlower() {
         }
 
         // Apply current stage
-        pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4');
+        pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5', 'stage-6', 'stage-7');
         pet.classList.add('stage-' + currentGrowthStage);
-        stageText.textContent = currentGrowthStage + ' (GROWING)';
+
+        // Update display
+        const stageName = stageNames[currentGrowthStage - 1];
+        stageText.textContent = currentGrowthStage + ' (' + stageName + ')';
         stateText.textContent = 'Growing... 🌱';
 
-        console.log('[Pet] Growth stage', currentGrowthStage);
+        console.log('[Pet] Growth stage', currentGrowthStage, '-', stageName);
+
+        // Add fractal branches at stage 5 (Budding)
+        if (currentGrowthStage === 5) {
+            addFractalBranches('budding');
+        }
+
+        // Add more branches at stage 6 (Blooming)
+        if (currentGrowthStage === 6) {
+            addFractalBranches('blooming');
+            addPetals('blooming');
+        }
+
+        // Full bloom branches and petals at stage 7
+        if (currentGrowthStage === 7) {
+            addFractalBranches('full-bloom');
+            addPetals('full-bloom');
+        }
 
         // Schedule next stage
         setTimeout(() => {
@@ -2288,13 +2345,98 @@ function transformToFlower() {
     growToNextStage();
 }
 
+// Add fractal branches at different bloom stages
+function addFractalBranches(stage) {
+    const container = document.getElementById('pet-branches');
+    if (!container) return;
+
+    // Clear existing branches
+    container.innerHTML = '';
+
+    let branches = [];
+
+    if (stage === 'budding') {
+        // Stage 5: First branches appear
+        branches = [
+            {x: -12, y: 12}, {x: -16, y: 10},
+            {x: 12, y: 12}, {x: 16, y: 10}
+        ];
+    } else if (stage === 'blooming') {
+        // Stage 6: More branches emerge
+        branches = [
+            {x: -12, y: 12}, {x: -16, y: 10}, {x: -12, y: 18},
+            {x: 12, y: 12}, {x: 16, y: 10}, {x: 12, y: 18},
+            {x: -20, y: 13}, {x: 20, y: 13}
+        ];
+    } else if (stage === 'full-bloom') {
+        // Stage 7: Full fractal spread
+        branches = [
+            {x: -12, y: 13}, {x: -16, y: 11}, {x: -12, y: 18}, {x: -8, y: 22},
+            {x: 12, y: 13}, {x: 16, y: 11}, {x: 12, y: 18}, {x: 8, y: 22},
+            {x: -20, y: 13}, {x: -24, y: 10}, {x: 20, y: 13}, {x: 24, y: 10},
+            {x: -16, y: 22}, {x: 16, y: 22}
+        ];
+    }
+
+    // Create branch pixels
+    branches.forEach(b => {
+        const branch = document.createElement('div');
+        branch.className = 'branch-pixel';
+        branch.style.left = b.x + 'px';
+        branch.style.bottom = b.y + 'px';
+        container.appendChild(branch);
+    });
+
+    console.log('[Pet] Added', branches.length, 'branches for', stage);
+}
+
+// Add petals around head at bloom stages
+function addPetals(stage) {
+    const container = document.getElementById('pet-petals');
+    if (!container) return;
+
+    // Clear existing petals
+    container.innerHTML = '';
+
+    let petals = [];
+
+    if (stage === 'blooming') {
+        // Stage 6: First petals unfold
+        petals = [
+            {x: -8, y: -4}, {x: -4, y: -8}, {x: 0, y: -8},
+            {x: 4, y: -8}, {x: 8, y: -4},
+            {x: -12, y: 0}, {x: 12, y: 0}
+        ];
+    } else if (stage === 'full-bloom') {
+        // Stage 7: Full petal crown
+        petals = [
+            {x: -12, y: -8}, {x: -8, y: -12}, {x: -4, y: -12},
+            {x: 0, y: -12}, {x: 4, y: -12}, {x: 8, y: -12}, {x: 12, y: -8},
+            {x: -16, y: -4}, {x: -12, y: 0}, {x: -16, y: 4},
+            {x: 16, y: -4}, {x: 12, y: 0}, {x: 16, y: 4},
+            {x: -8, y: -16}, {x: 0, y: -16}, {x: 8, y: -16}
+        ];
+    }
+
+    // Create petal pixels
+    petals.forEach(p => {
+        const petal = document.createElement('div');
+        petal.className = 'petal-pixel';
+        petal.style.left = p.x + 'px';
+        petal.style.top = p.y + 'px';
+        container.appendChild(petal);
+    });
+
+    console.log('[Pet] Added', petals.length, 'petals for', stage);
+}
+
 // Wind sway animation for bloom phase
 function startFlowerSway() {
     const pet = document.getElementById('agent-pet');
     const stageText = document.getElementById('pet-stage-text');
     const stateText = document.getElementById('pet-state-text');
 
-    stageText.textContent = '4 (BLOOM)';
+    stageText.textContent = '7 (Full Bloom)';
     stateText.textContent = 'Swaying in the wind... 🌸💨';
 
     // Trigger base flower animation
@@ -2332,8 +2474,21 @@ function transformFromFlower() {
 
     isInFlowerMode = false;
 
+    // Clear branches and petals
+    const branchesContainer = document.getElementById('pet-branches');
+    const petalsContainer = document.getElementById('pet-petals');
+    if (branchesContainer) branchesContainer.innerHTML = '';
+    if (petalsContainer) petalsContainer.innerHTML = '';
+
+    // Clear sway animation
+    if (swayInterval) {
+        clearInterval(swayInterval);
+        swayInterval = null;
+    }
+    pet.classList.remove('sway-0', 'sway-1', 'sway-2', 'sway-3', 'sway-4', 'sway-5', 'sway-6', 'sway-7');
+
     // Return to saved stage
-    pet.classList.remove('stage-4');
+    pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5', 'stage-6', 'stage-7');
     pet.classList.add('stage-' + petStage);
     stageText.textContent = petStage;
 
@@ -2579,7 +2734,164 @@ function showImagePreview(imagePath) {
     }, 300000); // 5 minutes = 300000ms
 }
 
+// ===== RAIN SYSTEM =====
+let rainActive = false;
+let rainInterval = null;
+let rainStopTimeout = null;
+
+function startRain() {
+    if (rainActive) return;
+
+    console.log('[Rain] Starting rain...');
+    rainActive = true;
+
+    const rainContainer = document.getElementById('rain-container');
+    const roof = document.getElementById('pet-roof');
+
+    rainContainer.classList.add('active');
+
+    // Spawn raindrops every 100ms
+    rainInterval = setInterval(() => {
+        spawnRaindrop();
+    }, 100);
+
+    // Rain lasts 30-60 seconds
+    const duration = 30000 + Math.random() * 30000;
+    rainStopTimeout = setTimeout(() => {
+        stopRain();
+    }, duration);
+}
+
+function stopRain() {
+    if (!rainActive) return;
+
+    console.log('[Rain] Stopping rain...');
+    rainActive = false;
+
+    if (rainInterval) {
+        clearInterval(rainInterval);
+        rainInterval = null;
+    }
+
+    if (rainStopTimeout) {
+        clearTimeout(rainStopTimeout);
+        rainStopTimeout = null;
+    }
+
+    // Fade out rain container
+    setTimeout(() => {
+        const rainContainer = document.getElementById('rain-container');
+        rainContainer.classList.remove('active');
+        rainContainer.innerHTML = ''; // Clear all drops
+    }, 2000);
+}
+
+function spawnRaindrop() {
+    const rainContainer = document.getElementById('rain-container');
+    const pet = document.getElementById('agent-pet');
+    const roof = document.getElementById('pet-roof');
+
+    if (!rainContainer) return;
+
+    const drop = document.createElement('div');
+    drop.className = 'raindrop';
+
+    // Random X position across the container
+    const containerWidth = rainContainer.offsetWidth;
+    drop.style.left = Math.random() * containerWidth + 'px';
+    drop.style.top = '0px';
+
+    // Random fall duration (faster/slower rain)
+    const fallDuration = 0.8 + Math.random() * 0.4; // 0.8-1.2s
+    drop.style.animationDuration = fallDuration + 's';
+
+    rainContainer.appendChild(drop);
+
+    // Check if drop hits roof (if pet is sleeping)
+    if (pet.classList.contains('sleeping') && roof) {
+        const roofRect = roof.getBoundingClientRect();
+        const dropRect = drop.getBoundingClientRect();
+
+        // Check collision after some time
+        setTimeout(() => {
+            const currentDropRect = drop.getBoundingClientRect();
+
+            // If drop is near roof height
+            if (currentDropRect.top >= roofRect.top - 5 &&
+                currentDropRect.top <= roofRect.bottom + 5 &&
+                currentDropRect.left >= roofRect.left &&
+                currentDropRect.left <= roofRect.right) {
+
+                // Bounce effect
+                drop.classList.add('bouncing');
+                console.log('[Rain] Drop bounced off roof!');
+            }
+        }, fallDuration * 400); // Check midway through fall
+    }
+
+    // Remove drop after animation
+    setTimeout(() => {
+        drop.remove();
+    }, (fallDuration * 1000) + 500);
+}
+
+// Random rain: 20% chance every 2 minutes when pet is sleeping
+setInterval(() => {
+    const pet = document.getElementById('agent-pet');
+    if (pet && pet.classList.contains('sleeping') && !rainActive) {
+        if (Math.random() < 0.2) {
+            startRain();
+        }
+    }
+}, 120000); // Check every 2 minutes
+
+// ===== SPIDER WEB ON STREAM =====
+// Spider web can appear randomly during rest periods
+let streamSpiderActive = false;
+let lastStreamSpiderTime = 0;
+const STREAM_SPIDER_COOLDOWN = 15 * 60 * 1000; // 15 minutes between webs
+
+function checkStreamSpiderMode() {
+    // Only during rest periods (when countdown is active)
+    const countdown = document.getElementById('rest-countdown-container');
+    if (!countdown || countdown.style.display === 'none') return;
+
+    // Check cooldown
+    const now = Date.now();
+    if (now - lastStreamSpiderTime < STREAM_SPIDER_COOLDOWN) return;
+
+    // Don't start if spider already active
+    if (streamSpiderActive) return;
+
+    // 30% chance to start spider web
+    if (Math.random() < 0.3) {
+        console.log('[Stream] Starting spider web mode!');
+        streamSpiderActive = true;
+        lastStreamSpiderTime = now;
+
+        // Get pet element (use a placeholder if needed)
+        const pet = document.getElementById('agent-pet');
+
+        if (window.SpiderWebSystem) {
+            window.SpiderWebSystem.start(pet);
+
+            // Spider mode lasts 30 minutes, then auto-ends
+            setTimeout(() => {
+                window.SpiderWebSystem.stop();
+                streamSpiderActive = false;
+                console.log('[Stream] Spider web ended');
+            }, 30 * 60 * 1000);
+        }
+    }
+}
+
+// Check for spider web every 3 minutes during rest
+setInterval(checkStreamSpiderMode, 3 * 60 * 1000);
+
 </script>
+
+<!-- Spider Web System -->
+<script src="spider-web-system.js"></script>
 
 <!-- manual-modal.js moved to test_pages -->
 

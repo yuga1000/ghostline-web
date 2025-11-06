@@ -1388,3 +1388,172 @@
 .pixel.flower-crown {
     transition: transform 0.5s ease-in-out;
 }
+
+/* ===== SLEEP ROOF/SHELTER ===== */
+
+/* Roof appears above pet when sleeping */
+.pet-roof {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 10;
+}
+
+.pet.sleeping .pet-roof {
+    display: block;
+}
+
+/* Roof structure - simple horizontal bar */
+.roof-bar {
+    display: flex;
+    gap: 0;
+}
+
+.roof-pixel {
+    width: 3px;
+    height: 3px;
+    background: #8B4513;
+    box-shadow: 0 0 2px #8B4513;
+}
+
+/* Rain system */
+.rain-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    display: none;
+}
+
+.rain-container.active {
+    display: block;
+}
+
+.raindrop {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #0088ff;
+    box-shadow: 0 0 2px #0088ff;
+    animation: raindrop-fall linear;
+}
+
+@keyframes raindrop-fall {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+}
+
+/* Bounce effect when hitting roof */
+.raindrop.bouncing {
+    animation: raindrop-bounce 0.3s ease-out;
+}
+
+@keyframes raindrop-bounce {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+}
+
+/* ===== FRACTAL BRANCHES & PETALS SYSTEM ===== */
+
+/* Branches container - positioned absolutely around pet */
+.pet-branches {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.branch-pixel {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ff00ff;
+    box-shadow: 0 0 2px #ff00ff;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Petals container - positioned around head */
+.pet-petals {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+
+.petal-pixel {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+/* Show branches/petals based on growth stage */
+.pet.stage-5 .branch-pixel,
+.pet.stage-6 .branch-pixel,
+.pet.stage-7 .branch-pixel {
+    opacity: 0.8;
+}
+
+.pet.stage-6 .petal-pixel,
+.pet.stage-7 .petal-pixel {
+    opacity: 0.9;
+}
+
+/* Wind sway affects branches and petals */
+.pet.sway-1 .branch-pixel {
+    transform: translateX(1px);
+}
+
+.pet.sway-2 .branch-pixel {
+    transform: translateX(2px) translateY(-1px);
+}
+
+.pet.sway-5 .branch-pixel {
+    transform: translateX(-1px);
+}
+
+.pet.sway-6 .branch-pixel {
+    transform: translateX(-2px) translateY(-1px);
+}
+
+.pet.sway-1 .petal-pixel {
+    transform: translateX(0.5px);
+}
+
+.pet.sway-2 .petal-pixel {
+    transform: translateX(1px) translateY(-0.5px);
+}
+
+.pet.sway-5 .petal-pixel {
+    transform: translateX(-0.5px);
+}
+
+.pet.sway-6 .petal-pixel {
+    transform: translateX(-1px) translateY(-0.5px);
+}

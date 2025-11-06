@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Pet - Animation Demo</title>
+    <link rel="stylesheet" href="agent-pet.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .demo-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff00;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        .info-banner {
+            background: rgba(255, 255, 0, 0.1);
+            border: 2px solid #ffff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #ffff00;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .info-banner h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-banner ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-panel h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.active {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .stage-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .stage-buttons button {
+            flex: 1;
+            max-width: 120px;
+        }
+
+        /* Pet Display Grid */
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .pet-showcase {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #00ff00;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .pet-showcase h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #00ff00;
+        }
+
+        .pet-showcase p {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .pet-stage-container {
+            width: 100%;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Clone pet-container-inline styles */
+        .demo-pet-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .demo-pet-display {
+            position: relative;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .badge-stage {
+            background: rgba(255, 165, 0, 0.3);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+
+        .badge-animation {
+            background: rgba(0, 255, 255, 0.3);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+        }
+
+        .badge-state {
+            background: rgba(255, 0, 255, 0.3);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+        }
+
+        /* Legend */
+        .legend {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .legend h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #00ffff;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #fff;
+        }
+
+        @media (max-width: 768px) {
+            .pet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-wrapper">
+        <h1>🌸 STREAM PET ANIMATION DEMO 🌸</h1>
+        <p class="subtitle">Complete testing suite for VERCEPT stream agent-pet</p>
+
+        <!-- Info Banner -->
+        <div class="info-banner">
+            <h2>⚠️ Stream Pet Features to Test:</h2>
+            <ul>
+                <li><strong>4 Growth Stages:</strong> Pet evolves as logs accumulate (Stage 1-4)</li>
+                <li><strong>Flower Crown:</strong> Appears during sleep/flower transformation</li>
+                <li><strong>Extra Eyes/Arms:</strong> Stage 4 = multiple eyes and arms</li>
+                <li><strong>Wall Movement:</strong> Pet can walk on bottom, left, top, right walls</li>
+                <li><strong>Log Reactions:</strong> Responds to success/error/working logs</li>
+                <li><strong>Leg Spacing:</strong> 4 legs with specific gaps (4px, 16px, 4px)</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Current Issues:</strong> Check if legs are properly spaced, flower crown appears correctly, and stage transitions are smooth.</p>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <h2>🎮 ANIMATION CONTROLS</h2>
+
+            <div class="button-grid">
+                <button onclick="testAnimation('idle')">🧍 Idle</button>
+                <button onclick="testAnimation('walking')">🚶 Walking</button>
+                <button onclick="testAnimation('waving')">👋 Waving</button>
+                <button onclick="testAnimation('playing')">🎮 Playing</button>
+                <button onclick="testAnimation('dancing')">💃 Dancing</button>
+                <button onclick="testAnimation('jumping')">🦘 Jumping</button>
+                <button onclick="testAnimation('spinning')">🌀 Spinning</button>
+                <button onclick="testAnimation('excited-bounce')">⚡ Excited</button>
+                <button onclick="testAnimation('sleeping')">😴 Sleeping</button>
+                <button onclick="testAnimation('flower')">🌸 Flower</button>
+            </div>
+
+            <div class="stage-buttons">
+                <button onclick="setStage(1)">Stage 1</button>
+                <button onclick="setStage(2)">Stage 2</button>
+                <button onclick="setStage(3)">Stage 3</button>
+                <button onclick="setStage(4)">Stage 4</button>
+            </div>
+
+            <div class="button-grid" style="margin-top: 15px;">
+                <button onclick="setMood('normal')">🟠 Normal (Orange)</button>
+                <button onclick="setMood('excited')">🔵 Excited (Cyan)</button>
+                <button onclick="setMood('happy')">🟣 Happy (Pink)</button>
+                <button onclick="resetAll()">🔄 Reset All</button>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3>🎨 COLOR GUIDE</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ffbb00; box-shadow: 0 0 5px #ffbb00;"></div>
+                    <span>Normal (Orange)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00ffff; box-shadow: 0 0 5px #00ffff;"></div>
+                    <span>Excited (Cyan)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff00ff; box-shadow: 0 0 5px #ff00ff;"></div>
+                    <span>Happy (Pink)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #00ff00; box-shadow: 0 0 5px #00ff00;"></div>
+                    <span>Sleeping (Green)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pet Showcase Grid -->
+        <div class="pet-grid">
+            <!-- Stage 1 -->
+            <div class="pet-showcase">
+                <h3>STAGE 1: Baby</h3>
+                <p>Small, basic form<br>2 eyes, 2 arms, 4 legs</p>
+                <div class="pet-stage-container">
+                    <div class="demo-pet-container">
+                        <div class="demo-pet-display">
+                            <div class="pet idle active stage-1" id="pet-stage1">
+                                <div class="pet-body-container">
+                                    <div class="pet-arms">
+                                        <div class="pixel arm arm-extra"></div>
+                                        <div class="pixel arm"></div>
+                                        <div class="pet-body">
+                                            <!-- Flower crown rows -->
+                                            <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div>
+                                            <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div>
+                                            <div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div>
+                                            <!-- Main body -->
+                                            <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
+                                            <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                        </div>
+                                        <div class="pixel arm"></div>
+                                        <div class="pixel arm arm-extra"></div>
+                                    </div>
+                                </div>
+                                <div class="pet-legs">
+                                    <div class="pixel leg"></div>
+                                    <div style="width: 4px;"></div>
+                                    <div class="pixel leg"></div>
+                                    <div style="width: 16px;"></div>
+                                    <div class="pixel leg"></div>
+                                    <div style="width: 4px;"></div>
+                                    <div class="pixel leg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="status-badges">
+                    <span class="badge badge-stage">Stage 1</span>
+                    <span class="badge badge-animation">Idle</span>
+                </div>
+            </div>
+
+            <!-- Stage 4 (Full grown) -->
+            <div class="pet-showcase">
+                <h3>STAGE 4: Fully Grown</h3>
+                <p>Maximum size<br>4 eyes, 4 arms, 4 legs<br>Flower crown visible</p>
+                <div class="pet-stage-container">
+                    <div class="demo-pet-container">
+                        <div class="demo-pet-display">
+                            <div class="pet idle active stage-4" id="pet-stage4">
+                                <div class="pet-body-container">
+                                    <div class="pet-arms">
+                                        <div class="pixel arm arm-extra"></div>
+                                        <div class="pixel arm"></div>
+                                        <div class="pet-body">
+                                            <!-- Flower crown rows -->
+                                            <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div>
+                                            <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div>
+                                            <div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div>
+                                            <!-- Main body -->
+                                            <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
+                                            <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                        </div>
+                                        <div class="pixel arm"></div>
+                                        <div class="pixel arm arm-extra"></div>
+                                    </div>
+                                </div>
+                                <div class="pet-legs">
+                                    <div class="pixel leg"></div>
+                                    <div style="width: 4px;"></div>
+                                    <div class="pixel leg"></div>
+                                    <div style="width: 16px;"></div>
+                                    <div class="pixel leg"></div>
+                                    <div style="width: 4px;"></div>
+                                    <div class="pixel leg"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="status-badges">
+                    <span class="badge badge-stage">Stage 4</span>
+                    <span class="badge badge-animation">Idle</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-banner" style="border-color: #ff00ff; background: rgba(255, 0, 255, 0.1); color: #ff00ff;">
+            <h2>💡 Testing Tips:</h2>
+            <ul>
+                <li>Use <strong>Stage buttons</strong> to switch between growth stages</li>
+                <li>Click <strong>🌸 Flower</strong> to see the flower crown appear (layers crown-3 to crown-6)</li>
+                <li>Try <strong>Stage 4 + Flower</strong> to see maximum form</li>
+                <li>Check <strong>leg spacing</strong> - should be evenly distributed with proper gaps</li>
+                <li>Test on <strong>mobile</strong> to verify autonomous behaviors work</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let currentPets = [];
+
+        function testAnimation(animName) {
+            const pets = document.querySelectorAll('.pet');
+            pets.forEach(pet => {
+                // Remove all animation classes
+                pet.classList.remove('idle', 'walking', 'waving', 'playing', 'dancing',
+                                     'jumping', 'spinning', 'excited-bounce', 'sleeping', 'flower');
+
+                // Special handling for sleeping and flower
+                if (animName === 'sleeping') {
+                    pet.classList.remove('active');
+                    pet.classList.add('sleeping', animName);
+                } else if (animName === 'flower') {
+                    pet.classList.add('active', 'flower');
+                } else {
+                    pet.classList.remove('sleeping');
+                    pet.classList.add('active', animName);
+                }
+
+                console.log(`[Demo] Animation: ${animName}`, pet.className);
+            });
+        }
+
+        function setStage(stage) {
+            const pets = document.querySelectorAll('.pet');
+            pets.forEach(pet => {
+                pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4');
+                pet.classList.add(`stage-${stage}`);
+                console.log(`[Demo] Stage: ${stage}`);
+            });
+        }
+
+        function setMood(mood) {
+            const pets = document.querySelectorAll('.pet');
+            pets.forEach(pet => {
+                pet.classList.remove('excited', 'happy');
+                if (mood !== 'normal') {
+                    pet.classList.add(mood);
+                }
+                console.log(`[Demo] Mood: ${mood}`);
+            });
+        }
+
+        function resetAll() {
+            const pets = document.querySelectorAll('.pet');
+            pets.forEach(pet => {
+                pet.className = 'pet idle active stage-1';
+            });
+            console.log('[Demo] Reset to defaults');
+        }
+
+        // Auto-start idle animation
+        window.addEventListener('load', () => {
+            console.log('🌸 Stream Pet Demo loaded');
+            testAnimation('idle');
+        });
+    </script>
+</body>
+</html>
