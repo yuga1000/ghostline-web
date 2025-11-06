@@ -1204,8 +1204,10 @@ function processLogQueue() {
 
         // Add log and wait for completion before processing next
         addLogLine(text, className, () => {
-            // Wait 400ms after log is fully displayed before showing next one
-            setTimeout(processNext, 400);
+            // Faster on mobile - 100ms delay instead of 400ms
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const delay = isMobile ? 100 : 200;
+            setTimeout(processNext, delay);
         });
     }
 
