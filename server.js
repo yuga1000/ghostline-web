@@ -143,35 +143,7 @@ function saveImagesToFile() {
 loadLogsFromFile();
 loadImagesFromFile();
 
-// Add placeholder welcome logs if empty
-if (recentLogs.length === 0) {
-  console.log('[Server] Adding placeholder welcome logs');
-  recentLogs.push({
-    type: 'log',
-    message: '╔════════════════════════════════════════════╗',
-    timestamp: new Date().toISOString(),
-    level: 'info'
-  });
-  recentLogs.push({
-    type: 'log',
-    message: '║  🎨 GHOSTLINE AGENT SYSTEM                ║',
-    timestamp: new Date().toISOString(),
-    level: 'info'
-  });
-  recentLogs.push({
-    type: 'log',
-    message: '║  Status: Ready • Logs will appear here   ║',
-    timestamp: new Date().toISOString(),
-    level: 'info'
-  });
-  recentLogs.push({
-    type: 'log',
-    message: '╚════════════════════════════════════════════╝',
-    timestamp: new Date().toISOString(),
-    level: 'info'
-  });
-  saveLogsToFile();
-}
+// No placeholder logs - empty when agent is off
 
 app.post('/api/logs', (req, res) => {
   // Check Bearer token
