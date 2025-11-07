@@ -22,6 +22,8 @@
     let trappedPrey = null;
     let spiderHunting = false;
     let preySpawnInterval = null;
+    let webContainer = null; // Pet container reference
+    let containerBounds = null; // Container dimensions
 
     // Web structure data
     let webLines = [];
@@ -29,10 +31,10 @@
 
     // ===== WEB CREATION =====
 
-    function createWebStructure(corner) {
+    function createWebStructure(corner, containerRect) {
         const web = {
             corner: corner, // 'top-left', 'top-right', 'bottom-left', 'bottom-right'
-            center: getWebCenter(corner),
+            center: getWebCenter(corner, containerRect),
             radialLines: [],
             spiralLines: [],
             trapZones: [] // Areas where prey can get caught
@@ -74,17 +76,20 @@
         return web;
     }
 
-    function getWebCenter(corner) {
+    function getWebCenter(corner, containerRect) {
         const margin = 20; // Closer to corner
+        const width = containerRect ? containerRect.width : window.innerWidth;
+        const height = containerRect ? containerRect.height : window.innerHeight;
+
         switch(corner) {
             case 'top-left':
                 return { x: margin + WEB_SIZE/2, y: margin + WEB_SIZE/2 };
             case 'top-right':
-                return { x: window.innerWidth - margin - WEB_SIZE/2, y: margin + WEB_SIZE/2 };
+                return { x: width - margin - WEB_SIZE/2, y: margin + WEB_SIZE/2 };
             case 'bottom-left':
-                return { x: margin + WEB_SIZE/2, y: window.innerHeight - margin - WEB_SIZE/2 };
+                return { x: margin + WEB_SIZE/2, y: height - margin - WEB_SIZE/2 };
             case 'bottom-right':
-                return { x: window.innerWidth - margin - WEB_SIZE/2, y: window.innerHeight - margin - WEB_SIZE/2 };
+                return { x: width - margin - WEB_SIZE/2, y: height - margin - WEB_SIZE/2 };
         }
     }
 
@@ -114,14 +119,15 @@
 
     // ===== WEB RENDERING (SVG) =====
 
-    function createWebSVG(webData) {
+    function createWebSVG(webData, containerRect) {
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.id = 'spider-web-svg';
-        svg.style.position = 'fixed';
+        svg.style.position = 'absolute'; // ABSOLUTE not fixed!
         svg.style.top = '0';
         svg.style.left = '0';
-        svg.style.width = '100%';
-        svg.style.height = '100%';
+        // Use container dimensions, not 100% viewport
+        svg.style.width = containerRect ? `${containerRect.width}px` : '100%';
+        svg.style.height = containerRect ? `${containerRect.height}px` : '100%';
         svg.style.pointerEvents = 'none';
         svg.style.zIndex = '100';
 
@@ -318,7 +324,7 @@
     function createPrey() {
         const prey = document.createElement('div');
         prey.className = 'spider-prey';
-        prey.style.position = 'fixed';
+        prey.style.position = 'absolute'; // ABSOLUTE not fixed!
         prey.style.width = '3px';
         prey.style.height = '3px';
         prey.style.background = '#00ff00';
@@ -327,13 +333,15 @@
         prey.style.zIndex = '99';
         prey.style.pointerEvents = 'none';
 
-        // Random spawn position
-        prey.x = Math.random() * (window.innerWidth - 100) + 50;
-        prey.y = Math.random() * (window.innerHeight - 100) + 50;
+        // Random spawn position (inside container!)
+        const bounds = containerBounds || { width: 400, height: 300 };
+        const margin = 30;
+        prey.x = Math.random() * (bounds.width - margin * 2) + margin;
+        prey.y = Math.random() * (bounds.height - margin * 2) + margin;
 
         // Random velocity
-        prey.vx = (Math.random() - 0.5) * 200; // pixels per second
-        prey.vy = (Math.random() - 0.5) * 200;
+        prey.vx = (Math.random() - 0.5) * 150; // pixels per second (slower)
+        prey.vy = (Math.random() - 0.5) * 150;
 
         prey.style.left = prey.x + 'px';
         prey.style.top = prey.y + 'px';
@@ -341,7 +349,12 @@
         prey.trapped = false;
         prey.createdAt = Date.now();
 
-        document.body.appendChild(prey);
+        // Add to container, not body!
+        if (webContainer) {
+            webContainer.appendChild(prey);
+        } else {
+            document.body.appendChild(prey);
+        }
 
         return prey;
     }
@@ -358,12 +371,13 @@
         prey.x += prey.vx * deltaTime;
         prey.y += prey.vy * deltaTime;
 
-        // Bounce off walls
-        if (prey.x < 0 || prey.x > window.innerWidth) prey.vx *= -1;
-        if (prey.y < 0 || prey.y > window.innerHeight) prey.vy *= -1;
+        // Bounce off container walls (not window!)
+        const bounds = containerBounds || { width: 400, height: 300 };
+        if (prey.x < 0 || prey.x > bounds.width) prey.vx *= -1;
+        if (prey.y < 0 || prey.y > bounds.height) prey.vy *= -1;
 
-        prey.x = Math.max(0, Math.min(window.innerWidth, prey.x));
-        prey.y = Math.max(0, Math.min(window.innerHeight, prey.y));
+        prey.x = Math.max(0, Math.min(bounds.width, prey.x));
+        prey.y = Math.max(0, Math.min(bounds.height, prey.y));
 
         prey.style.left = prey.x + 'px';
         prey.style.top = prey.y + 'px';
@@ -491,26 +505,40 @@
         console.log('[Spider Web] Starting spider mode!');
         webActive = true;
 
-        // Prefer top-left corner (near image/logo area)
-        const corners = ['top-left', 'top-left', 'top-left', 'top-right']; // 75% chance top-left
-        webCorner = corners[Math.floor(Math.random() * corners.length)];
-
-        console.log('[Spider Web] Building web in', webCorner);
-
-        // Create web structure
-        const webData = createWebStructure(webCorner);
-
-        // Check for nearby elements to attach to
-        const nearbyElement = findNearbyElement(webCorner);
-        if (nearbyElement) {
-            console.log('[Spider Web] Found nearby element to attach:', nearbyElement.element.tagName);
-            // Add visual anchor line
-            webData.anchorElement = nearbyElement;
+        // Find pet container
+        const petContainer = pet ? pet.closest('.pet-display-inline') : null;
+        if (!petContainer) {
+            console.error('[Spider Web] Pet container not found!');
+            webActive = false;
+            return;
         }
 
-        // Create SVG
-        webElement = createWebSVG(webData);
-        document.body.appendChild(webElement);
+        // Save container reference
+        webContainer = petContainer;
+
+        // Get container dimensions
+        const containerRect = petContainer.getBoundingClientRect();
+        containerBounds = {
+            width: containerRect.width,
+            height: containerRect.height
+        };
+        console.log('[Spider Web] Container size:', containerBounds.width, 'x', containerBounds.height);
+
+        // Make container position: relative so web is positioned inside it
+        petContainer.style.position = 'relative';
+
+        // Prefer top-right corner (inside pet container)
+        const corners = ['top-right', 'top-left', 'bottom-right', 'bottom-left'];
+        webCorner = corners[Math.floor(Math.random() * corners.length)];
+
+        console.log('[Spider Web] Building web in', webCorner, 'of pet container');
+
+        // Create web structure (relative to container)
+        const webData = createWebStructure(webCorner, containerRect);
+
+        // Create SVG and add to PET CONTAINER (not body!)
+        webElement = createWebSVG(webData, containerRect);
+        petContainer.appendChild(webElement);
 
         // Animate weaving
         animateWebWeaving(webElement, CONFIG.weavingDuration);
@@ -612,6 +640,10 @@
 
         trappedPrey = null;
         spiderHunting = false;
+
+        // Clear container references
+        webContainer = null;
+        containerBounds = null;
 
         console.log('[Spider Web] Spider mode ended');
     }
