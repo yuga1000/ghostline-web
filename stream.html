@@ -590,17 +590,18 @@
             padding: 2px 6px;
         }
 
-        /* MOBILE FIX: Make terminal taller so logs are visible! */
+        /* MOBILE FIX: Make terminal visible but not too big */
         .agent-terminal {
-            height: 300px !important; /* Bigger on mobile (was 160px) */
-            max-height: 300px !important;
+            height: 200px !important; /* Balanced size (was 160px desktop) */
+            max-height: 200px !important;
+            min-height: 200px !important;
         }
 
         .agent-terminal-content {
-            max-height: 300px;
-            font-size: 10px; /* Smaller font on mobile */
-            padding: 0.5rem; /* Less padding */
-            line-height: 1.3; /* Tighter line height */
+            max-height: 200px;
+            font-size: 11px; /* Readable but compact */
+            padding: 0.5rem;
+            line-height: 1.4;
         }
 
         /* Make log lines wrap better on mobile */
