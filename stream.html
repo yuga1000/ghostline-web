@@ -1237,6 +1237,12 @@ async function loadExistingLogs() {
                 startTime = Date.now();
             }
 
+            // WAKE UP PET! (если есть логи - значит агент работал/работает)
+            if (!petIsAwake) {
+                console.log('[Load Logs] 🎉 Waking up pet - logs found!');
+                wakeUpPet();
+            }
+
             // Display all logs INSTANTLY (no animation for old logs)
             for (let i = 0; i < data.logs.length; i++) {
                 const logEvent = data.logs[i];
