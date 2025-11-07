@@ -1244,27 +1244,10 @@ async function loadExistingLogs() {
                 startTime = Date.now();
             }
 
-            // DON'T wake pet automatically - only wake on REAL fresh logs
-            // Check if logs are fresh AND not just placeholder welcome messages
-            const lastLog = data.logs[data.logs.length - 1];
-            const lastLogMessage = lastLog.message || lastLog.content || '';
-            const lastLogTime = lastLog.timestamp ? new Date(lastLog.timestamp).getTime() : 0;
-            const now = Date.now();
-            const isFresh = lastLogTime && (now - lastLogTime) < 5 * 60 * 1000; // 5 minutes
-
-            // Check if this is just placeholder welcome screen (not real agent activity)
-            const isPlaceholder = lastLogMessage.includes('╔═══') ||
-                                  lastLogMessage.includes('GHOSTLINE AGENT SYSTEM') ||
-                                  lastLogMessage.includes('Status: Ready') ||
-                                  lastLogMessage.includes('╚═══');
-
-            if (isFresh && !isPlaceholder && !petIsAwake) {
-                console.log('[Load Logs] ✅ Fresh REAL logs detected - waking up pet!');
+            // WAKE UP PET! (если есть логи - значит агент работал/работает)
+            if (!petIsAwake) {
+                console.log('[Load Logs] 🎉 Waking up pet - logs found!');
                 wakeUpPet();
-            } else if (isPlaceholder) {
-                console.log('[Load Logs] ⏸️  Only placeholder logs - pet stays asleep');
-            } else if (!isFresh) {
-                console.log('[Load Logs] ⏰ Logs are old (>5 min) - pet stays asleep');
             }
 
             // Display all logs INSTANTLY (no animation for old logs)
@@ -1415,7 +1398,7 @@ function addLogLine(text, className = 'log-info', onComplete, instant = false) {
     updatePetOnLog(className, text);
 
     // ===== IMAGE DETECTION LOGIC =====
-    detectAndShowImage(text, instant);
+    detectAndShowImage(text);
 
     // ===== GENERATION COMPLETE - PET JUMPS! =====
     if (text.includes('GLVSF Image') || text.includes('saved successfully') || text.includes('Image generated')) {
@@ -2931,27 +2914,6 @@ async function checkInitialAgentStatus() {
     console.log('[Agent Status] Checking initial status...');
 
     try {
-        // First check if we have REAL logs (not placeholders)
-        const logsResponse = await fetch('/api/logs');
-        const logsData = await logsResponse.json();
-
-        let hasRealLogs = false;
-        if (logsData.logs && logsData.logs.length > 0) {
-            const lastLog = logsData.logs[logsData.logs.length - 1];
-            const lastLogMessage = lastLog.message || lastLog.content || '';
-            const isPlaceholder = lastLogMessage.includes('╔═══') ||
-                                  lastLogMessage.includes('GHOSTLINE AGENT SYSTEM') ||
-                                  lastLogMessage.includes('Status: Ready') ||
-                                  lastLogMessage.includes('╚═══');
-            hasRealLogs = !isPlaceholder;
-        }
-
-        if (!hasRealLogs) {
-            console.log('[Agent Status] No real logs - skipping status check (pet stays asleep)');
-            return;
-        }
-
-        // Now check agent status
         const response = await fetch('/api/agent-status');
         const data = await response.json();
 
@@ -3007,7 +2969,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // ===== IMAGE DETECTION AND DISPLAY =====
 let imageDisplayTimer = null;
 
-function detectAndShowImage(logText, isOldLog = false) {
+function detectAndShowImage(logText) {
     // FIX: Updated pattern matching for actual vercept log format
     // Looking for patterns like:
     // - "╔══ IMAGE GENERATED ══╗"
@@ -3093,27 +3055,23 @@ function detectAndShowImage(logText, isOldLog = false) {
         console.log('[Image Display] Showing image:', imagePath.substring(0, 100) + '...');
         showImagePreview(imagePath);
 
-        // Make pet excited about the new image! (only for NEW images, not old logs on page load)
-        if (!isOldLog) {
-            if (petIsAwake) {
-                const pet = document.getElementById('agent-pet');
-                pet.classList.add('excited');
-                triggerPetAnimation('dancing', 3000);
-                setTimeout(() => {
-                    pet.classList.remove('excited');
-                }, 3000);
-            } else {
-                // Wake up pet briefly to celebrate NEW image
-                wakeUpPet();
-                const pet = document.getElementById('agent-pet');
-                pet.classList.add('excited');
-                triggerPetAnimation('waving', 3000);
-                setTimeout(() => {
-                    pet.classList.remove('excited');
-                }, 3000);
-            }
+        // Make pet excited about the new image!
+        if (petIsAwake) {
+            const pet = document.getElementById('agent-pet');
+            pet.classList.add('excited');
+            triggerPetAnimation('dancing', 3000);
+            setTimeout(() => {
+                pet.classList.remove('excited');
+            }, 3000);
         } else {
-            console.log('[Image Display] Skipping pet wake - this is an old log being loaded');
+            // Wake up pet briefly to celebrate
+            wakeUpPet();
+            const pet = document.getElementById('agent-pet');
+            pet.classList.add('excited');
+            triggerPetAnimation('waving', 3000);
+            setTimeout(() => {
+                pet.classList.remove('excited');
+            }, 3000);
         }
     }
 }
