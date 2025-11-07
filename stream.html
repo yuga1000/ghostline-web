@@ -1860,27 +1860,27 @@ function wakeUpPet() {
             () => {
                 // Excited jump
                 console.log('[Pet] Energetic wake-up - jumping!');
-                setPetAnimation('jumping', 2000);
+                triggerPetAnimation('jumping', 2000);
             },
             () => {
                 // Happy dance
                 console.log('[Pet] Joyful wake-up - dancing!');
-                setPetAnimation('dancing', 3000);
+                triggerPetAnimation('dancing', 3000);
             },
             () => {
                 // Wave hello
                 console.log('[Pet] Friendly wake-up - waving!');
-                setPetAnimation('waving', 2500);
+                triggerPetAnimation('waving', 2500);
             },
             () => {
                 // Spin around
                 console.log('[Pet] Dizzy wake-up - spinning!');
-                setPetAnimation('spinning', 2000);
+                triggerPetAnimation('spinning', 2000);
             },
             () => {
                 // Play with toy
                 console.log('[Pet] Playful wake-up - playing!');
-                setPetAnimation('playing', 3000);
+                triggerPetAnimation('playing', 3000);
             },
             () => {
                 // Calm stretch - just idle
@@ -2489,6 +2489,16 @@ function startRestCountdown(durationSeconds) {
 
     console.log('[Countdown] Starting rest countdown:', durationSeconds, 'seconds');
 
+    // Log cooldown start to terminal with ASCII art
+    const cooldownMins = Math.floor(durationSeconds / 60);
+    const cooldownStartLog = `
+╔════════════════════════════════════════════╗
+║  💤 ENTERING COOLDOWN MODE                ║
+║  Duration: ${cooldownMins} minutes                     ║
+║  Status: Resting • Agent will resume soon ║
+╚════════════════════════════════════════════╝`;
+    addLogLine(cooldownStartLog, 'log-info', null, false);
+
     // Clear existing interval
     if (restCountdownInterval) {
         clearInterval(restCountdownInterval);
@@ -2548,6 +2558,14 @@ function startRestCountdown(durationSeconds) {
 
             console.log('[Countdown] Rest period ended - agent cycle starting');
 
+            // Log to terminal in ASCII style
+            const cycleStartLog = `
+╔════════════════════════════════════════════╗
+║  🔄 AGENT CYCLE STARTING                  ║
+║  Status: ACTIVE • Ready to generate!      ║
+╚════════════════════════════════════════════╝`;
+            addLogLine(cycleStartLog, 'log-success', null, false);
+
             // Transform back from flower
             if (isInFlowerMode) {
                 transformFromFlower();
@@ -2557,6 +2575,18 @@ function startRestCountdown(durationSeconds) {
             const minutes = Math.floor(remaining / 60);
             const seconds = remaining % 60;
             countdownText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Log countdown updates to terminal every 5 minutes (ASCII style)
+            if (remaining % 300 === 0 && remaining > 0) {
+                const mins = Math.floor(remaining / 60);
+                const asciiCountdown = `
+╭─────────────────────────────────────────╮
+│ ⏰ COOLDOWN IN PROGRESS                │
+│ Time remaining: ${mins} minutes          │
+│ Status: Resting ${isInFlowerMode ? '🌸' : '😴'}            │
+╰─────────────────────────────────────────╯`;
+                addLogLine(asciiCountdown, 'log-info', null, false);
+            }
         }
     }, 1000);
 }
