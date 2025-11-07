@@ -457,6 +457,23 @@
                     <button class="export-btn" id="exportGIF">🎬 Export GIF</button>
                     <button class="export-btn" id="exportJSON">📋 Export JSON</button>
                 </div>
+
+                <div class="tool-section" style="margin-top: 10px;">
+                    <h3>[ WORKFLOW ]</h3>
+                    <div style="font-size: 9px; color: #888888; line-height: 1.4;">
+                        <strong style="color: #ffff00;">PNG:</strong> Download image file<br>
+                        <strong style="color: #ffff00;">CSS:</strong> Copies code to clipboard!<br>
+                        Use box-shadow in your HTML<br>
+                        <strong style="color: #ffff00;">Sprite:</strong> All frames → one image<br>
+                        <strong style="color: #ffff00;">JSON:</strong> Pixel data (x, y, color)<br>
+                        <br>
+                        <strong style="color: #00ff00;">For pet animations:</strong><br>
+                        1. Draw animation frames<br>
+                        2. Export CSS or JSON<br>
+                        3. Copy code to stream.html<br>
+                        4. Add to pet animations!
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -535,22 +552,37 @@
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw onion skin (previous frame)
-            if (onionSkinEnabled && currentFrameIndex > 0) {
-                const prevFrame = frames[currentFrameIndex - 1];
-                ctx.globalAlpha = 0.3;
-                ctx.putImageData(prevFrame, 0, 0);
-                ctx.globalAlpha = 1.0;
-            }
-
-            // Draw current frame
+            // Draw current frame FIRST
             if (frames[currentFrameIndex]) {
                 ctx.putImageData(frames[currentFrameIndex], 0, 0);
             }
 
-            // Draw grid
+            // Draw onion skin OVER current frame (previous frame with red tint)
+            if (onionSkinEnabled && currentFrameIndex > 0) {
+                const prevFrame = frames[currentFrameIndex - 1];
+
+                // Create temp canvas to draw previous frame
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.putImageData(prevFrame, 0, 0);
+
+                // Draw previous frame with red overlay (so you can distinguish it)
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.drawImage(tempCanvas, 0, 0);
+
+                // Add slight red tint to show it's the previous frame
+                ctx.globalCompositeOperation = 'source-atop';
+                ctx.fillStyle = 'rgba(255, 100, 100, 0.4)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
+
+            // Draw grid (subtle, less eye-strain!)
             if (showGrid) {
-                ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
+                ctx.strokeStyle = 'rgba(0, 255, 0, 0.08)'; // Much more transparent!
                 ctx.lineWidth = 1;
 
                 for (let i = 0; i <= gridSize; i++) {
