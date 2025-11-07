@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
@@ -76,10 +77,101 @@ app.post('/api/logout', (req, res) => {
 
 // Log streaming endpoint for Ghostline Agent
 const LOG_STREAM_PASSWORD = process.env.LOG_STREAM_PASSWORD || 'Gho$tline_2025!';
-const recentLogs = []; // Keep last 100 logs in memory
-const MAX_LOGS = 100;
-const recentImages = []; // Keep last 10 images in memory
-const MAX_IMAGES = 10;
+
+// ═══════════════════════════════════════════════════════════════
+// 📝 PERSISTENT LOG STORAGE (survives Railway restarts!)
+// ═══════════════════════════════════════════════════════════════
+const LOGS_FILE = path.join(__dirname, 'logs.json');
+const IMAGES_FILE = path.join(__dirname, 'images.json');
+const MAX_LOGS = 500; // Increased from 100
+const MAX_IMAGES = 20; // Increased from 10
+
+let recentLogs = [];
+let recentImages = [];
+
+// Load logs from file on startup
+function loadLogsFromFile() {
+  try {
+    if (fs.existsSync(LOGS_FILE)) {
+      const data = fs.readFileSync(LOGS_FILE, 'utf8');
+      recentLogs = JSON.parse(data);
+      console.log('[Server] ✓ Loaded', recentLogs.length, 'logs from file');
+    } else {
+      console.log('[Server] No logs file found, starting fresh');
+    }
+  } catch (e) {
+    console.error('[Server] ❌ Failed to load logs from file:', e.message);
+    recentLogs = [];
+  }
+}
+
+// Load images from file on startup
+function loadImagesFromFile() {
+  try {
+    if (fs.existsSync(IMAGES_FILE)) {
+      const data = fs.readFileSync(IMAGES_FILE, 'utf8');
+      recentImages = JSON.parse(data);
+      console.log('[Server] ✓ Loaded', recentImages.length, 'images from file');
+    } else {
+      console.log('[Server] No images file found, starting fresh');
+    }
+  } catch (e) {
+    console.error('[Server] ❌ Failed to load images from file:', e.message);
+    recentImages = [];
+  }
+}
+
+// Save logs to file
+function saveLogsToFile() {
+  try {
+    fs.writeFileSync(LOGS_FILE, JSON.stringify(recentLogs, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Server] ❌ Failed to save logs to file:', e.message);
+  }
+}
+
+// Save images to file
+function saveImagesToFile() {
+  try {
+    fs.writeFileSync(IMAGES_FILE, JSON.stringify(recentImages, null, 2), 'utf8');
+  } catch (e) {
+    console.error('[Server] ❌ Failed to save images to file:', e.message);
+  }
+}
+
+// Initialize logs and images from files
+loadLogsFromFile();
+loadImagesFromFile();
+
+// Add placeholder welcome logs if empty
+if (recentLogs.length === 0) {
+  console.log('[Server] Adding placeholder welcome logs');
+  recentLogs.push({
+    type: 'log',
+    message: '╔════════════════════════════════════════════╗',
+    timestamp: new Date().toISOString(),
+    level: 'info'
+  });
+  recentLogs.push({
+    type: 'log',
+    message: '║  🎨 GHOSTLINE AGENT SYSTEM                ║',
+    timestamp: new Date().toISOString(),
+    level: 'info'
+  });
+  recentLogs.push({
+    type: 'log',
+    message: '║  Status: Ready • Logs will appear here   ║',
+    timestamp: new Date().toISOString(),
+    level: 'info'
+  });
+  recentLogs.push({
+    type: 'log',
+    message: '╚════════════════════════════════════════════╝',
+    timestamp: new Date().toISOString(),
+    level: 'info'
+  });
+  saveLogsToFile();
+}
 
 app.post('/api/logs', (req, res) => {
   // Check Bearer token
@@ -107,6 +199,9 @@ app.post('/api/logs', (req, res) => {
   if (recentLogs.length > MAX_LOGS) {
     recentLogs.shift(); // Remove oldest
   }
+
+  // ✓ Save to file immediately (persist across restarts!)
+  saveLogsToFile();
 
   res.json({ status: 'ok' });
 });
@@ -139,6 +234,9 @@ app.post('/api/images', (req, res) => {
   if (recentImages.length > MAX_IMAGES) {
     recentImages.shift(); // Remove oldest
   }
+
+  // ✓ Save to file immediately (persist across restarts!)
+  saveImagesToFile();
 
   res.json({ status: 'ok' });
 });

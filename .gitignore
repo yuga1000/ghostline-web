@@ -23,6 +23,13 @@ yarn-error.log*
 # Logs
 logs
 *.log
+logs.json
+images.json
+
+# Playwright
+playwright-report/
+test-results/
+.last-run.json
 
 # Runtime data
 pids
