@@ -611,6 +611,94 @@
         }
     }
 
+    /* SPIDER MODE - Frozen spider with spread legs */
+    .agent-pet.spider-mode {
+        transform: rotate(90deg) scale(1.5) !important;
+        animation: none !important; /* NO animations - spider freezes! */
+        transition: none !important; /* NO smooth rotation! */
+    }
+
+    /* Dark spider body AND arms - same color */
+    .agent-pet.spider-mode .pet-body,
+    .agent-pet.spider-mode .pet-arms {
+        filter: brightness(0.2) saturate(0) !important;
+    }
+
+    /* Disable transitions on ALL spider child elements */
+    .agent-pet.spider-mode * {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .agent-pet.spider-mode .pet-body-container {
+        /* Spread legs apart */
+        transform: scaleX(1.8) scaleY(1.5) !important;
+        letter-spacing: 4px;
+        transition: none !important;
+    }
+
+    /* Mandibles - hidden by default */
+    .pixel.mandible {
+        display: none;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* SPIDER: Show ALL arms (6 legs side by side) */
+    #agent-pet.spider-mode .pixel.arm-extra,
+    .agent-pet.spider-mode div.pixel.arm.arm-extra,
+    .agent-pet.spider-mode .pixel.arm {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important; /* inline-block to display side by side */
+        width: 4px !important;
+        height: 4px !important;
+        /* No background override - inherit default color */
+        box-shadow: none !important; /* No glow */
+        transform: none !important;
+        position: relative !important;
+        animation: none !important;
+        transition: none !important;
+        flex-shrink: 0 !important;
+        z-index: 100 !important;
+        filter: none !important; /* No filters - same as body */
+    }
+
+    /* SPIDER: Show mandibles (small, stick out) */
+    #agent-pet.spider-mode .pixel.mandible {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 4px !important;
+        height: 4px !important;
+        /* No background override - inherit default color */
+        box-shadow: none !important; /* No glow */
+        position: absolute !important;
+        top: -6px !important; /* Stick out above head */
+        z-index: 101 !important;
+        filter: none !important; /* No filters */
+    }
+
+    #agent-pet.spider-mode .mandible-left {
+        left: 24px !important;
+    }
+
+    #agent-pet.spider-mode .mandible-right {
+        right: 24px !important;
+    }
+
+    /* SPIDER: Hide legs (spiders don't have legs, only arms!) */
+    .agent-pet.spider-mode .pet-legs {
+        display: none !important;
+    }
+
+    /* When spider CATCHES pixel - NO rotation, just freeze */
+    .agent-pet.spider-mode.catching {
+        /* No animation - spider stays frozen */
+        animation: none !important;
+    }
+
 </style>
 
 
@@ -729,13 +817,17 @@
                                         <div class="pet-petals" id="pet-petals"></div>
                                         <!-- Arms row (with body top) -->
                                         <div class="pet-arms">
-                                            <!-- Extra left arm (shows on stage 4) -->
-                                            <div class="pixel arm arm-extra"></div>
-                                            <!-- Left arm -->
+                                            <!-- 🕷️ Spider legs - 3 left arms -->
+                                            <div class="pixel arm arm-extra spider-leg-3"></div>
+                                            <div class="pixel arm arm-extra spider-leg-2"></div>
                                             <div class="pixel arm"></div>
 
                                             <!-- Body (12x6 grid + flower crown pixels) -->
                                             <div class="pet-body">
+                                                <!-- 🕷️ SPIDER MANDIBLES (жвала) - hidden by default, shown in spider mode -->
+                                                <div class="pixel mandible mandible-left"></div>
+                                                <div class="pixel mandible mandible-right"></div>
+
                                                 <!-- FLOWER CROWN - Row -3 (only visible in flower phase 5-6) -->
                                                 <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div>
                                                 <!-- FLOWER CROWN - Row -2 (visible in flower phase 4-6) -->
@@ -759,8 +851,9 @@
 
                                             <!-- Right arm -->
                                             <div class="pixel arm"></div>
-                                            <!-- Extra right arm (shows on stage 4) -->
-                                            <div class="pixel arm arm-extra"></div>
+                                            <!-- 🕷️ Spider legs - 3 right arms -->
+                                            <div class="pixel arm arm-extra spider-leg-2"></div>
+                                            <div class="pixel arm arm-extra spider-leg-3"></div>
                                         </div>
                                     </div>
 
@@ -1493,12 +1586,10 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 5000); // Poll every 5 seconds
     }
 
-    // Start HTTP polling after 3 seconds if WebSocket doesn't connect
+    // Start HTTP polling after 3 seconds (ALWAYS, for localhost testing)
     setTimeout(() => {
-        if (!isConnected) {
-            console.log('[HTTP Polling] WebSocket not connected, starting HTTP fallback');
-            startHttpPolling();
-        }
+        console.log('[HTTP Polling] Starting HTTP fallback (works on localhost + Railway)');
+        startHttpPolling();
     }, 3000);
 
     // ===== IMAGE POLLING =====
@@ -1870,7 +1961,9 @@ function wakeUpPet() {
     }
 
     const stateText = document.getElementById('pet-state-text');
-    stateText.textContent = 'Watching logs...';
+    if (stateText) {
+        stateText.textContent = 'Watching logs...';
+    }
 
     // === AUTONOMOUS WAKE-UP BEHAVIOR ===
     // Randomly perform an action after waking up (especially visible on mobile)
@@ -2120,7 +2213,9 @@ function triggerPetAnimation(animation, duration) {
         'shaking': 'Shaking!',
         'flower': 'Resting as flower'
     };
-    stateText.textContent = moodTexts[animation] || 'Active';
+    if (stateText) {
+        stateText.textContent = moodTexts[animation] || 'Active';
+    }
 
     // Return to idle after duration
     petAnimationTimer = setTimeout(() => {
@@ -2128,7 +2223,9 @@ function triggerPetAnimation(animation, duration) {
         pet.classList.add('idle');
         petAnimationState = 'idle';
         toy.style.opacity = '0';
-        stateText.textContent = 'Watching logs...';
+        if (stateText) {
+            stateText.textContent = 'Watching logs...';
+        }
     }, duration);
 }
 
@@ -2526,8 +2623,8 @@ function startRestCountdown(durationSeconds) {
     // ALWAYS show visual effect during cooldown (not just 50%)
     console.log('[REST] Cooldown started - duration:', durationSeconds, 'seconds');
 
-    // Random visual effect choice (weighted)
-    const visualEffect = Math.random();
+    // TEMPORARY: ALWAYS flower mode for testing
+    const visualEffect = 0; // Force flower mode (was: Math.random())
 
     if (visualEffect < 0.6) {
         // 60% - FLOWER mode (was 50%)
@@ -2876,6 +2973,8 @@ function transformFromFlower() {
 
 // Detect rest period from logs (vercept cooldown messages)
 function detectRestPeriod(logText) {
+    console.log('[DEBUG detectRestPeriod] Checking log:', logText.substring(0, 100));
+
     // Pattern 1: "Cooldown period: X minutes before next iteration..."
     const cooldownPattern = /Cooldown period: (\d+) minutes/i;
     const match = logText.match(cooldownPattern);
@@ -2884,9 +2983,11 @@ function detectRestPeriod(logText) {
         const minutes = parseInt(match[1]);
         const seconds = minutes * 60;
 
-        console.log('[Pet] Detected rest period (format 1):', minutes, 'minutes');
+        console.log('[Pet] ✅ Detected rest period (format 1):', minutes, 'minutes');
         startRestCountdown(seconds);
         return true;
+    } else {
+        console.log('[DEBUG] Pattern 1 (Cooldown period) - NO MATCH');
     }
 
     // Pattern 2: Progress bar format "[█████░░] XX% • YYY/ZZZs"
@@ -3283,6 +3384,82 @@ function checkStreamSpiderMode() {
         // Get pet element (use a placeholder if needed)
         const pet = document.getElementById('agent-pet');
 
+        // 🕷️ TRANSFORM PET TO SPIDER!
+        if (pet) {
+            console.log('[Stream] 🕷️ Transforming pet to SPIDER!');
+            pet.classList.add('spider-mode', 'hunting');
+
+            // 🛑 STOP idle animations and wall movement - spider only moves to catch pixels!
+            stopIdleAnimationLoop();
+            stopWallMovementLoop();
+
+            // 🕷️ FORCE styles via JavaScript (highest priority!)
+            pet.style.transition = 'none !important';
+            pet.style.animation = 'none !important';
+            pet.style.transform = 'rotate(90deg) scale(1.5)'; // Set rotation instantly
+
+            // Also disable transitions on all child elements
+            const allChildren = pet.querySelectorAll('*');
+            allChildren.forEach(child => {
+                child.style.transition = 'none !important';
+                child.style.animation = 'none !important';
+            });
+
+            // Show ALL arms (6 legs - side by side, not overlapping!)
+            const allArms = pet.querySelectorAll('.pixel.arm, .pixel.arm-extra');
+            console.log('[Spider] 🕷️ Found', allArms.length, 'arms total');
+
+            // Get body color
+            const bodyPixel = pet.querySelector('.pixel.body');
+            const bodyColor = bodyPixel ? window.getComputedStyle(bodyPixel).backgroundColor : '#000000';
+            console.log('[Spider] Body color:', bodyColor);
+
+            allArms.forEach((arm, index) => {
+                arm.style.opacity = '1';
+                arm.style.width = '4px';
+                arm.style.height = '4px';
+                arm.style.display = 'inline-block'; // inline-block to display side by side
+                arm.style.background = bodyColor; // Same color as body!
+                arm.style.boxShadow = 'none'; // No glow
+                arm.style.visibility = 'visible';
+                arm.style.filter = 'none'; // No filters
+                arm.style.transition = 'none'; // No smooth transitions
+                arm.style.zIndex = '100';
+                console.log(`[Spider] 🦵 Leg ${index + 1}: ${arm.className}`);
+            });
+
+            // Show mandibles (small, same color as body)
+            const mandibles = pet.querySelectorAll('.mandible');
+            console.log('[Spider] 🦷 Found', mandibles.length, 'mandibles');
+            mandibles.forEach((mandible, index) => {
+                mandible.style.display = 'block';
+                mandible.style.opacity = '1';
+                mandible.style.width = '4px'; // Small
+                mandible.style.height = '4px';
+                mandible.style.background = bodyColor; // Same color as body!
+                mandible.style.boxShadow = 'none'; // No glow
+                mandible.style.visibility = 'visible';
+                mandible.style.position = 'absolute';
+                mandible.style.top = '-6px'; // Stick out slightly above head
+                mandible.style.zIndex = '101';
+                mandible.style.filter = 'none'; // No filters
+                mandible.style.transition = 'none'; // No smooth transitions
+                if (mandible.classList.contains('mandible-left')) {
+                    mandible.style.left = '24px';
+                } else {
+                    mandible.style.right = '24px';
+                }
+                console.log(`[Spider] 🦷 Mandible ${index + 1}: ${mandible.className}`);
+            });
+
+            // Hide legs
+            const legs = pet.querySelector('.pet-legs');
+            if (legs) {
+                legs.style.display = 'none';
+                console.log('[Spider] 👢 Legs hidden');
+            }
+        }
+
         if (window.SpiderWebSystem) {
             window.SpiderWebSystem.start(pet);
 
@@ -3290,6 +3467,59 @@ function checkStreamSpiderMode() {
             setTimeout(() => {
                 window.SpiderWebSystem.stop();
                 streamSpiderActive = false;
+
+                // 🔙 RESTORE PET TO NORMAL
+                if (pet) {
+                    console.log('[Stream] Restoring pet from spider mode');
+                    pet.classList.remove('spider-mode', 'hunting');
+
+                    // Clear inline styles
+                    pet.style.transition = '';
+                    pet.style.animation = '';
+
+                    // Restore ALL arms to normal
+                    const allArms = pet.querySelectorAll('.pixel.arm, .pixel.arm-extra');
+                    allArms.forEach(arm => {
+                        arm.style.opacity = '';
+                        arm.style.width = '';
+                        arm.style.height = '';
+                        arm.style.display = '';
+                        arm.style.background = '';
+                        arm.style.boxShadow = '';
+                        arm.style.visibility = '';
+                        arm.style.filter = '';
+                        arm.style.zIndex = '';
+                    });
+
+                    // Hide mandibles
+                    const mandibles = pet.querySelectorAll('.mandible');
+                    mandibles.forEach(mandible => {
+                        mandible.style.display = '';
+                        mandible.style.opacity = '';
+                        mandible.style.width = '';
+                        mandible.style.height = '';
+                        mandible.style.background = '';
+                        mandible.style.boxShadow = '';
+                        mandible.style.visibility = '';
+                        mandible.style.position = '';
+                        mandible.style.top = '';
+                        mandible.style.left = '';
+                        mandible.style.right = '';
+                        mandible.style.zIndex = '';
+                        mandible.style.filter = '';
+                    });
+
+                    // Restore legs
+                    const legs = pet.querySelector('.pet-legs');
+                    if (legs) {
+                        legs.style.display = '';
+                    }
+
+                    // ▶️ RESTART idle animations and wall movement
+                    startIdleAnimationLoop();
+                    startWallMovementLoop();
+                }
+
                 console.log('[Stream] Spider web ended');
             }, 30 * 60 * 1000);
         }

@@ -290,7 +290,7 @@
     // ===== WEB PHYSICS (VIBRATION) =====
 
     function vibrateWeb(svg, sourceX, sourceY, intensity = 1.0) {
-        console.log('[Spider Web] Vibration detected at', sourceX, sourceY);
+        console.log('[Spider Web] 💥 Vibration detected at', sourceX, sourceY);
 
         const allLines = svg.querySelectorAll('line, path');
 
@@ -304,17 +304,25 @@
                 Math.pow(centerY - sourceY, 2)
             );
 
-            // Closer lines vibrate more
-            const vibrationAmount = Math.max(0, 5 * intensity * (1 - distance / WEB_SIZE));
+            // Closer lines vibrate more - УСИЛЕНА ВИБРАЦИЯ (10x вместо 5x)
+            const vibrationAmount = Math.max(0, 10 * intensity * (1 - distance / WEB_SIZE));
 
             if (vibrationAmount > 0.5) {
-                line.style.transition = 'transform 0.1s ease-out';
+                // Дискретные колыхания - 3 волны
+                line.style.transition = 'none'; // БЕЗ плавного перехода!
+
+                // Волна 1
                 line.style.transform = `translate(${(Math.random() - 0.5) * vibrationAmount}px, ${(Math.random() - 0.5) * vibrationAmount}px)`;
 
                 setTimeout(() => {
-                    line.style.transition = 'transform 0.3s ease-out';
+                    // Волна 2
+                    line.style.transform = `translate(${(Math.random() - 0.5) * vibrationAmount * 0.5}px, ${(Math.random() - 0.5) * vibrationAmount * 0.5}px)`;
+                }, 80);
+
+                setTimeout(() => {
+                    // Волна 3 - возврат
                     line.style.transform = 'translate(0, 0)';
-                }, 100);
+                }, 160);
             }
         });
     }
@@ -393,7 +401,7 @@
     // ===== COLLISION DETECTION =====
 
     function checkWebCollision(prey, webData) {
-        if (!webData || prey.trapped) return false;
+        if (!webData) return false;
 
         const dx = prey.x - webData.center.x;
         const dy = prey.y - webData.center.y;
@@ -401,15 +409,30 @@
 
         // Check if prey is within web radius
         if (distance < WEB_SIZE) {
-            console.log('[Spider Web] Prey caught in web!');
-            prey.trapped = true;
-            prey.trapX = prey.x;
-            prey.trapY = prey.y;
+            // 🌊 КОЛЫХАНИЕ - вибрация когда пиксель ВХОДИТ в паутину!
+            if (!prey.inWeb) {
+                console.log('[Spider Web] 💥 Prey ENTERED web!');
+                prey.inWeb = true;
+                vibrateWeb(webElement, prey.x, prey.y, 1.5);
+            }
 
-            // Vibrate web
-            vibrateWeb(webElement, prey.x, prey.y, 2.0);
+            // 🕸️ Попалась! Trap prey
+            if (!prey.trapped) {
+                console.log('[Spider Web] 🕷️ Prey TRAPPED!');
+                prey.trapped = true;
+                prey.trapX = prey.x;
+                prey.trapY = prey.y;
+
+                // СИЛЬНАЯ вибрация когда попалась
+                vibrateWeb(webElement, prey.x, prey.y, 3.0);
+            }
 
             return true;
+        } else {
+            // Вышел из паутины
+            if (prey.inWeb) {
+                prey.inWeb = false;
+            }
         }
 
         return false;
@@ -437,6 +460,13 @@
         const container = document.getElementById('roaming-pet-container');
         if (!container) return;
 
+        // 🕷️ ADD CATCHING ANIMATION TO AGENT PET!
+        const agentPet = document.getElementById('agent-pet');
+        if (agentPet && agentPet.classList.contains('spider-mode')) {
+            console.log('[Spider] 🎯 Adding catching animation!');
+            agentPet.classList.add('catching');
+        }
+
         // Calculate path along web (simplified - direct line for now)
         const currentX = parseInt(container.style.left) || 0;
         const currentY = parseInt(container.style.top) || 0;
@@ -453,8 +483,9 @@
 
         console.log('[Spider] Running to prey at', targetX, targetY, 'duration:', duration + 'ms');
 
-        // Animate spider movement
-        container.style.transition = `left ${duration}ms linear, top ${duration}ms linear`;
+        // 🕷️ ДИСКРЕТНОЕ движение - пиксельная физика (steps, не плавное!)
+        const steps = Math.ceil(distance / 4); // Прыжки по 4 пикселя
+        container.style.transition = `left ${duration}ms steps(${steps}), top ${duration}ms steps(${steps})`;
         container.style.left = targetX + 'px';
         container.style.top = targetY + 'px';
 
@@ -482,12 +513,24 @@
             trappedPrey = null;
             spiderHunting = false;
 
+            // 🕷️ REMOVE CATCHING ANIMATION - spider returns to frozen state
+            const agentPet = document.getElementById('agent-pet');
+            if (agentPet && agentPet.classList.contains('spider-mode')) {
+                console.log('[Spider] ❄️ Returning to frozen state');
+                agentPet.classList.remove('catching');
+            }
+
             console.log('[Spider] Prey consumed! Returning to web center...');
 
-            // Return to web center
+            // Return to web center - ДИСКРЕТНОЕ движение!
             const container = document.getElementById('roaming-pet-container');
             if (container && webData) {
-                container.style.transition = 'left 2s ease-in-out, top 2s ease-in-out';
+                const returnDistance = Math.sqrt(
+                    Math.pow(webData.center.x - parseInt(container.style.left), 2) +
+                    Math.pow(webData.center.y - parseInt(container.style.top), 2)
+                );
+                const returnSteps = Math.ceil(returnDistance / 4);
+                container.style.transition = `left 2s steps(${returnSteps}), top 2s steps(${returnSteps})`;
                 container.style.left = webData.center.x + 'px';
                 container.style.top = webData.center.y + 'px';
             }
@@ -543,13 +586,24 @@
         // Animate weaving
         animateWebWeaving(webElement, CONFIG.weavingDuration);
 
-        // Move spider to web center immediately
+        // Move spider to web center - ДИСКРЕТНОЕ движение!
         const container = document.getElementById('roaming-pet-container');
         if (container) {
-            // Position spider in center of web
-            container.style.transition = 'left 2s ease-in-out, top 2s ease-in-out';
-            container.style.left = (webData.center.x - 15) + 'px'; // -15 to center the pet sprite
-            container.style.top = (webData.center.y - 15) + 'px';
+            // Calculate distance for discrete steps
+            const currentX = parseInt(container.style.left) || 0;
+            const currentY = parseInt(container.style.top) || 0;
+            const targetX = webData.center.x - 15;
+            const targetY = webData.center.y - 15;
+            const climbDistance = Math.sqrt(
+                Math.pow(targetX - currentX, 2) +
+                Math.pow(targetY - currentY, 2)
+            );
+            const climbSteps = Math.ceil(climbDistance / 4); // Прыжки по 4 пикселя
+
+            // Position spider in center of web with discrete movement
+            container.style.transition = `left 2s steps(${climbSteps}), top 2s steps(${climbSteps})`;
+            container.style.left = targetX + 'px';
+            container.style.top = targetY + 'px';
 
             // Add a class to indicate spider is on web
             const pet = document.getElementById('roaming-pet');
