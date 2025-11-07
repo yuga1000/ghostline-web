@@ -409,19 +409,42 @@
                 </div>
 
                 <div class="tool-section">
+                    <h3>[ ZOOM ]</h3>
+                    <div style="display: flex; gap: 5px; margin-bottom: 8px;">
+                        <button class="tool-btn" id="zoomOut" style="flex: 1; padding: 4px;">➖</button>
+                        <button class="tool-btn" id="zoomReset" style="flex: 1; padding: 4px;">1:1</button>
+                        <button class="tool-btn" id="zoomIn" style="flex: 1; padding: 4px;">➕</button>
+                    </div>
+                    <div style="font-size: 10px; color: #00ff00; text-align: center;" id="zoomLevel">100%</div>
+                </div>
+
+                <div class="tool-section">
                     <h3>[ OPTIONS ]</h3>
                     <label class="checkbox-label">
                         <input type="checkbox" id="gridToggle" checked>
                         Show Grid
                     </label>
+                    <div style="margin-left: 24px; margin-top: 5px; margin-bottom: 10px;">
+                        <label style="font-size: 9px; color: #888888;">Grid Opacity:</label>
+                        <input type="range" id="gridOpacity" min="0" max="100" value="8"
+                               style="width: 100%; margin-top: 3px;">
+                        <div style="font-size: 8px; color: #00ff00; text-align: center;" id="gridOpacityValue">8%</div>
+                    </div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="onionSkin">
                         Onion Skin
                     </label>
+                    <div style="margin-left: 24px; margin-top: 5px; margin-bottom: 10px;">
+                        <label style="font-size: 9px; color: #888888;">Onion Opacity:</label>
+                        <input type="range" id="onionOpacity" min="0" max="100" value="30"
+                               style="width: 100%; margin-top: 3px;">
+                        <div style="font-size: 8px; color: #00ff00; text-align: center;" id="onionOpacityValue">30%</div>
+                    </div>
                 </div>
 
                 <div class="tool-section">
                     <h3>[ ACTIONS ]</h3>
+                    <button class="tool-btn" id="undoBtn">↶ Undo (Ctrl+Z)</button>
                     <button class="tool-btn" id="clearBtn">🗑️ Clear Frame</button>
                     <button class="tool-btn" id="fillAllBtn">⬛ Fill All</button>
                 </div>
@@ -509,6 +532,18 @@
         let showGrid = true;
         let onionSkinEnabled = false;
 
+        // NEW: Grid and onion skin opacity
+        let gridOpacity = 0.08;
+        let onionOpacity = 0.30;
+
+        // NEW: Zoom level
+        let zoomLevel = 1.0;
+
+        // NEW: Undo/Redo history
+        let undoHistory = [];
+        let redoHistory = [];
+        const MAX_HISTORY = 50;
+
         // Animation state
         let frames = [];
         let currentFrameIndex = 0;
@@ -558,31 +593,47 @@
             }
 
             // Draw onion skin OVER current frame (previous frame with red tint)
+            // ONLY if previous frame has content (not empty!)
             if (onionSkinEnabled && currentFrameIndex > 0) {
                 const prevFrame = frames[currentFrameIndex - 1];
 
-                // Create temp canvas to draw previous frame
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.putImageData(prevFrame, 0, 0);
+                // Check if previous frame has any content
+                let hasContent = false;
+                for (let i = 0; i < prevFrame.data.length; i += 4) {
+                    const r = prevFrame.data[i];
+                    const g = prevFrame.data[i + 1];
+                    const b = prevFrame.data[i + 2];
+                    if (r > 0 || g > 0 || b > 0) {
+                        hasContent = true;
+                        break;
+                    }
+                }
 
-                // Draw previous frame with red overlay (so you can distinguish it)
-                ctx.save();
-                ctx.globalAlpha = 0.3;
-                ctx.drawImage(tempCanvas, 0, 0);
+                // Only show onion skin if previous frame has pixels
+                if (hasContent) {
+                    // Create temp canvas to draw previous frame
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = canvas.width;
+                    tempCanvas.height = canvas.height;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.putImageData(prevFrame, 0, 0);
 
-                // Add slight red tint to show it's the previous frame
-                ctx.globalCompositeOperation = 'source-atop';
-                ctx.fillStyle = 'rgba(255, 100, 100, 0.4)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.restore();
+                    // Draw previous frame with red overlay (so you can distinguish it)
+                    ctx.save();
+                    ctx.globalAlpha = onionOpacity; // Use dynamic opacity!
+                    ctx.drawImage(tempCanvas, 0, 0);
+
+                    // Add slight red tint to show it's the previous frame
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.fillStyle = 'rgba(255, 100, 100, 0.4)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                }
             }
 
-            // Draw grid (subtle, less eye-strain!)
+            // Draw grid (using dynamic opacity!)
             if (showGrid) {
-                ctx.strokeStyle = 'rgba(0, 255, 0, 0.08)'; // Much more transparent!
+                ctx.strokeStyle = `rgba(0, 255, 0, ${gridOpacity})`; // Dynamic opacity!
                 ctx.lineWidth = 1;
 
                 for (let i = 0; i <= gridSize; i++) {
@@ -908,6 +959,52 @@
             }
         }
 
+        // ===== ZOOM FUNCTIONS =====
+        function applyZoom() {
+            canvas.style.transform = `scale(${zoomLevel})`;
+            canvas.style.transformOrigin = 'center center';
+            document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+            console.log('[Zoom] Applied zoom:', zoomLevel);
+        }
+
+        // ===== UNDO/REDO FUNCTIONS =====
+        function saveToHistory() {
+            // Clone current frame state
+            const frameClone = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            undoHistory.push(frameClone);
+
+            // Limit history size
+            if (undoHistory.length > MAX_HISTORY) {
+                undoHistory.shift(); // Remove oldest
+            }
+
+            // Clear redo when new action performed
+            redoHistory = [];
+
+            console.log('[Undo] Saved to history. Stack size:', undoHistory.length);
+        }
+
+        function performUndo() {
+            if (undoHistory.length === 0) {
+                console.log('[Undo] No history available');
+                return;
+            }
+
+            // Save current state to redo
+            const currentState = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            redoHistory.push(currentState);
+
+            // Restore previous state
+            const previousState = undoHistory.pop();
+            ctx.putImageData(previousState, 0, 0);
+            frames[currentFrameIndex] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            renderCanvas();
+            updateFrameThumbnail(currentFrameIndex);
+
+            console.log('[Undo] Restored previous state. History:', undoHistory.length);
+        }
+
         // ===== EXPORT FUNCTIONS =====
         function exportPNG() {
             const exportCanvas = document.createElement('canvas');
@@ -1016,6 +1113,8 @@
             // Canvas mouse events
             canvas.addEventListener('mousedown', (e) => {
                 isDrawing = true;
+                // Save to history before first stroke
+                saveToHistory();
                 handleCanvasClick(e);
             });
 
@@ -1074,8 +1173,53 @@
                 renderCanvas();
             });
 
+            // NEW: Grid opacity slider
+            document.getElementById('gridOpacity').addEventListener('input', (e) => {
+                gridOpacity = parseInt(e.target.value) / 100; // Convert 0-100 to 0-1
+                document.getElementById('gridOpacityValue').textContent = e.target.value + '%';
+                renderCanvas();
+            });
+
+            // NEW: Onion skin opacity slider
+            document.getElementById('onionOpacity').addEventListener('input', (e) => {
+                onionOpacity = parseInt(e.target.value) / 100; // Convert 0-100 to 0-1
+                document.getElementById('onionOpacityValue').textContent = e.target.value + '%';
+                renderCanvas();
+            });
+
+            // NEW: Zoom controls
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                zoomLevel = Math.min(4.0, zoomLevel + 0.25);
+                applyZoom();
+            });
+
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                zoomLevel = Math.max(0.5, zoomLevel - 0.25);
+                applyZoom();
+            });
+
+            document.getElementById('zoomReset').addEventListener('click', () => {
+                zoomLevel = 1.0;
+                applyZoom();
+            });
+
+            // NEW: Undo button
+            document.getElementById('undoBtn').addEventListener('click', () => {
+                performUndo();
+            });
+
+            // NEW: Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+Z or Cmd+Z for undo
+                if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                    e.preventDefault();
+                    performUndo();
+                }
+            });
+
             // Actions
             document.getElementById('clearBtn').addEventListener('click', () => {
+                saveToHistory(); // Save before clearing
                 const blankData = ctx.createImageData(canvas.width, canvas.height);
                 for (let i = 0; i < blankData.data.length; i += 4) {
                     blankData.data[i] = 0;
@@ -1089,6 +1233,7 @@
             });
 
             document.getElementById('fillAllBtn').addEventListener('click', () => {
+                saveToHistory(); // Save before filling
                 ctx.fillStyle = currentColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 frames[currentFrameIndex] = ctx.getImageData(0, 0, canvas.width, canvas.height);
