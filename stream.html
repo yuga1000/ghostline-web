@@ -3144,6 +3144,24 @@ function spawnRaindrop() {
         }, fallDuration * 400); // Check midway through fall
     }
 
+    // Create splash when drop hits ground (near end of animation)
+    setTimeout(() => {
+        const dropRect = drop.getBoundingClientRect();
+
+        // Spawn 2 splash pixels at drop position
+        for (let i = 0; i < 2; i++) {
+            const splash = document.createElement('div');
+            splash.className = 'splash-pixel ' + (i === 0 ? 'left' : 'right');
+            splash.style.left = drop.style.left;
+            splash.style.top = (220 + Math.random() * 10) + 'px'; // Near bottom
+
+            rainContainer.appendChild(splash);
+
+            // Remove splash after animation
+            setTimeout(() => splash.remove(), 400);
+        }
+    }, fallDuration * 900); // Trigger at 90% of fall (when hitting ground)
+
     // Remove drop after animation
     setTimeout(() => {
         drop.remove();
