@@ -302,7 +302,12 @@ app.get('/api/agent-status', (req, res) => {
 
 // Test endpoint to verify deployment
 app.get('/api/test-deployment', (req, res) => {
-  res.json({ status: 'ok', message: 'Deployment verified', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    message: 'Deployment verified',
+    version: '2.0-persistent-logs',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Hide admin entry under secret slug - show login form if not authenticated
