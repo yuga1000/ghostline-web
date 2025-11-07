@@ -451,6 +451,17 @@
         50% { transform: translateY(-3px); }
     }
 
+    @keyframes floatUp {
+        0% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-40px);
+        }
+    }
+
     /* Hover effect for entire line */
     .log-line:hover {
         background: rgba(0, 255, 0, 0.03);
@@ -2178,18 +2189,36 @@ function startWallMovementLoop() {
 
     console.log('[Pet Movement] Starting wall movement loop');
 
-    // Random wall movement every 8-15 seconds (more frequent!)
+    // Random wall movement every 5-10 seconds (VERY ACTIVE!)
     wallMovementInterval = setInterval(() => {
         if (!petIsAwake) {
             console.log('[Pet Movement] Skipping - pet is sleeping');
             return;
         }
 
-        // 70% chance to move to a different wall (more active!)
-        if (Math.random() < 0.7) {
-            randomWallMovement();
+        // 80% chance to do SOMETHING (more active!)
+        if (Math.random() < 0.8) {
+            // Random activity choice
+            const activity = Math.random();
+
+            if (activity < 0.5) {
+                // 50% - move to different wall
+                randomWallMovement();
+            } else if (activity < 0.7) {
+                // 20% - just dance/jump in place
+                const animations = ['dancing', 'excited-bounce', 'jumping'];
+                const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+                console.log('[Pet Activity] Doing', randomAnim, 'in place!');
+                triggerPetAnimation(randomAnim, 2000);
+            } else if (activity < 0.85) {
+                // 15% - laugh/giggle
+                laughAnimation();
+            } else {
+                // 15% - pixel game
+                startPixelCatchGame();
+            }
         }
-    }, 8000 + Math.random() * 7000); // 8-15 seconds
+    }, 5000 + Math.random() * 5000); // 5-10 seconds
 }
 
 function stopWallMovementLoop() {
@@ -2197,6 +2226,121 @@ function stopWallMovementLoop() {
         clearInterval(wallMovementInterval);
         wallMovementInterval = null;
     }
+}
+
+// ===== LAUGH/GIGGLE ANIMATION =====
+function laughAnimation() {
+    const pet = document.getElementById('agent-pet');
+    console.log('[Pet Activity] 😄 Laughing/Giggling!');
+
+    // Bounce animation
+    triggerPetAnimation('excited-bounce', 3000);
+
+    // Create laugh text bubbles
+    const laughs = ['hehe', 'haha', 'lol', '😄', 'ха-ха'];
+    const randomLaugh = laughs[Math.floor(Math.random() * laughs.length)];
+
+    const bubble = document.createElement('div');
+    bubble.textContent = randomLaugh;
+    bubble.style.cssText = `
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #00ff00;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        font-weight: bold;
+        text-shadow: 0 0 4px #00ff00;
+        pointer-events: none;
+        z-index: 100;
+        animation: floatUp 2s ease-out forwards;
+    `;
+
+    pet.style.position = 'relative';
+    pet.appendChild(bubble);
+
+    setTimeout(() => bubble.remove(), 2000);
+}
+
+// ===== PIXEL CATCH GAME =====
+let pixelGameActive = false;
+
+function startPixelCatchGame() {
+    if (pixelGameActive) return;
+
+    pixelGameActive = true;
+    const pet = document.getElementById('agent-pet');
+    const petDisplay = pet.closest('.pet-display-inline');
+
+    console.log('[Pet Activity] 🎮 Starting pixel catch game!');
+
+    // Create 3-5 floating pixels
+    const numPixels = 3 + Math.floor(Math.random() * 3);
+    const pixels = [];
+
+    for (let i = 0; i < numPixels; i++) {
+        const pixel = document.createElement('div');
+        pixel.className = 'catch-pixel';
+        pixel.style.cssText = `
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: ${Math.random() < 0.5 ? '#00ff00' : '#ffff00'};
+            box-shadow: 0 0 6px currentColor;
+            border-radius: 1px;
+            pointer-events: none;
+            z-index: 50;
+        `;
+
+        // Random starting position around pet
+        const angle = (i / numPixels) * Math.PI * 2;
+        const distance = 60 + Math.random() * 40;
+        const startX = Math.cos(angle) * distance;
+        const startY = Math.sin(angle) * distance;
+
+        pixel.style.left = `calc(50% + ${startX}px)`;
+        pixel.style.top = `calc(50% + ${startY}px)`;
+
+        petDisplay.appendChild(pixel);
+        pixels.push(pixel);
+
+        // Animate pixel floating
+        const floatAnim = pixel.animate([
+            { transform: 'translateY(0px) scale(1)' },
+            { transform: 'translateY(-20px) scale(1.2)' },
+            { transform: 'translateY(0px) scale(1)' }
+        ], {
+            duration: 1000 + Math.random() * 1000,
+            iterations: Infinity,
+            easing: 'ease-in-out'
+        });
+    }
+
+    // Pet tries to catch pixels
+    triggerPetAnimation('excited-bounce', 4000);
+
+    // Catch pixels one by one
+    pixels.forEach((pixel, index) => {
+        setTimeout(() => {
+            // Pixel moves toward pet
+            pixel.style.transition = 'all 0.5s ease-in';
+            pixel.style.left = '50%';
+            pixel.style.top = '50%';
+            pixel.style.transform = 'scale(0)';
+
+            setTimeout(() => pixel.remove(), 500);
+
+            // Pet celebrates catch
+            if (index === pixels.length - 1) {
+                setTimeout(() => {
+                    triggerPetAnimation('dancing', 2000);
+                    pixelGameActive = false;
+                    console.log('[Pet Activity] ✅ Caught all pixels!');
+                }, 600);
+            }
+        }, 1000 + index * 800);
+    });
 }
 
 // ===== HUNTING ANIMATION WITH TONGUE (CHAMELEON STYLE) =====
@@ -2932,7 +3076,7 @@ setInterval(() => {
 // Spider web can appear randomly during rest periods
 let streamSpiderActive = false;
 let lastStreamSpiderTime = 0;
-const STREAM_SPIDER_COOLDOWN = 15 * 60 * 1000; // 15 minutes between webs
+const STREAM_SPIDER_COOLDOWN = 5 * 60 * 1000; // 5 minutes between webs (reduced!)
 
 function checkStreamSpiderMode() {
     // Only during rest periods (when countdown is active)
@@ -2946,9 +3090,9 @@ function checkStreamSpiderMode() {
     // Don't start if spider already active
     if (streamSpiderActive) return;
 
-    // 30% chance to start spider web
-    if (Math.random() < 0.3) {
-        console.log('[Stream] Starting spider web mode!');
+    // 60% chance to start spider web (increased!)
+    if (Math.random() < 0.6) {
+        console.log('[Stream] 🕷️ Starting spider web mode!');
         streamSpiderActive = true;
         lastStreamSpiderTime = now;
 
@@ -2968,8 +3112,8 @@ function checkStreamSpiderMode() {
     }
 }
 
-// Check for spider web every 3 minutes during rest
-setInterval(checkStreamSpiderMode, 3 * 60 * 1000);
+// Check for spider web every 1 minute during rest (more frequent!)
+setInterval(checkStreamSpiderMode, 60 * 1000);
 
 // ===== STARS SYSTEM =====
 let starsActive = false;
