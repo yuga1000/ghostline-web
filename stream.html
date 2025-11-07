@@ -1244,10 +1244,18 @@ async function loadExistingLogs() {
                 startTime = Date.now();
             }
 
-            // WAKE UP PET! (если есть логи - значит агент работал/работает)
-            if (!petIsAwake) {
-                console.log('[Load Logs] 🎉 Waking up pet - logs found!');
+            // DON'T wake pet automatically - only wake on NEW logs
+            // Check if logs are fresh (last log within 5 minutes)
+            const lastLog = data.logs[data.logs.length - 1];
+            const lastLogTime = lastLog.timestamp ? new Date(lastLog.timestamp).getTime() : 0;
+            const now = Date.now();
+            const isFresh = lastLogTime && (now - lastLogTime) < 5 * 60 * 1000; // 5 minutes
+
+            if (isFresh && !petIsAwake) {
+                console.log('[Load Logs] ✅ Fresh logs detected - waking up pet!');
                 wakeUpPet();
+            } else if (!isFresh) {
+                console.log('[Load Logs] ⏰ Logs are old (>5 min) - pet stays asleep');
             }
 
             // Display all logs INSTANTLY (no animation for old logs)
