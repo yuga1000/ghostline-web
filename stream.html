@@ -1216,6 +1216,46 @@ function clearPlaceholder() {
     logContent.style.display = 'block';
 }
 
+// Load existing logs on page load (immediate display)
+async function loadExistingLogs() {
+    console.log('[Load Logs] Fetching existing logs from /api/logs...');
+
+    try {
+        const response = await fetch('/api/logs');
+        const data = await response.json();
+
+        console.log('[Load Logs] Response:', data);
+
+        if (data.logs && data.logs.length > 0) {
+            console.log('[Load Logs] Found', data.logs.length, 'existing logs');
+
+            // Clear placeholder
+            clearPlaceholder();
+            updateStatus('████', true);
+            if (!startTime) {
+                startTime = Date.now();
+            }
+
+            // Display all logs INSTANTLY (no animation for old logs)
+            for (let i = 0; i < data.logs.length; i++) {
+                const logEvent = data.logs[i];
+                console.log('[Load Logs] Processing log:', logEvent);
+
+                // Add log line - INSTANT (true parameter means no animation)
+                if (logEvent.content || logEvent.message) {
+                    addLogLine(logEvent.content || logEvent.message, 'log-info', null, true);
+                }
+            }
+
+            console.log('[Load Logs] ✅ Loaded', data.logs.length, 'logs');
+        } else {
+            console.log('[Load Logs] No existing logs found');
+        }
+    } catch (e) {
+        console.error('[Load Logs] Error fetching logs:', e);
+    }
+}
+
 // Process log queue with delay between logs
 function processLogQueue() {
     if (isProcessingQueue || logQueue.length === 0) {
@@ -1381,6 +1421,10 @@ function startUptimeCounter() {
 // Initialize WebSocket on page load
 window.addEventListener('DOMContentLoaded', () => {
     console.log('[Agent Terminal] Initializing WebSocket connection...');
+
+    // LOAD EXISTING LOGS IMMEDIATELY (before WebSocket/polling)
+    loadExistingLogs();
+
     initWebSocket();
 
     // FALLBACK: Poll HTTP API for logs if WebSocket fails (for testing base64 images)
