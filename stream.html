@@ -1217,13 +1217,20 @@ function clearPlaceholder() {
     logContent.style.display = 'block';
 }
 
+// ⚡ PREFETCH logs BEFORE DOM loads (faster on mobile!)
+let logsPrefetchPromise = null;
+if (document.readyState === 'loading') {
+    console.log('[Prefetch] 🚀 Starting early fetch of logs...');
+    logsPrefetchPromise = fetch('/api/logs').then(r => r.json());
+}
+
 // Load existing logs on page load (immediate display)
 async function loadExistingLogs() {
     console.log('[Load Logs] Fetching existing logs from /api/logs...');
 
     try {
-        const response = await fetch('/api/logs');
-        const data = await response.json();
+        // Use prefetched data if available, otherwise fetch now
+        const data = logsPrefetchPromise ? await logsPrefetchPromise : await fetch('/api/logs').then(r => r.json());
 
         console.log('[Load Logs] Response:', data);
 
@@ -1392,6 +1399,18 @@ function addLogLine(text, className = 'log-info', onComplete, instant = false) {
 
     // ===== IMAGE DETECTION LOGIC =====
     detectAndShowImage(text);
+
+    // ===== GENERATION COMPLETE - PET JUMPS! =====
+    if (text.includes('GLVSF Image') || text.includes('saved successfully') || text.includes('Image generated')) {
+        console.log('[Pet] 🎉 Generation complete detected - PET JUMPS!');
+        // Immediate excited jump!
+        setTimeout(() => {
+            if (petIsAwake) {
+                triggerPetAnimation('excited-bounce', 3000);
+                console.log('[Pet] 🦘 JUMPING for generation complete!');
+            }
+        }, 500);
+    }
 }
 
 // Update status indicator
@@ -2259,15 +2278,15 @@ function startWallMovementLoop() {
 
     console.log('[Pet Movement] Starting wall movement loop');
 
-    // Random wall movement every 5-10 seconds (VERY ACTIVE!)
+    // Random wall movement every 3-7 seconds (ULTRA ACTIVE!)
     wallMovementInterval = setInterval(() => {
         if (!petIsAwake) {
             console.log('[Pet Movement] Skipping - pet is sleeping');
             return;
         }
 
-        // 80% chance to do SOMETHING (more active!)
-        if (Math.random() < 0.8) {
+        // 90% chance to do SOMETHING (ultra active!)
+        if (Math.random() < 0.9) {
             // Random activity choice
             const activity = Math.random();
 
@@ -2288,7 +2307,7 @@ function startWallMovementLoop() {
                 startPixelCatchGame();
             }
         }
-    }, 5000 + Math.random() * 5000); // 5-10 seconds
+    }, 3000 + Math.random() * 4000); // 3-7 seconds (ultra active!)
 }
 
 function stopWallMovementLoop() {
@@ -2576,6 +2595,11 @@ function startRestCountdown(durationSeconds) {
             const seconds = remaining % 60;
             countdownText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
+            // Check if spider should appear (every 30 seconds to avoid spam)
+            if (remaining % 30 === 0) {
+                checkStreamSpiderMode();
+            }
+
             // Log countdown updates to terminal every 5 minutes (ASCII style)
             if (remaining % 300 === 0 && remaining > 0) {
                 const mins = Math.floor(remaining / 60);
@@ -2852,7 +2876,7 @@ function transformFromFlower() {
 
 // Detect rest period from logs (vercept cooldown messages)
 function detectRestPeriod(logText) {
-    // Pattern: "Cooldown period: X minutes before next iteration..."
+    // Pattern 1: "Cooldown period: X minutes before next iteration..."
     const cooldownPattern = /Cooldown period: (\d+) minutes/i;
     const match = logText.match(cooldownPattern);
 
@@ -2860,9 +2884,26 @@ function detectRestPeriod(logText) {
         const minutes = parseInt(match[1]);
         const seconds = minutes * 60;
 
-        console.log('[Pet] Detected rest period:', minutes, 'minutes');
+        console.log('[Pet] Detected rest period (format 1):', minutes, 'minutes');
         startRestCountdown(seconds);
         return true;
+    }
+
+    // Pattern 2: Progress bar format "[█████░░] XX% • YYY/ZZZs"
+    const progressPattern = /\[█.*?\]\s+\d+%\s+•\s+(\d+)\/(\d+)s/;
+    const progressMatch = logText.match(progressPattern);
+
+    if (progressMatch) {
+        const current = parseInt(progressMatch[1]);
+        const total = parseInt(progressMatch[2]);
+        const remaining = total - current;
+
+        // Only trigger if this is first progress bar or significant cooldown remaining
+        if (remaining > 60 && !restCountdownEndTime) {
+            console.log('[Pet] Detected cooldown via progress bar - remaining:', remaining, 'seconds');
+            startRestCountdown(total); // Start from total duration
+            return true;
+        }
     }
 
     return false;
