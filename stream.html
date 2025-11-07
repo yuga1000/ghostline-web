@@ -764,7 +764,7 @@
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
                         <div>STAGE: <span id="pet-stage-text">1</span> / 4</div>
-                        <div id="rest-countdown-container" style="display: block;">
+                        <div id="rest-countdown-container" style="display: none;">
                             <span style="color: #ffaa00;">REST: </span>
                             <span id="rest-countdown-text">--:--</span>
                         </div>
@@ -2790,8 +2790,8 @@ async function checkInitialAgentStatus() {
             const remainingMs = data.cooldownMinutes * 60 * 1000;
             transformToFlower();
 
-            // Also start the REST countdown display
-            startRestCountdown(data.cooldownMinutes);
+            // Also start the REST countdown display (in seconds!)
+            startRestCountdown(data.cooldownMinutes * 60);
         } else if (data.status === 'working') {
             console.log('[Agent Status] Agent is working - pet should wake up soon');
         } else {
