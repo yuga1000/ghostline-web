@@ -2424,20 +2424,45 @@ function startRestCountdown(durationSeconds) {
         clearInterval(restCountdownInterval);
     }
 
-    // Randomly choose between flower mode and sleep mode (50/50)
+    // ALWAYS show visual effect during cooldown (not just 50%)
     console.log('[REST] Cooldown started - duration:', durationSeconds, 'seconds');
-    const shouldFlower = Math.random() < 0.5; // 50/50 chance
 
-    if (shouldFlower) {
+    // Random visual effect choice (weighted)
+    const visualEffect = Math.random();
+
+    if (visualEffect < 0.6) {
+        // 60% - FLOWER mode (was 50%)
         console.log('[REST] 🌸 Choosing FLOWER mode for this cooldown');
         if (!isInFlowerMode) {
             transformToFlower();
         } else {
             console.log('[REST] Already in flower mode, skipping');
         }
-    } else {
-        console.log('[REST] 😴 Choosing SLEEP mode for this cooldown');
+    } else if (visualEffect < 0.8) {
+        // 20% - SLEEP mode with stars
+        console.log('[REST] 😴 Choosing SLEEP mode (with stars!) for this cooldown');
         goToSleep();
+        // Auto-start stars during sleep
+        setTimeout(() => {
+            if (!starsActive) {
+                toggleStars();
+            }
+        }, 2000);
+    } else {
+        // 20% - AWAKE mode with special visual (more active!)
+        console.log('[REST] ✨ Choosing AWAKE REST mode (pet stays awake with visuals)');
+        // Keep pet awake but with special visual effects
+        if (!petIsAwake) {
+            wakeUpPet();
+        }
+        // Trigger special rain or stars
+        setTimeout(() => {
+            if (Math.random() < 0.5) {
+                toggleRain();
+            } else {
+                toggleStars();
+            }
+        }, 1000);
     }
 
     // Update countdown every second
