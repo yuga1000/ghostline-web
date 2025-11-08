@@ -426,9 +426,9 @@
                     </label>
                     <div style="margin-left: 24px; margin-top: 5px; margin-bottom: 10px;">
                         <label style="font-size: 9px; color: #888888;">Grid Opacity:</label>
-                        <input type="range" id="gridOpacity" min="0" max="100" value="8"
+                        <input type="range" id="gridOpacity" min="0" max="100" value="3"
                                style="width: 100%; margin-top: 3px;">
-                        <div style="font-size: 8px; color: #00ff00; text-align: center;" id="gridOpacityValue">8%</div>
+                        <div style="font-size: 8px; color: #00ff00; text-align: center;" id="gridOpacityValue">3%</div>
                     </div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="onionSkin">
@@ -474,11 +474,13 @@
 
                 <div class="tool-section export-section">
                     <h3>[ EXPORT ]</h3>
+                    <input type="text" id="artworkName" placeholder="artwork-name"
+                           style="width: 100%; padding: 8px; background: #000; color: #00ff00; border: 1px solid #00ff00; margin-bottom: 10px; font-family: 'Courier New'; font-size: 11px;">
                     <button class="export-btn" id="exportPNG">📄 Export PNG</button>
-                    <button class="export-btn" id="exportCSS">🎨 Export CSS</button>
+                    <button class="export-btn" id="exportCSS">🎨 Copy CSS</button>
                     <button class="export-btn" id="exportSpriteSheet">📊 Sprite Sheet</button>
-                    <button class="export-btn" id="exportGIF">🎬 Export GIF</button>
-                    <button class="export-btn" id="exportJSON">📋 Export JSON</button>
+                    <button class="export-btn" id="saveCodeFile">💾 Save Code File</button>
+                    <button class="export-btn" id="exportJSON">📋 Copy JSON</button>
                 </div>
 
                 <div class="tool-section" style="margin-top: 10px;">
@@ -533,7 +535,7 @@
         let onionSkinEnabled = false;
 
         // NEW: Grid and onion skin opacity
-        let gridOpacity = 0.08;
+        let gridOpacity = 0.03; // Едва заметная сетка
         let onionOpacity = 0.30;
 
         // NEW: Zoom level
@@ -587,12 +589,30 @@
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw current frame FIRST
+            // Draw current frame
             if (frames[currentFrameIndex]) {
                 ctx.putImageData(frames[currentFrameIndex], 0, 0);
             }
 
-            // Draw onion skin OVER current frame (previous frame with red tint)
+            // Draw grid FIRST (before onion skin)
+            if (showGrid) {
+                ctx.strokeStyle = `rgba(80, 80, 80, ${gridOpacity})`;
+                ctx.lineWidth = 1;
+
+                for (let i = 0; i <= gridSize; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * pixelSize, 0);
+                    ctx.lineTo(i * pixelSize, canvas.height);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * pixelSize);
+                    ctx.lineTo(canvas.width, i * pixelSize);
+                    ctx.stroke();
+                }
+            }
+
+            // Draw onion skin OVER everything (as overlay, not saved to frame!)
             // ONLY if previous frame has content (not empty!)
             if (onionSkinEnabled && currentFrameIndex > 0) {
                 const prevFrame = frames[currentFrameIndex - 1];
@@ -630,26 +650,6 @@
                     ctx.restore();
                 }
             }
-
-            // Draw grid (using dynamic opacity!)
-            if (showGrid) {
-                ctx.strokeStyle = `rgba(0, 255, 0, ${gridOpacity})`; // Dynamic opacity!
-                ctx.lineWidth = 1;
-
-                for (let i = 0; i <= gridSize; i++) {
-                    // Vertical lines
-                    ctx.beginPath();
-                    ctx.moveTo(i * pixelSize, 0);
-                    ctx.lineTo(i * pixelSize, canvas.height);
-                    ctx.stroke();
-
-                    // Horizontal lines
-                    ctx.beginPath();
-                    ctx.moveTo(0, i * pixelSize);
-                    ctx.lineTo(canvas.width, i * pixelSize);
-                    ctx.stroke();
-                }
-            }
         }
 
         // ===== DRAWING FUNCTIONS =====
@@ -659,15 +659,29 @@
 
             if (pixelX < 0 || pixelX >= gridSize || pixelY < 0 || pixelY >= gridSize) return;
 
-            const imageData = frames[currentFrameIndex];
             const startX = pixelX * pixelSize;
             const startY = pixelY * pixelSize;
 
-            ctx.fillStyle = currentColor;
-            ctx.fillRect(startX, startY, pixelSize, pixelSize);
+            // Get clean frame data
+            const imageData = frames[currentFrameIndex];
 
-            // Update frame data
-            frames[currentFrameIndex] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            // Modify pixel in imageData directly
+            const rgb = hexToRgb(currentColor);
+            for (let dy = 0; dy < pixelSize; dy++) {
+                for (let dx = 0; dx < pixelSize; dx++) {
+                    const px = startX + dx;
+                    const py = startY + dy;
+                    const index = (py * canvas.width + px) * 4;
+
+                    imageData.data[index] = rgb.r;
+                    imageData.data[index + 1] = rgb.g;
+                    imageData.data[index + 2] = rgb.b;
+                    imageData.data[index + 3] = 255;
+                }
+            }
+
+            // Save clean frame (no onion skin captured!)
+            frames[currentFrameIndex] = imageData;
             updateFrameThumbnail(currentFrameIndex);
         }
 
@@ -680,10 +694,25 @@
             const startX = pixelX * pixelSize;
             const startY = pixelY * pixelSize;
 
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(startX, startY, pixelSize, pixelSize);
+            // Get clean frame data
+            const imageData = frames[currentFrameIndex];
 
-            frames[currentFrameIndex] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            // Erase pixel in imageData directly (set to black)
+            for (let dy = 0; dy < pixelSize; dy++) {
+                for (let dx = 0; dx < pixelSize; dx++) {
+                    const px = startX + dx;
+                    const py = startY + dy;
+                    const index = (py * canvas.width + px) * 4;
+
+                    imageData.data[index] = 0;
+                    imageData.data[index + 1] = 0;
+                    imageData.data[index + 2] = 0;
+                    imageData.data[index + 3] = 255;
+                }
+            }
+
+            // Save clean frame
+            frames[currentFrameIndex] = imageData;
             updateFrameThumbnail(currentFrameIndex);
         }
 
@@ -1030,11 +1059,17 @@
             for (let y = 0; y < gridSize; y++) {
                 for (let x = 0; x < gridSize; x++) {
                     const color = getPixelColor(imageData, x, y);
-                    if (color.a > 0 && (color.r > 0 || color.g > 0 || color.b > 0)) {
+                    // Skip black/dark pixels (background/grid)
+                    if (color.a > 0 && (color.r > 10 || color.g > 10 || color.b > 10)) {
                         const hex = rgbToHex(color.r, color.g, color.b);
                         shadows.push(`${x * 3}px ${y * 3}px ${hex}`);
                     }
                 }
+            }
+
+            if (shadows.length === 0) {
+                alert('⚠️ No pixels to export! Draw something first.');
+                return;
             }
 
             const cssCode = `.pixel-art {
@@ -1045,7 +1080,7 @@
 
             // Copy to clipboard
             navigator.clipboard.writeText(cssCode).then(() => {
-                alert('✅ CSS code copied to clipboard!');
+                alert(`✅ CSS code copied to clipboard!\n\nPixels: ${shadows.length}`);
                 console.log(cssCode);
             });
         }
@@ -1089,7 +1124,8 @@
                     for (let y = 0; y < gridSize; y++) {
                         for (let x = 0; x < gridSize; x++) {
                             const color = getPixelColor(frameData, x, y);
-                            if (color.a > 0 && (color.r > 0 || color.g > 0 || color.b > 0)) {
+                            // Skip black pixels (background)
+                            if (color.a > 0 && (color.r > 10 || color.g > 10 || color.b > 10)) {
                                 pixels.push({
                                     x, y,
                                     color: rgbToHex(color.r, color.g, color.b)
@@ -1106,6 +1142,51 @@
                 alert('✅ JSON data copied to clipboard!');
                 console.log(json);
             });
+        }
+
+        function saveCodeFile() {
+            const artworkName = document.getElementById('artworkName').value.trim() || 'pixel-art';
+
+            const data = {
+                name: artworkName,
+                gridSize,
+                pixelSize: 3,
+                created: new Date().toISOString(),
+                frames: frames.map((frameData, index) => {
+                    const pixels = [];
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let x = 0; x < gridSize; x++) {
+                            const color = getPixelColor(frameData, x, y);
+                            // Skip black pixels (background/grid)
+                            if (color.a > 0 && (color.r > 10 || color.g > 10 || color.b > 10)) {
+                                pixels.push({
+                                    x, y,
+                                    color: rgbToHex(color.r, color.g, color.b)
+                                });
+                            }
+                        }
+                    }
+                    return {
+                        frameIndex: index,
+                        pixelCount: pixels.length,
+                        pixels: pixels
+                    };
+                })
+            };
+
+            // Save to file
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const timestamp = Date.now();
+            link.download = `${artworkName}-${timestamp}.json`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            console.log('✅ Code file saved:', link.download);
+            alert(`✅ Code saved to Downloads:\n${link.download}\n\nFrames: ${frames.length}\nPixels: ${data.frames.reduce((sum, f) => sum + f.pixelCount, 0)}`);
         }
 
         // ===== EVENT LISTENERS =====
@@ -1255,19 +1336,25 @@
             document.getElementById('exportSpriteSheet').addEventListener('click', exportSpriteSheet);
             document.getElementById('exportGIF').addEventListener('click', exportGIF);
             document.getElementById('exportJSON').addEventListener('click', exportJSON);
+            document.getElementById('saveCodeFile').addEventListener('click', saveCodeFile);
         }
 
         function handleCanvasClick(e) {
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            // Учитываем zoom при вычислении координат
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
 
             switch (currentTool) {
                 case 'draw':
                     drawPixel(x, y);
+                    renderCanvas();
                     break;
                 case 'erase':
                     erasePixel(x, y);
+                    renderCanvas();
                     break;
                 case 'fill':
                     fillArea(x, y);
@@ -1276,8 +1363,6 @@
                     pickColor(x, y);
                     break;
             }
-
-            renderCanvas();
         }
 
         // ===== START APP =====
