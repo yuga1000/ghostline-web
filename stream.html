@@ -1355,6 +1355,9 @@ async function loadExistingLogs() {
             }
 
             console.log('[Load Logs] ✅ Loaded', data.logs.length, 'logs');
+
+            // Check agent status to set correct pet mode (flower/spider during cooldown, etc.)
+            checkInitialAgentStatus();
         } else {
             console.log('[Load Logs] No existing logs found');
         }
