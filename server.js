@@ -272,6 +272,11 @@ app.get('/api/agent-status', (req, res) => {
   });
 });
 
+// Health check endpoint for StreamLogger
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Test endpoint to verify deployment
 app.get('/api/test-deployment', (req, res) => {
   res.json({
