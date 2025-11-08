@@ -1381,9 +1381,9 @@ function processLogQueue() {
 
         // Add log and wait for completion before processing next
         addLogLine(text, className, () => {
-            // Faster on mobile - 100ms delay instead of 400ms
+            // Instant on mobile - no delay
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const delay = isMobile ? 100 : 200;
+            const delay = isMobile ? 0 : 50;
             setTimeout(processNext, delay);
         });
     }
@@ -2609,9 +2609,10 @@ function startRestCountdown(durationSeconds) {
     const cooldownMins = Math.floor(durationSeconds / 60);
     const cooldownStartLog = `
 ╔════════════════════════════════════════════╗
-║  💤 ENTERING COOLDOWN MODE                ║
+║  zzz ENTERING COOLDOWN MODE               ║
 ║  Duration: ${cooldownMins} minutes                     ║
-║  Status: Resting • Agent will resume soon ║
+║  Progress: [▓▓▓▓▓▓▓▓▓▓] 0%                ║
+║  Status: Resting - Agent will resume soon ║
 ╚════════════════════════════════════════════╝`;
     addLogLine(cooldownStartLog, 'log-info', null, false);
 
@@ -2677,8 +2678,9 @@ function startRestCountdown(durationSeconds) {
             // Log to terminal in ASCII style
             const cycleStartLog = `
 ╔════════════════════════════════════════════╗
-║  🔄 AGENT CYCLE STARTING                  ║
-║  Status: ACTIVE • Ready to generate!      ║
+║  >>> AGENT CYCLE STARTING                 ║
+║  Progress: [▓▓▓▓▓▓▓▓▓▓] 100%              ║
+║  Status: ACTIVE - Ready to generate!      ║
 ╚════════════════════════════════════════════╝`;
             addLogLine(cycleStartLog, 'log-success', null, false);
 
@@ -2700,11 +2702,19 @@ function startRestCountdown(durationSeconds) {
             // Log countdown updates to terminal every 5 minutes (ASCII style)
             if (remaining % 300 === 0 && remaining > 0) {
                 const mins = Math.floor(remaining / 60);
+                const totalDuration = durationSeconds;
+                const elapsed = totalDuration - remaining;
+                const percent = Math.floor((elapsed / totalDuration) * 100);
+                const filled = Math.floor(percent / 10);
+                const empty = 10 - filled;
+                const progressBar = '▓'.repeat(filled) + '░'.repeat(empty);
+
                 const asciiCountdown = `
 ╭─────────────────────────────────────────╮
-│ ⏰ COOLDOWN IN PROGRESS                │
-│ Time remaining: ${mins} minutes          │
-│ Status: Resting ${isInFlowerMode ? '🌸' : '😴'}            │
+│ zzz COOLDOWN IN PROGRESS               │
+│ Time: ${mins} min remaining                │
+│ [${progressBar}] ${percent}%           │
+│ Status: Resting ${isInFlowerMode ? 'flower' : 'zzz'}            │
 ╰─────────────────────────────────────────╯`;
                 addLogLine(asciiCountdown, 'log-info', null, false);
             }
