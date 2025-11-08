@@ -3408,7 +3408,7 @@ function checkStreamSpiderMode() {
             // 🕷️ FORCE styles via JavaScript (highest priority!)
             pet.style.transition = 'none !important';
             pet.style.animation = 'none !important';
-            pet.style.transform = 'rotate(90deg) scale(1.5)'; // Set rotation instantly
+            pet.style.transform = 'rotate(90deg)'; // Set rotation instantly (no scale)
 
             // Also disable transitions on all child elements
             const allChildren = pet.querySelectorAll('*');
