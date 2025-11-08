@@ -2417,13 +2417,13 @@ function stopWallMovementLoop() {
 // ===== LAUGH/GIGGLE ANIMATION =====
 function laughAnimation() {
     const pet = document.getElementById('agent-pet');
-    console.log('[Pet Activity] 😄 Laughing/Giggling!');
+    console.log('[Pet Activity] ^_^ Laughing/Giggling!');
 
     // Bounce animation
     triggerPetAnimation('excited-bounce', 3000);
 
-    // Create laugh text bubbles
-    const laughs = ['hehe', 'haha', 'lol', '😄', 'ха-ха'];
+    // Create laugh text bubbles (ASCII only)
+    const laughs = ['^_^', '>_<', 'o.o', '^o^', '>w<', 'uwu', '^.^', '*_*'];
     const randomLaugh = laughs[Math.floor(Math.random() * laughs.length)];
 
     const bubble = document.createElement('div');
