@@ -1,0 +1,1843 @@
+/* ===== AGENT PET STYLES ===== */
+
+.pet-container-inline {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #000000;
+}
+
+.pet-display-inline {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Pet wall positions */
+.pet-display-inline.wall-bottom {
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.pet-display-inline.wall-left {
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 8px;
+    padding-bottom: 0;
+}
+
+.pet-display-inline.wall-top {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
+    padding-bottom: 0;
+}
+
+.pet-display-inline.wall-right {
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    padding-bottom: 0;
+}
+
+/* Pet rotation for walls */
+.pet-display-inline.wall-left .pet {
+    transform: rotate(90deg);
+}
+
+.pet-display-inline.wall-top .pet {
+    transform: rotate(180deg);
+}
+
+.pet-display-inline.wall-right .pet {
+    transform: rotate(-90deg);
+}
+
+/* Sleeping noise mask overlay */
+.pet-sleep-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('plate_noisemask.GIF') center center;
+    background-size: cover;
+    opacity: 0;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 1s ease;
+}
+
+.pet-sleep-mask.visible {
+    opacity: 0.3;
+}
+
+/* Falling stars */
+.falling-star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    box-shadow: 0 0 3px #ffffff;
+    opacity: 0;
+    z-index: 4;
+}
+
+@keyframes star-fall {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-40px, 30px);
+    }
+}
+
+.falling-star.active {
+    animation: star-fall 2s step-end 1 forwards;
+}
+
+.pet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.pet-body-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pet-arms {
+    display: flex;
+    gap: 0;
+    align-items: center;
+}
+
+.pet-body {
+    display: grid;
+    grid-template-columns: repeat(12, 4px);
+    grid-template-rows: repeat(6, 4px);
+    gap: 0;
+}
+
+.pet-legs {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+}
+
+.pixel {
+    width: 4px;
+    height: 4px;
+    background: transparent;
+}
+
+/* Active state (bright orange-yellow) */
+.pet.active .pixel.body {
+    background: #ffbb00;
+    box-shadow: 0 0 3px #ffbb00;
+}
+
+/* Sleeping state (green) - higher specificity, must override active */
+.pet.sleeping .pixel.body,
+#agent-pet.sleeping .pixel.body,
+.pet.active.sleeping .pixel.body,
+#agent-pet.active.sleeping .pixel.body {
+    background: #00ff00 !important;
+    box-shadow: 0 0 2px #00ff00 !important;
+}
+
+/* Excited state (cyan/blue) - for special moments */
+.pet.excited .pixel.body {
+    background: #00ffff;
+    box-shadow: 0 0 3px #00ffff;
+}
+
+/* Happy state (pink cyberpunk) */
+.pet.happy .pixel.body {
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
+}
+
+/* Inactive state (green) - fallback */
+.pet.inactive .pixel.body {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.pixel.eye {
+    background: #000000;
+}
+
+.pixel.arm {
+    background: inherit;
+}
+
+.pet.active .pixel.arm {
+    background: #ffbb00;
+    box-shadow: 0 0 3px #ffbb00;
+}
+
+.pet.sleeping .pixel.arm,
+#agent-pet.sleeping .pixel.arm,
+.pet.active.sleeping .pixel.arm,
+#agent-pet.active.sleeping .pixel.arm {
+    background: #00ff00 !important;
+    box-shadow: 0 0 2px #00ff00 !important;
+}
+
+.pet.excited .pixel.arm {
+    background: #00ffff;
+    box-shadow: 0 0 3px #00ffff;
+}
+
+.pet.happy .pixel.arm {
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
+}
+
+.pet.inactive .pixel.arm {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.pixel.leg {
+    background: inherit;
+}
+
+.pet.active .pixel.leg {
+    background: #ffbb00;
+    box-shadow: 0 0 3px #ffbb00;
+}
+
+.pet.sleeping .pixel.leg,
+#agent-pet.sleeping .pixel.leg,
+.pet.active.sleeping .pixel.leg,
+#agent-pet.active.sleeping .pixel.leg {
+    background: #00ff00 !important;
+    box-shadow: 0 0 2px #00ff00 !important;
+}
+
+.pet.excited .pixel.leg {
+    background: #00ffff;
+    box-shadow: 0 0 3px #00ffff;
+}
+
+.pet.happy .pixel.leg {
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
+}
+
+.pet.inactive .pixel.leg {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+/* Leg growth stages */
+.pet.stage-1 .pet-legs .pixel.leg {
+    height: 8px; /* 2 pixels */
+}
+
+.pet.stage-2 .pet-legs .pixel.leg {
+    height: 12px; /* 3 pixels */
+}
+
+.pet.stage-3 .pet-legs .pixel.leg {
+    height: 16px; /* 4 pixels */
+}
+
+.pet.stage-4 .pet-legs .pixel.leg {
+    height: 20px; /* 5 pixels */
+}
+
+/* Extra arms and eyes - hidden by default */
+.pixel.arm-extra,
+.pixel.eye-extra {
+    opacity: 0;
+    width: 0;
+}
+
+/* Show extra features on stage 4 */
+.pet.stage-4 .pixel.arm-extra {
+    opacity: 1;
+    width: 4px;
+    animation: extra-arm-appear 0.5s step-end forwards;
+}
+
+.pet.stage-4 .pixel.eye-extra {
+    opacity: 1;
+    animation: extra-eye-appear 0.5s step-end forwards;
+}
+
+@keyframes extra-arm-appear {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes extra-eye-appear {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+/* ===== IDLE BREATHING ANIMATION ===== */
+.pet.idle .pet-body-container {
+    animation: pet-bounce 2.25s step-end infinite;
+}
+
+@keyframes pet-bounce {
+    0% { transform: translateY(0px); }
+    66% { transform: translateY(0px); }
+    67% { transform: translateY(-4px); }
+    99% { transform: translateY(-4px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== WALKING ANIMATION ===== */
+.pet.walking .pet-body-container {
+    animation: pet-bounce 2.25s step-end infinite;
+}
+
+.pet.walking .pet-legs:first-child .pixel.leg:nth-child(1) {
+    animation: leg-step-1 1.6s step-end infinite;
+}
+
+.pet.walking .pet-legs:first-child .pixel.leg:nth-child(3) {
+    animation: leg-step-2 1.6s step-end infinite;
+}
+
+.pet.walking .pet-legs:first-child .pixel.leg:nth-child(5) {
+    animation: leg-step-3 1.6s step-end infinite;
+}
+
+.pet.walking .pet-legs:first-child .pixel.leg:nth-child(7) {
+    animation: leg-step-4 1.6s step-end infinite;
+}
+
+@keyframes leg-step-1 {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes leg-step-2 {
+    0% { opacity: 0; }
+    24% { opacity: 0; }
+    25% { opacity: 1; }
+    49% { opacity: 1; }
+    50% { opacity: 0; }
+    74% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes leg-step-3 {
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    50% { opacity: 0; }
+    74% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes leg-step-4 {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    74% { opacity: 1; }
+    75% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ===== DANCING ANIMATION ===== */
+.pet.dancing .pet-body-container {
+    animation: pet-bounce 2.25s step-end infinite;
+}
+
+.pet.dancing .pet-legs {
+    animation: legs-dance 1.5s step-end infinite;
+}
+
+@keyframes legs-dance {
+    0% { transform: translateX(0px); }
+    49% { transform: translateX(0px); }
+    50% { transform: translateX(3px); }
+    99% { transform: translateX(3px); }
+    100% { transform: translateX(0px); }
+}
+
+.pet.dancing .pet-legs:nth-child(3) {
+    animation: legs-dance-alt 1.5s step-end infinite;
+}
+
+@keyframes legs-dance-alt {
+    0% { transform: translateX(3px); }
+    49% { transform: translateX(3px); }
+    50% { transform: translateX(0px); }
+    99% { transform: translateX(0px); }
+    100% { transform: translateX(3px); }
+}
+
+/* ===== ARM WAVE ANIMATION ===== */
+.pet.waving .pet-arms .pixel.arm {
+    animation: arm-wave 1.2s step-end infinite;
+}
+
+@keyframes arm-wave {
+    0% { transform: translateY(0px); }
+    49% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+    99% { transform: translateY(-4px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== BLINKING ANIMATION ===== */
+.pet.blinking .pixel.eye {
+    animation: eye-blink 3s step-end infinite;
+}
+
+@keyframes eye-blink {
+    0% { opacity: 1; }
+    89% { opacity: 1; }
+    90% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ===== SLEEPING ANIMATION ===== */
+.pet.sleeping .pet-body-container {
+    /* No scale/rotation - just position */
+    transform: translateY(8px) !important;
+}
+
+/* Discrete breathing - outer pixels disappear, inner stay */
+.pet.idle .pixel.breath-outer,
+.pet.sleeping .pixel.breath-outer {
+    animation: breath-outer-pulse 3s step-end infinite;
+}
+
+@keyframes breath-outer-pulse {
+    /* Outer pixels visible */
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    /* Breathe in - outer pixels disappear */
+    50% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Arms go down when breathing in */
+.pet.idle .pet-arms,
+.pet.sleeping .pet-arms {
+    animation: arms-breathe 3s step-end infinite;
+}
+
+@keyframes arms-breathe {
+    /* Normal position */
+    0% { transform: translateY(0px); }
+    49% { transform: translateY(0px); }
+    /* Breathe in - arms down */
+    50% { transform: translateY(4px); }
+    99% { transform: translateY(4px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Sleeping eyes - thin slits instead of full open */
+.pet.sleeping .pixel.eye,
+#agent-pet.sleeping .pixel.eye,
+.pet.active.sleeping .pixel.eye,
+#agent-pet.active.sleeping .pixel.eye {
+    /* Make eyes into thin slits (4px height -> 1px height) */
+    height: 1px !important;
+    background: #000000 !important;
+    animation: eye-flutter 4s step-end infinite !important;
+}
+
+@keyframes eye-flutter {
+    /* Eyes mostly closed, occasionally flutter */
+    0% { opacity: 0.6; }
+    79% { opacity: 0.6; }
+    /* Brief flutter */
+    80% { opacity: 0.3; }
+    84% { opacity: 0.3; }
+    85% { opacity: 0.6; }
+    100% { opacity: 0.6; }
+}
+
+/* Sleeping legs - must be hidden */
+.pet.sleeping .pet-legs,
+#agent-pet.sleeping .pet-legs,
+.pet.active.sleeping .pet-legs,
+#agent-pet.active.sleeping .pet-legs {
+    opacity: 0 !important;
+}
+
+/* Sleep pixels floating above pet */
+.pet-sleep-pixels {
+    position: absolute;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    bottom: 60%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sleep-pixel {
+    width: 4px;
+    height: 4px;
+    background: #00ff00;
+    box-shadow: 0 0 3px #00ff00;
+}
+
+/* Show pixels when sleeping */
+#agent-pet.sleeping ~ .pet-sleep-pixels {
+    opacity: 1;
+}
+
+.sleep-pixel:nth-child(1) {
+    animation: sleep-pixel-float 3s step-end infinite;
+}
+
+.sleep-pixel:nth-child(2) {
+    animation: sleep-pixel-float 3s step-end infinite;
+    animation-delay: 1s;
+}
+
+.sleep-pixel:nth-child(3) {
+    animation: sleep-pixel-float 3s step-end infinite;
+    animation-delay: 2s;
+}
+
+@keyframes sleep-pixel-float {
+    0% { opacity: 0; transform: translateY(0px); }
+    24% { opacity: 0; transform: translateY(0px); }
+    25% { opacity: 1; transform: translateY(0px); }
+    49% { opacity: 1; transform: translateY(0px); }
+    50% { opacity: 1; transform: translateY(-8px); }
+    74% { opacity: 1; transform: translateY(-8px); }
+    75% { opacity: 1; transform: translateY(-16px); }
+    99% { opacity: 1; transform: translateY(-16px); }
+    100% { opacity: 0; transform: translateY(-16px); }
+}
+
+/* ===== PLAYING ANIMATION (on back with pixel toy) ===== */
+.pet.playing .pet-body-container {
+    animation: none;
+    /* Move down to ground - legs will appear above (no scaleY) */
+    transform: translateY(8px) !important;
+}
+
+.pet.playing .pet-legs {
+    /* Legs up in the air - alternating pattern */
+    animation: legs-wiggle 1.2s step-end infinite;
+}
+
+@keyframes legs-wiggle {
+    /* Pattern: out -> in -> out -> in */
+    0% { transform: translateX(0px); }
+    24% { transform: translateX(0px); }
+    25% { transform: translateX(2px); }
+    49% { transform: translateX(2px); }
+    50% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(-2px); }
+    99% { transform: translateX(-2px); }
+    100% { transform: translateX(0px); }
+}
+
+/* Pixel toy floating above */
+.pet-toy-pixel {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #00ff00;
+    box-shadow: 0 0 3px #00ff00;
+    bottom: 50%;
+    left: 50%;
+    margin-left: -2px;
+    animation: toy-bounce 1.2s step-end infinite;
+    opacity: 0;
+}
+
+.pet.playing ~ .pet-toy-pixel {
+    opacity: 1;
+}
+
+@keyframes toy-bounce {
+    0% { transform: translateY(0px); }
+    25% { transform: translateY(-8px); }
+    50% { transform: translateY(-16px); }
+    75% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Progress bar */
+.pet-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #000000;
+    border-top: 1px solid #00ff00;
+    position: relative;
+    margin-top: auto;
+}
+
+.pet-progress-fill {
+    height: 100%;
+    background: #00ff00;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 3px rgba(0, 255, 0, 0.5);
+}
+
+/* ===== IMAGE PREVIEW WINDOW ===== */
+.pet-image-window {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 120px;
+    background: #000000;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.6), inset 0 0 4px rgba(0, 255, 0, 0.3);
+    padding: 4px;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pet-image-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: #00ff00;
+    text-align: center;
+    margin-bottom: 4px;
+    text-shadow: 0 0 4px rgba(0, 255, 0, 0.8);
+    animation: label-pulse 0.8s step-end infinite;
+}
+
+@keyframes label-pulse {
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    50% { opacity: 0.5; }
+    99% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.pet-image-window img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid #00ff00;
+    box-shadow: 0 0 4px rgba(0, 255, 0, 0.4);
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Discrete fade-in animation (8fps step-end) */
+.pet-image-window.fade-in {
+    animation: discrete-fade-in 0.625s step-end forwards;
+}
+
+@keyframes discrete-fade-in {
+    0% { opacity: 0; transform: translateY(-8px); }
+    12.5% { opacity: 0.125; transform: translateY(-7px); }
+    25% { opacity: 0.25; transform: translateY(-6px); }
+    37.5% { opacity: 0.375; transform: translateY(-4px); }
+    50% { opacity: 0.5; transform: translateY(-2px); }
+    62.5% { opacity: 0.625; transform: translateY(-1px); }
+    75% { opacity: 0.75; transform: translateY(0px); }
+    87.5% { opacity: 0.875; transform: translateY(0px); }
+    100% { opacity: 1; transform: translateY(0px); }
+}
+
+/* Discrete fade-out animation (8fps step-end) */
+.pet-image-window.fade-out {
+    animation: discrete-fade-out 0.625s step-end forwards;
+}
+
+@keyframes discrete-fade-out {
+    0% { opacity: 1; transform: translateY(0px); }
+    12.5% { opacity: 0.875; transform: translateY(0px); }
+    25% { opacity: 0.75; transform: translateY(-1px); }
+    37.5% { opacity: 0.625; transform: translateY(-2px); }
+    50% { opacity: 0.5; transform: translateY(-4px); }
+    62.5% { opacity: 0.375; transform: translateY(-6px); }
+    75% { opacity: 0.25; transform: translateY(-7px); }
+    87.5% { opacity: 0.125; transform: translateY(-8px); }
+    100% { opacity: 0; transform: translateY(-8px); }
+}
+
+/* ===== НОВЫЕ АНИМАЦИИ ===== */
+
+/* RUNNING - Бег по экрану (горизонтально) */
+.pet.running {
+    animation: pet-run-horizontal 3s step-end infinite;
+}
+
+.pet.running .pet-body-container {
+    animation: pet-run-bounce 0.8s step-end infinite;
+}
+
+.pet.running .pet-legs {
+    animation: legs-run 0.4s step-end infinite;
+}
+
+@keyframes pet-run-horizontal {
+    0% { transform: translateX(-30px); }
+    24% { transform: translateX(-15px); }
+    49% { transform: translateX(0px); }
+    74% { transform: translateX(15px); }
+    99% { transform: translateX(30px); }
+    100% { transform: translateX(-30px); }
+}
+
+@keyframes pet-run-bounce {
+    0% { transform: translateY(0px); }
+    49% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    99% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes legs-run {
+    0% { transform: scaleX(1); }
+    49% { transform: scaleX(1); }
+    50% { transform: scaleX(0.8); }
+    99% { transform: scaleX(0.8); }
+    100% { transform: scaleX(1); }
+}
+
+/* JUMPING - Высокие прыжки */
+.pet.jumping .pet-body-container {
+    animation: pet-jump 1.6s step-end infinite;
+}
+
+.pet.jumping .pet-legs {
+    animation: legs-jump 1.6s step-end infinite;
+}
+
+@keyframes pet-jump {
+    0% { transform: translateY(0px); }
+    12% { transform: translateY(-8px); }
+    24% { transform: translateY(-16px); }
+    37% { transform: translateY(-24px); }
+    49% { transform: translateY(-16px); }
+    62% { transform: translateY(-8px); }
+    74% { transform: translateY(-4px); }
+    87% { transform: translateY(0px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes legs-jump {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    74% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+/* SPINNING - Кружится на месте (4 фазы вращения) */
+.pet.spinning .pet-body-container {
+    animation: spin-body 2s step-end infinite;
+}
+
+@keyframes spin-body {
+    /* Фаза 1: Лицо (0-24%) */
+    0% {
+        width: 48px;
+        opacity: 1;
+    }
+    24% {
+        width: 48px;
+        opacity: 1;
+    }
+
+    /* Фаза 2: Боком 90° (25-49%) - узкий прямоугольник */
+    25% {
+        width: 8px;
+        opacity: 1;
+    }
+    49% {
+        width: 8px;
+        opacity: 1;
+    }
+
+    /* Фаза 3: Спина 180° (50-74%) */
+    50% {
+        width: 48px;
+        opacity: 1;
+    }
+    74% {
+        width: 48px;
+        opacity: 1;
+    }
+
+    /* Фаза 4: Боком 270° (75-99%) - узкий прямоугольник */
+    75% {
+        width: 8px;
+        opacity: 1;
+    }
+    99% {
+        width: 8px;
+        opacity: 1;
+    }
+
+    100% {
+        width: 48px;
+        opacity: 1;
+    }
+}
+
+/* Глаза исчезают когда боком или спиной */
+.pet.spinning .pixel.eye {
+    animation: spin-eyes 2s step-end infinite;
+}
+
+@keyframes spin-eyes {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Руки скрываются когда боком */
+.pet.spinning .pixel.arm {
+    animation: spin-arms 2s step-end infinite;
+}
+
+@keyframes spin-arms {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    74% { opacity: 1; }
+    75% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Ноги - показываем только 1 ногу когда боком */
+.pet.spinning .pet-legs {
+    animation: spin-legs 2s step-end infinite;
+}
+
+@keyframes spin-legs {
+    /* Лицо - все 8 ног */
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+
+    /* Боком - только центральные 2 ноги видны */
+    25% { opacity: 1; }
+    49% { opacity: 1; }
+
+    /* Спина - все 8 ног */
+    50% { opacity: 1; }
+    74% { opacity: 1; }
+
+    /* Боком - только центральные 2 ноги */
+    75% { opacity: 1; }
+    99% { opacity: 1; }
+
+    100% { opacity: 1; }
+}
+
+/* Скрываем крайние ноги когда боком */
+.pet.spinning .pet-legs .pixel.leg:nth-child(1),
+.pet.spinning .pet-legs .pixel.leg:nth-child(2),
+.pet.spinning .pet-legs .pixel.leg:nth-child(7),
+.pet.spinning .pet-legs .pixel.leg:nth-child(8) {
+    animation: spin-outer-legs 2s step-end infinite;
+}
+
+@keyframes spin-outer-legs {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    74% { opacity: 1; }
+    75% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.pet.spinning .pet-legs .pixel.leg:nth-child(3),
+.pet.spinning .pet-legs .pixel.leg:nth-child(6) {
+    animation: spin-mid-legs 2s step-end infinite;
+}
+
+@keyframes spin-mid-legs {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    74% { opacity: 1; }
+    75% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* TRANSFORM - Превращение (пульсация размера) */
+.pet.transforming .pet-body-container {
+    animation: pet-transform 2.4s step-end infinite;
+}
+
+.pet.transforming .pet-legs {
+    animation: legs-transform 2.4s step-end infinite;
+}
+
+@keyframes pet-transform {
+    0% { transform: translateY(0); }
+    16% { transform: translateY(-4px); }
+    33% { transform: translateY(4px); }
+    49% { transform: translateY(-6px); }
+    66% { transform: translateY(6px); }
+    83% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes legs-transform {
+    0% { transform: scaleY(1); }
+    16% { transform: scaleY(0.8); }
+    33% { transform: scaleY(1.2); }
+    49% { transform: scaleY(0.7); }
+    66% { transform: scaleY(1.3); }
+    83% { transform: scaleY(0.9); }
+    100% { transform: scaleY(1); }
+}
+
+/* HUNTING - Охота (движется вертикально и горизонтально) */
+.pet.hunting {
+    animation: pet-hunt-move 4s step-end infinite;
+}
+
+.pet.hunting .pet-body-container {
+    animation: pet-hunt-look 1.2s step-end infinite;
+}
+
+@keyframes pet-hunt-move {
+    0% { transform: translate(0px, 0px); }
+    12% { transform: translate(8px, -4px); }
+    25% { transform: translate(16px, -8px); }
+    37% { transform: translate(8px, -12px); }
+    50% { transform: translate(-8px, -8px); }
+    62% { transform: translate(-16px, -4px); }
+    75% { transform: translate(-8px, 0px); }
+    87% { transform: translate(0px, -4px); }
+    100% { transform: translate(0px, 0px); }
+}
+
+@keyframes pet-hunt-look {
+    0% { transform: rotate(0deg); }
+    24% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    49% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+    74% { transform: rotate(5deg); }
+    75% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* TONGUE HUNT - Охота с языком (как хамелеон) */
+.pet-tongue {
+    position: absolute;
+    width: 2px;
+    background: #00ff00;
+    box-shadow: 0 0 3px #00ff00;
+    height: 0;
+    opacity: 0;
+    transform-origin: center center;
+    z-index: 6;
+    pointer-events: none;
+}
+
+/* Язык стреляет вправо из середины пета */
+.pet-tongue.shooting-right {
+    left: 50%;
+    top: 50%;
+    animation: tongue-shoot-right 1.2s step-end 1 forwards;
+}
+
+/* Язык стреляет влево */
+.pet-tongue.shooting-left {
+    left: 50%;
+    top: 50%;
+    animation: tongue-shoot-left 1.2s step-end 1 forwards;
+}
+
+@keyframes tongue-shoot-right {
+    /* Быстро выстреливает */
+    0% { opacity: 0; height: 0; transform: translateX(0px); }
+    8% { opacity: 1; height: 30px; transform: translateX(0px) rotate(90deg); }
+    16% { opacity: 1; height: 40px; transform: translateX(15px) rotate(90deg); }
+    24% { opacity: 1; height: 50px; transform: translateX(30px) rotate(90deg); }
+    /* Микро задержка - поймал пиксель */
+    32% { opacity: 1; height: 50px; transform: translateX(30px) rotate(90deg); }
+    /* Втягивается обратно с пикселем */
+    40% { opacity: 1; height: 40px; transform: translateX(20px) rotate(90deg); }
+    48% { opacity: 1; height: 30px; transform: translateX(10px) rotate(90deg); }
+    56% { opacity: 1; height: 20px; transform: translateX(5px) rotate(90deg); }
+    64% { opacity: 1; height: 10px; transform: translateX(2px) rotate(90deg); }
+    /* Исчезает */
+    72% { opacity: 0; height: 0; transform: translateX(0px); }
+    100% { opacity: 0; height: 0; transform: translateX(0px); }
+}
+
+@keyframes tongue-shoot-left {
+    0% { opacity: 0; height: 0; transform: translateX(0px); }
+    8% { opacity: 1; height: 30px; transform: translateX(0px) rotate(-90deg); }
+    16% { opacity: 1; height: 40px; transform: translateX(-15px) rotate(-90deg); }
+    24% { opacity: 1; height: 50px; transform: translateX(-30px) rotate(-90deg); }
+    32% { opacity: 1; height: 50px; transform: translateX(-30px) rotate(-90deg); }
+    40% { opacity: 1; height: 40px; transform: translateX(-20px) rotate(-90deg); }
+    48% { opacity: 1; height: 30px; transform: translateX(-10px) rotate(-90deg); }
+    56% { opacity: 1; height: 20px; transform: translateX(-5px) rotate(-90deg); }
+    64% { opacity: 1; height: 10px; transform: translateX(-2px) rotate(-90deg); }
+    72% { opacity: 0; height: 0; transform: translateX(0px); }
+    100% { opacity: 0; height: 0; transform: translateX(0px); }
+}
+
+/* PREY PIXELS - Летающие пиксели для охоты */
+.prey-pixel {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ff00ff;
+    box-shadow: 0 0 4px #ff00ff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.prey-pixel.active {
+    opacity: 1;
+    animation: prey-fly 3s step-end infinite;
+}
+
+.prey-pixel:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.prey-pixel:nth-child(2) {
+    animation-delay: 1s;
+}
+
+.prey-pixel:nth-child(3) {
+    animation-delay: 2s;
+}
+
+@keyframes prey-fly {
+    0% { transform: translate(var(--start-x), var(--start-y)); }
+    12% { transform: translate(var(--mid1-x), var(--mid1-y)); }
+    25% { transform: translate(var(--mid2-x), var(--mid2-y)); }
+    37% { transform: translate(var(--mid3-x), var(--mid3-y)); }
+    50% { transform: translate(var(--mid4-x), var(--mid4-y)); }
+    62% { transform: translate(var(--mid5-x), var(--mid5-y)); }
+    75% { transform: translate(var(--mid6-x), var(--mid6-y)); }
+    87% { transform: translate(var(--end-x), var(--end-y)); }
+    100% { transform: translate(var(--start-x), var(--start-y)); }
+}
+
+/* EXCITED BOUNCE - Активное подпрыгивание */
+.pet.excited-bounce .pet-body-container {
+    animation: pet-excited-bounce 0.8s step-end infinite;
+}
+
+@keyframes pet-excited-bounce {
+    0% { transform: translateY(0px); }
+    24% { transform: translateY(-8px); }
+    49% { transform: translateY(-16px); }
+    74% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+
+/* SHAKING - Трясется (от ошибок или волнения) */
+.pet.shaking {
+    animation: pet-shake 0.8s step-end infinite;
+}
+
+@keyframes pet-shake {
+    0% { transform: translateX(0px); }
+    12% { transform: translateX(-2px); }
+    25% { transform: translateX(2px); }
+    37% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    62% { transform: translateX(-1px); }
+    75% { transform: translateX(1px); }
+    87% { transform: translateX(-1px); }
+    100% { transform: translateX(0px); }
+}
+
+/* FLOWER - Цветок (превращение из существа в растение, 6 фаз) */
+.pet.flower {
+    /* Постепенная трансформация */
+}
+
+/* Фаза 1-2: Тело начинает подниматься */
+.pet.flower .pet-body-container {
+    animation: flower-body-transform 12s step-end infinite;
+}
+
+@keyframes flower-body-transform {
+    /* Фаза 1: Базовая форма */
+    0% { transform: translateY(0px); }
+    16% { transform: translateY(0px); }
+
+    /* Фаза 2: Чуть выше */
+    17% { transform: translateY(-4px); }
+    32% { transform: translateY(-4px); }
+
+    /* Фаза 3: Еще выше */
+    33% { transform: translateY(-8px); }
+    48% { transform: translateY(-8px); }
+
+    /* Фаза 4: Продолжает подниматься */
+    49% { transform: translateY(-12px); }
+    64% { transform: translateY(-12px); }
+
+    /* Фаза 5: Высоко */
+    65% { transform: translateY(-16px); }
+    80% { transform: translateY(-16px); }
+
+    /* Фаза 6: Максимальная высота */
+    81% { transform: translateY(-20px); }
+    100% { transform: translateY(-20px); }
+}
+
+/* Ноги растут и раздвигаются */
+.pet.flower .pixel.leg {
+    animation: flower-leg-grow 12s step-end infinite;
+}
+
+@keyframes flower-leg-grow {
+    /* Фаза 1-2: Короткие ноги */
+    0% { height: 8px; }
+    32% { height: 8px; }
+
+    /* Фаза 3: Ноги удлиняются (2 ряда пикселей) */
+    33% { height: 12px; }
+    48% { height: 12px; }
+
+    /* Фаза 4: Еще длиннее (3-4 ряда) */
+    49% { height: 16px; }
+    64% { height: 16px; }
+
+    /* Фаза 5: Длинные с корнями */
+    65% { height: 20px; }
+    80% { height: 20px; }
+
+    /* Фаза 6: Максимальная длина */
+    81% { height: 24px; }
+    100% { height: 24px; }
+}
+
+/* Крайние ноги раздвигаются больше всего */
+.pet.flower .pet-legs .pixel.leg:nth-child(1),
+.pet.flower .pet-legs .pixel.leg:nth-child(8) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-outer 12s step-end infinite;
+}
+
+@keyframes flower-spread-outer {
+    0% { transform: translateX(0px); }
+    32% { transform: translateX(0px); }
+    33% { transform: translateX(-2px); }
+    48% { transform: translateX(-2px); }
+    49% { transform: translateX(-4px); }
+    64% { transform: translateX(-4px); }
+    65% { transform: translateX(-6px); }
+    80% { transform: translateX(-6px); }
+    81% { transform: translateX(-8px); }
+    100% { transform: translateX(-8px); }
+}
+
+.pet.flower .pet-legs .pixel.leg:nth-child(8) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-outer-right 12s step-end infinite;
+}
+
+@keyframes flower-spread-outer-right {
+    0% { transform: translateX(0px); }
+    32% { transform: translateX(0px); }
+    33% { transform: translateX(2px); }
+    48% { transform: translateX(2px); }
+    49% { transform: translateX(4px); }
+    64% { transform: translateX(4px); }
+    65% { transform: translateX(6px); }
+    80% { transform: translateX(6px); }
+    81% { transform: translateX(8px); }
+    100% { transform: translateX(8px); }
+}
+
+/* Средние ноги раздвигаются меньше */
+.pet.flower .pet-legs .pixel.leg:nth-child(2),
+.pet.flower .pet-legs .pixel.leg:nth-child(7) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-mid 12s step-end infinite;
+}
+
+@keyframes flower-spread-mid {
+    0% { transform: translateX(0px); }
+    48% { transform: translateX(0px); }
+    49% { transform: translateX(-2px); }
+    80% { transform: translateX(-2px); }
+    81% { transform: translateX(-4px); }
+    100% { transform: translateX(-4px); }
+}
+
+.pet.flower .pet-legs .pixel.leg:nth-child(7) {
+    animation: flower-leg-grow 12s step-end infinite, flower-spread-mid-right 12s step-end infinite;
+}
+
+@keyframes flower-spread-mid-right {
+    0% { transform: translateX(0px); }
+    48% { transform: translateX(0px); }
+    49% { transform: translateX(2px); }
+    80% { transform: translateX(2px); }
+    81% { transform: translateX(4px); }
+    100% { transform: translateX(4px); }
+}
+
+/* Руки расширяются как ветки на фазе 4-6 */
+.pet.flower .pixel.arm {
+    animation: flower-arms-branches 12s step-end infinite;
+}
+
+@keyframes flower-arms-branches {
+    0% { width: 4px; opacity: 1; }
+    48% { width: 4px; opacity: 1; }
+
+    /* Фаза 4: Руки становятся ветками */
+    49% { width: 6px; opacity: 1; }
+    64% { width: 6px; opacity: 1; }
+
+    /* Фаза 5-6: Широкие ветки */
+    65% { width: 8px; opacity: 1; }
+    100% { width: 8px; opacity: 1; }
+}
+
+/* Глаза превращаются в 4 черных прямоугольника на фазе 5 */
+.pet.flower .pixel.eye {
+    animation: flower-eyes-transform 12s step-end infinite;
+}
+
+@keyframes flower-eyes-transform {
+    0% { width: 4px; height: 4px; }
+    64% { width: 4px; height: 4px; }
+
+    /* Фаза 5: Глаза становятся прямоугольниками (4 штуки) */
+    65% { width: 3px; height: 6px; }
+    100% { width: 3px; height: 6px; }
+}
+
+/* FLOWER CROWN - дополнительные пиксели, которые появляются постепенно */
+/* По умолчанию - скрыты */
+.pixel.flower-crown {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* Фаза 3 - появляется Row -1 (crown-3 и crown-4) */
+.pet.flower .pixel.flower-crown.crown-3 {
+    animation: flower-crown-appear-3 12s step-end infinite;
+}
+
+@keyframes flower-crown-appear-3 {
+    0% { opacity: 0; height: 0; }
+    32% { opacity: 0; height: 0; }
+    33% { opacity: 1; height: 4px; }
+    100% { opacity: 1; height: 4px; }
+}
+
+/* Фаза 4 - появляется Row -2 (crown-4) */
+.pet.flower .pixel.flower-crown.crown-4 {
+    animation: flower-crown-appear-4 12s step-end infinite;
+}
+
+@keyframes flower-crown-appear-4 {
+    0% { opacity: 0; height: 0; }
+    48% { opacity: 0; height: 0; }
+    49% { opacity: 1; height: 4px; }
+    100% { opacity: 1; height: 4px; }
+}
+
+/* Фаза 5-6 - появляется Row -3 (crown-5) */
+.pet.flower .pixel.flower-crown.crown-5 {
+    animation: flower-crown-appear-5 12s step-end infinite;
+}
+
+@keyframes flower-crown-appear-5 {
+    0% { opacity: 0; height: 0; }
+    64% { opacity: 0; height: 0; }
+    65% { opacity: 1; height: 4px; }
+    100% { opacity: 1; height: 4px; }
+}
+
+/* Цвет цветка - розовый/фиолетовый */
+.pet.flower .pixel.body {
+    background: #ff00ff !important;
+    box-shadow: 0 0 3px #ff00ff !important;
+}
+
+.pet.flower .pixel.arm {
+    background: #ff00ff !important;
+    box-shadow: 0 0 3px #ff00ff !important;
+}
+
+.pet.flower .pixel.leg {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+/* ===== WIND SWAY ANIMATION FOR BLOOM (8 variants) ===== */
+/* Sway pattern: center -> right -> strong right -> center -> left -> strong left -> center -> subtle */
+
+.pet.sway-0 {
+    /* Center - neutral */
+    transform: translateX(0px);
+}
+
+.pet.sway-1 {
+    /* Slight right */
+    transform: translateX(2px);
+}
+
+.pet.sway-1 .pixel.flower-crown {
+    transform: translateX(1px);
+}
+
+.pet.sway-2 {
+    /* Strong right with droop */
+    transform: translateX(4px) translateY(1px);
+}
+
+.pet.sway-2 .pixel.flower-crown {
+    transform: translateX(3px) translateY(-1px);
+}
+
+.pet.sway-3 {
+    /* Return slight right */
+    transform: translateX(2px);
+}
+
+.pet.sway-3 .pixel.flower-crown {
+    transform: translateX(1px);
+}
+
+.pet.sway-4 {
+    /* Center - neutral */
+    transform: translateX(0px);
+}
+
+.pet.sway-5 {
+    /* Slight left */
+    transform: translateX(-2px);
+}
+
+.pet.sway-5 .pixel.flower-crown {
+    transform: translateX(-1px);
+}
+
+.pet.sway-6 {
+    /* Strong left with droop */
+    transform: translateX(-4px) translateY(1px);
+}
+
+.pet.sway-6 .pixel.flower-crown {
+    transform: translateX(-3px) translateY(-1px);
+}
+
+.pet.sway-7 {
+    /* Return slight left */
+    transform: translateX(-2px);
+}
+
+.pet.sway-7 .pixel.flower-crown {
+    transform: translateX(-1px);
+}
+
+/* Smooth transitions between sway states */
+.pet {
+    transition: transform 0.5s ease-in-out;
+}
+
+.pixel.flower-crown {
+    transition: transform 0.5s ease-in-out;
+}
+
+/* ===== SLEEP ROOF/SHELTER ===== */
+
+/* Roof appears above pet when sleeping */
+.pet-roof {
+    position: relative;
+    margin-bottom: 6px;
+    display: none;
+    z-index: 10;
+    justify-content: center;
+}
+
+.pet.sleeping .pet-roof {
+    display: flex;
+}
+
+/* Roof structure - simple horizontal bar */
+.roof-bar {
+    display: flex;
+    gap: 0;
+}
+
+.roof-pixel {
+    width: 3px;
+    height: 3px;
+    background: #ff8800;
+    box-shadow: 0 0 2px #ff8800;
+}
+
+/* Rain system */
+.rain-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    display: none;
+}
+
+.rain-container.active {
+    display: block;
+}
+
+.raindrop {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #0088ff;
+    box-shadow: 0 0 2px #0088ff;
+    animation: raindrop-fall linear;
+}
+
+@keyframes raindrop-fall {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    90% {
+        transform: translateY(220px);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(240px);
+        opacity: 0;
+    }
+}
+
+/* Bounce effect when hitting roof */
+.raindrop.bouncing {
+    animation: raindrop-bounce 0.3s ease-out;
+}
+
+@keyframes raindrop-bounce {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+}
+
+/* Ground splash pixels (when drops hit ground) */
+.splash-pixel {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #0088ff;
+    box-shadow: 0 0 1px #0088ff;
+    pointer-events: none;
+}
+
+.splash-pixel.left {
+    animation: splash-left 0.4s ease-out forwards;
+}
+
+.splash-pixel.right {
+    animation: splash-right 0.4s ease-out forwards;
+}
+
+@keyframes splash-left {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-8px, -3px);
+        opacity: 0;
+    }
+}
+
+@keyframes splash-right {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(8px, -3px);
+        opacity: 0;
+    }
+}
+
+/* ===== STARS SYSTEM ===== */
+
+/* Stars container */
+.stars-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    display: none;
+}
+
+.stars-container.active {
+    display: block;
+}
+
+/* Static star - cross shape (+ pattern) */
+.star {
+    position: absolute;
+    width: 4.5px;
+    height: 4.5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1.5px);
+    grid-template-rows: repeat(3, 1.5px);
+}
+
+.star-pixel {
+    width: 1.5px;
+    height: 1.5px;
+    background: transparent;
+}
+
+.star-pixel.lit {
+    background: #ffff00;
+    box-shadow: 0 0 4px #ffff00;
+}
+
+/* Star cross pattern - center + 4 directions */
+.star .star-pixel:nth-child(2),  /* top */
+.star .star-pixel:nth-child(4),  /* left */
+.star .star-pixel:nth-child(5),  /* center */
+.star .star-pixel:nth-child(6),  /* right */
+.star .star-pixel:nth-child(8) { /* bottom */
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Twinkling animation */
+@keyframes star-twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.star.twinkling {
+    animation: star-twinkle 2s ease-in-out infinite;
+}
+
+/* Shooting star - moves diagonally */
+.shooting-star {
+    position: absolute;
+    z-index: 2;
+}
+
+/* Shooting star head (cross) */
+.shooting-star-head {
+    width: 4.5px;
+    height: 4.5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1.5px);
+    grid-template-rows: repeat(3, 1.5px);
+    position: relative;
+    z-index: 2;
+}
+
+.shooting-star-head .star-pixel:nth-child(2),
+.shooting-star-head .star-pixel:nth-child(4),
+.shooting-star-head .star-pixel:nth-child(5),
+.shooting-star-head .star-pixel:nth-child(6),
+.shooting-star-head .star-pixel:nth-child(8) {
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Shooting star trail - diagonal layout */
+.shooting-star-trail {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.trail-pixel {
+    position: absolute;
+    width: 1.5px;
+    height: 1.5px;
+    background: #ffffff;
+    box-shadow: none;
+}
+
+/* Diagonal trail positioning for downward shooting stars */
+.shooting-star.down .trail-pixel:nth-child(1) {
+    left: -3px;
+    top: -3px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(2) {
+    left: -6px;
+    top: -6px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(3) {
+    left: -9px;
+    top: -9px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(4) {
+    left: -12px;
+    top: -12px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(5) {
+    left: -15px;
+    top: -15px;
+}
+
+.shooting-star.down .trail-pixel:nth-child(6) {
+    left: -18px;
+    top: -18px;
+}
+
+/* Diagonal trail positioning for upward shooting stars */
+.shooting-star.up .trail-pixel:nth-child(1) {
+    left: -3px;
+    top: 3px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(2) {
+    left: -6px;
+    top: 6px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(3) {
+    left: -9px;
+    top: 9px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(4) {
+    left: -12px;
+    top: 12px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(5) {
+    left: -15px;
+    top: 15px;
+}
+
+.shooting-star.up .trail-pixel:nth-child(6) {
+    left: -18px;
+    top: 18px;
+}
+
+/* Diagonal movement animation */
+@keyframes shoot-diagonal-down {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(400px, 400px);
+        opacity: 0;
+    }
+}
+
+@keyframes shoot-diagonal-up {
+    0% {
+        transform: translate(0, 0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(400px, -400px);
+        opacity: 0;
+    }
+}
+
+.shooting-star.down {
+    animation: shoot-diagonal-down 2s linear forwards;
+}
+
+.shooting-star.up {
+    animation: shoot-diagonal-up 2s linear forwards;
+}
+
+/* Burning effect (gets smaller and brighter) */
+@keyframes star-burn {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+        filter: brightness(3);
+    }
+}
+
+.shooting-star.burning {
+    animation: star-burn 0.5s ease-out forwards;
+}
+
+/* Bounce effect */
+@keyframes star-bounce {
+    0% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(-20px, -20px);
+    }
+    100% {
+        transform: translate(-40px, -40px);
+        opacity: 0;
+    }
+}
+
+.shooting-star.bouncing {
+    animation: star-bounce 0.6s ease-out forwards;
+}
+
+/* ===== FRACTAL BRANCHES & PETALS SYSTEM ===== */
+
+/* Branches container - positioned absolutely around pet */
+.pet-branches {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.branch-pixel {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ff00ff;
+    box-shadow: 0 0 2px #ff00ff;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Petals container - positioned around head */
+.pet-petals {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+
+.petal-pixel {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ff00ff;
+    box-shadow: 0 0 3px #ff00ff;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+/* Show branches/petals based on growth stage */
+.pet.stage-5 .branch-pixel,
+.pet.stage-6 .branch-pixel,
+.pet.stage-7 .branch-pixel {
+    opacity: 0.8;
+}
+
+.pet.stage-6 .petal-pixel,
+.pet.stage-7 .petal-pixel {
+    opacity: 0.9;
+}
+
+/* Wind sway affects branches and petals */
+.pet.sway-1 .branch-pixel {
+    transform: translateX(1px);
+}
+
+.pet.sway-2 .branch-pixel {
+    transform: translateX(2px) translateY(-1px);
+}
+
+.pet.sway-5 .branch-pixel {
+    transform: translateX(-1px);
+}
+
+.pet.sway-6 .branch-pixel {
+    transform: translateX(-2px) translateY(-1px);
+}
+
+.pet.sway-1 .petal-pixel {
+    transform: translateX(0.5px);
+}
+
+.pet.sway-2 .petal-pixel {
+    transform: translateX(1px) translateY(-0.5px);
+}
+
+.pet.sway-5 .petal-pixel {
+    transform: translateX(-0.5px);
+}
+
+.pet.sway-6 .petal-pixel {
+    transform: translateX(-1px) translateY(-0.5px);
+}

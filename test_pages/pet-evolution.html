@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE PET | EVOLUTION SYSTEM</title>
+
+    <!-- Press Start 2P Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <!-- Pet Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: crosshair;
+        }
+
+        /* Floating pixels background */
+        .pixel {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+            25% { transform: translate(100px, -200px); opacity: 0.8; }
+            50% { transform: translate(-50px, -300px); opacity: 0.5; }
+            75% { transform: translate(150px, -100px); opacity: 0.9; }
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: #000000;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 8px;
+            opacity: 0.7;
+        }
+
+        /* Tamagotchi Sprite Display */
+        .tamagotchi-sprite-container {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tamagotchi-sprite {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            width: 64px;
+            height: 64px;
+            object-fit: none;
+            object-position: 0 0;
+            transform: scale(2);
+            filter: contrast(1.3);
+            animation: sprite-bounce 2s ease-in-out infinite, sprite-walk 1s steps(4) infinite;
+        }
+
+        @keyframes sprite-bounce {
+            0%, 100% { transform: translateY(0px) scale(2); }
+            50% { transform: translateY(-10px) scale(2); }
+        }
+
+        /* Sprite sheet animation - cycles through frames */
+        @keyframes sprite-walk {
+            0% { object-position: 0 0; }
+            25% { object-position: -64px 0; }
+            50% { object-position: -128px 0; }
+            75% { object-position: -192px 0; }
+            100% { object-position: 0 0; }
+        }
+
+        /* Evolution stage indicator */
+        .evolution-stage {
+            text-align: center;
+            font-size: 10px;
+            color: #00ff00;
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid #00ff00;
+            background: #000000;
+        }
+
+        /* Evolution animation */
+        @keyframes evolve-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .evolving {
+            animation: evolve-flash 0.2s ease-in-out 5;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 8px;
+            color: #00ff00;
+            opacity: 0.5;
+            padding: 15px;
+            border-top: 1px solid #00ff00;
+        }
+
+        /* Override for sprite mode */
+        .arcade-pet-screen.sprite-mode {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        /* Evolution milestone notification */
+        .evolution-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #000000;
+            border: 3px solid #00ff00;
+            padding: 30px;
+            font-size: 14px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+            animation: notification-appear 0.3s ease-out;
+        }
+
+        @keyframes notification-appear {
+            from {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating pixels background -->
+    <div id="pixels-container"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>[ GHOSTLINE PET EVOLUTION ]</h1>
+            <p>OFFICIAL TAMAGOTCHI SPRITES | EVOLUTION SYSTEM</p>
+        </div>
+
+        <!-- Main Screen -->
+        <div class="tamagotchi-arcade-screen">
+            <!-- Title -->
+            <div class="arcade-title">
+                ★ DIGITAL COMPANION ★
+            </div>
+
+            <!-- Evolution Stage -->
+            <div class="evolution-stage" id="evolution-stage">
+                STAGE: BABY (0-5 MIN)
+            </div>
+
+            <!-- Pet Display with Sprite -->
+            <div class="arcade-pet-screen sprite-mode">
+                <div class="tamagotchi-sprite-container">
+                    <img src="tamagotchi-sprites/babytchi.png"
+                         id="pet-sprite"
+                         class="tamagotchi-sprite"
+                         alt="Tamagotchi Pet">
+                </div>
+            </div>
+
+            <!-- Mood Display -->
+            <div class="arcade-mood-sign" style="margin-top: 15px;">
+                <div class="arcade-mood-text" id="mood-display">VERY HAPPY</div>
+            </div>
+
+            <!-- Age Counter -->
+            <div class="arcade-age-display">
+                AGE: <span id="age-counter">000</span> MIN
+            </div>
+
+            <!-- Progress Bars -->
+            <div style="margin-top: 20px;">
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">HUNGER</div>
+                    <div class="arcade-stat-value" id="hunger-value">100%</div>
+                    <div class="arcade-stat-fill" id="hunger-fill" style="width: 100%;"></div>
+                </div>
+
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">HAPPY</div>
+                    <div class="arcade-stat-value" id="happy-value">100%</div>
+                    <div class="arcade-stat-fill" id="happy-fill" style="width: 100%;"></div>
+                </div>
+
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">ENERGY</div>
+                    <div class="arcade-stat-value" id="energy-value">100%</div>
+                    <div class="arcade-stat-fill" id="energy-fill" style="width: 100%;"></div>
+                </div>
+
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">HEALTH</div>
+                    <div class="arcade-stat-value" id="health-value">100%</div>
+                    <div class="arcade-stat-fill full" id="health-fill" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="button-grid">
+                <button class="arcade-button feed" onclick="feedPet()">
+                    > FEED
+                </button>
+                <button class="arcade-button play" onclick="playWithPet()">
+                    > PLAY
+                </button>
+                <button class="arcade-button sleep" onclick="petSleep()">
+                    > SLEEP
+                </button>
+                <button class="arcade-button heal" onclick="healPet()">
+                    > HEAL
+                </button>
+            </div>
+
+            <!-- Evolution Info -->
+            <div style="margin-top: 20px; padding: 15px; border: 1px solid #00ff00; font-size: 8px; line-height: 1.6;">
+                <div style="margin-bottom: 8px; color: #00ff00; font-weight: bold;">EVOLUTION STAGES:</div>
+                <div>0-5 MIN: BABY (Babytchi)</div>
+                <div>5-15 MIN: TEEN (Tamatchi)</div>
+                <div>15+ MIN: ADULT (Mametchi)</div>
+                <div style="margin-top: 8px; opacity: 0.7;">Care quality affects evolution!</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            [ GHOSTLINE SYSTEMS ] | [ EVOLUTION MODULE v2.0 ]<br>
+            OFFICIAL TAMAGOTCHI SPRITES © BANDAI
+        </div>
+    </div>
+
+    <!-- Include pet.js functionality -->
+    <script src="pet.js"></script>
+
+    <script>
+        // Evolution stages configuration
+        const evolutionStages = {
+            baby: {
+                name: 'BABY',
+                sprite: 'tamagotchi-sprites/babytchi.png',
+                minAge: 0,
+                maxAge: 5,
+                spriteWidth: 64,
+                spriteHeight: 64,
+                frames: 4
+            },
+            teen: {
+                name: 'TEEN',
+                sprite: 'tamagotchi-sprites/tamatchi.png',
+                minAge: 5,
+                maxAge: 15,
+                spriteWidth: 64,
+                spriteHeight: 64,
+                frames: 4
+            },
+            adult: {
+                name: 'ADULT',
+                sprite: 'tamagotchi-sprites/mametchi.png',
+                minAge: 15,
+                maxAge: Infinity,
+                spriteWidth: 32,
+                spriteHeight: 32,
+                frames: 8
+            }
+        };
+
+        let currentStage = 'baby';
+        let lastEvolutionCheck = 0;
+
+        // Generate floating pixels
+        function generatePixels() {
+            const container = document.createElement('div');
+            container.id = 'pixels-container';
+            container.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;';
+            document.body.appendChild(container);
+
+            for (let i = 0; i < 30; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                pixel.style.left = Math.random() * 100 + '%';
+                pixel.style.top = Math.random() * 100 + '%';
+                pixel.style.animationDelay = Math.random() * 20 + 's';
+                pixel.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(pixel);
+            }
+        }
+        generatePixels();
+
+        // Check for evolution
+        function checkEvolution() {
+            if (!window.petModule) return;
+
+            const stats = window.petModule.getStats();
+            const ageMinutes = Math.floor(stats.age / 60);
+
+            let newStage = currentStage;
+
+            if (ageMinutes >= evolutionStages.adult.minAge) {
+                newStage = 'adult';
+            } else if (ageMinutes >= evolutionStages.teen.minAge) {
+                newStage = 'teen';
+            } else {
+                newStage = 'baby';
+            }
+
+            if (newStage !== currentStage) {
+                evolvePet(newStage);
+            }
+        }
+
+        // Evolution animation
+        function evolvePet(newStage) {
+            const sprite = document.getElementById('pet-sprite');
+            const stageDisplay = document.getElementById('evolution-stage');
+            const stage = evolutionStages[newStage];
+
+            // Flash animation
+            sprite.classList.add('evolving');
+
+            // Show notification
+            const notification = document.createElement('div');
+            notification.className = 'evolution-notification';
+            notification.innerHTML = `
+                <div style="font-size: 16px; margin-bottom: 15px;">★ EVOLUTION ★</div>
+                <div style="font-size: 12px; margin-bottom: 10px;">
+                    ${evolutionStages[currentStage].name} → ${stage.name}
+                </div>
+                <div style="font-size: 8px; opacity: 0.7;">NEW FORM UNLOCKED!</div>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                // Change sprite
+                sprite.src = stage.sprite;
+                sprite.style.width = stage.spriteWidth + 'px';
+                sprite.style.height = stage.spriteHeight + 'px';
+                sprite.classList.remove('evolving');
+
+                // Update stage display
+                stageDisplay.textContent = `STAGE: ${stage.name} (${stage.minAge}+ MIN)`;
+
+                // Remove notification
+                notification.remove();
+
+                currentStage = newStage;
+                console.log('[Evolution] Evolved to:', newStage);
+            }, 1000);
+        }
+
+        // Update progress bars and check evolution
+        setInterval(() => {
+            if (window.petModule) {
+                const stats = window.petModule.getStats();
+
+                // Update values
+                document.getElementById('hunger-value').textContent = Math.round(stats.hunger) + '%';
+                document.getElementById('happy-value').textContent = Math.round(stats.happiness) + '%';
+                document.getElementById('energy-value').textContent = Math.round(stats.energy) + '%';
+                document.getElementById('health-value').textContent = Math.round(stats.health) + '%';
+
+                // Update bar widths
+                const hungerBar = document.getElementById('hunger-fill');
+                const happyBar = document.getElementById('happy-fill');
+                const energyBar = document.getElementById('energy-fill');
+                const healthBar = document.getElementById('health-fill');
+
+                hungerBar.style.width = stats.hunger + '%';
+                happyBar.style.width = stats.happiness + '%';
+                energyBar.style.width = stats.energy + '%';
+                healthBar.style.width = stats.health + '%';
+
+                // Critical states
+                hungerBar.classList.toggle('critical', stats.hunger < 30);
+                happyBar.classList.toggle('critical', stats.happiness < 30);
+                energyBar.classList.toggle('critical', stats.energy < 30);
+                healthBar.classList.toggle('critical', stats.health < 30);
+
+                // Full states
+                hungerBar.classList.toggle('full', stats.hunger >= 100);
+                happyBar.classList.toggle('full', stats.happiness >= 100);
+                energyBar.classList.toggle('full', stats.energy >= 100);
+                healthBar.classList.toggle('full', stats.health >= 100);
+
+                // Update mood
+                const mood = document.getElementById('mood-display');
+                if (!stats.alive) {
+                    mood.textContent = '[ SYSTEM OFFLINE ]';
+                } else if (stats.happiness > 80) {
+                    mood.textContent = '[ VERY HAPPY ]';
+                } else if (stats.happiness > 60) {
+                    mood.textContent = '[ HAPPY ]';
+                } else if (stats.happiness > 40) {
+                    mood.textContent = '[ OK ]';
+                } else if (stats.happiness > 20) {
+                    mood.textContent = '[ SAD ]';
+                } else {
+                    mood.textContent = '[ DEPRESSED ]';
+                }
+
+                // Update age
+                const age = Math.floor(stats.age / 60);
+                document.getElementById('age-counter').textContent = String(age).padStart(3, '0');
+
+                // Check evolution (every 5 seconds)
+                if (Date.now() - lastEvolutionCheck > 5000) {
+                    checkEvolution();
+                    lastEvolutionCheck = Date.now();
+                }
+            }
+        }, 100);
+
+        // Wrapper functions
+        function feedPet() {
+            if (window.petModule) window.petModule.feed();
+        }
+
+        function playWithPet() {
+            if (window.petModule) window.petModule.play();
+        }
+
+        function petSleep() {
+            if (window.petModule) window.petModule.sleep();
+        }
+
+        function healPet() {
+            if (window.petModule) window.petModule.heal();
+        }
+
+        console.log('[GHOSTLINE] Evolution System Loaded');
+        console.log('[GHOSTLINE] Official Tamagotchi sprites integrated');
+    </script>
+</body>
+</html>

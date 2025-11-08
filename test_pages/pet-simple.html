@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE PET | SIMPLE</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Pet Container */
+        .pet-container {
+            width: 300px;
+            border: 2px solid #00ff00;
+            background: #000000;
+            padding: 20px;
+        }
+
+        .pet-title {
+            text-align: center;
+            font-size: 10px;
+            margin-bottom: 15px;
+            color: #00ff00;
+        }
+
+        /* Pet Display Area - square */
+        .pet-display {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 1px solid #00ff00;
+            background: #000000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+
+        /* Pet pixel structure */
+        .pet {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        /* ===== IDLE BREATHING ANIMATION ===== */
+        .pet.idle .pet-body-container {
+            animation: pet-bounce 2.25s step-end infinite;
+        }
+
+        @keyframes pet-bounce {
+            0% { transform: translateY(0px); }
+            66% { transform: translateY(0px); }
+            67% { transform: translateY(-8px); }
+            99% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* ===== WALKING ANIMATION ===== */
+        .pet.walking .pet-body-container {
+            animation: pet-bounce 2.25s step-end infinite;
+        }
+
+        /* Each leg disappears and reappears in sequence */
+        /* Left legs are in first row, we'll animate each pixel */
+        .pet.walking .pet-legs:first-child .pixel.leg:nth-child(1) {
+            animation: leg-step-1 1.6s step-end infinite;
+        }
+
+        .pet.walking .pet-legs:first-child .pixel.leg:nth-child(3) {
+            animation: leg-step-2 1.6s step-end infinite;
+        }
+
+        .pet.walking .pet-legs:first-child .pixel.leg:nth-child(5) {
+            animation: leg-step-3 1.6s step-end infinite;
+        }
+
+        .pet.walking .pet-legs:first-child .pixel.leg:nth-child(7) {
+            animation: leg-step-4 1.6s step-end infinite;
+        }
+
+        /* Second row - same pattern but offset */
+        .pet.walking .pet-legs:last-child .pixel.leg:nth-child(1) {
+            animation: leg-step-1 1.6s step-end infinite;
+        }
+
+        .pet.walking .pet-legs:last-child .pixel.leg:nth-child(3) {
+            animation: leg-step-2 1.6s step-end infinite;
+        }
+
+        .pet.walking .pet-legs:last-child .pixel.leg:nth-child(5) {
+            animation: leg-step-3 1.6s step-end infinite;
+        }
+
+        .pet.walking .pet-legs:last-child .pixel.leg:nth-child(7) {
+            animation: leg-step-4 1.6s step-end infinite;
+        }
+
+        /* Leg 1: visible → invisible → visible */
+        @keyframes leg-step-1 {
+            0% { opacity: 1; }
+            24% { opacity: 1; }
+            25% { opacity: 0; }   /* Disappear */
+            49% { opacity: 0; }
+            50% { opacity: 1; }   /* Reappear */
+            100% { opacity: 1; }
+        }
+
+        /* Leg 2: offset by 25% */
+        @keyframes leg-step-2 {
+            0% { opacity: 0; }
+            24% { opacity: 0; }
+            25% { opacity: 1; }
+            49% { opacity: 1; }
+            50% { opacity: 0; }
+            74% { opacity: 0; }
+            75% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        /* Leg 3: offset by 50% */
+        @keyframes leg-step-3 {
+            0% { opacity: 1; }
+            49% { opacity: 1; }
+            50% { opacity: 0; }
+            74% { opacity: 0; }
+            75% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+
+        /* Leg 4: offset by 75% */
+        @keyframes leg-step-4 {
+            0% { opacity: 0; }
+            49% { opacity: 0; }
+            50% { opacity: 1; }
+            74% { opacity: 1; }
+            75% { opacity: 0; }
+            99% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ===== DANCE ANIMATION ===== */
+        .pet.dancing .pet-body-container {
+            animation: pet-bounce 2.25s step-end infinite;
+        }
+
+        /* Legs move left-right synchronously */
+        .pet.dancing .pet-legs {
+            animation: legs-dance 1.5s step-end infinite;
+        }
+
+        @keyframes legs-dance {
+            /* Position A - hold 750ms */
+            0% { transform: translateX(0px); }
+            49% { transform: translateX(0px); }
+            /* INSTANT switch to position B */
+            50% { transform: translateX(4px); }
+            99% { transform: translateX(4px); }
+            /* INSTANT back to position A */
+            100% { transform: translateX(0px); }
+        }
+
+        /* Alternate leg rows for dance effect */
+        .pet.dancing .pet-legs:nth-child(3) {
+            animation: legs-dance-alt 1.5s step-end infinite;
+        }
+
+        @keyframes legs-dance-alt {
+            0% { transform: translateX(4px); }
+            49% { transform: translateX(4px); }
+            50% { transform: translateX(0px); }
+            99% { transform: translateX(0px); }
+            100% { transform: translateX(4px); }
+        }
+
+        /* ===== ARM WAVE ANIMATION ===== */
+        .pet.waving .pet-arms .pixel.arm {
+            animation: arm-wave 1.2s step-end infinite;
+        }
+
+        @keyframes arm-wave {
+            /* Down - hold 600ms */
+            0% { transform: translateY(0px); }
+            49% { transform: translateY(0px); }
+            /* INSTANT up */
+            50% { transform: translateY(-8px); }
+            99% { transform: translateY(-8px); }
+            /* INSTANT down */
+            100% { transform: translateY(0px); }
+        }
+
+        /* ===== BLINKING ANIMATION ===== */
+        .pet.blinking .pixel.eye {
+            animation: eye-blink 3s step-end infinite;
+        }
+
+        @keyframes eye-blink {
+            /* Eyes open - hold 2700ms */
+            0% { opacity: 1; }
+            89% { opacity: 1; }
+            /* INSTANT close - hold 300ms */
+            90% { opacity: 0; }
+            99% { opacity: 0; }
+            /* INSTANT open */
+            100% { opacity: 1; }
+        }
+
+        /* ===== SLEEPING ANIMATION ===== */
+        .pet.sleeping .pet-body-container {
+            animation: none;
+            /* Move body down to where legs were (2 leg pixels * 8px = 16px down) */
+            transform: translateY(16px) !important;
+        }
+
+        .pet.sleeping .pixel.eye {
+            opacity: 0;
+        }
+
+        .pet.sleeping .pet-legs {
+            opacity: 0;
+        }
+
+        /* Keep arms visible when sleeping */
+        /* .pet.sleeping .pet-arms .pixel.arm {
+            opacity: 0;
+        } */
+
+        .pet-arms {
+            display: flex;
+            gap: 0;
+            align-items: center;
+        }
+
+        .pet-body {
+            display: grid;
+            grid-template-columns: repeat(12, 8px);
+            grid-template-rows: repeat(6, 8px);
+            gap: 0;
+        }
+
+        .pet-legs-gap {
+            height: 8px;
+        }
+
+        .pet-legs {
+            display: flex;
+            gap: 0;
+            justify-content: center;
+        }
+
+        .pet-leg-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .pixel {
+            width: 8px;
+            height: 8px;
+            background: transparent;
+        }
+
+        /* Active state (orange) */
+        .pet.active .pixel.body {
+            background: #ff6b35;
+            box-shadow: 0 0 2px #ff6b35;
+        }
+
+        /* Inactive state (green) */
+        .pet.inactive .pixel.body {
+            background: #00ff00;
+            box-shadow: 0 0 2px #00ff00;
+        }
+
+        .pixel.eye {
+            background: #000000;
+        }
+
+        .pixel.arm {
+            background: inherit;
+        }
+
+        .pet.active .pixel.arm {
+            background: #ff6b35;
+            box-shadow: 0 0 2px #ff6b35;
+        }
+
+        .pet.inactive .pixel.arm {
+            background: #00ff00;
+            box-shadow: 0 0 2px #00ff00;
+        }
+
+        .pixel.leg {
+            background: inherit;
+        }
+
+        .pet.active .pixel.leg {
+            background: #ff6b35;
+            box-shadow: 0 0 2px #ff6b35;
+        }
+
+        .pet.inactive .pixel.leg {
+            background: #00ff00;
+            box-shadow: 0 0 2px #00ff00;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-label {
+            font-size: 8px;
+            margin-bottom: 5px;
+            color: #00ff00;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 16px;
+            background: #000000;
+            border: 1px solid #00ff00;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00ff00;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        .progress-fill.critical {
+            background: #ff0000;
+            animation: critical-blink 0.5s ease-in-out infinite;
+        }
+
+        @keyframes critical-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Status */
+        .status {
+            text-align: center;
+            font-size: 8px;
+            margin-top: 10px;
+            color: #00ff00;
+            opacity: 0.7;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #000000;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #00ff00;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="pet-container">
+        <div class="pet-title">[AGENT_PET]</div>
+
+        <!-- Pet Display -->
+        <div class="pet-display">
+            <div class="pet active idle" id="pet">
+                <!-- Body container (animated) -->
+                <div class="pet-body-container">
+                    <!-- Arms row (with body top) -->
+                    <div class="pet-arms">
+                    <!-- Left arm -->
+                    <div class="pixel arm"></div>
+
+                    <!-- Body (12x6 grid) -->
+                    <div class="pet-body">
+                        <!-- Row 1 -->
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+
+                        <!-- Row 2 -->
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+
+                        <!-- Row 3 (eyes row) -->
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel eye"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel eye"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+
+                        <!-- Row 4 -->
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+
+                        <!-- Row 5 -->
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+
+                        <!-- Row 6 -->
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                        <div class="pixel body"></div>
+                    </div>
+
+                    <!-- Right arm -->
+                    <div class="pixel arm"></div>
+                </div>
+                </div>
+
+                <!-- Legs (4 legs, 2px tall each) - STATIC, don't move -->
+                <div class="pet-legs">
+                    <!-- Left legs -->
+                    <div class="pixel leg"></div>
+                    <div style="width: 8px;"></div>
+                    <div class="pixel leg"></div>
+
+                    <!-- Gap in middle -->
+                    <div style="width: 32px;"></div>
+
+                    <!-- Right legs -->
+                    <div class="pixel leg"></div>
+                    <div style="width: 8px;"></div>
+                    <div class="pixel leg"></div>
+                </div>
+                <div class="pet-legs">
+                    <!-- Second row of legs -->
+                    <div class="pixel leg"></div>
+                    <div style="width: 8px;"></div>
+                    <div class="pixel leg"></div>
+
+                    <!-- Gap in middle -->
+                    <div style="width: 32px;"></div>
+
+                    <div class="pixel leg"></div>
+                    <div style="width: 8px;"></div>
+                    <div class="pixel leg"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-label">ENERGY</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 75%;"></div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="status" id="status">STATE: Watching logs...</div>
+
+        <!-- Animation Controls -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
+            <button class="toggle-btn" onclick="setAnimation('idle')">IDLE</button>
+            <button class="toggle-btn" onclick="setAnimation('walking')">WALK</button>
+            <button class="toggle-btn" onclick="setAnimation('dancing')">DANCE</button>
+            <button class="toggle-btn" onclick="setAnimation('waving')">WAVE</button>
+            <button class="toggle-btn" onclick="setAnimation('blinking')">BLINK</button>
+            <button class="toggle-btn" onclick="setAnimation('sleeping')">SLEEP</button>
+            <button class="toggle-btn" onclick="togglePetState()">TOGGLE COLOR</button>
+        </div>
+    </div>
+
+    <script>
+        let isActive = true;
+        let energy = 75;
+        let currentAnimation = 'idle';
+
+        function setAnimation(animName) {
+            const pet = document.getElementById('pet');
+            const status = document.getElementById('status');
+
+            // Remove all animation classes
+            pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'sleeping');
+
+            // Add new animation
+            pet.classList.add(animName);
+            currentAnimation = animName;
+
+            // Update status
+            const statusTexts = {
+                'idle': 'STATE: Idle breathing...',
+                'walking': 'STATE: Walking...',
+                'dancing': 'STATE: Dancing! ♪',
+                'waving': 'STATE: Waving arms...',
+                'blinking': 'STATE: Blinking...',
+                'sleeping': 'STATE: Sleeping... ZZZ'
+            };
+            status.textContent = statusTexts[animName] || 'STATE: Unknown';
+        }
+
+        function togglePetState() {
+            const pet = document.getElementById('pet');
+
+            isActive = !isActive;
+
+            if (isActive) {
+                pet.classList.remove('inactive');
+                pet.classList.add('active');
+            } else {
+                pet.classList.remove('active');
+                pet.classList.add('inactive');
+            }
+        }
+
+        // Simulate energy drain
+        setInterval(() => {
+            energy = Math.max(0, energy - 0.1);
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.style.width = energy + '%';
+
+            if (energy < 30) {
+                progressFill.classList.add('critical');
+            } else {
+                progressFill.classList.remove('critical');
+            }
+
+            if (energy <= 0) {
+                const pet = document.getElementById('pet');
+                pet.classList.remove('active');
+                pet.classList.add('inactive');
+                document.getElementById('status').textContent = 'STATE: Sleeping...';
+            }
+        }, 100);
+    </script>
+</body>
+</html>

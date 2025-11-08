@@ -1,0 +1,324 @@
+/* ==================== GHOSTLINE PET STYLES ==================== */
+/* Adapted to match order.html aesthetic: black #000 + green #00ff00 */
+
+/* Pet pixel structure */
+.pet-row {
+    display: flex;
+    gap: 0;
+}
+
+.pet-pixel {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+}
+
+.pet-pixel.pink {
+    background: #00ff00; /* Changed from pink to green! */
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.pet-pixel.eye {
+    background: #000000;
+}
+
+/* Pet animations */
+.pixel-pet {
+    display: inline-block;
+    transition: transform 0.1s;
+}
+
+/* Noise mask placeholder */
+.noise-mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(0, 255, 0, 0.03) 0px,
+            rgba(0, 255, 0, 0.03) 1px,
+            transparent 1px,
+            transparent 2px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(0, 255, 0, 0.03) 0px,
+            rgba(0, 255, 0, 0.03) 1px,
+            transparent 1px,
+            transparent 2px
+        );
+    display: none;
+}
+
+/* Pet speech bubbles */
+.pet-bubble {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000000;
+    border: 1px solid #00ff00;
+    padding: 5px 10px;
+    font-size: 8px;
+    white-space: nowrap;
+    animation: bubble-appear 2s ease-in-out;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+.pet-bubble.success {
+    border-color: #00ff00;
+    color: #00ff00;
+}
+
+.pet-bubble.error {
+    border-color: #ff0000;
+    color: #ff0000;
+}
+
+.pet-bubble.thinking {
+    border-color: #ffff00;
+    color: #ffff00;
+}
+
+.pet-bubble.action {
+    border-color: #00ffff;
+    color: #00ffff;
+}
+
+@keyframes bubble-appear {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(10px);
+    }
+    10%, 90% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+/* ==================== GHOSTLINE ARCADE STYLE ==================== */
+/* Adapted from neon to green terminal aesthetic */
+
+.tamagotchi-arcade-screen {
+    background: #000000;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    padding: 20px;
+    position: relative;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+}
+
+/* Scanline effect (subtle green) */
+.tamagotchi-arcade-screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 0, 0.02) 0px,
+        rgba(0, 255, 0, 0.02) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Title */
+.arcade-title {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 16px;
+    text-align: center;
+    color: #00ff00;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+/* Progress Bars - GREEN TERMINAL STYLE */
+.arcade-stat-bar {
+    position: relative;
+    height: 24px;
+    background: #000000;
+    border: 1px solid #00ff00;
+    margin: 8px 0;
+    overflow: hidden;
+}
+
+.arcade-stat-label {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    transform: translateY(-50%);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 8px;
+    color: #00ff00;
+    z-index: 2;
+    letter-spacing: 1px;
+}
+
+.arcade-stat-value {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 8px;
+    color: #00ff00;
+    z-index: 2;
+}
+
+.arcade-stat-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #00ff00;
+    transition: width 0.3s ease;
+    opacity: 0.7;
+}
+
+/* Critical state (low stat) */
+.arcade-stat-fill.critical {
+    background: #ff0000;
+    animation: critical-blink 0.5s ease-in-out infinite;
+}
+
+@keyframes critical-blink {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.3; }
+}
+
+/* Full state */
+.arcade-stat-fill.full {
+    background: #00ff00;
+    opacity: 1;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+/* Pet Display Area */
+.arcade-pet-screen {
+    background: #0a0a0a;
+    border: 2px solid #00ff00;
+    padding: 20px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+/* Age Counter */
+.arcade-age-display {
+    background: #000000;
+    border: 1px solid #00ff00;
+    padding: 8px 16px;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 12px;
+    color: #00ff00;
+    text-align: center;
+    letter-spacing: 2px;
+    margin-top: 10px;
+}
+
+/* Mood Indicator */
+.arcade-mood-sign {
+    background: #000000;
+    border: 1px solid #00ff00;
+    padding: 12px;
+    text-align: center;
+}
+
+.arcade-mood-text {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 10px;
+    color: #00ff00;
+}
+
+/* Arcade Buttons - GREEN STYLE */
+.arcade-button {
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    font-size: 10px;
+    padding: 12px 20px;
+    background: #000000;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    cursor: pointer;
+    transition: all 0.1s;
+    position: relative;
+}
+
+.arcade-button:hover {
+    background: #001a00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.arcade-button:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+/* Specific button accent colors (subtle) */
+.arcade-button.feed:hover {
+    border-color: #00ff88;
+}
+
+.arcade-button.play:hover {
+    border-color: #00ffff;
+}
+
+.arcade-button.sleep:hover {
+    border-color: #88ff00;
+}
+
+.arcade-button.heal:hover {
+    border-color: #ffff00;
+}
+
+/* Button Grid */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+@media (max-width: 500px) {
+    .button-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .arcade-title {
+        font-size: 12px;
+    }
+
+    .arcade-button {
+        font-size: 8px;
+        padding: 10px 15px;
+    }
+
+    .arcade-stat-bar {
+        height: 20px;
+    }
+
+    .arcade-stat-label,
+    .arcade-stat-value {
+        font-size: 7px;
+    }
+}

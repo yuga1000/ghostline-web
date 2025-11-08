@@ -1,0 +1,673 @@
+/* ===== ROAMING AGENT PET STYLES (for index.html) ===== */
+
+.roaming-pet-container {
+    position: fixed;
+    /* Initial position will be set randomly by JS */
+    bottom: 20px;
+    left: 20px;
+    z-index: 9998;
+    pointer-events: none;
+    transition: none; /* No smooth transitions - discrete only */
+}
+
+.roaming-pet {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.roaming-pet-body-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.roaming-pet-arms {
+    display: flex;
+    gap: 0;
+    align-items: center;
+}
+
+/* Smaller body - 8x4 grid instead of 12x6 */
+.roaming-pet-body {
+    display: grid;
+    grid-template-columns: repeat(8, 3px);
+    grid-template-rows: repeat(4, 3px);
+    gap: 0;
+}
+
+.roaming-pet-legs {
+    display: flex;
+    gap: 1px; /* Small gap to prevent leg overlap */
+    justify-content: center;
+}
+
+/* Hide even-indexed legs by default (spacers for walking animation) */
+.roaming-pet-legs .roaming-pixel.leg:nth-child(even) {
+    opacity: 0;
+    width: 0; /* Don't take up space */
+}
+
+.roaming-pixel {
+    width: 3px;
+    height: 3px;
+    background: transparent;
+}
+
+/* Active state (bright orange-yellow) */
+.roaming-pet.active .roaming-pixel.body {
+    background: #ffbb00;
+    box-shadow: 0 0 2px #ffbb00;
+}
+
+/* Sleeping state (green) */
+.roaming-pet.sleeping .roaming-pixel.body {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+/* Excited state (cyan) */
+.roaming-pet.excited .roaming-pixel.body {
+    background: #00ffff;
+    box-shadow: 0 0 2px #00ffff;
+}
+
+/* Happy state (pink) */
+.roaming-pet.happy .roaming-pixel.body {
+    background: #ff00ff;
+    box-shadow: 0 0 2px #ff00ff;
+}
+
+.roaming-pixel.eye {
+    background: #000000;
+}
+
+.roaming-pixel.arm {
+    background: inherit;
+}
+
+.roaming-pet.active .roaming-pixel.arm {
+    background: #ffbb00;
+    box-shadow: 0 0 2px #ffbb00;
+}
+
+.roaming-pet.sleeping .roaming-pixel.arm {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.roaming-pet.excited .roaming-pixel.arm {
+    background: #00ffff;
+    box-shadow: 0 0 2px #00ffff;
+}
+
+.roaming-pet.happy .roaming-pixel.arm {
+    background: #ff00ff;
+    box-shadow: 0 0 2px #ff00ff;
+}
+
+.roaming-pixel.leg {
+    background: inherit;
+    height: 6px; /* 2 pixels tall by default */
+}
+
+.roaming-pet.active .roaming-pixel.leg {
+    background: #ffbb00;
+    box-shadow: 0 0 2px #ffbb00;
+}
+
+.roaming-pet.sleeping .roaming-pixel.leg {
+    background: #00ff00;
+    box-shadow: 0 0 2px #00ff00;
+}
+
+.roaming-pet.excited .roaming-pixel.leg {
+    background: #00ffff;
+    box-shadow: 0 0 2px #00ffff;
+}
+
+.roaming-pet.happy .roaming-pixel.leg {
+    background: #ff00ff;
+    box-shadow: 0 0 2px #ff00ff;
+}
+
+/* ===== IDLE BREATHING ANIMATION ===== */
+.roaming-pet.idle .roaming-pet-body-container {
+    animation: roaming-pet-bounce 2.25s step-end infinite;
+}
+
+@keyframes roaming-pet-bounce {
+    0% { transform: translateY(0px); }
+    66% { transform: translateY(0px); }
+    67% { transform: translateY(-3px); }
+    99% { transform: translateY(-3px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== WALKING ANIMATION ===== */
+.roaming-pet.walking .roaming-pet-body-container {
+    animation: roaming-pet-bounce 2.25s step-end infinite;
+}
+
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(1) {
+    animation: roaming-leg-step-1 1.6s step-end infinite;
+}
+
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(3) {
+    animation: roaming-leg-step-2 1.6s step-end infinite;
+}
+
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(5) {
+    animation: roaming-leg-step-3 1.6s step-end infinite;
+}
+
+.roaming-pet.walking .roaming-pet-legs .roaming-pixel.leg:nth-child(7) {
+    animation: roaming-leg-step-4 1.6s step-end infinite;
+}
+
+@keyframes roaming-leg-step-1 {
+    0% { opacity: 1; }
+    24% { opacity: 1; }
+    25% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes roaming-leg-step-2 {
+    0% { opacity: 0; }
+    24% { opacity: 0; }
+    25% { opacity: 1; }
+    49% { opacity: 1; }
+    50% { opacity: 0; }
+    74% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes roaming-leg-step-3 {
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    50% { opacity: 0; }
+    74% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+@keyframes roaming-leg-step-4 {
+    0% { opacity: 0; }
+    49% { opacity: 0; }
+    50% { opacity: 1; }
+    74% { opacity: 1; }
+    75% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ===== DANCING ANIMATION ===== */
+.roaming-pet.dancing .roaming-pet-body-container {
+    animation: roaming-pet-bounce 2.25s step-end infinite;
+}
+
+.roaming-pet.dancing .roaming-pet-legs {
+    animation: roaming-legs-dance 1.5s step-end infinite;
+}
+
+@keyframes roaming-legs-dance {
+    0% { transform: translateX(0px); }
+    49% { transform: translateX(0px); }
+    50% { transform: translateX(2px); }
+    99% { transform: translateX(2px); }
+    100% { transform: translateX(0px); }
+}
+
+/* ===== ARM WAVE ANIMATION ===== */
+.roaming-pet.waving .roaming-pet-arms .roaming-pixel.arm {
+    animation: roaming-arm-wave 1.2s step-end infinite;
+}
+
+@keyframes roaming-arm-wave {
+    0% { transform: translateY(0px); }
+    49% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
+    99% { transform: translateY(-3px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== BLINKING ANIMATION ===== */
+.roaming-pet.blinking .roaming-pixel.eye {
+    animation: roaming-eye-blink 3s step-end infinite;
+}
+
+@keyframes roaming-eye-blink {
+    0% { opacity: 1; }
+    89% { opacity: 1; }
+    90% { opacity: 0; }
+    99% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ===== PLAYING ANIMATION (on back) ===== */
+.roaming-pet.playing .roaming-pet-body-container {
+    animation: none;
+    /* Move down to ground - legs will appear above */
+    transform: translateY(6px) !important;
+}
+
+.roaming-pet.playing .roaming-pet-legs {
+    animation: roaming-legs-wiggle 1.2s step-end infinite;
+}
+
+@keyframes roaming-legs-wiggle {
+    0% { transform: translateX(0px); }
+    24% { transform: translateX(0px); }
+    25% { transform: translateX(2px); }
+    49% { transform: translateX(2px); }
+    50% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(-2px); }
+    99% { transform: translateX(-2px); }
+    100% { transform: translateX(0px); }
+}
+
+/* ===== SLEEPING ANIMATION ===== */
+.roaming-pet.sleeping .roaming-pet-body-container {
+    /* No scale/rotation - just position */
+    transform: translateY(6px) !important;
+}
+
+/* Discrete breathing - pixels pulse */
+.roaming-pet.sleeping .roaming-pixel.body {
+    animation: roaming-sleep-breathing-pulse 3s step-end infinite;
+}
+
+@keyframes roaming-sleep-breathing-pulse {
+    /* Normal brightness */
+    0% { opacity: 1; }
+    49% { opacity: 1; }
+    /* Slightly dimmed (breathing in) */
+    50% { opacity: 0.7; }
+    99% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Sleeping eyes - thin slits instead of full open */
+.roaming-pet.sleeping .roaming-pixel.eye {
+    /* Make eyes into thin slits */
+    height: 1px;
+    animation: roaming-eye-flutter 4s step-end infinite;
+}
+
+@keyframes roaming-eye-flutter {
+    /* Eyes mostly closed, occasionally flutter */
+    0% { opacity: 0.6; }
+    79% { opacity: 0.6; }
+    /* Brief flutter */
+    80% { opacity: 0.3; }
+    84% { opacity: 0.3; }
+    85% { opacity: 0.6; }
+    100% { opacity: 0.6; }
+}
+
+.roaming-pet.sleeping .roaming-pet-legs {
+    opacity: 0;
+}
+
+/* ===== JUMPING ANIMATION (discrete arc jumps) ===== */
+.roaming-pet.jumping .roaming-pet-body-container {
+    animation: jump-arc 0.5s step-end 1;
+}
+
+@keyframes jump-arc {
+    /* 8 fps = 4 frames for 0.5s jump - no scale, just discrete height changes */
+    0% { transform: translateY(0px); }
+    24% { transform: translateY(0px); } /* Ready */
+    25% { transform: translateY(-12px); } /* Jump up */
+    49% { transform: translateY(-12px); }
+    50% { transform: translateY(-18px); } /* Apex */
+    74% { transform: translateY(-18px); }
+    75% { transform: translateY(-6px); } /* Coming down */
+    99% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); } /* Land */
+}
+
+/* Legs tuck up during jump */
+.roaming-pet.jumping .roaming-pet-legs {
+    animation: legs-tuck 0.5s step-end 1;
+}
+
+@keyframes legs-tuck {
+    0% { transform: translateY(0px); opacity: 1; }
+    24% { transform: translateY(0px); opacity: 1; }
+    25% { transform: translateY(-3px); opacity: 0.5; } /* Tuck up */
+    74% { transform: translateY(-3px); opacity: 0.5; }
+    75% { transform: translateY(0px); opacity: 1; }
+    100% { transform: translateY(0px); opacity: 1; }
+}
+
+/* ===== GROWING ANIMATION (like a plant) ===== */
+.roaming-pet.growing .roaming-pet-body-container {
+    animation: plant-grow 3s step-end forwards;
+}
+
+@keyframes plant-grow {
+    /* Discrete growth - just move up, no scale */
+    /* Stage 1: normal size */
+    0% { transform: translateY(0px); }
+    24% { transform: translateY(0px); }
+    /* Stage 2: grow +1 pixel */
+    25% { transform: translateY(-3px); }
+    49% { transform: translateY(-3px); }
+    /* Stage 3: grow +2 pixels */
+    50% { transform: translateY(-6px); }
+    74% { transform: translateY(-6px); }
+    /* Stage 4: grow +3 pixels (fully grown) */
+    75% { transform: translateY(-9px); }
+    100% { transform: translateY(-9px); }
+}
+
+/* Arms spread when fully grown */
+.roaming-pet.growing .roaming-pet-arms {
+    animation: arms-spread 3s step-end forwards;
+}
+
+@keyframes arms-spread {
+    0% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(3px); }
+    100% { transform: translateX(3px); }
+}
+
+.roaming-pet.growing .roaming-pet-arms .roaming-pixel.arm:first-child {
+    animation: arm-left-spread 3s step-end forwards;
+}
+
+@keyframes arm-left-spread {
+    0% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(-3px); }
+}
+
+.roaming-pet.growing .roaming-pet-arms .roaming-pixel.arm:last-child {
+    animation: arm-right-spread 3s step-end forwards;
+}
+
+@keyframes arm-right-spread {
+    0% { transform: translateX(0px); }
+    74% { transform: translateX(0px); }
+    75% { transform: translateX(3px); }
+    100% { transform: translateX(3px); }
+}
+
+/* Antennae pixels that appear from head */
+.roaming-pet-antenna {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: inherit;
+    opacity: 0;
+    top: -6px;
+    left: 50%;
+    margin-left: -1.5px;
+}
+
+.roaming-pet.growing .roaming-pet-antenna {
+    animation: antenna-grow 3s step-end forwards;
+}
+
+@keyframes antenna-grow {
+    0% { opacity: 0; transform: translateY(0px); }
+    74% { opacity: 0; transform: translateY(0px); }
+    75% { opacity: 1; transform: translateY(0px); }
+    87% { opacity: 1; transform: translateY(0px); }
+    88% { opacity: 1; transform: translateY(-3px); }
+    100% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* Shrinking back animation */
+.roaming-pet.shrinking .roaming-pet-body-container {
+    animation: plant-shrink 2s step-end forwards;
+}
+
+@keyframes plant-shrink {
+    /* Discrete shrinking - no scale */
+    0% { transform: translateY(-9px); }
+    32% { transform: translateY(-9px); }
+    33% { transform: translateY(-6px); }
+    65% { transform: translateY(-6px); }
+    66% { transform: translateY(-3px); }
+    99% { transform: translateY(-3px); }
+    100% { transform: translateY(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-arms {
+    animation: arms-close 2s step-end forwards;
+}
+
+@keyframes arms-close {
+    0% { transform: translateX(3px); }
+    32% { transform: translateX(3px); }
+    33% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-arms .roaming-pixel.arm:first-child {
+    animation: arm-left-close 2s step-end forwards;
+}
+
+@keyframes arm-left-close {
+    0% { transform: translateX(-3px); }
+    32% { transform: translateX(-3px); }
+    33% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-arms .roaming-pixel.arm:last-child {
+    animation: arm-right-close 2s step-end forwards;
+}
+
+@keyframes arm-right-close {
+    0% { transform: translateX(3px); }
+    32% { transform: translateX(3px); }
+    33% { transform: translateX(0px); }
+    100% { transform: translateX(0px); }
+}
+
+.roaming-pet.shrinking .roaming-pet-antenna {
+    animation: antenna-shrink 2s step-end forwards;
+}
+
+@keyframes antenna-shrink {
+    0% { opacity: 1; transform: translateY(-3px); }
+    32% { opacity: 1; transform: translateY(-3px); }
+    33% { opacity: 1; transform: translateY(0px); }
+    65% { opacity: 1; transform: translateY(0px); }
+    66% { opacity: 0; transform: translateY(0px); }
+    100% { opacity: 0; transform: translateY(0px); }
+}
+
+/* ===== FLOWER GROWTH STAGES (Progressive) ===== */
+
+/* Stage 0: Seed - small */
+.roaming-pet.flower-stage-0 .roaming-pet-body-container {
+    transform: scale(0.8);
+}
+
+/* Stage 1: Sprout - slightly bigger */
+.roaming-pet.flower-stage-1 .roaming-pet-body-container {
+    transform: scale(0.9);
+}
+
+/* Stage 2: Young - growing */
+.roaming-pet.flower-stage-2 .roaming-pet-body-container {
+    transform: scale(1.0);
+}
+
+.roaming-pet.flower-stage-2 .roaming-pet-antenna {
+    opacity: 0.3;
+}
+
+/* Stage 3: Pre-bloom - antenna appears */
+.roaming-pet.flower-stage-3 .roaming-pet-body-container {
+    transform: scale(1.1);
+}
+
+.roaming-pet.flower-stage-3 .roaming-pet-antenna {
+    opacity: 0.6;
+}
+
+.roaming-pet.flower-stage-3 .roaming-pixel.body {
+    background: #ff69b4 !important;
+}
+
+/* Stage 4: Budding - almost bloomed */
+.roaming-pet.flower-stage-4 .roaming-pet-body-container {
+    transform: scale(1.2);
+}
+
+.roaming-pet.flower-stage-4 .roaming-pet-antenna {
+    opacity: 1;
+}
+
+.roaming-pet.flower-stage-4 .roaming-pixel.body {
+    background: #ff1493 !important;
+}
+
+/* Full Bloom - maximum size with petals */
+.roaming-pet.flower-bloom .roaming-pet-body-container {
+    transform: scale(1.3);
+}
+
+.roaming-pet.flower-bloom .roaming-pet-antenna {
+    opacity: 1;
+    transform: translateY(-6px);
+}
+
+.roaming-pet.flower-bloom .roaming-pixel.body {
+    background: #ff00ff !important;
+    box-shadow: 0 0 5px #ff00ff !important;
+}
+
+.roaming-pet.flower-bloom .roaming-pixel.arm {
+    background: #ff00ff !important;
+}
+
+/* ===== WIND SWAY ANIMATION (8 variants) ===== */
+
+.roaming-pet.flower-sway {
+    transition: transform 0.5s ease-in-out;
+}
+
+.roaming-pet.flower-sway-0 {
+    transform: translateX(0px);
+}
+
+.roaming-pet.flower-sway-1 {
+    transform: translateX(2px);
+}
+
+.roaming-pet.flower-sway-2 {
+    transform: translateX(4px) translateY(1px);
+}
+
+.roaming-pet.flower-sway-3 {
+    transform: translateX(2px);
+}
+
+.roaming-pet.flower-sway-4 {
+    transform: translateX(0px);
+}
+
+.roaming-pet.flower-sway-5 {
+    transform: translateX(-2px);
+}
+
+.roaming-pet.flower-sway-6 {
+    transform: translateX(-4px) translateY(1px);
+}
+
+.roaming-pet.flower-sway-7 {
+    transform: translateX(-2px);
+}
+
+/* Antenna sways more dramatically */
+.roaming-pet.flower-sway-2 .roaming-pet-antenna,
+.roaming-pet.flower-sway-6 .roaming-pet-antenna {
+    transform: translateY(-6px) translateX(2px);
+}
+
+/* ===== SPIDER ON WEB MODE ===== */
+
+.roaming-pet.on-spider-web {
+    /* Spider is stationary on web, slightly smaller */
+    transform: scale(0.9);
+}
+
+.roaming-pet.on-spider-web .roaming-pet-body-container {
+    /* Subtle breathing while waiting */
+    animation: spider-wait-breathing 3s ease-in-out infinite;
+}
+
+@keyframes spider-wait-breathing {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* Spider legs spread out on web */
+.roaming-pet.on-spider-web .roaming-pixel.leg {
+    opacity: 1;
+}
+
+/* ===== SPIDER FORM (spread legs like spider) ===== */
+
+.roaming-pet.spider-form {
+    /* Stay green like spider */
+}
+
+.roaming-pet.spider-form .roaming-pixel.body {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+.roaming-pet.spider-form .roaming-pixel.arm {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+.roaming-pet.spider-form .roaming-pixel.leg {
+    background: #00ff00 !important;
+    box-shadow: 0 0 3px #00ff00 !important;
+}
+
+/* Spread arms wider like spider legs */
+.roaming-pet.spider-form .roaming-pet-arms .roaming-pixel.arm:first-child {
+    transform: translateX(-6px) translateY(-2px);
+}
+
+.roaming-pet.spider-form .roaming-pet-arms .roaming-pixel.arm:last-child {
+    transform: translateX(6px) translateY(-2px);
+}
+
+/* Make legs more visible and spread */
+.roaming-pet.spider-form .roaming-pixel.leg {
+    opacity: 1;
+}
+
+/* Spread legs horizontally like spider stance */
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(1) {
+    transform: translateX(-4px);
+}
+
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(2) {
+    transform: translateX(-2px);
+}
+
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(7) {
+    transform: translateX(2px);
+}
+
+.roaming-pet.spider-form .roaming-pet-legs .roaming-pixel.leg:nth-child(8) {
+    transform: translateX(4px);
+}

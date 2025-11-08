@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 ARCADE TAMAGOTCHI 🎮</title>
+
+    <!-- Google Fonts for retro look -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="pet-arcade.css">
+
+    <style>
+        body {
+            background: #000000;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', monospace;
+            overflow-x: hidden;
+        }
+
+        /* Animated background stars */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated star background -->
+    <div class="stars" id="stars-container"></div>
+
+    <div class="container">
+        <!-- Main Arcade Screen -->
+        <div class="tamagotchi-arcade-screen">
+            <!-- Title -->
+            <div class="arcade-title">
+                ★ GHOSTLINE PET ★
+            </div>
+
+            <!-- Pet Display -->
+            <div class="arcade-pet-screen" id="pet-display">
+                <!-- Your pixel pet will be here -->
+                <div class="pixel-pet idle" id="pixel-pet" style="transform: scale(3);">
+                    <!-- Row 1: Top of head -->
+                    <div class="pet-row">
+                        <div class="pet-pixel"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel"></div>
+                    </div>
+                    <!-- Row 2: Eyes row -->
+                    <div class="pet-row">
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel eye" id="pet-eye-left"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel eye" id="pet-eye-right"></div>
+                        <div class="pet-pixel pink"></div>
+                    </div>
+                    <!-- Row 3: Body -->
+                    <div class="pet-row">
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel pink"></div>
+                    </div>
+                    <!-- Row 4: Legs -->
+                    <div class="pet-row">
+                        <div class="pet-pixel"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel"></div>
+                        <div class="pet-pixel pink"></div>
+                        <div class="pet-pixel"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Display -->
+            <div class="arcade-mood-sign" style="margin-top: 20px;">
+                <div class="arcade-mood-text" id="mood-display">VERY HAPPY</div>
+            </div>
+
+            <!-- Age Counter -->
+            <div class="arcade-age-display" style="margin-top: 15px;">
+                AGE: <span id="age-counter">000</span> MIN
+            </div>
+
+            <!-- Progress Bars -->
+            <div style="margin-top: 25px;">
+                <!-- Hunger Bar -->
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">HUNGER</div>
+                    <div class="arcade-stat-value" id="hunger-value">100%</div>
+                    <div class="arcade-stat-fill" id="hunger-fill" style="width: 100%;"></div>
+                </div>
+
+                <!-- Happiness Bar -->
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">HAPPY</div>
+                    <div class="arcade-stat-value" id="happy-value">100%</div>
+                    <div class="arcade-stat-fill" id="happy-fill" style="width: 100%;"></div>
+                </div>
+
+                <!-- Energy Bar -->
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">ENERGY</div>
+                    <div class="arcade-stat-value" id="energy-value">100%</div>
+                    <div class="arcade-stat-fill" id="energy-fill" style="width: 100%;"></div>
+                </div>
+
+                <!-- Health Bar -->
+                <div class="arcade-stat-bar">
+                    <div class="arcade-stat-label">HEALTH</div>
+                    <div class="arcade-stat-value" id="health-value">100%</div>
+                    <div class="arcade-stat-fill full" id="health-fill" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="button-grid">
+                <button class="arcade-button feed" onclick="feedPet()">
+                    🍕 FEED
+                </button>
+                <button class="arcade-button play" onclick="playWithPet()">
+                    🎮 PLAY
+                </button>
+                <button class="arcade-button sleep" onclick="petSleep()">
+                    😴 SLEEP
+                </button>
+                <button class="arcade-button heal" onclick="healPet()">
+                    💊 HEAL
+                </button>
+            </div>
+
+            <!-- Credits -->
+            <div style="margin-top: 30px; text-align: center; font-size: 8px; color: #00ffff; opacity: 0.6;">
+                ★ INSERT COIN TO CONTINUE ★<br>
+                GHOSTLINE ARCADE 2025
+            </div>
+        </div>
+    </div>
+
+    <!-- Include pet.js styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Include pet.js functionality -->
+    <script src="pet.js"></script>
+
+    <script>
+        // Generate random stars
+        function generateStars() {
+            const container = document.getElementById('stars-container');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+        generateStars();
+
+        // Update progress bars in real-time
+        setInterval(() => {
+            if (window.petModule) {
+                const stats = window.petModule.getStats();
+
+                // Update values
+                document.getElementById('hunger-value').textContent = Math.round(stats.hunger) + '%';
+                document.getElementById('happy-value').textContent = Math.round(stats.happiness) + '%';
+                document.getElementById('energy-value').textContent = Math.round(stats.energy) + '%';
+                document.getElementById('health-value').textContent = Math.round(stats.health) + '%';
+
+                // Update bar widths
+                const hungerBar = document.getElementById('hunger-fill');
+                const happyBar = document.getElementById('happy-fill');
+                const energyBar = document.getElementById('energy-fill');
+                const healthBar = document.getElementById('health-fill');
+
+                hungerBar.style.width = stats.hunger + '%';
+                happyBar.style.width = stats.happiness + '%';
+                energyBar.style.width = stats.energy + '%';
+                healthBar.style.width = stats.health + '%';
+
+                // Add critical class if low
+                hungerBar.classList.toggle('critical', stats.hunger < 30);
+                happyBar.classList.toggle('critical', stats.happiness < 30);
+                energyBar.classList.toggle('critical', stats.energy < 30);
+                healthBar.classList.toggle('critical', stats.health < 30);
+
+                // Add full class if maxed
+                hungerBar.classList.toggle('full', stats.hunger >= 100);
+                happyBar.classList.toggle('full', stats.happiness >= 100);
+                energyBar.classList.toggle('full', stats.energy >= 100);
+                healthBar.classList.toggle('full', stats.health >= 100);
+
+                // Update mood
+                const mood = document.getElementById('mood-display');
+                if (!stats.alive) {
+                    mood.textContent = '💀 DEAD 💀';
+                } else if (stats.happiness > 80) {
+                    mood.textContent = '✨ VERY HAPPY ✨';
+                } else if (stats.happiness > 60) {
+                    mood.textContent = '😊 HAPPY';
+                } else if (stats.happiness > 40) {
+                    mood.textContent = '😐 OK';
+                } else if (stats.happiness > 20) {
+                    mood.textContent = '😢 SAD';
+                } else {
+                    mood.textContent = '😭 DEPRESSED';
+                }
+
+                // Update age
+                const age = Math.floor(stats.age / 60);
+                document.getElementById('age-counter').textContent = String(age).padStart(3, '0');
+            }
+        }, 100); // Update 10 times per second for smooth bars
+
+        // Wrapper functions for buttons
+        function feedPet() {
+            if (window.petModule) window.petModule.feed();
+        }
+
+        function playWithPet() {
+            if (window.petModule) window.petModule.play();
+        }
+
+        function petSleep() {
+            if (window.petModule) window.petModule.sleep();
+        }
+
+        function healPet() {
+            if (window.petModule) window.petModule.heal();
+        }
+
+        console.log('🎮 ARCADE TAMAGOTCHI LOADED 🎮');
+        console.log('Use the colorful buttons to interact!');
+    </script>
+</body>
+</html>

@@ -133,7 +133,16 @@
         text-shadow: 0 0 2px #00ff00;
         animation: symbolFlicker 1.5s infinite;
     }
-    
+
+    .artwork-size {
+        color: #00ff00;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 11px;
+        text-align: center;
+        margin-top: 4px;
+        opacity: 0.8;
+    }
+
     .ghost-coin {
         width: 20px;
         height: 20px;
@@ -503,8 +512,8 @@
         
         /* Category tabs responsive */
         .category-tab {
-            padding: 6px 12px;
-            font-size: 11px;
+            padding: 6px 8px;
+            font-size: 9px;
         }
         
         /* Header responsive */
@@ -556,6 +565,7 @@
         <a href="index.html" class="nav-link">[HOME]</a>
         <span class="nav-link nav-active">[GALLERY]</span>
         <a href="stream.html" class="nav-link">[STREAM]</a>
+        <a href="order.html" class="nav-link">[ORDER]</a>
     </nav>
 </div>
 
@@ -564,7 +574,10 @@
 <div class="container mx-auto px-4 pb-8">
     <!-- Title -->
     <div class="text-center mb-6">
-        <h1 class="pixel-text text-3xl mb-4">GALLERY</h1>
+        <div class="flex items-center justify-center gap-6 mb-4">
+            <img src="components/Yuga.GIF" alt="Yuga" style="width: 80px; height: 80px; image-rendering: pixelated;">
+            <h1 class="pixel-text text-3xl">GALLERY</h1>
+        </div>
     </div>
 
 
@@ -588,13 +601,6 @@
 <!-- Empty state -->
 <div id="emptyState" class="text-center py-16 hidden">
     <p class="text-green-600 mb-4">No artworks in this category yet.</p>
-</div>
-
-<!-- Donate Button - moved inside main content for mobile -->
-<div class="donate-wrapper">
-    <button class="donate-console" id="donateBtn" onclick="handleDonateClick()">
-        <span style="color: #ffffff;">SUPPORT PROJECT</span>
-    </button>
 </div>
 
 
@@ -635,41 +641,6 @@
 
 <!-- Donate Modal -->
 
-<div class="modal" id="donateModal">
-    <div class="modal-content">
-        <h3 class="pixel-text text-lg mb-4" style="color: #00ff00;">SUPPORT GHOSTLINE</h3>
-
-
-    <!-- Ethereum -->
-    <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a', 'Ethereum')">
-        <p class="text-sm mb-2" style="color: #00ff00;">ETHEREUM (ETH)</p>
-        <p class="text-xs break-all mb-2" style="color: #ffffff;">0x2451A14572F67C587eEfca42C1F4C41f4FA2ca6a</p>
-        <p class="text-xs" style="color: #666;">Click to copy</p>
-    </div>
-    
-    <!-- Bitcoin -->
-    <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d', 'Bitcoin')">
-        <p class="text-sm mb-2" style="color: #00ff00;">BITCOIN (BTC)</p>
-        <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dg7ycj908d</p>
-        <p class="text-xs" style="color: #666;">Click to copy</p>
-    </div>
-    
-    <!-- USDT -->
-    <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B', 'USDT')">
-        <p class="text-sm mb-2" style="color: #00ff00;">USDT (TRC20)</p>
-        <p class="text-xs break-all mb-2" style="color: #ffffff;">0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B</p>
-        <p class="text-xs" style="color: #666;">Click to copy</p>
-    </div>
-    
-    <p class="text-xs text-green-600 mb-4">
-        Your support helps robots learn art!<br>
-        Click any address to copy instantly
-    </p>
-    <button class="category-tab" onclick="closeDonateModal()">CLOSE</button>
-</div>
-
-
-</div>
 
 <script>
 // Простая инициализация
@@ -749,7 +720,8 @@ async function loadGallery() {
                     url: 'pages/2Large.jpeg?v=' + Date.now(),
                     category: 'latest',
                     status: 'available',
-                    description: 'Test artwork for gallery functionality'
+                    description: 'Test artwork for gallery functionality',
+                    size: '40×40 cm'
                 },
                 {
                     id: 2,
@@ -757,7 +729,8 @@ async function loadGallery() {
                     url: 'components/3scene-terminator-draw.gif.gif?v=' + Date.now(),
                     category: 'series',
                     status: 'available',
-                    description: 'Another test artwork'
+                    description: 'Another test artwork',
+                    size: '30×30 cm'
                 },
                 {
                     id: 3,
@@ -765,7 +738,8 @@ async function loadGallery() {
                     url: 'plate_noisemask.GIF?v=' + Date.now(),
                     category: 'rare',
                     status: 'sold',
-                    description: 'Sold test artwork'
+                    description: 'Sold test artwork',
+                    size: '50×50 cm'
                 }
             ];
             localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
@@ -825,6 +799,7 @@ function renderGallery() {
                     <span class="artwork-symbol" data-index="${index}-3">░</span>
                     <span class="artwork-symbol" data-index="${index}-4">▖</span>
                 </div>
+                ${item.size ? `<div class="artwork-size">${item.size}</div>` : ''}
             </div>
         </div>
     `).join('');
@@ -1481,13 +1456,6 @@ function handleDonateClick() {
     createBranchingLines();
 }
 
-function showDonateModal() {
-    document.getElementById('donateModal').style.display = 'flex';
-}
-
-function closeDonateModal() {
-    document.getElementById('donateModal').style.display = 'none';
-}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>

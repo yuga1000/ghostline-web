@@ -14,6 +14,8 @@
     <title>GHOSTLINE - Live Stream</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <!-- Agent Pet Styles -->
+    <link rel="stylesheet" href="agent-pet.css?v=14">
     <style>
         body {
             background: #000000;
@@ -70,6 +72,8 @@
         background: #000000;
         position: relative;
         overflow: hidden;
+        height: 160px !important;  /* Fixed height (h-40 = 10rem = 160px) */
+        max-height: 160px !important;
     }
     .donate-wrapper {
         position: fixed;
@@ -207,14 +211,26 @@
         background: #000000;
         position: relative;
         overflow: hidden;
+        height: 160px !important;  /* Fixed height (h-40 = 10rem = 160px) */
+        max-height: 160px !important;
+        width: 100%;
+        max-width: 100%;
     }
 
     .agent-terminal-content {
         height: 100%;
+        max-height: 160px;
+        width: 100%;
+        max-width: 100%;
         overflow-y: auto;
         overflow-x: hidden;
         padding-right: 4px;
         scroll-behavior: smooth;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;  /* Changed from break-word to anywhere for aggressive wrapping */
+        white-space: pre-wrap;
+        word-break: break-all;  /* Force break long words */
+        box-sizing: border-box;
     }
 
     /* Custom scrollbar for webkit browsers */
@@ -260,6 +276,13 @@
         animation: fadeInLog 0.3s ease-out;
         line-height: 1.5;
         margin: 2px 0;
+        white-space: pre-wrap;  /* Wrap long lines instead of pre (which causes stretching) */
+        font-family: 'Share Tech Mono', monospace;  /* Ensure monospace for alignment */
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        word-break: break-word;  /* Break long words if needed */
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     @keyframes fadeInLog {
@@ -428,6 +451,17 @@
         50% { transform: translateY(-3px); }
     }
 
+    @keyframes floatUp {
+        0% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-40px);
+        }
+    }
+
     /* Hover effect for entire line */
     .log-line:hover {
         background: rgba(0, 255, 0, 0.03);
@@ -502,6 +536,10 @@
     .robot-card {
         background: rgba(0, 0, 0, 0.8);
         padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;  /* Prevent children from stretching parent */
     }
     
     /* Mobile */
@@ -530,18 +568,135 @@
 
         .nav-menu {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .nav-menu a,
         .nav-menu span {
-            margin: 4px 0;
+            margin: 0;
+            font-size: 10px;
         }
 
         .live-status {
-            margin-top: 4px;
+            margin-top: 0;
         }
+
+        .live-status span {
+            font-size: 8px;
+            padding: 2px 6px;
+        }
+
+        /* MOBILE FIX: Make terminal visible but not too big */
+        .agent-terminal {
+            height: 200px !important; /* Balanced size (was 160px desktop) */
+            max-height: 200px !important;
+            min-height: 200px !important;
+        }
+
+        .agent-terminal-content {
+            max-height: 200px;
+            font-size: 11px; /* Readable but compact */
+            padding: 0.5rem;
+            line-height: 1.4;
+        }
+
+        /* Make log lines wrap better on mobile */
+        .log-line {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+    }
+
+    /* SPIDER MODE - Frozen spider with spread legs */
+    .agent-pet.spider-mode {
+        transform: rotate(90deg) scale(1.5) !important;
+        animation: none !important; /* NO animations - spider freezes! */
+        transition: none !important; /* NO smooth rotation! */
+    }
+
+    /* Dark spider body AND arms - same color */
+    .agent-pet.spider-mode .pet-body,
+    .agent-pet.spider-mode .pet-arms {
+        filter: brightness(0.2) saturate(0) !important;
+    }
+
+    /* Disable transitions on ALL spider child elements */
+    .agent-pet.spider-mode * {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    .agent-pet.spider-mode .pet-body-container {
+        /* Spread legs apart */
+        transform: scaleX(1.8) scaleY(1.5) !important;
+        letter-spacing: 4px;
+        transition: none !important;
+    }
+
+    /* Mandibles - hidden by default */
+    .pixel.mandible {
+        display: none;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* SPIDER: Show ALL arms (6 legs side by side) */
+    #agent-pet.spider-mode .pixel.arm-extra,
+    .agent-pet.spider-mode div.pixel.arm.arm-extra,
+    .agent-pet.spider-mode .pixel.arm {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: inline-block !important; /* inline-block to display side by side */
+        width: 4px !important;
+        height: 4px !important;
+        /* No background override - inherit default color */
+        box-shadow: none !important; /* No glow */
+        transform: none !important;
+        position: relative !important;
+        animation: none !important;
+        transition: none !important;
+        flex-shrink: 0 !important;
+        z-index: 100 !important;
+        filter: none !important; /* No filters - same as body */
+    }
+
+    /* SPIDER: Show mandibles (small, stick out) */
+    #agent-pet.spider-mode .pixel.mandible {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        width: 4px !important;
+        height: 4px !important;
+        /* No background override - inherit default color */
+        box-shadow: none !important; /* No glow */
+        position: absolute !important;
+        top: -6px !important; /* Stick out above head */
+        z-index: 101 !important;
+        filter: none !important; /* No filters */
+    }
+
+    #agent-pet.spider-mode .mandible-left {
+        left: 24px !important;
+    }
+
+    #agent-pet.spider-mode .mandible-right {
+        right: 24px !important;
+    }
+
+    /* SPIDER: Hide legs (spiders don't have legs, only arms!) */
+    .agent-pet.spider-mode .pet-legs {
+        display: none !important;
+    }
+
+    /* When spider CATCHES pixel - NO rotation, just freeze */
+    .agent-pet.spider-mode.catching {
+        /* No animation - spider stays frozen */
+        animation: none !important;
     }
 
 </style>
@@ -558,6 +713,7 @@
                     <a href="index.html" class="nav-link mr-4">[HOME]</a>
                     <span class="text-green-400 mr-4">[LIVE STREAM]</span>
                     <a href="gallery.html" class="nav-link mr-4">[GALLERY]</a>
+                    <a href="order.html" class="nav-link mr-4">[ORDER]</a>
                 </div>
                 <div class="text-xs live-status">
                     <span class="px-2 py-1 bg-green-900 bg-opacity-30">● LIVE</span>
@@ -584,8 +740,8 @@
                 <!-- Agent Terminal (Real-time Logs) -->
                 <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
-                        <span>[AGENT_CONSCIOUSNESS - "LIVE LOGS"]</span>
-                        <span id="agent-status-indicator"><span class="status-online" id="status1"></span><span id="agent-status-text">STANDBY</span></span>
+                        <span>GHOSTLINE ART MODULE 01</span>
+                        <span id="agent-status-indicator"><span class="status-online" id="status1"></span><span id="agent-status-text">█▓▒░</span></span>
                     </div>
                     <div class="agent-terminal h-40 terminal-border relative" id="agent-terminal-feed">
                         <!-- Noise mask placeholder (shown when offline) -->
@@ -593,24 +749,138 @@
                         <!-- Log content (always visible, dimmed by overlay when offline) -->
                         <div class="agent-terminal-content pixel-font text-xs p-2" id="agent-log-content"></div>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs mt-2">
+                    <div class="pixel-font text-green-600 text-xs mt-2" style="visibility: hidden;">
                         <div>PIPELINE: <span id="agent-pipeline-name">GLVSF Generation</span></div>
                         <div>UPTIME: <span id="agent-uptime">--:--:--</span></div>
                     </div>
                 </div>
 
-                <!-- AGENT PET -->
+                <!-- Agent Pet -->
                 <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[AGENT_PET]</span>
-                        <span><span class="status-online" id="status2"></span>ANIMATED</span>
+                        <span><span class="status-online" id="pet-status"></span><span id="pet-mood">▓▒░</span></span>
                     </div>
                     <div class="video-feed h-40 terminal-border relative" id="pet-feed">
-                        <div class="noise-mask"></div>
+                        <div class="pet-container-inline">
+                            <!-- Stars container (for night sky) -->
+                            <div class="stars-container" id="stars-container"></div>
+                            <!-- Rain container (for rain effect) -->
+                            <div class="rain-container" id="rain-container"></div>
+                            <div class="pet-display-inline">
+                                <!-- Sleep mask (shows when sleeping) -->
+                                <div class="pet-sleep-mask" id="pet-sleep-mask"></div>
+                                <!-- Falling stars container -->
+                                <div id="falling-stars-container"></div>
+                                <!-- Toy pixel (shows when playing) -->
+                                <div class="pet-toy-pixel" id="pet-toy"></div>
+                                <!-- Tongue for hunting (shoots out like chameleon) -->
+                                <div class="pet-tongue" id="pet-tongue"></div>
+                                <!-- Sleep pixels (shows when sleeping) -->
+                                <div class="pet-sleep-pixels" id="pet-sleep-pixels">
+                                    <div class="sleep-pixel"></div>
+                                    <div class="sleep-pixel"></div>
+                                    <div class="sleep-pixel"></div>
+                                </div>
+                                <!-- Image preview window -->
+                                <div class="pet-image-window" id="pet-image-window">
+                                    <div class="pet-image-label">NEW IMAGE!</div>
+                                    <img id="pet-image-preview" src="" alt="Generated Image" />
+                                </div>
+                                <div class="pet sleeping stage-1" id="agent-pet">
+                                    <!-- Roof/shelter (shows when sleeping) -->
+                                    <div class="pet-roof" id="pet-roof">
+                                        <div class="roof-bar">
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                            <div class="roof-pixel"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Body container (animated) -->
+                                    <div class="pet-body-container">
+                                        <!-- Fractal branches container (for advanced bloom stages) -->
+                                        <div class="pet-branches" id="pet-branches"></div>
+                                        <!-- Petals container (for full bloom) -->
+                                        <div class="pet-petals" id="pet-petals"></div>
+                                        <!-- Arms row (with body top) -->
+                                        <div class="pet-arms">
+                                            <!-- 🕷️ Spider legs - 3 left arms -->
+                                            <div class="pixel arm arm-extra spider-leg-3"></div>
+                                            <div class="pixel arm arm-extra spider-leg-2"></div>
+                                            <div class="pixel arm"></div>
+
+                                            <!-- Body (12x6 grid + flower crown pixels) -->
+                                            <div class="pet-body">
+                                                <!-- 🕷️ SPIDER MANDIBLES (жвала) - hidden by default, shown in spider mode -->
+                                                <div class="pixel mandible mandible-left"></div>
+                                                <div class="pixel mandible mandible-right"></div>
+
+                                                <!-- FLOWER CROWN - Row -3 (only visible in flower phase 5-6) -->
+                                                <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div>
+                                                <!-- FLOWER CROWN - Row -2 (visible in flower phase 4-6) -->
+                                                <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div>
+                                                <!-- FLOWER CROWN - Row -1 (visible in flower phase 3-6) -->
+                                                <div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div>
+
+                                                <!-- Row 1 (breathing layer - outer pixels appear/disappear) -->
+                                                <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
+                                                <!-- Row 2 (extra eyes row for stage 4) -->
+                                                <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
+                                                <!-- Row 3 (eyes row) -->
+                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                                <!-- Row 4 -->
+                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                                <!-- Row 5 -->
+                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                                <!-- Row 6 -->
+                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
+                                            </div>
+
+                                            <!-- Right arm -->
+                                            <div class="pixel arm"></div>
+                                            <!-- 🕷️ Spider legs - 3 right arms -->
+                                            <div class="pixel arm arm-extra spider-leg-2"></div>
+                                            <div class="pixel arm arm-extra spider-leg-3"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Legs (4 legs, 2px tall each) - STATIC, don't move -->
+                                    <div class="pet-legs">
+                                        <div class="pixel leg"></div>
+                                        <div style="width: 4px;"></div>
+                                        <div class="pixel leg"></div>
+                                        <div style="width: 16px;"></div>
+                                        <div class="pixel leg"></div>
+                                        <div style="width: 4px;"></div>
+                                        <div class="pixel leg"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Progress bar -->
+                            <div class="pet-progress-bar">
+                                <div class="pet-progress-fill" id="pet-progress" style="width: 0%;"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2">
-                        <div>MOOD: <span id="pet-mood">Sleeping... ZZZ</span></div>
-                        <div>STAGE: <span id="pet-stage">2 / 4</span></div>
+                        <div>STAGE: <span id="pet-stage-text">1</span> / 4</div>
+                        <div id="rest-countdown-container" style="display: none;">
+                            <span style="color: #ffaa00;">REST: </span>
+                            <span id="rest-countdown-text">--:--</span>
+                        </div>
                     </div>
                 </div>
 
@@ -629,20 +899,6 @@
                     </div>
                 </div>
 
-                <!-- Robot 04 -->
-                <div class="terminal-border robot-card">
-                    <div class="pixel-font text-xs mb-2 flex justify-between">
-                        <span>[ROBOT_04 - "LINE"]</span>
-                        <span><span class="status-online" id="status4"></span>OFF</span>
-                    </div>
-                    <div class="video-feed h-40 terminal-border relative" id="robot4-feed">
-                        <div class="noise-mask"></div>
-                    </div>
-                    <div class="pixel-font text-green-600 text-xs mt-2">
-                        <div>STYLE: Geometric Patterns</div>
-                        <div>STATUS: Standby</div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -670,16 +926,16 @@
         </div>
 
             <!-- Bitcoin -->
-            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d', 'Bitcoin')">
+            <div class="terminal-border p-4 mb-3 bg-black cursor-pointer" onclick="copyToClipboard('1LwghpsSDNYoXPKmmX1rdTSq4DAP3UhqUH', 'Bitcoin')">
                 <p class="text-sm mb-2" style="color: #00ff00;">BITCOIN (BTC)</p>
-                <p class="text-xs break-all mb-2" style="color: #ffffff;">bc1q6l4rw7qvcf2mfe4qyyl45wh7cnu7dgyycj908d</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">1LwghpsSDNYoXPKmmX1rdTSq4DAP3UhqUH</p>
                 <p class="text-xs" style="color: #666;">Click to copy</p>
             </div>
 
             <!-- USDT -->
-            <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B', 'USDT')">
+            <div class="terminal-border p-4 mb-4 bg-black cursor-pointer" onclick="copyToClipboard('TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU', 'USDT')">
                 <p class="text-sm mb-2" style="color: #00ff00;">USDT (TRC20)</p>
-                <p class="text-xs break-all mb-2" style="color: #ffffff;">0x9B7B551C120AC91661f5E094a9E51E22Fe4D049B</p>
+                <p class="text-xs break-all mb-2" style="color: #ffffff;">TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</p>
                 <p class="text-xs" style="color: #666;">Click to copy</p>
             </div>
 
@@ -882,10 +1138,12 @@ function initWebSocket() {
     ws = new WebSocket('wss://ghostline-web-production-7bc6.up.railway.app/ws');
 
     ws.onopen = () => {
-        console.log('[WS] Connected to agent terminal stream');
+        console.log('[WS] ✓ Connected to agent terminal stream');
+        console.log('[WS] URL:', ws.url);
+        console.log('[WS] ReadyState:', ws.readyState);
         isConnected = true;
         lastLogTime = Date.now();
-        updateStatus('STANDBY', false);  // Start as STANDBY until first log
+        updateStatus('█▓▒░', false);  // Start as STANDBY until first log
 
         // DON'T clear placeholder here - wait for actual logs
         // Placeholder will be cleared in onmessage when first log arrives
@@ -915,22 +1173,28 @@ function initWebSocket() {
             if (timeSinceLastLog > 10000) {
                 console.log('[WS] No logs for 10s - agent appears offline, showing placeholder');
                 showPlaceholder();
-                updateStatus('STANDBY', false);
+                updateStatus('█▓▒░', false);
                 startTime = null;
             }
         }, 2000); // Check every 2 seconds
     };
 
     ws.onmessage = (event) => {
+        const receiveTime = Date.now();
+
         // Update last log time (agent is active)
-        lastLogTime = Date.now();
+        lastLogTime = receiveTime;
+
+        console.log('[WS] ⬇ Message received at', new Date(receiveTime).toISOString());
+        console.log('[WS] Data length:', event.data.length, 'bytes');
 
         // Show log content if placeholder is visible
         const noiseMask = document.getElementById('agent-noise-mask');
         const logContent = document.getElementById('agent-log-content');
         if (noiseMask.style.display !== 'none') {
+            console.log('[WS] First log received - clearing placeholder');
             clearPlaceholder();
-            updateStatus('STREAMING', true);
+            updateStatus('████', true);
             if (!startTime) {
                 startTime = Date.now();
             }
@@ -938,8 +1202,16 @@ function initWebSocket() {
 
         try {
             const data = JSON.parse(event.data);
+            console.log('[WS] Parsed message:', {
+                type: data.type,
+                level: data.level,
+                content: data.content ? data.content.substring(0, 50) + '...' : 'N/A',
+                timestamp: data.timestamp
+            });
             handleLogMessage(data);
         } catch (e) {
+            console.error('[WS] Failed to parse message:', e);
+            console.error('[WS] Raw data:', event.data.substring(0, 200));
             // If not JSON, treat as plain text log
             addLogLine(event.data, 'log-info');
         }
@@ -984,16 +1256,6 @@ function handleLogMessage(data) {
         document.getElementById('agent-pipeline-name').textContent = metadata.pipeline;
     }
 
-    // Check for IMAGE level messages to display in pet window
-    if (level === 'IMAGE' && metadata) {
-        const imageUrl = metadata.image_url || metadata.catbox_url || metadata.url;
-        const filename = metadata.filename || 'image.png';
-        
-        if (imageUrl && imageUrl.startsWith('http')) {
-            displayPetImage(imageUrl, filename);
-        }
-    }
-
     // Determine log class based on level
     let logClass = 'log-info';
     switch (level) {
@@ -1003,101 +1265,19 @@ function handleLogMessage(data) {
         case 'thinking': logClass = 'log-thinking'; break;
         case 'action': logClass = 'log-action'; break;
         case 'dim': logClass = 'log-dim'; break;
-        case 'IMAGE': logClass = 'log-success'; break; // IMAGE logs shown as success
     }
 
-    // Add log line with timestamp if provided
-    const logText = timestamp ? `[${timestamp}] ${content}` : content;
+    // Content already includes timestamp from server, use as-is
+    const logText = content;
 
-    // Add to queue instead of showing immediately (for 300ms animation)
+    // Add to queue with small delay for sequential appearance (200ms between logs)
     logQueue.push({ text: logText, className: logClass });
     processLogQueue();
-}
 
-// Display image in pet window
-function displayPetImage(imageUrl, filename) {
-    console.log('[Pet] Displaying image:', filename, imageUrl);
-    
-    // Get or create pet image window
-    let petWindow = document.getElementById('pet-image-window');
-    if (!petWindow) {
-        const petFeed = document.getElementById('pet-feed');
-        if (!petFeed) return;
-        
-        petWindow = document.createElement('div');
-        petWindow.id = 'pet-image-window';
-        petWindow.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #000;
-            border: 2px solid #00ff00;
-            padding: 5px;
-            max-width: 180px;
-            z-index: 20;
-            display: none;
-        `;
-        
-        const label = document.createElement('div');
-        label.className = 'pet-image-label';
-        label.style.cssText = `
-            color: #00ff00;
-            font-size: 10px;
-            margin-bottom: 5px;
-            font-family: 'Share Tech Mono', monospace;
-        `;
-        label.textContent = 'New: loading...';
-        
-        const img = document.createElement('img');
-        img.id = 'pet-image-preview';
-        img.style.cssText = `
-            width: 100%;
-            height: auto;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        `;
-        
-        petWindow.appendChild(label);
-        petWindow.appendChild(img);
-        petFeed.appendChild(petWindow);
+    // Notify pet about new log
+    if (window.petModule && window.petModule.onLogReceived) {
+        window.petModule.onLogReceived(level, content);
     }
-    
-    // Update image
-    const img = document.getElementById('pet-image-preview');
-    const label = document.querySelector('.pet-image-label');
-    
-    if (img) {
-        img.src = imageUrl;
-        img.alt = filename;
-    }
-    
-    if (label) {
-        label.textContent = `New: ${filename}`;
-    }
-    
-    // Show window with fade in
-    petWindow.style.display = 'block';
-    setTimeout(() => {
-        petWindow.style.opacity = '1';
-    }, 10);
-    
-    // Update pet mood
-    const petMood = document.getElementById('pet-mood');
-    if (petMood) {
-        petMood.textContent = 'Showing Art';
-    }
-    
-    // Hide after 30 seconds
-    setTimeout(() => {
-        petWindow.style.opacity = '0';
-        setTimeout(() => {
-            petWindow.style.display = 'none';
-            if (petMood) {
-                petMood.textContent = 'Sleeping... ZZZ';
-            }
-        }, 500);
-    }, 30000);
 }
 
 // Show placeholder (when not connected)
@@ -1130,7 +1310,60 @@ function clearPlaceholder() {
     logContent.style.display = 'block';
 }
 
-// Process log queue with 300ms delay between logs (typewriter effect)
+// ⚡ PREFETCH logs BEFORE DOM loads (faster on mobile!)
+let logsPrefetchPromise = null;
+if (document.readyState === 'loading') {
+    console.log('[Prefetch] 🚀 Starting early fetch of logs...');
+    logsPrefetchPromise = fetch('/api/logs').then(r => r.json());
+}
+
+// Load existing logs on page load (immediate display)
+async function loadExistingLogs() {
+    console.log('[Load Logs] Fetching existing logs from /api/logs...');
+
+    try {
+        // Use prefetched data if available, otherwise fetch now
+        const data = logsPrefetchPromise ? await logsPrefetchPromise : await fetch('/api/logs').then(r => r.json());
+
+        console.log('[Load Logs] Response:', data);
+
+        if (data.logs && data.logs.length > 0) {
+            console.log('[Load Logs] Found', data.logs.length, 'existing logs');
+
+            // Clear placeholder
+            clearPlaceholder();
+            updateStatus('████', true);
+            if (!startTime) {
+                startTime = Date.now();
+            }
+
+            // WAKE UP PET! (если есть логи - значит агент работал/работает)
+            if (!petIsAwake) {
+                console.log('[Load Logs] 🎉 Waking up pet - logs found!');
+                wakeUpPet();
+            }
+
+            // Display all logs INSTANTLY (no animation for old logs)
+            for (let i = 0; i < data.logs.length; i++) {
+                const logEvent = data.logs[i];
+                console.log('[Load Logs] Processing log:', logEvent);
+
+                // Add log line - INSTANT (true parameter means no animation)
+                if (logEvent.content || logEvent.message) {
+                    addLogLine(logEvent.content || logEvent.message, 'log-info', null, true);
+                }
+            }
+
+            console.log('[Load Logs] ✅ Loaded', data.logs.length, 'logs');
+        } else {
+            console.log('[Load Logs] No existing logs found');
+        }
+    } catch (e) {
+        console.error('[Load Logs] Error fetching logs:', e);
+    }
+}
+
+// Process log queue with delay between logs
 function processLogQueue() {
     if (isProcessingQueue || logQueue.length === 0) {
         return;
@@ -1145,33 +1378,34 @@ function processLogQueue() {
         }
 
         const { text, className } = logQueue.shift();
-        addLogLine(text, className);
 
-        // Process next log after 300ms
-        setTimeout(processNext, 300);
+        // Add log and wait for completion before processing next
+        addLogLine(text, className, () => {
+            // Faster on mobile - 100ms delay instead of 400ms
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const delay = isMobile ? 100 : 200;
+            setTimeout(processNext, delay);
+        });
     }
 
     processNext();
 }
 
 // Add a log line to the terminal with typewriter effect
-function addLogLine(text, className = 'log-info') {
+function addLogLine(text, className = 'log-info', onComplete, instant = false) {
     const logContent = document.getElementById('agent-log-content');
 
-    // Parse the log format: [HH:MM:SS.mmm] ICON message
-    // Remove timestamp if present (format: [12:28:48] or [12:28:48.206])
-    let cleanText = text.replace(/^\[\d{2}:\d{2}:\d{2}(?:\.\d+)?\]\s*/, '');
-
-    // Remove ALL emoji (keep only ASCII special chars like ▓⟡✓✗)
-    // This regex matches emoji ranges while preserving ASCII special chars
-    cleanText = cleanText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+    // Keep timestamp and icons - just remove emoji
+    // Remove ALL emoji (keep ASCII special chars like ▓⟡✓✗ and timestamps)
+    let cleanText = text.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
 
     // Extract icon and message
     let icon = '';
     let message = cleanText;
 
-    // Check for common icons at start
-    const iconMatch = cleanText.match(/^([▓⟡✓✗ℹ⚠]+)\s*/);
+    // Check for common icons at start (expanded to include all ASCII art chars)
+    // Include: block elements (█▓▒░), arrows (→←↑↓▲▶), symbols (✓✗⟡◆●○•), etc
+    const iconMatch = cleanText.match(/^([▓⟡✓✗ℹ⚠█▒░→←▲▶◆●○•]+)\s*/);
     if (iconMatch) {
         icon = iconMatch[1];
         message = cleanText.substring(iconMatch[0].length);
@@ -1179,7 +1413,7 @@ function addLogLine(text, className = 'log-info') {
 
     // Create log line element
     const logLine = document.createElement('div');
-    logLine.className = `log-line ${className} typing`;
+    logLine.className = `log-line ${className}`;
 
     // Build HTML with icon and message separately
     if (icon) {
@@ -1189,43 +1423,86 @@ function addLogLine(text, className = 'log-info') {
 
         const messageSpan = document.createElement('span');
         messageSpan.className = 'log-message';
-        messageSpan.textContent = ''; // Start empty for typewriter
 
         logLine.appendChild(iconSpan);
         logLine.appendChild(messageSpan);
 
-        // Append to log content
+        // Append to log content FIRST
         logContent.appendChild(logLine);
 
-        // Typewriter effect - type one character at a time
-        let charIndex = 0;
-        const typeSpeed = 270; // milliseconds per character (slowed down 18x for cinematic effect)
+        // Scroll to show the new log line immediately
+        logContent.scrollTop = logContent.scrollHeight;
 
-        function typeNextChar() {
-            if (charIndex < message.length) {
-                messageSpan.textContent += message[charIndex];
-                charIndex++;
-                logContent.scrollTop = logContent.scrollHeight;
-                setTimeout(typeNextChar, typeSpeed);
-            } else {
-                // Remove typing cursor when done
-                logLine.classList.remove('typing');
+        // Instant display or typewriter effect
+        if (instant) {
+            // Show instantly
+            messageSpan.textContent = message;
+            if (onComplete) onComplete();
+        } else {
+            // Typewriter effect
+            logLine.classList.add('typing');
+            messageSpan.textContent = ''; // Start empty for typewriter
+
+            let charIndex = 0;
+            const typeSpeed = 20; // milliseconds per character (faster)
+
+            function typeNextChar() {
+                if (charIndex < message.length) {
+                    messageSpan.textContent += message[charIndex];
+                    charIndex++;
+                    setTimeout(typeNextChar, typeSpeed);
+                } else {
+                    // Remove typing cursor when done
+                    logLine.classList.remove('typing');
+                    // Call completion callback
+                    if (onComplete) onComplete();
+                }
             }
-        }
 
-        typeNextChar();
+            typeNextChar();
+        }
     } else {
-        // No icon - just show message
+        // No icon - just show message instantly
         logLine.textContent = message;
         logContent.appendChild(logLine);
-    }
 
-    // Auto-scroll to bottom
-    logContent.scrollTop = logContent.scrollHeight;
+        // Scroll to show the new log line
+        logContent.scrollTop = logContent.scrollHeight;
+
+        // Call completion callback immediately
+        if (onComplete) onComplete();
+    }
 
     // Keep only last 100 lines to prevent memory issues
     while (logContent.children.length > 100) {
         logContent.removeChild(logContent.firstChild);
+    }
+
+    // ===== REST COUNTDOWN DETECTION =====
+    const isRestPeriod = detectRestPeriod(text);
+
+    // If entering rest, stop showing countdown when agent wakes up
+    if (!isRestPeriod && text.includes('VERCEPT') && text.includes('PHASE')) {
+        // Agent is active - stop countdown if running
+        stopRestCountdown();
+    }
+
+    // ===== AGENT PET LOGIC =====
+    updatePetOnLog(className, text);
+
+    // ===== IMAGE DETECTION LOGIC =====
+    detectAndShowImage(text);
+
+    // ===== GENERATION COMPLETE - PET JUMPS! =====
+    if (text.includes('GLVSF Image') || text.includes('saved successfully') || text.includes('Image generated')) {
+        console.log('[Pet] 🎉 Generation complete detected - PET JUMPS!');
+        // Immediate excited jump!
+        setTimeout(() => {
+            if (petIsAwake) {
+                triggerPetAnimation('excited-bounce', 3000);
+                console.log('[Pet] 🦘 JUMPING for generation complete!');
+            }
+        }, 500);
     }
 }
 
@@ -1263,7 +1540,103 @@ function startUptimeCounter() {
 // Initialize WebSocket on page load
 window.addEventListener('DOMContentLoaded', () => {
     console.log('[Agent Terminal] Initializing WebSocket connection...');
+
+    // LOAD EXISTING LOGS IMMEDIATELY (before WebSocket/polling)
+    loadExistingLogs();
+
     initWebSocket();
+
+    // FALLBACK: Poll HTTP API for logs if WebSocket fails (for testing base64 images)
+    let lastProcessedLogIndex = 0;
+
+    function startHttpPolling() {
+        console.log('[HTTP Polling] Starting fallback polling for /api/logs');
+
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/logs');
+                const data = await response.json();
+
+                if (data.logs && data.logs.length > lastProcessedLogIndex) {
+                    console.log('[HTTP Polling] Found', data.logs.length - lastProcessedLogIndex, 'new logs');
+
+                    // Clear placeholder on first load
+                    if (lastProcessedLogIndex === 0 && data.logs.length > 0) {
+                        clearPlaceholder();
+                    }
+
+                    // Process new logs
+                    const isFirstLoad = (lastProcessedLogIndex === 0);
+
+                    for (let i = lastProcessedLogIndex; i < data.logs.length; i++) {
+                        const logEvent = data.logs[i];
+                        console.log('[HTTP Polling] Processing log:', logEvent);
+
+                        // Add log line - instant on first load, animated for new logs
+                        if (logEvent.content || logEvent.message) {
+                            addLogLine(logEvent.content || logEvent.message, 'log-info', null, isFirstLoad);
+                        }
+                    }
+
+                    lastProcessedLogIndex = data.logs.length;
+                }
+            } catch (e) {
+                console.error('[HTTP Polling] Error:', e);
+            }
+        }, 5000); // Poll every 5 seconds
+    }
+
+    // Start HTTP polling after 3 seconds (ALWAYS, for localhost testing)
+    setTimeout(() => {
+        console.log('[HTTP Polling] Starting HTTP fallback (works on localhost + Railway)');
+        startHttpPolling();
+    }, 3000);
+
+    // ===== IMAGE POLLING =====
+    let lastProcessedImageIndex = 0;
+
+    function startImagePolling() {
+        console.log('[Image Polling] Starting image polling for /api/images');
+
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/images');
+                const data = await response.json();
+
+                if (data.images && data.images.length > lastProcessedImageIndex) {
+                    console.log('[Image Polling] Found', data.images.length - lastProcessedImageIndex, 'new images');
+
+                    // Get the latest image
+                    const latestImage = data.images[data.images.length - 1];
+
+                    // Display image in pet window
+                    const imgElement = document.getElementById('pet-image-preview');
+                    const imgWindow = document.getElementById('pet-image-window');
+
+                    if (imgElement && latestImage.image_data) {
+                        imgElement.src = latestImage.image_data;
+                        imgWindow.style.display = 'block';
+                        console.log('[Image Polling] Displayed image:', latestImage.filename);
+
+                        // Hide after 30 seconds
+                        setTimeout(() => {
+                            imgWindow.style.display = 'none';
+                        }, 30000);
+                    }
+
+                    lastProcessedImageIndex = data.images.length;
+                }
+            } catch (e) {
+                console.error('[Image Polling] Error:', e);
+            }
+        }, 10000); // Poll every 10 seconds
+    }
+
+    // Start image polling after 5 seconds
+    setTimeout(() => {
+        console.log('[Image Polling] Starting image polling...');
+        startImagePolling();
+    }, 5000);
 });
 
 // Handle visibility change (mobile/tablet switching tabs)
@@ -1285,141 +1658,2049 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
-</script>
+// ===== AGENT PET SYSTEM (v2.0 - Enhanced) =====
+let petLogCount = 0;
+let petStage = 1; // Stages: 1 (2px legs) -> 2 (3px) -> 3 (4px) -> 4 (5px)
+let petAnimationState = 'sleeping';
+let petAnimationTimer = null;
+let petAwakeTimer = null;
+let petIsAwake = false;
+let lastAnimationTime = 0;
+const ANIMATION_COOLDOWN = 3000; // 3 seconds between animations
 
-<script src="manual-modal.js"></script>
+// Pet wall position tracking
+let petWallPosition = 'bottom'; // 'bottom', 'left', 'top', 'right'
+let petIsMovingToWall = false;
 
-<!-- AGENT_PET Image Display Module (inline) -->
-<script>
-(function() {
-    console.log('[PET] Image display module v2 initializing (inline)...');
-    
-    // Find or create pet window
-    function initPetDisplay() {
-        // Find the AGENT_PET robot card  
-        const petFeed = document.getElementById('pet-feed');
-        if (!petFeed) {
-            console.error('[PET] Could not find pet-feed element!');
+// Log thresholds for growth
+const STAGE_THRESHOLDS = {
+    1: 0,    // Stage 1: 0+ logs
+    2: 10,   // Stage 2: 10+ logs
+    3: 25,   // Stage 3: 25+ logs
+    4: 50    // Stage 4: 50+ logs
+};
+
+// === PERSISTENCE ===
+function savePetState() {
+    const state = {
+        logCount: petLogCount,
+        stage: petStage,
+        lastUpdate: Date.now()
+    };
+    localStorage.setItem('ghostline-pet-state', JSON.stringify(state));
+}
+
+function loadPetState() {
+    const saved = localStorage.getItem('ghostline-pet-state');
+    if (saved) {
+        try {
+            const state = JSON.parse(saved);
+            petLogCount = state.logCount || 0;
+            petStage = state.stage || 1;
+
+            // Apply stage to pet
+            const pet = document.getElementById('agent-pet');
+            if (pet) {
+                pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4');
+                pet.classList.add('stage-' + petStage);
+            }
+
+            // Update UI
+            updateProgressBar();
+            const stageText = document.getElementById('pet-stage-text');
+            if (stageText) stageText.textContent = petStage;
+
+            console.log('[Pet] Loaded state - Logs:', petLogCount, 'Stage:', petStage);
+        } catch (e) {
+            console.error('[Pet] Failed to load state:', e);
+        }
+    }
+}
+
+// === IMPROVED LOG REACTION ===
+function updatePetOnLog(logType, logText = '') {
+    petLogCount++;
+    savePetState();
+
+    // Wake up pet if sleeping
+    if (!petIsAwake) {
+        wakeUpPet();
+    }
+
+    // Reset awake timer - pet stays awake during entire Vercept cycle (120 minutes)
+    clearTimeout(petAwakeTimer);
+    petAwakeTimer = setTimeout(() => {
+        goToSleep();
+    }, 120 * 60 * 1000); // 120 minutes = 7,200,000ms
+
+    // Update progress bar
+    updateProgressBar();
+
+    // Check for stage upgrade with visual effect
+    checkStageUpgrade(logText);
+
+    // === SMART REACTIONS WITH DEBOUNCING ===
+    const now = Date.now();
+    if (now - lastAnimationTime < ANIMATION_COOLDOWN) {
+        return; // Skip animation, too frequent
+    }
+
+    // Analyze log content for keywords
+    const lowerText = (logText || '').toLowerCase();
+    const keywords = {
+        exciting: ['generated', 'complete', 'success', 'launched', 'finished'],
+        error: ['error', 'failed', 'crash', 'timeout'],
+        working: ['rendering', 'processing', 'generating', 'building'],
+        waiting: ['waiting', 'scanning', 'cooldown', 'delay']
+    };
+
+    let shouldAnimate = false;
+    let animation = 'idle';
+    let duration = 2000;
+
+    // Determine log importance
+    if (logType === 'log-success' && keywords.exciting.some(kw => lowerText.includes(kw))) {
+        shouldAnimate = true;
+        // Random celebration animation
+        const celebrations = ['dancing', 'excited-bounce', 'jumping', 'spinning'];
+        animation = celebrations[Math.floor(Math.random() * celebrations.length)];
+        duration = 3000;
+    } else if (logType === 'log-success') {
+        shouldAnimate = Math.random() < 0.3; // 30% for regular success
+        animation = Math.random() < 0.5 ? 'waving' : 'playing';
+        duration = 2000;
+    } else if (logType === 'log-error') {
+        shouldAnimate = true;
+        // Shake on errors!
+        animation = Math.random() < 0.6 ? 'shaking' : 'blinking';
+        duration = 1500;
+    } else if (logType === 'log-action' && keywords.working.some(kw => lowerText.includes(kw))) {
+        shouldAnimate = Math.random() < 0.25; // 25%
+        // Random work animation
+        animation = Math.random() < 0.5 ? 'walking' : 'running';
+        duration = 2500;
+    } else if (logType === 'log-thinking') {
+        shouldAnimate = Math.random() < 0.2; // 20%
+        animation = 'blinking';
+        duration = 2000;
+    }
+
+    if (shouldAnimate && petIsAwake) {
+        triggerPetAnimation(animation, duration);
+        lastAnimationTime = now;
+    }
+}
+
+// === PROGRESS BAR UPDATE ===
+function updateProgressBar() {
+    const progress = document.getElementById('pet-progress');
+    const nextStageThreshold = STAGE_THRESHOLDS[Math.min(petStage + 1, 4)];
+    const currentStageThreshold = STAGE_THRESHOLDS[petStage];
+
+    if (petStage < 4) {
+        const progressPercent = Math.min(100,
+            ((petLogCount - currentStageThreshold) / (nextStageThreshold - currentStageThreshold)) * 100
+        );
+        progress.style.width = progressPercent + '%';
+
+        // Visual feedback when close to next stage
+        const remaining = nextStageThreshold - petLogCount;
+        if (remaining <= 5 && remaining > 0) {
+            progress.style.boxShadow = '0 0 8px rgba(0, 255, 0, 0.8)';
+        } else {
+            progress.style.boxShadow = '';
+        }
+    } else {
+        progress.style.width = '100%';
+        progress.style.boxShadow = '0 0 8px rgba(0, 255, 0, 1)';
+    }
+}
+
+// === STAGE UPGRADE WITH VISUAL EFFECT ===
+function checkStageUpgrade(logText) {
+    const pet = document.getElementById('agent-pet');
+    const stageText = document.getElementById('pet-stage-text');
+
+    if (petStage < 4 && petLogCount >= STAGE_THRESHOLDS[petStage + 1]) {
+        const oldStage = petStage;
+        petStage++;
+
+        // Visual growth effect - blinking
+        let blinks = 0;
+        const blinkInterval = setInterval(() => {
+            pet.style.opacity = pet.style.opacity === '0' ? '1' : '0';
+            blinks++;
+            if (blinks >= 6) {
+                clearInterval(blinkInterval);
+                pet.style.opacity = '1';
+
+                // Apply new stage
+                pet.classList.remove('stage-' + oldStage);
+                pet.classList.add('stage-' + petStage);
+
+                // Update text
+                stageText.textContent = petStage;
+
+                // Add special color for level up!
+                // Alternate between cyan and pink
+                if (petStage % 2 === 0) {
+                    pet.classList.add('excited');
+                    pet.classList.remove('happy');
+                } else {
+                    pet.classList.add('happy');
+                    pet.classList.remove('excited');
+                }
+
+                // Celebrate!
+                triggerPetAnimation('dancing', 4000);
+
+                // Return to normal color after dance
+                setTimeout(() => {
+                    pet.classList.remove('excited', 'happy');
+                }, 4000);
+
+                // Show growth message
+                showGrowthMessage(petStage);
+
+                // Save state
+                savePetState();
+            }
+        }, 200);
+    }
+}
+
+// === GROWTH MESSAGE ===
+function showGrowthMessage(stage) {
+    const stateText = document.getElementById('pet-state-text');
+    const messages = {
+        2: 'Growing up! Stage 2',
+        3: 'Getting bigger! Stage 3',
+        4: 'Fully grown! Stage 4'
+    };
+
+    const oldText = stateText.textContent;
+    const oldColor = stateText.style.color;
+
+    stateText.textContent = messages[stage] || 'Level up!';
+    stateText.style.color = '#44ff44';
+
+    setTimeout(() => {
+        stateText.textContent = oldText;
+        stateText.style.color = oldColor;
+    }, 3000);
+}
+
+function wakeUpPet() {
+    const pet = document.getElementById('agent-pet');
+    const sleepMask = document.getElementById('pet-sleep-mask');
+
+    console.log('⏰ Waking up - before:', pet.className);
+    pet.classList.remove('sleeping');
+    pet.classList.add('active', 'idle');
+    petIsAwake = true;
+    petAnimationState = 'idle';
+
+    // Remove inline styles from sleeping state
+    const bodyPixels = pet.querySelectorAll('.pixel.body');
+    const armPixels = pet.querySelectorAll('.pixel.arm');
+    const legPixels = pet.querySelectorAll('.pixel.leg');
+    const eyePixels = pet.querySelectorAll('.pixel.eye');
+
+    console.log('⏰ Clearing inline styles - body pixels:', bodyPixels.length);
+    bodyPixels.forEach(p => {
+        p.style.background = '';
+        p.style.boxShadow = '';
+    });
+    armPixels.forEach(p => {
+        p.style.background = '';
+        p.style.boxShadow = '';
+    });
+    legPixels.forEach(p => {
+        p.style.background = '';
+        p.style.boxShadow = '';
+    });
+    eyePixels.forEach(p => {
+        p.style.height = '';
+    });
+
+    if (bodyPixels.length > 0) {
+        console.log('⏰ First body pixel after clear:', bodyPixels[0].style.background, bodyPixels[0].style.boxShadow);
+    }
+    console.log('⏰ Waking up - after:', pet.className);
+
+    // Hide sleep mask
+    if (sleepMask) {
+        sleepMask.classList.remove('visible');
+    }
+
+    // Stop falling stars (sleep mode)
+    stopFallingStars();
+
+    // Start occasional active stars (awake mode)
+    startActiveStars();
+
+    // Random chance for different wake-up colors
+    const rand = Math.random();
+    if (rand < 0.7) {
+        // 70% - normal orange
+        pet.classList.remove('excited', 'happy');
+    } else if (rand < 0.85) {
+        // 15% - excited cyan
+        pet.classList.add('excited');
+        pet.classList.remove('happy');
+        setTimeout(() => {
+            pet.classList.remove('excited');
+        }, 2000);
+    } else {
+        // 15% - happy pink
+        pet.classList.add('happy');
+        pet.classList.remove('excited');
+        setTimeout(() => {
+            pet.classList.remove('happy');
+        }, 2000);
+    }
+
+    const stateText = document.getElementById('pet-state-text');
+    if (stateText) {
+        stateText.textContent = 'Watching logs...';
+    }
+
+    // === AUTONOMOUS WAKE-UP BEHAVIOR ===
+    // Randomly perform an action after waking up (especially visible on mobile)
+    setTimeout(() => {
+        const wakeUpBehaviors = [
+            () => {
+                // Excited jump
+                console.log('[Pet] Energetic wake-up - jumping!');
+                triggerPetAnimation('jumping', 2000);
+            },
+            () => {
+                // Happy dance
+                console.log('[Pet] Joyful wake-up - dancing!');
+                triggerPetAnimation('dancing', 3000);
+            },
+            () => {
+                // Wave hello
+                console.log('[Pet] Friendly wake-up - waving!');
+                triggerPetAnimation('waving', 2500);
+            },
+            () => {
+                // Spin around
+                console.log('[Pet] Dizzy wake-up - spinning!');
+                triggerPetAnimation('spinning', 2000);
+            },
+            () => {
+                // Play with toy
+                console.log('[Pet] Playful wake-up - playing!');
+                triggerPetAnimation('playing', 3000);
+            },
+            () => {
+                // Calm stretch - just idle
+                console.log('[Pet] Calm wake-up - stretching...');
+                // Already in idle, do nothing extra
+            }
+        ];
+
+        // Pick random behavior
+        const behavior = wakeUpBehaviors[Math.floor(Math.random() * wakeUpBehaviors.length)];
+        behavior();
+    }, 500); // Small delay after wake-up
+
+    // FIX: Start idle animation loop for active pet
+    startIdleAnimationLoop();
+
+    // Start wall movement loop
+    startWallMovementLoop();
+}
+
+function goToSleep() {
+    const pet = document.getElementById('agent-pet');
+    const toy = document.getElementById('pet-toy');
+    const sleepMask = document.getElementById('pet-sleep-mask');
+
+    // Clear any ongoing animation
+    if (petAnimationTimer) {
+        clearTimeout(petAnimationTimer);
+    }
+
+    // FIX: Stop idle animation loop when going to sleep
+    stopIdleAnimationLoop();
+
+    // Stop wall movement loop
+    stopWallMovementLoop();
+
+    // Return pet to bottom wall when sleeping
+    const petDisplay = document.querySelector('.pet-display-inline');
+    if (petDisplay) {
+        petDisplay.classList.remove('wall-left', 'wall-top', 'wall-right');
+        petDisplay.classList.add('wall-bottom');
+        petWallPosition = 'bottom';
+    }
+
+    console.log('🛌 Going to sleep - before:', pet.className);
+    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'playing', 'excited', 'happy', 'active');
+    pet.classList.add('sleeping');
+    console.log('🛌 Going to sleep - after:', pet.className);
+    toy.style.opacity = '0';
+    petIsAwake = false;
+    petAnimationState = 'sleeping';
+
+    // Force green color with inline styles as backup
+    const bodyPixels = pet.querySelectorAll('.pixel.body');
+    const armPixels = pet.querySelectorAll('.pixel.arm');
+    const legPixels = pet.querySelectorAll('.pixel.leg');
+    const eyePixels = pet.querySelectorAll('.pixel.eye');
+
+    console.log('🛌 Setting inline styles - body pixels:', bodyPixels.length);
+    bodyPixels.forEach(p => {
+        p.style.background = '#00ff00';
+        p.style.boxShadow = '0 0 2px #00ff00';
+    });
+    armPixels.forEach(p => {
+        p.style.background = '#00ff00';
+        p.style.boxShadow = '0 0 2px #00ff00';
+    });
+    legPixels.forEach(p => {
+        p.style.background = '#00ff00';
+        p.style.boxShadow = '0 0 2px #00ff00';
+    });
+    eyePixels.forEach(p => {
+        p.style.height = '1px';
+    });
+
+    // Verify first body pixel has green color
+    if (bodyPixels.length > 0) {
+        console.log('🛌 First body pixel style:', bodyPixels[0].style.background, bodyPixels[0].style.boxShadow);
+    }
+
+    // Show sleep mask
+    if (sleepMask) {
+        sleepMask.classList.add('visible');
+    }
+
+    // Stop active stars and start sleep falling stars
+    stopActiveStars();
+    startFallingStars();
+
+    const stateText = document.getElementById('pet-state-text');
+    stateText.textContent = 'Sleeping... ZZZ';
+}
+
+let fallingStarsInterval = null;
+
+function startFallingStars() {
+    // Clear existing interval
+    if (fallingStarsInterval) {
+        clearInterval(fallingStarsInterval);
+    }
+
+    // Create a falling star every 3-7 seconds while sleeping
+    fallingStarsInterval = setInterval(() => {
+        if (petIsAwake) {
+            stopFallingStars();
             return;
         }
-        
-        // Clear noise mask
-        const existingNoise = petFeed.querySelector('.noise-mask');
-        if (existingNoise) {
-            existingNoise.style.display = 'none';
-        }
-        
-        // Create image container
-        let imageContainer = petFeed.querySelector('#pet-image-container');
-        if (!imageContainer) {
-            imageContainer = document.createElement('div');
-            imageContainer.id = 'pet-image-container';
-            imageContainer.style.cssText = `
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #000;
-                z-index: 5;
-            `;
-            petFeed.appendChild(imageContainer);
-        }
-        
-        // Create status overlay
-        let statusOverlay = petFeed.querySelector('#pet-status-overlay');
-        if (!statusOverlay) {
-            statusOverlay = document.createElement('div');
-            statusOverlay.id = 'pet-status-overlay';
-            statusOverlay.style.cssText = `
-                position: absolute;
-                top: 5px;
-                left: 5px;
-                color: #00ff00;
-                font-size: 10px;
-                font-family: 'Share Tech Mono', monospace;
-                z-index: 10;
-                text-shadow: 0 0 3px rgba(0, 255, 0, 0.5);
-            `;
-            petFeed.appendChild(statusOverlay);
-        }
-        
-        return { imageContainer, statusOverlay };
+
+        createFallingStar();
+    }, 3000 + Math.random() * 4000);
+}
+
+function stopFallingStars() {
+    if (fallingStarsInterval) {
+        clearInterval(fallingStarsInterval);
+        fallingStarsInterval = null;
     }
-    
-    // Display image function
-    window.displayPetImage = function(imageUrl, filename) {
-        console.log('[PET] Displaying image:', imageUrl);
-        
-        const elements = initPetDisplay();
-        if (!elements) return;
-        
-        const { imageContainer, statusOverlay } = elements;
-        
-        // Update status
-        statusOverlay.textContent = 'NEW IMAGE!';
-        statusOverlay.style.color = '#44ff44';
-        
-        // Create image element
-        const img = document.createElement('img');
-        img.style.cssText = `
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-            border: 1px solid #00ff00;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
-        `;
-        
-        img.onload = function() {
-            // Clear and add image
-            imageContainer.innerHTML = '';
-            imageContainer.appendChild(img);
-            
-            // Update mood
-            const moodElement = document.getElementById('pet-mood');
-            if (moodElement) {
-                moodElement.textContent = 'Showing: ' + (filename || 'artwork');
-            }
-            
-            // Fade status after 3 seconds
-            setTimeout(() => {
-                statusOverlay.style.color = '#00ff00';
-                statusOverlay.textContent = 'ANIMATED';
-            }, 3000);
-            
-            // Reset after 60 seconds
-            setTimeout(() => {
-                if (moodElement) {
-                    moodElement.textContent = 'Sleeping... ZZZ';
-                }
-                statusOverlay.textContent = '';
-            }, 60000);
-        };
-        
-        img.onerror = function() {
-            console.error('[PET] Failed to load image:', imageUrl);
-            statusOverlay.textContent = 'LOAD ERROR';
-            statusOverlay.style.color = '#ff4444';
-        };
-        
-        // Start loading
-        img.src = imageUrl;
+}
+
+// Active stars - occasional stars when awake
+let activeStarsInterval = null;
+
+function startActiveStars() {
+    // Clear existing interval
+    if (activeStarsInterval) {
+        clearInterval(activeStarsInterval);
+    }
+
+    // Create an occasional star every 10-20 seconds while awake
+    activeStarsInterval = setInterval(() => {
+        if (!petIsAwake) {
+            stopActiveStars();
+            return;
+        }
+
+        // 30% chance to create a star
+        if (Math.random() < 0.3) {
+            createFallingStar();
+        }
+    }, 10000 + Math.random() * 10000);
+}
+
+function stopActiveStars() {
+    if (activeStarsInterval) {
+        clearInterval(activeStarsInterval);
+        activeStarsInterval = null;
+    }
+}
+
+function createFallingStar() {
+    const container = document.getElementById('falling-stars-container');
+    if (!container) return;
+
+    const star = document.createElement('div');
+    star.className = 'falling-star';
+
+    // Random position in top area (horizon)
+    star.style.left = (20 + Math.random() * 60) + '%';
+    star.style.top = (10 + Math.random() * 30) + '%';
+
+    container.appendChild(star);
+
+    // Trigger animation
+    setTimeout(() => {
+        star.classList.add('active');
+    }, 10);
+
+    // Remove after animation
+    setTimeout(() => {
+        star.remove();
+    }, 2100);
+}
+
+function triggerPetAnimation(animation, duration) {
+    const pet = document.getElementById('agent-pet');
+    const stateText = document.getElementById('pet-state-text');
+    const toy = document.getElementById('pet-toy');
+
+    console.log(`[Pet Animation] Triggering: ${animation} for ${duration}ms`);
+
+    // Clear existing timer
+    if (petAnimationTimer) {
+        clearTimeout(petAnimationTimer);
+    }
+
+    // Remove all animation classes
+    pet.classList.remove('idle', 'walking', 'dancing', 'waving', 'blinking', 'sleeping', 'playing',
+                         'running', 'jumping', 'spinning', 'transforming', 'hunting', 'excited-bounce', 'shaking', 'flower');
+
+    // Add new animation
+    pet.classList.add(animation);
+    petAnimationState = animation;
+
+    console.log(`[Pet Animation] Applied classes:`, pet.className);
+
+    // Show/hide toy pixel
+    if (animation === 'playing') {
+        toy.style.opacity = '1';
+    } else {
+        toy.style.opacity = '0';
+    }
+
+    // Update mood text
+    const moodTexts = {
+        'idle': 'Watching logs...',
+        'walking': 'Walking around',
+        'dancing': 'Dancing!',
+        'waving': 'Celebrating!',
+        'blinking': 'Thinking...',
+        'sleeping': 'Resting...',
+        'playing': 'Playing with toy',
+        'running': 'Running!',
+        'jumping': 'Jumping!',
+        'spinning': 'Spinning around',
+        'transforming': 'Transforming...',
+        'hunting': 'Hunting pixels',
+        'excited-bounce': 'So excited!',
+        'shaking': 'Shaking!',
+        'flower': 'Resting as flower'
     };
-    
-    // Hook into existing displayPetImage calls if it's already defined
-    // This overrides the function from WebSocket handler
-    const originalDisplayPetImage = window.displayPetImage;
-    
-    console.log('[PET] Image display module loaded (inline)');
-})();
+    if (stateText) {
+        stateText.textContent = moodTexts[animation] || 'Active';
+    }
+
+    // Return to idle after duration
+    petAnimationTimer = setTimeout(() => {
+        pet.classList.remove(animation);
+        pet.classList.add('idle');
+        petAnimationState = 'idle';
+        toy.style.opacity = '0';
+        if (stateText) {
+            stateText.textContent = 'Watching logs...';
+        }
+    }, duration);
+}
+
+// FIX: Idle animation loop - triggers random animations while pet is awake
+let idleAnimationInterval = null;
+
+function startIdleAnimationLoop() {
+    // Clear existing interval if any
+    if (idleAnimationInterval) {
+        clearInterval(idleAnimationInterval);
+    }
+
+    console.log('[Pet Animation] Starting idle animation loop');
+
+    // Trigger random idle animations every 5-10 seconds
+    idleAnimationInterval = setInterval(() => {
+        if (!petIsAwake) {
+            console.log('[Pet Animation] Skipping - pet is sleeping');
+            return;
+        }
+
+        if (petAnimationState !== 'idle') {
+            console.log('[Pet Animation] Skipping - pet is already animating:', petAnimationState);
+            return;
+        }
+
+        // Random chance to trigger an animation
+        const rand = Math.random();
+
+        console.log('[Pet Animation] Idle loop tick - rand:', rand.toFixed(2));
+
+        if (rand < 0.10) {
+            // 10% - blinking
+            triggerPetAnimation('blinking', 2000);
+        } else if (rand < 0.20) {
+            // 10% - waving
+            triggerPetAnimation('waving', 2500);
+        } else if (rand < 0.30) {
+            // 10% - walking
+            triggerPetAnimation('walking', 3000);
+        } else if (rand < 0.38) {
+            // 8% - dancing (танцует!)
+            triggerPetAnimation('dancing', 3000);
+        } else if (rand < 0.45) {
+            // 7% - running (бег!)
+            triggerPetAnimation('running', 3500);
+        } else if (rand < 0.52) {
+            // 7% - jumping (прыжки!)
+            triggerPetAnimation('jumping', 2500);
+        } else if (rand < 0.58) {
+            // 6% - spinning (кружится!)
+            triggerPetAnimation('spinning', 2500);
+        } else if (rand < 0.64) {
+            // 6% - transforming (превращается!)
+            triggerPetAnimation('transforming', 3000);
+        } else if (rand < 0.69) {
+            // 5% - hunting (охотится!)
+            startHuntingAnimation();
+        } else if (rand < 0.73) {
+            // 4% - excited bounce
+            triggerPetAnimation('excited-bounce', 2000);
+        } else if (rand < 0.76) {
+            // 3% - playing
+            triggerPetAnimation('playing', 3000);
+        } else if (rand < 0.78) {
+            // 2% - flower (blooming!)
+            triggerPetAnimation('flower', 12000); // 12 seconds for idle flower
+        } else {
+            console.log('[Pet Animation] Staying in idle');
+        }
+        // 22% - stay in idle (breathing continues via CSS)
+    }, 5000 + Math.random() * 5000); // Random interval 5-10 seconds
+}
+
+function stopIdleAnimationLoop() {
+    if (idleAnimationInterval) {
+        clearInterval(idleAnimationInterval);
+        idleAnimationInterval = null;
+    }
+}
+
+// ===== PET WALL MOVEMENT SYSTEM =====
+function moveToWall(targetWall) {
+    if (petIsMovingToWall) {
+        console.log('[Pet Movement] Already moving to wall, skipping');
+        return;
+    }
+
+    const petDisplay = document.querySelector('.pet-display-inline');
+    if (!petDisplay) return;
+
+    console.log(`[Pet Movement] Moving from ${petWallPosition} to ${targetWall}`);
+
+    petIsMovingToWall = true;
+
+    // Remove old wall class
+    petDisplay.classList.remove('wall-bottom', 'wall-left', 'wall-top', 'wall-right');
+
+    // Add transition
+    petDisplay.style.transition = 'all 1.5s step-end';
+
+    // Add new wall class
+    petDisplay.classList.add(`wall-${targetWall}`);
+
+    // Update position
+    petWallPosition = targetWall;
+
+    // After transition, allow next movement
+    setTimeout(() => {
+        petIsMovingToWall = false;
+        petDisplay.style.transition = '';
+        console.log(`[Pet Movement] Arrived at ${targetWall}`);
+    }, 1500);
+}
+
+function randomWallMovement() {
+    if (petIsMovingToWall) return;
+
+    // Pick a random wall different from current
+    const walls = ['bottom', 'left', 'top', 'right'];
+    const availableWalls = walls.filter(w => w !== petWallPosition);
+    const targetWall = availableWalls[Math.floor(Math.random() * availableWalls.length)];
+
+    // Random animation choice for variety
+    const animations = ['running', 'jumping', 'dancing', 'excited-bounce'];
+    const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+
+    console.log('[Pet Movement] Moving to', targetWall, 'with', randomAnimation, 'animation');
+
+    // Trigger random animation while moving
+    triggerPetAnimation(randomAnimation, 2000);
+
+    // Move to new wall
+    setTimeout(() => {
+        moveToWall(targetWall);
+    }, 500);
+}
+
+// Add wall movement to idle loop
+let wallMovementInterval = null;
+
+function startWallMovementLoop() {
+    // Clear existing
+    if (wallMovementInterval) {
+        clearInterval(wallMovementInterval);
+    }
+
+    console.log('[Pet Movement] Starting wall movement loop');
+
+    // Random wall movement every 3-7 seconds (ULTRA ACTIVE!)
+    wallMovementInterval = setInterval(() => {
+        if (!petIsAwake) {
+            console.log('[Pet Movement] Skipping - pet is sleeping');
+            return;
+        }
+
+        // 90% chance to do SOMETHING (ultra active!)
+        if (Math.random() < 0.9) {
+            // Random activity choice
+            const activity = Math.random();
+
+            if (activity < 0.5) {
+                // 50% - move to different wall
+                randomWallMovement();
+            } else if (activity < 0.7) {
+                // 20% - just dance/jump in place
+                const animations = ['dancing', 'excited-bounce', 'jumping'];
+                const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+                console.log('[Pet Activity] Doing', randomAnim, 'in place!');
+                triggerPetAnimation(randomAnim, 2000);
+            } else if (activity < 0.85) {
+                // 15% - laugh/giggle
+                laughAnimation();
+            } else {
+                // 15% - pixel game
+                startPixelCatchGame();
+            }
+        }
+    }, 3000 + Math.random() * 4000); // 3-7 seconds (ultra active!)
+}
+
+function stopWallMovementLoop() {
+    if (wallMovementInterval) {
+        clearInterval(wallMovementInterval);
+        wallMovementInterval = null;
+    }
+}
+
+// ===== LAUGH/GIGGLE ANIMATION =====
+function laughAnimation() {
+    const pet = document.getElementById('agent-pet');
+    console.log('[Pet Activity] 😄 Laughing/Giggling!');
+
+    // Bounce animation
+    triggerPetAnimation('excited-bounce', 3000);
+
+    // Create laugh text bubbles
+    const laughs = ['hehe', 'haha', 'lol', '😄', 'ха-ха'];
+    const randomLaugh = laughs[Math.floor(Math.random() * laughs.length)];
+
+    const bubble = document.createElement('div');
+    bubble.textContent = randomLaugh;
+    bubble.style.cssText = `
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #00ff00;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        font-weight: bold;
+        text-shadow: 0 0 4px #00ff00;
+        pointer-events: none;
+        z-index: 100;
+        animation: floatUp 2s ease-out forwards;
+    `;
+
+    pet.style.position = 'relative';
+    pet.appendChild(bubble);
+
+    setTimeout(() => bubble.remove(), 2000);
+}
+
+// ===== PIXEL CATCH GAME =====
+let pixelGameActive = false;
+
+function startPixelCatchGame() {
+    if (pixelGameActive) return;
+
+    pixelGameActive = true;
+    const pet = document.getElementById('agent-pet');
+    const petDisplay = pet.closest('.pet-display-inline');
+
+    console.log('[Pet Activity] 🎮 Starting pixel catch game!');
+
+    // Create 3-5 floating pixels
+    const numPixels = 3 + Math.floor(Math.random() * 3);
+    const pixels = [];
+
+    for (let i = 0; i < numPixels; i++) {
+        const pixel = document.createElement('div');
+        pixel.className = 'catch-pixel';
+        pixel.style.cssText = `
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: ${Math.random() < 0.5 ? '#00ff00' : '#ffff00'};
+            box-shadow: 0 0 6px currentColor;
+            border-radius: 1px;
+            pointer-events: none;
+            z-index: 50;
+        `;
+
+        // Random starting position around pet
+        const angle = (i / numPixels) * Math.PI * 2;
+        const distance = 60 + Math.random() * 40;
+        const startX = Math.cos(angle) * distance;
+        const startY = Math.sin(angle) * distance;
+
+        pixel.style.left = `calc(50% + ${startX}px)`;
+        pixel.style.top = `calc(50% + ${startY}px)`;
+
+        petDisplay.appendChild(pixel);
+        pixels.push(pixel);
+
+        // Animate pixel floating
+        const floatAnim = pixel.animate([
+            { transform: 'translateY(0px) scale(1)' },
+            { transform: 'translateY(-20px) scale(1.2)' },
+            { transform: 'translateY(0px) scale(1)' }
+        ], {
+            duration: 1000 + Math.random() * 1000,
+            iterations: Infinity,
+            easing: 'ease-in-out'
+        });
+    }
+
+    // Pet tries to catch pixels
+    triggerPetAnimation('excited-bounce', 4000);
+
+    // Catch pixels one by one
+    pixels.forEach((pixel, index) => {
+        setTimeout(() => {
+            // Pixel moves toward pet
+            pixel.style.transition = 'all 0.5s ease-in';
+            pixel.style.left = '50%';
+            pixel.style.top = '50%';
+            pixel.style.transform = 'scale(0)';
+
+            setTimeout(() => pixel.remove(), 500);
+
+            // Pet celebrates catch
+            if (index === pixels.length - 1) {
+                setTimeout(() => {
+                    triggerPetAnimation('dancing', 2000);
+                    pixelGameActive = false;
+                    console.log('[Pet Activity] ✅ Caught all pixels!');
+                }, 600);
+            }
+        }, 1000 + index * 800);
+    });
+}
+
+// ===== HUNTING ANIMATION WITH TONGUE (CHAMELEON STYLE) =====
+function startHuntingAnimation() {
+    const pet = document.getElementById('agent-pet');
+    const petDisplay = pet.closest('.pet-display-inline');
+    const tongue = document.getElementById('pet-tongue');
+
+    console.log('[Pet Animation] Starting tongue hunt (chameleon style)!');
+
+    // Keep pet still (no hunting animation, just tongue shoots)
+    triggerPetAnimation('idle', 5000);
+
+    // Create target pixel (floating on the side)
+    const prey = document.createElement('div');
+    prey.className = 'prey-pixel';
+    prey.style.cssText = 'position: absolute; width: 4px; height: 4px; background: #00ff00; box-shadow: 0 0 4px #00ff00; z-index: 5;';
+
+    // Random side (left or right)
+    const direction = Math.random() < 0.5 ? 'right' : 'left';
+    const xPos = direction === 'right' ? '70%' : '30%';
+    const yPos = '40%';
+
+    prey.style.left = xPos;
+    prey.style.top = yPos;
+
+    petDisplay.appendChild(prey);
+
+    console.log(`[Pet Animation] Target pixel spawned on ${direction} side`);
+
+    // After 500ms - shoot tongue!
+    setTimeout(() => {
+        console.log('[Pet Animation] Shooting tongue!');
+
+        // Add shooting animation to tongue
+        tongue.classList.remove('shooting-left', 'shooting-right');
+        tongue.classList.add(`shooting-${direction}`);
+
+        // After 300ms (when tongue reaches pixel) - make pixel start moving toward pet
+        setTimeout(() => {
+            console.log('[Pet Animation] Tongue caught pixel!');
+            prey.style.transition = 'all 0.6s step-end';
+            prey.style.left = '50%';
+            prey.style.top = '50%';
+            prey.style.opacity = '1';
+        }, 300);
+
+        // After 700ms total - pixel disappears (absorbed)
+        setTimeout(() => {
+            console.log('[Pet Animation] Pixel absorbed!');
+            prey.style.opacity = '0';
+        }, 700);
+
+        // After 1200ms - clean up
+        setTimeout(() => {
+            tongue.classList.remove('shooting-left', 'shooting-right');
+            prey.remove();
+            console.log('[Pet Animation] Tongue hunt complete!');
+        }, 1200);
+
+    }, 500);
+}
+
+// ===== COUNTDOWN TIMER & FLOWER TRANSFORMATION =====
+let restCountdownEndTime = null;
+let restCountdownInterval = null;
+let isInFlowerMode = false;
+
+// Start rest countdown (called when agent enters rest period)
+function startRestCountdown(durationSeconds) {
+    const container = document.getElementById('rest-countdown-container');
+    const countdownText = document.getElementById('rest-countdown-text');
+
+    restCountdownEndTime = Date.now() + (durationSeconds * 1000);
+    container.style.display = 'block';
+
+    console.log('[Countdown] Starting rest countdown:', durationSeconds, 'seconds');
+
+    // Log cooldown start to terminal with ASCII art
+    const cooldownMins = Math.floor(durationSeconds / 60);
+    const cooldownStartLog = `
+╔════════════════════════════════════════════╗
+║  💤 ENTERING COOLDOWN MODE                ║
+║  Duration: ${cooldownMins} minutes                     ║
+║  Status: Resting • Agent will resume soon ║
+╚════════════════════════════════════════════╝`;
+    addLogLine(cooldownStartLog, 'log-info', null, false);
+
+    // Clear existing interval
+    if (restCountdownInterval) {
+        clearInterval(restCountdownInterval);
+    }
+
+    // ALWAYS show visual effect during cooldown (not just 50%)
+    console.log('[REST] Cooldown started - duration:', durationSeconds, 'seconds');
+
+    // TEMPORARY: ALWAYS flower mode for testing
+    const visualEffect = 0; // Force flower mode (was: Math.random())
+
+    if (visualEffect < 0.6) {
+        // 60% - FLOWER mode (was 50%)
+        console.log('[REST] 🌸 Choosing FLOWER mode for this cooldown');
+        if (!isInFlowerMode) {
+            transformToFlower();
+        } else {
+            console.log('[REST] Already in flower mode, skipping');
+        }
+    } else if (visualEffect < 0.8) {
+        // 20% - SLEEP mode with stars
+        console.log('[REST] 😴 Choosing SLEEP mode (with stars!) for this cooldown');
+        goToSleep();
+        // Auto-start stars during sleep
+        setTimeout(() => {
+            if (!starsActive) {
+                toggleStars();
+            }
+        }, 2000);
+    } else {
+        // 20% - AWAKE mode with special visual (more active!)
+        console.log('[REST] ✨ Choosing AWAKE REST mode (pet stays awake with visuals)');
+        // Keep pet awake but with special visual effects
+        if (!petIsAwake) {
+            wakeUpPet();
+        }
+        // Trigger special rain or stars
+        setTimeout(() => {
+            if (Math.random() < 0.5) {
+                toggleRain();
+            } else {
+                toggleStars();
+            }
+        }, 1000);
+    }
+
+    // Update countdown every second
+    restCountdownInterval = setInterval(() => {
+        const remaining = Math.max(0, Math.floor((restCountdownEndTime - Date.now()) / 1000));
+
+        if (remaining <= 0) {
+            // Countdown finished - agent cycle starting
+            clearInterval(restCountdownInterval);
+            restCountdownInterval = null;
+            container.style.display = 'none';
+            countdownText.textContent = '--:--';
+
+            console.log('[Countdown] Rest period ended - agent cycle starting');
+
+            // Log to terminal in ASCII style
+            const cycleStartLog = `
+╔════════════════════════════════════════════╗
+║  🔄 AGENT CYCLE STARTING                  ║
+║  Status: ACTIVE • Ready to generate!      ║
+╚════════════════════════════════════════════╝`;
+            addLogLine(cycleStartLog, 'log-success', null, false);
+
+            // Transform back from flower
+            if (isInFlowerMode) {
+                transformFromFlower();
+            }
+        } else {
+            // Update display
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            countdownText.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            // Check if spider should appear (every 30 seconds to avoid spam)
+            if (remaining % 30 === 0) {
+                checkStreamSpiderMode();
+            }
+
+            // Log countdown updates to terminal every 5 minutes (ASCII style)
+            if (remaining % 300 === 0 && remaining > 0) {
+                const mins = Math.floor(remaining / 60);
+                const asciiCountdown = `
+╭─────────────────────────────────────────╮
+│ ⏰ COOLDOWN IN PROGRESS                │
+│ Time remaining: ${mins} minutes          │
+│ Status: Resting ${isInFlowerMode ? '🌸' : '😴'}            │
+╰─────────────────────────────────────────╯`;
+                addLogLine(asciiCountdown, 'log-info', null, false);
+            }
+        }
+    }, 1000);
+}
+
+// Stop rest countdown (agent became active)
+function stopRestCountdown() {
+    if (restCountdownInterval) {
+        clearInterval(restCountdownInterval);
+        restCountdownInterval = null;
+    }
+
+    const container = document.getElementById('rest-countdown-container');
+    const countdownText = document.getElementById('rest-countdown-text');
+
+    container.style.display = 'none';
+    countdownText.textContent = '--:--';
+
+    // Transform back from flower if needed
+    if (isInFlowerMode) {
+        transformFromFlower();
+    }
+}
+
+// Transform pet into flower (growing animation with stages)
+let growthInterval = null;
+let swayInterval = null;
+function transformToFlower() {
+    const pet = document.getElementById('agent-pet');
+    const stateText = document.getElementById('pet-state-text');
+    const stageText = document.getElementById('pet-stage-text');
+
+    console.log('═══════════════════════════════════════');
+    console.log('🌸 [Pet] STARTING FLOWER GROWTH! 🌸');
+    console.log('═══════════════════════════════════════');
+    console.log('[Pet] Pet element:', pet ? 'FOUND' : 'NOT FOUND');
+    console.log('[Pet] Is in flower mode already?', isInFlowerMode);
+    console.log('[Pet] Pet is awake?', petIsAwake);
+
+    isInFlowerMode = true;
+
+    // Wake up pet if sleeping - flower is an ACTIVE animation!
+    if (!petIsAwake) {
+        wakeUpPet();
+    }
+
+    // Clear any existing intervals
+    if (growthInterval) clearInterval(growthInterval);
+    if (swayInterval) clearInterval(swayInterval);
+
+    // 7-stage progressive growth system
+    // Stage 1: Seed
+    // Stage 2: Sprout
+    // Stage 3: Young
+    // Stage 4: Pre-Bloom (arms visible)
+    // Stage 5: Budding (fractal branches begin)
+    // Stage 6: Blooming (petals unfold)
+    // Stage 7: Full Bloom (wind sway)
+    let currentGrowthStage = 1;
+    const growthDurations = [800, 800, 1000, 1000, 1200, 1500, 2000]; // ms for each stage
+
+    // Stage names for display
+    const stageNames = ['Seed', 'Sprout', 'Young', 'Pre-Bloom', 'Budding', 'Blooming', 'Full Bloom'];
+
+    function growToNextStage() {
+        if (currentGrowthStage > 7) {
+            // Reached full bloom - start sway animation
+            console.log('[Pet] Full bloom reached - starting sway');
+            startFlowerSway();
+            return;
+        }
+
+        // Apply current stage
+        pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5', 'stage-6', 'stage-7');
+        pet.classList.add('stage-' + currentGrowthStage);
+
+        // Update display
+        const stageName = stageNames[currentGrowthStage - 1];
+        stageText.textContent = currentGrowthStage + ' (' + stageName + ')';
+        stateText.textContent = 'Growing... 🌱';
+
+        console.log('[Pet] Growth stage', currentGrowthStage, '-', stageName);
+
+        // Add fractal branches at stage 5 (Budding)
+        if (currentGrowthStage === 5) {
+            addFractalBranches('budding');
+        }
+
+        // Add more branches at stage 6 (Blooming)
+        if (currentGrowthStage === 6) {
+            addFractalBranches('blooming');
+            addPetals('blooming');
+        }
+
+        // Full bloom branches and petals at stage 7
+        if (currentGrowthStage === 7) {
+            addFractalBranches('full-bloom');
+            addPetals('full-bloom');
+        }
+
+        // Schedule next stage
+        setTimeout(() => {
+            currentGrowthStage++;
+            growToNextStage();
+        }, growthDurations[currentGrowthStage - 1]);
+    }
+
+    // Start growth sequence
+    growToNextStage();
+}
+
+// Add fractal branches at different bloom stages
+function addFractalBranches(stage) {
+    const container = document.getElementById('pet-branches');
+    if (!container) return;
+
+    // Clear existing branches
+    container.innerHTML = '';
+
+    let branches = [];
+
+    if (stage === 'budding') {
+        // Stage 5: First branches appear
+        branches = [
+            {x: -12, y: 12}, {x: -16, y: 10},
+            {x: 12, y: 12}, {x: 16, y: 10}
+        ];
+    } else if (stage === 'blooming') {
+        // Stage 6: More branches emerge
+        branches = [
+            {x: -12, y: 12}, {x: -16, y: 10}, {x: -12, y: 18},
+            {x: 12, y: 12}, {x: 16, y: 10}, {x: 12, y: 18},
+            {x: -20, y: 13}, {x: 20, y: 13}
+        ];
+    } else if (stage === 'full-bloom') {
+        // Stage 7: Full fractal spread
+        branches = [
+            {x: -12, y: 13}, {x: -16, y: 11}, {x: -12, y: 18}, {x: -8, y: 22},
+            {x: 12, y: 13}, {x: 16, y: 11}, {x: 12, y: 18}, {x: 8, y: 22},
+            {x: -20, y: 13}, {x: -24, y: 10}, {x: 20, y: 13}, {x: 24, y: 10},
+            {x: -16, y: 22}, {x: 16, y: 22}
+        ];
+    }
+
+    // Create branch pixels
+    branches.forEach(b => {
+        const branch = document.createElement('div');
+        branch.className = 'branch-pixel';
+        branch.style.left = b.x + 'px';
+        branch.style.bottom = b.y + 'px';
+        container.appendChild(branch);
+    });
+
+    console.log('[Pet] Added', branches.length, 'branches for', stage);
+}
+
+// Add petals around head at bloom stages
+function addPetals(stage) {
+    const container = document.getElementById('pet-petals');
+    if (!container) return;
+
+    // Clear existing petals
+    container.innerHTML = '';
+
+    let petals = [];
+
+    if (stage === 'blooming') {
+        // Stage 6: First petals unfold
+        petals = [
+            {x: -8, y: -4}, {x: -4, y: -8}, {x: 0, y: -8},
+            {x: 4, y: -8}, {x: 8, y: -4},
+            {x: -12, y: 0}, {x: 12, y: 0}
+        ];
+    } else if (stage === 'full-bloom') {
+        // Stage 7: Full petal crown
+        petals = [
+            {x: -12, y: -8}, {x: -8, y: -12}, {x: -4, y: -12},
+            {x: 0, y: -12}, {x: 4, y: -12}, {x: 8, y: -12}, {x: 12, y: -8},
+            {x: -16, y: -4}, {x: -12, y: 0}, {x: -16, y: 4},
+            {x: 16, y: -4}, {x: 12, y: 0}, {x: 16, y: 4},
+            {x: -8, y: -16}, {x: 0, y: -16}, {x: 8, y: -16}
+        ];
+    }
+
+    // Create petal pixels
+    petals.forEach(p => {
+        const petal = document.createElement('div');
+        petal.className = 'petal-pixel';
+        petal.style.left = p.x + 'px';
+        petal.style.top = p.y + 'px';
+        container.appendChild(petal);
+    });
+
+    console.log('[Pet] Added', petals.length, 'petals for', stage);
+}
+
+// Wind sway animation for bloom phase
+function startFlowerSway() {
+    const pet = document.getElementById('agent-pet');
+    const stageText = document.getElementById('pet-stage-text');
+    const stateText = document.getElementById('pet-state-text');
+
+    stageText.textContent = '7 (Full Bloom)';
+    stateText.textContent = 'Swaying in the wind... 🌸💨';
+
+    // Trigger base flower animation
+    triggerPetAnimation('flower', 300000); // 5 minutes
+
+    // Sway pattern: create subtle movement by toggling classes
+    let swayStep = 0;
+    // 8 sway variants cycling every 500ms
+    swayInterval = setInterval(() => {
+        // Remove all sway classes
+        pet.classList.remove('sway-0', 'sway-1', 'sway-2', 'sway-3',
+                            'sway-4', 'sway-5', 'sway-6', 'sway-7');
+        // Add current sway
+        pet.classList.add('sway-' + swayStep);
+        swayStep = (swayStep + 1) % 8;
+    }, 500);
+
+    // Stop sway after 5 minutes
+    setTimeout(() => {
+        if (swayInterval) {
+            clearInterval(swayInterval);
+            swayInterval = null;
+        }
+        console.log('[Pet] Sway animation complete');
+    }, 300000); // 5 minutes
+}
+
+// Transform pet back from flower (shrinking animation)
+function transformFromFlower() {
+    const pet = document.getElementById('agent-pet');
+    const stateText = document.getElementById('pet-state-text');
+    const stageText = document.getElementById('pet-stage-text');
+
+    console.log('[Pet] Transforming from flower mode');
+
+    isInFlowerMode = false;
+
+    // Clear branches and petals
+    const branchesContainer = document.getElementById('pet-branches');
+    const petalsContainer = document.getElementById('pet-petals');
+    if (branchesContainer) branchesContainer.innerHTML = '';
+    if (petalsContainer) petalsContainer.innerHTML = '';
+
+    // Clear sway animation
+    if (swayInterval) {
+        clearInterval(swayInterval);
+        swayInterval = null;
+    }
+    pet.classList.remove('sway-0', 'sway-1', 'sway-2', 'sway-3', 'sway-4', 'sway-5', 'sway-6', 'sway-7');
+
+    // Return to saved stage
+    pet.classList.remove('stage-1', 'stage-2', 'stage-3', 'stage-4', 'stage-5', 'stage-6', 'stage-7');
+    pet.classList.add('stage-' + petStage);
+    stageText.textContent = petStage;
+
+    // Pet will wake up when next log arrives
+    stateText.textContent = 'Resting...';
+
+    console.log('[Pet] Returned to normal mode - stage', petStage);
+}
+
+// Detect rest period from logs (vercept cooldown messages)
+function detectRestPeriod(logText) {
+    console.log('[DEBUG detectRestPeriod] Checking log:', logText.substring(0, 100));
+
+    // Pattern 1: "Cooldown period: X minutes before next iteration..."
+    const cooldownPattern = /Cooldown period: (\d+) minutes/i;
+    const match = logText.match(cooldownPattern);
+
+    if (match) {
+        const minutes = parseInt(match[1]);
+        const seconds = minutes * 60;
+
+        console.log('[Pet] ✅ Detected rest period (format 1):', minutes, 'minutes');
+        startRestCountdown(seconds);
+        return true;
+    } else {
+        console.log('[DEBUG] Pattern 1 (Cooldown period) - NO MATCH');
+    }
+
+    // Pattern 2: Progress bar format "[█████░░] XX% • YYY/ZZZs"
+    const progressPattern = /\[█.*?\]\s+\d+%\s+•\s+(\d+)\/(\d+)s/;
+    const progressMatch = logText.match(progressPattern);
+
+    if (progressMatch) {
+        const current = parseInt(progressMatch[1]);
+        const total = parseInt(progressMatch[2]);
+        const remaining = total - current;
+
+        // Only trigger if this is first progress bar or significant cooldown remaining
+        if (remaining > 60 && !restCountdownEndTime) {
+            console.log('[Pet] Detected cooldown via progress bar - remaining:', remaining, 'seconds');
+            startRestCountdown(total); // Start from total duration
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Check agent status on page load and auto-trigger flower if in cooldown
+async function checkInitialAgentStatus() {
+    console.log('[Agent Status] Checking initial status...');
+
+    try {
+        const response = await fetch('/api/agent-status');
+        const data = await response.json();
+
+        console.log('[Agent Status] Server status:', data.status, 'cooldown minutes:', data.cooldownMinutes);
+
+        if (data.status === 'cooldown' && data.cooldownMinutes > 0) {
+            console.log('[Agent Status] Agent is in cooldown! Auto-triggering flower mode');
+
+            // Wake up pet if sleeping
+            if (!petIsAwake) {
+                wakeUpPet();
+            }
+
+            // Trigger flower mode for remaining cooldown time
+            const remainingMs = data.cooldownMinutes * 60 * 1000;
+            transformToFlower();
+
+            // Also start the REST countdown display (in seconds!)
+            startRestCountdown(data.cooldownMinutes * 60);
+        } else if (data.status === 'working') {
+            console.log('[Agent Status] Agent is working - pet should wake up soon');
+        } else {
+            console.log('[Agent Status] Agent is idle');
+        }
+    } catch (error) {
+        console.error('[Agent Status] Failed to check status:', error);
+    }
+}
+
+// Initialize pet - load state and start sleeping
+window.addEventListener('DOMContentLoaded', () => {
+    const pet = document.getElementById('agent-pet');
+    if (pet) {
+        // Load saved state from localStorage
+        loadPetState();
+
+        // Start sleeping
+        pet.classList.add('sleeping');
+        const stateText = document.getElementById('pet-state-text');
+        if (stateText) {
+            stateText.textContent = 'Sleeping... ZZZ';
+        }
+
+        console.log('[Pet] Initialized - Stage:', petStage, 'Logs:', petLogCount);
+
+        // Check if agent is in cooldown and auto-trigger flower mode
+        setTimeout(() => {
+            checkInitialAgentStatus();
+        }, 1000); // Wait 1 second after page load to check status
+    }
+});
+
+// ===== IMAGE DETECTION AND DISPLAY =====
+let imageDisplayTimer = null;
+
+function detectAndShowImage(logText) {
+    // FIX: Updated pattern matching for actual vercept log format
+    // Looking for patterns like:
+    // - "╔══ IMAGE GENERATED ══╗"
+    // - "Angel_20251105_105409.png"
+    // - Filename patterns from GLVSF_Images folder
+
+    let imagePath = null;
+    let imageFilename = null;
+
+    // Pattern 1: Check for "IMAGE GENERATED" marker with filename in same message
+    // This matches the actual log format from run_vercept_workflow_python_fixed.py line 480-481
+    if (logText.includes('IMAGE GENERATED')) {
+        console.log('[Image Display] Found IMAGE GENERATED marker');
+
+        // FIX: Parse filename from the SAME multiline message
+        // Format: "╔══ IMAGE GENERATED ══╗\nfilename.png\nCompleted in..."
+        const lines = logText.split('\n');
+
+        // Look for filename and optional base64 data
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+
+            // Check for base64 data URL
+            if (line.startsWith('data:image/png;base64,')) {
+                imagePath = line; // Use base64 directly
+                console.log('[Image Display] Found base64 image data:', line.substring(0, 50) + '...');
+                break;
+            }
+
+            // Check for filename
+            const filenamePattern = /^([a-zA-Z0-9_\-]+\.png)$/i;
+            const match = line.match(filenamePattern);
+
+            if (match && !line.includes('╔') && !line.includes('Completed')) {
+                imageFilename = match[1];
+                console.log('[Image Display] Found filename in same message:', imageFilename);
+                break;
+            }
+        }
+
+        // If we found it, continue to display logic below
+        // If not found, set flag for next message (fallback)
+        if (!imageFilename && !imagePath) {
+            window.expectingImageFilename = true;
+            return;
+        }
+    }
+
+    // Pattern 2: If we're expecting a filename from previous message, check this line
+    if (window.expectingImageFilename && !imageFilename) {
+        // Match common filename patterns from GLVSF_Images folder
+        const filenamePattern = /([a-zA-Z0-9_\-]+_\d{8}_\d{6}\.png|[a-zA-Z0-9_\-]+\.png)/i;
+        const match = logText.match(filenamePattern);
+        if (match) {
+            imageFilename = match[1];
+            window.expectingImageFilename = false;
+            console.log('[Image Display] Found filename after IMAGE GENERATED:', imageFilename);
+        }
+    }
+
+    // Pattern 3: Direct filename detection in any log
+    // Match filenames like: "Angel_20251105_105409.png" or "glvsf_resonant_ascent.png"
+    const directPattern = /([a-zA-Z0-9_\-]+(?:_\d{8}_\d{6})?\.png)/i;
+    const directMatch = logText.match(directPattern);
+    if (directMatch && !imageFilename) {
+        // Only use if it looks like a generated image filename (not a path to source)
+        const potentialFilename = directMatch[1];
+        // Exclude reference images from GLVSF_REFS
+        if (!logText.includes('GLVSF_REFS') && !logText.includes('ref_current')) {
+            imageFilename = potentialFilename;
+            console.log('[Image Display] Found filename via direct pattern:', imageFilename);
+        }
+    }
+
+    // If we found a filename or base64 data, show the image
+    if (imageFilename && !imagePath) {
+        // FIX: Use web server route (server.js serves generated images at /generated-images/)
+        imagePath = `/generated-images/${imageFilename}`;
+        console.log('[Image Display] Constructed image path:', imagePath);
+    }
+
+    if (imagePath) {
+        console.log('[Image Display] Showing image:', imagePath.substring(0, 100) + '...');
+        showImagePreview(imagePath);
+
+        // Make pet excited about the new image!
+        if (petIsAwake) {
+            const pet = document.getElementById('agent-pet');
+            pet.classList.add('excited');
+            triggerPetAnimation('dancing', 3000);
+            setTimeout(() => {
+                pet.classList.remove('excited');
+            }, 3000);
+        } else {
+            // Wake up pet briefly to celebrate
+            wakeUpPet();
+            const pet = document.getElementById('agent-pet');
+            pet.classList.add('excited');
+            triggerPetAnimation('waving', 3000);
+            setTimeout(() => {
+                pet.classList.remove('excited');
+            }, 3000);
+        }
+    }
+}
+
+function showImagePreview(imagePath) {
+    const imageWindow = document.getElementById('pet-image-window');
+    const imagePreview = document.getElementById('pet-image-preview');
+
+    // Clear any existing timer
+    if (imageDisplayTimer) {
+        clearTimeout(imageDisplayTimer);
+    }
+
+    console.log('[Image Display] Setting image source to:', imagePath);
+
+    // FIX: Handle image loading with error fallback
+    imagePreview.onerror = () => {
+        console.error('[Image Display] Failed to load image:', imagePath);
+        const filename = imagePath.split('/').pop();
+
+        // Show filename in label if image fails to load
+        console.error('[Image Display] Image not accessible. Showing filename instead.');
+        imagePreview.style.display = 'none';
+        const label = imageWindow.querySelector('.pet-image-label');
+        if (label) {
+            label.textContent = `New: ${filename}`;
+        }
+    };
+
+    imagePreview.onload = () => {
+        console.log('[Image Display] Image loaded successfully!');
+        imagePreview.style.display = 'block';
+    };
+
+    // Set image source
+    imagePreview.src = imagePath;
+    imagePreview.style.display = 'block';
+
+    // Fade in with discrete animation
+    imageWindow.classList.remove('fade-out');
+    imageWindow.classList.add('fade-in');
+
+    // FIX: Longer display time - 5 minutes instead of 7 seconds
+    imageDisplayTimer = setTimeout(() => {
+        imageWindow.classList.remove('fade-in');
+        imageWindow.classList.add('fade-out');
+
+        // Reset after fade out completes
+        setTimeout(() => {
+            imagePreview.src = '';
+            imagePreview.style.display = 'block';
+        }, 800);
+    }, 300000); // 5 minutes = 300000ms
+}
+
+// ===== RAIN SYSTEM =====
+let rainActive = false;
+let rainInterval = null;
+let rainStopTimeout = null;
+
+function startRain() {
+    if (rainActive) return;
+
+    console.log('[Rain] Starting rain...');
+    rainActive = true;
+
+    const rainContainer = document.getElementById('rain-container');
+    const roof = document.getElementById('pet-roof');
+
+    rainContainer.classList.add('active');
+
+    // Spawn raindrops every 100ms
+    rainInterval = setInterval(() => {
+        spawnRaindrop();
+    }, 100);
+
+    // Rain lasts 30-60 seconds
+    const duration = 30000 + Math.random() * 30000;
+    rainStopTimeout = setTimeout(() => {
+        stopRain();
+    }, duration);
+}
+
+function stopRain() {
+    if (!rainActive) return;
+
+    console.log('[Rain] Stopping rain...');
+    rainActive = false;
+
+    if (rainInterval) {
+        clearInterval(rainInterval);
+        rainInterval = null;
+    }
+
+    if (rainStopTimeout) {
+        clearTimeout(rainStopTimeout);
+        rainStopTimeout = null;
+    }
+
+    // Fade out rain container
+    setTimeout(() => {
+        const rainContainer = document.getElementById('rain-container');
+        rainContainer.classList.remove('active');
+        rainContainer.innerHTML = ''; // Clear all drops
+    }, 2000);
+}
+
+function spawnRaindrop() {
+    const rainContainer = document.getElementById('rain-container');
+    const pet = document.getElementById('agent-pet');
+    const roof = document.getElementById('pet-roof');
+
+    if (!rainContainer) return;
+
+    const drop = document.createElement('div');
+    drop.className = 'raindrop';
+
+    // Random X position across the container
+    const containerWidth = rainContainer.offsetWidth;
+    drop.style.left = Math.random() * containerWidth + 'px';
+    drop.style.top = '0px';
+
+    // Random fall duration (faster/slower rain)
+    const fallDuration = 0.8 + Math.random() * 0.4; // 0.8-1.2s
+    drop.style.animationDuration = fallDuration + 's';
+
+    rainContainer.appendChild(drop);
+
+    // Check if drop hits roof (if pet is sleeping)
+    if (pet.classList.contains('sleeping') && roof) {
+        const roofRect = roof.getBoundingClientRect();
+        const dropRect = drop.getBoundingClientRect();
+
+        // Check collision after some time
+        setTimeout(() => {
+            const currentDropRect = drop.getBoundingClientRect();
+
+            // If drop is near roof height
+            if (currentDropRect.top >= roofRect.top - 5 &&
+                currentDropRect.top <= roofRect.bottom + 5 &&
+                currentDropRect.left >= roofRect.left &&
+                currentDropRect.left <= roofRect.right) {
+
+                // Bounce effect
+                drop.classList.add('bouncing');
+                console.log('[Rain] Drop bounced off roof!');
+            }
+        }, fallDuration * 400); // Check midway through fall
+    }
+
+    // Create splash when drop hits ground (near end of animation)
+    setTimeout(() => {
+        const dropRect = drop.getBoundingClientRect();
+
+        // Spawn 2 splash pixels at drop position
+        for (let i = 0; i < 2; i++) {
+            const splash = document.createElement('div');
+            splash.className = 'splash-pixel ' + (i === 0 ? 'left' : 'right');
+            splash.style.left = drop.style.left;
+            splash.style.top = (220 + Math.random() * 10) + 'px'; // Near bottom
+
+            rainContainer.appendChild(splash);
+
+            // Remove splash after animation
+            setTimeout(() => splash.remove(), 400);
+        }
+    }, fallDuration * 900); // Trigger at 90% of fall (when hitting ground)
+
+    // Remove drop after animation
+    setTimeout(() => {
+        drop.remove();
+    }, (fallDuration * 1000) + 500);
+}
+
+// Random rain: 20% chance every 2 minutes when pet is sleeping
+setInterval(() => {
+    const pet = document.getElementById('agent-pet');
+    if (pet && pet.classList.contains('sleeping') && !rainActive) {
+        if (Math.random() < 0.2) {
+            startRain();
+        }
+    }
+}, 120000); // Check every 2 minutes
+
+// ===== SPIDER WEB ON STREAM =====
+// Spider web can appear randomly during rest periods
+let streamSpiderActive = false;
+let lastStreamSpiderTime = 0;
+const STREAM_SPIDER_COOLDOWN = 5 * 60 * 1000; // 5 minutes between webs (reduced!)
+
+function checkStreamSpiderMode() {
+    // Only during rest periods (when countdown is active)
+    const countdown = document.getElementById('rest-countdown-container');
+    if (!countdown || countdown.style.display === 'none') return;
+
+    // Check cooldown
+    const now = Date.now();
+    if (now - lastStreamSpiderTime < STREAM_SPIDER_COOLDOWN) return;
+
+    // Don't start if spider already active
+    if (streamSpiderActive) return;
+
+    // 60% chance to start spider web (increased!)
+    if (Math.random() < 0.6) {
+        console.log('[Stream] 🕷️ Starting spider web mode!');
+        streamSpiderActive = true;
+        lastStreamSpiderTime = now;
+
+        // Get pet element (use a placeholder if needed)
+        const pet = document.getElementById('agent-pet');
+
+        // 🕷️ TRANSFORM PET TO SPIDER!
+        if (pet) {
+            console.log('[Stream] 🕷️ Transforming pet to SPIDER!');
+            pet.classList.add('spider-mode', 'hunting');
+
+            // 🛑 STOP idle animations and wall movement - spider only moves to catch pixels!
+            stopIdleAnimationLoop();
+            stopWallMovementLoop();
+
+            // 🕷️ FORCE styles via JavaScript (highest priority!)
+            pet.style.transition = 'none !important';
+            pet.style.animation = 'none !important';
+            pet.style.transform = 'rotate(90deg) scale(1.5)'; // Set rotation instantly
+
+            // Also disable transitions on all child elements
+            const allChildren = pet.querySelectorAll('*');
+            allChildren.forEach(child => {
+                child.style.transition = 'none !important';
+                child.style.animation = 'none !important';
+            });
+
+            // Show ALL arms (6 legs - side by side, not overlapping!)
+            const allArms = pet.querySelectorAll('.pixel.arm, .pixel.arm-extra');
+            console.log('[Spider] 🕷️ Found', allArms.length, 'arms total');
+
+            // Get body color
+            const bodyPixel = pet.querySelector('.pixel.body');
+            const bodyColor = bodyPixel ? window.getComputedStyle(bodyPixel).backgroundColor : '#000000';
+            console.log('[Spider] Body color:', bodyColor);
+
+            allArms.forEach((arm, index) => {
+                arm.style.opacity = '1';
+                arm.style.width = '4px';
+                arm.style.height = '4px';
+                arm.style.display = 'inline-block'; // inline-block to display side by side
+                arm.style.background = bodyColor; // Same color as body!
+                arm.style.boxShadow = 'none'; // No glow
+                arm.style.visibility = 'visible';
+                arm.style.filter = 'none'; // No filters
+                arm.style.transition = 'none'; // No smooth transitions
+                arm.style.zIndex = '100';
+                console.log(`[Spider] 🦵 Leg ${index + 1}: ${arm.className}`);
+            });
+
+            // Show mandibles (small, same color as body)
+            const mandibles = pet.querySelectorAll('.mandible');
+            console.log('[Spider] 🦷 Found', mandibles.length, 'mandibles');
+            mandibles.forEach((mandible, index) => {
+                mandible.style.display = 'block';
+                mandible.style.opacity = '1';
+                mandible.style.width = '4px'; // Small
+                mandible.style.height = '4px';
+                mandible.style.background = bodyColor; // Same color as body!
+                mandible.style.boxShadow = 'none'; // No glow
+                mandible.style.visibility = 'visible';
+                mandible.style.position = 'absolute';
+                mandible.style.top = '-6px'; // Stick out slightly above head
+                mandible.style.zIndex = '101';
+                mandible.style.filter = 'none'; // No filters
+                mandible.style.transition = 'none'; // No smooth transitions
+                if (mandible.classList.contains('mandible-left')) {
+                    mandible.style.left = '24px';
+                } else {
+                    mandible.style.right = '24px';
+                }
+                console.log(`[Spider] 🦷 Mandible ${index + 1}: ${mandible.className}`);
+            });
+
+            // Hide legs
+            const legs = pet.querySelector('.pet-legs');
+            if (legs) {
+                legs.style.display = 'none';
+                console.log('[Spider] 👢 Legs hidden');
+            }
+        }
+
+        if (window.SpiderWebSystem) {
+            window.SpiderWebSystem.start(pet);
+
+            // Spider mode lasts 30 minutes, then auto-ends
+            setTimeout(() => {
+                window.SpiderWebSystem.stop();
+                streamSpiderActive = false;
+
+                // 🔙 RESTORE PET TO NORMAL
+                if (pet) {
+                    console.log('[Stream] Restoring pet from spider mode');
+                    pet.classList.remove('spider-mode', 'hunting');
+
+                    // Clear inline styles
+                    pet.style.transition = '';
+                    pet.style.animation = '';
+
+                    // Restore ALL arms to normal
+                    const allArms = pet.querySelectorAll('.pixel.arm, .pixel.arm-extra');
+                    allArms.forEach(arm => {
+                        arm.style.opacity = '';
+                        arm.style.width = '';
+                        arm.style.height = '';
+                        arm.style.display = '';
+                        arm.style.background = '';
+                        arm.style.boxShadow = '';
+                        arm.style.visibility = '';
+                        arm.style.filter = '';
+                        arm.style.zIndex = '';
+                    });
+
+                    // Hide mandibles
+                    const mandibles = pet.querySelectorAll('.mandible');
+                    mandibles.forEach(mandible => {
+                        mandible.style.display = '';
+                        mandible.style.opacity = '';
+                        mandible.style.width = '';
+                        mandible.style.height = '';
+                        mandible.style.background = '';
+                        mandible.style.boxShadow = '';
+                        mandible.style.visibility = '';
+                        mandible.style.position = '';
+                        mandible.style.top = '';
+                        mandible.style.left = '';
+                        mandible.style.right = '';
+                        mandible.style.zIndex = '';
+                        mandible.style.filter = '';
+                    });
+
+                    // Restore legs
+                    const legs = pet.querySelector('.pet-legs');
+                    if (legs) {
+                        legs.style.display = '';
+                    }
+
+                    // ▶️ RESTART idle animations and wall movement
+                    startIdleAnimationLoop();
+                    startWallMovementLoop();
+                }
+
+                console.log('[Stream] Spider web ended');
+            }, 30 * 60 * 1000);
+        }
+    }
+}
+
+// Check for spider web every 1 minute during rest (more frequent!)
+setInterval(checkStreamSpiderMode, 60 * 1000);
+
+// ===== STARS SYSTEM =====
+let starsActive = false;
+let shootingStarInterval = null;
+
+// Create static twinkling stars
+function createStaticStars() {
+    const container = document.getElementById('stars-container');
+    if (!container) return;
+
+    // Clear existing stars
+    container.innerHTML = '';
+
+    // Create 5-8 static stars at random positions
+    const numStars = 5 + Math.floor(Math.random() * 4);
+
+    for (let i = 0; i < numStars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star twinkling';
+
+        // Create cross pattern (9 pixels)
+        for (let j = 0; j < 9; j++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'star-pixel';
+            star.appendChild(pixel);
+        }
+
+        // Random position
+        star.style.left = (10 + Math.random() * 80) + '%';
+        star.style.top = (10 + Math.random() * 60) + '%';
+
+        // Random twinkle delay
+        star.style.animationDelay = Math.random() * 2 + 's';
+
+        container.appendChild(star);
+    }
+
+    console.log('[Stars] Created', numStars, 'static stars');
+}
+
+// Create shooting star with trail
+function createShootingStar() {
+    const container = document.getElementById('stars-container');
+    if (!container) return;
+
+    const shootingStar = document.createElement('div');
+    shootingStar.className = 'shooting-star';
+
+    // Random direction: down or up diagonal
+    const direction = Math.random() < 0.5 ? 'down' : 'up';
+    shootingStar.classList.add(direction);
+
+    // Star head (cross)
+    const head = document.createElement('div');
+    head.className = 'shooting-star-head';
+    for (let i = 0; i < 9; i++) {
+        const pixel = document.createElement('div');
+        pixel.className = 'star-pixel';
+        head.appendChild(pixel);
+    }
+    shootingStar.appendChild(head);
+
+    // Trail (4-6 pixels)
+    const trail = document.createElement('div');
+    trail.className = 'shooting-star-trail';
+    const trailLength = 4 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < trailLength; i++) {
+        const trailPixel = document.createElement('div');
+        trailPixel.className = 'trail-pixel';
+        trail.appendChild(trailPixel);
+    }
+    shootingStar.appendChild(trail);
+
+    // Random starting position
+    if (direction === 'down') {
+        shootingStar.style.left = (Math.random() * 30) + '%';
+        shootingStar.style.top = '0%';
+    } else {
+        shootingStar.style.left = (Math.random() * 30) + '%';
+        shootingStar.style.bottom = '0%';
+    }
+
+    container.appendChild(shootingStar);
+
+    console.log('[Stars] Shooting star created - direction:', direction);
+
+    // After animation, either burn or bounce
+    setTimeout(() => {
+        const fate = Math.random();
+        if (fate < 0.6) {
+            // 60% chance to burn
+            shootingStar.classList.remove('down', 'up');
+            shootingStar.classList.add('burning');
+            console.log('[Stars] Shooting star burning!');
+            setTimeout(() => shootingStar.remove(), 500);
+        } else {
+            // 40% chance to bounce
+            shootingStar.classList.remove('down', 'up');
+            shootingStar.classList.add('bouncing');
+            console.log('[Stars] Shooting star bouncing!');
+            setTimeout(() => shootingStar.remove(), 600);
+        }
+    }, 2000);
+}
+
+// Start stars system
+function startStars() {
+    if (starsActive) return;
+
+    console.log('[Stars] Starting night sky...');
+    starsActive = true;
+
+    const container = document.getElementById('stars-container');
+    container.classList.add('active');
+
+    // Create static stars
+    createStaticStars();
+
+    // Shooting stars appear rarely (every 8-15 seconds)
+    shootingStarInterval = setInterval(() => {
+        if (Math.random() < 0.7) { // 70% chance each interval
+            createShootingStar();
+        }
+    }, 8000 + Math.random() * 7000);
+}
+
+// Stop stars system
+function stopStars() {
+    if (!starsActive) return;
+
+    console.log('[Stars] Stopping night sky...');
+    starsActive = false;
+
+    if (shootingStarInterval) {
+        clearInterval(shootingStarInterval);
+        shootingStarInterval = null;
+    }
+
+    const container = document.getElementById('stars-container');
+    container.classList.remove('active');
+    container.innerHTML = '';
+}
+
+// Check if it's night time (10 PM - 6 AM)
+function isNightTime() {
+    const hour = new Date().getHours();
+    return hour >= 22 || hour < 6;
+}
+
+// Auto-start/stop stars based on time
+function checkStarsTime() {
+    if (isNightTime() && !starsActive) {
+        startStars();
+    } else if (!isNightTime() && starsActive) {
+        stopStars();
+    }
+}
+
+// Check every 5 minutes
+setInterval(checkStarsTime, 5 * 60 * 1000);
+
+// Check on page load
+setTimeout(checkStarsTime, 1000);
+
 </script>
+
+<!-- Spider Web System -->
+<script src="spider-web-system.js"></script>
+
+<!-- manual-modal.js moved to test_pages -->
+
+<!-- Pixel Pet Module - DISABLED, using integrated pet instead -->
+<!-- <script src="pet.js?v=1762247417"></script> -->
 
 </body>
 </html>
