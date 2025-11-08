@@ -2607,9 +2607,6 @@ function startRestCountdown(durationSeconds) {
 
     console.log('[Countdown] Starting rest countdown:', durationSeconds, 'seconds');
 
-    // Update status indicator to yellow (charging/resting)
-    updateStatus('REST', false); // Turn off green, show REST text
-
     // Log cooldown start to terminal with ASCII art
     const cooldownMins = Math.floor(durationSeconds / 60);
     const cooldownStartLog = `
@@ -2679,9 +2676,6 @@ function startRestCountdown(durationSeconds) {
             countdownText.textContent = '--:--';
 
             console.log('[Countdown] Rest period ended - agent cycle starting');
-
-            // Turn indicator back to green (active)
-            updateStatus('ACTIVE', true);
 
             // Log to terminal in ASCII style
             const cycleStartLog = `
@@ -3045,16 +3039,6 @@ async function checkInitialAgentStatus() {
             if (!petIsAwake) {
                 wakeUpPet();
             }
-
-            // Show current cooldown progress in log
-            const mins = data.cooldownMinutes;
-            const cooldownProgressLog = `
-╭─────────────────────────────────────────╮
-│ ... COOLDOWN IN PROGRESS               │
-│ Time: ${mins} min remaining                │
-│ Status: Resting flower                 │
-╰─────────────────────────────────────────╯`;
-            addLogLine(cooldownProgressLog, 'log-info', null, true);
 
             // Trigger flower mode for remaining cooldown time
             const remainingMs = data.cooldownMinutes * 60 * 1000;
