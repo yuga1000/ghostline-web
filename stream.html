@@ -2083,7 +2083,7 @@ function goToSleep() {
     startFallingStars();
 
     const stateText = document.getElementById('pet-state-text');
-    stateText.textContent = 'Sleeping... ZZZ';
+    stateText.textContent = 'Sleeping~';
 }
 
 let fallingStarsInterval = null;
@@ -2609,7 +2609,7 @@ function startRestCountdown(durationSeconds) {
     const cooldownMins = Math.floor(durationSeconds / 60);
     const cooldownStartLog = `
 ╔════════════════════════════════════════════╗
-║  zzz ENTERING COOLDOWN MODE               ║
+║  ... ENTERING COOLDOWN MODE               ║
 ║  Duration: ${cooldownMins} minutes                     ║
 ║  Progress: [▓▓▓▓▓▓▓▓▓▓] 0%                ║
 ║  Status: Resting - Agent will resume soon ║
@@ -2711,10 +2711,10 @@ function startRestCountdown(durationSeconds) {
 
                 const asciiCountdown = `
 ╭─────────────────────────────────────────╮
-│ zzz COOLDOWN IN PROGRESS               │
+│ ... COOLDOWN IN PROGRESS               │
 │ Time: ${mins} min remaining                │
 │ [${progressBar}] ${percent}%           │
-│ Status: Resting ${isInFlowerMode ? 'flower' : 'zzz'}            │
+│ Status: Resting ${isInFlowerMode ? 'flower' : '...'}            │
 ╰─────────────────────────────────────────╯`;
                 addLogLine(asciiCountdown, 'log-info', null, false);
             }
@@ -3000,7 +3000,7 @@ function detectRestPeriod(logText) {
         console.log('[DEBUG] Pattern 1 (Cooldown period) - NO MATCH');
     }
 
-    // Pattern 2: Progress bar format "[█████░░] XX% • YYY/ZZZs"
+    // Pattern 2: Progress bar format "[█████░░] XX% • YYY/...s"
     const progressPattern = /\[█.*?\]\s+\d+%\s+•\s+(\d+)\/(\d+)s/;
     const progressMatch = logText.match(progressPattern);
 
@@ -3065,7 +3065,7 @@ window.addEventListener('DOMContentLoaded', () => {
         pet.classList.add('sleeping');
         const stateText = document.getElementById('pet-state-text');
         if (stateText) {
-            stateText.textContent = 'Sleeping... ZZZ';
+            stateText.textContent = 'Sleeping~';
         }
 
         console.log('[Pet] Initialized - Stage:', petStage, 'Logs:', petLogCount);
