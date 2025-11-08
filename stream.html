@@ -1434,12 +1434,14 @@ function addLogLine(text, className = 'log-info', onComplete, instant = false) {
         logContent.scrollTop = logContent.scrollHeight;
 
         // Instant display or typewriter effect
-        if (instant) {
-            // Show instantly
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (instant || isMobile) {
+            // Show instantly on mobile or when instant flag is set
             messageSpan.textContent = message;
             if (onComplete) onComplete();
         } else {
-            // Typewriter effect
+            // Typewriter effect (desktop only)
             logLine.classList.add('typing');
             messageSpan.textContent = ''; // Start empty for typewriter
 
