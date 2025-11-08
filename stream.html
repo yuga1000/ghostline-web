@@ -1763,8 +1763,8 @@ function updatePetOnLog(logType, logText = '') {
     // Determine log importance
     if (logType === 'log-success' && keywords.exciting.some(kw => lowerText.includes(kw))) {
         shouldAnimate = true;
-        // Random celebration animation
-        const celebrations = ['dancing', 'excited-bounce', 'jumping', 'spinning'];
+        // Random celebration animation (no spinning!)
+        const celebrations = ['dancing', 'excited-bounce', 'jumping', 'waving'];
         animation = celebrations[Math.floor(Math.random() * celebrations.length)];
         duration = 3000;
     } else if (logType === 'log-success') {
@@ -1987,9 +1987,9 @@ function wakeUpPet() {
                 triggerPetAnimation('waving', 2500);
             },
             () => {
-                // Spin around
-                console.log('[Pet] Dizzy wake-up - spinning!');
-                triggerPetAnimation('spinning', 2000);
+                // Shake off sleepiness
+                console.log('[Pet] Shaking off sleep!');
+                triggerPetAnimation('shaking', 2000);
             },
             () => {
                 // Play with toy
@@ -2278,8 +2278,8 @@ function startIdleAnimationLoop() {
             // 7% - jumping (прыжки!)
             triggerPetAnimation('jumping', 2500);
         } else if (rand < 0.58) {
-            // 6% - spinning (кружится!)
-            triggerPetAnimation('spinning', 2500);
+            // 6% - excited bounce (подпрыгивает!)
+            triggerPetAnimation('excited-bounce', 2500);
         } else if (rand < 0.64) {
             // 6% - transforming (превращается!)
             triggerPetAnimation('transforming', 3000);
