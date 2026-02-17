@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Static deployment of ghostline-web via Railway",
   "scripts": {
-    "start": "node generate-env.js && node server.js",
+    "start": "node scripts/generate-env.js && node server.js",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
@@ -16,7 +16,7 @@
     "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0"
   },
-  "main": "agent-pet-roaming.js",
+  "main": "js/agent-pet-roaming.js",
   "devDependencies": {
     "@playwright/test": "^1.56.1"
   },
