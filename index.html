@@ -198,7 +198,8 @@
                 <div class="manifesto-loader-fill"></div>
             </div>
             <div class="image-wrapper">
-                <img id="manifestoImage" src="pages/2Large.jpeg" alt="manifesto image">
+                <img id="manifestoImage" src="components/1.gif" alt="manifesto image">
+                <video id="manifestoVideo" src="components/2.mp4" autoplay loop muted playsinline style="display:none; width:100%; height:100%; object-fit:contain;"></video>
                 <div id="pixelOverlay" class="pixel-overlay"></div>
                 <div id="manifestoText"></div>
             </div>
@@ -461,97 +462,70 @@ let currentManifestoSlide = 0;
         }
     }
 
+    // Slides config: type 'image' | 'video' | 'text'
+    const manifestoSlides = [
+        { type: 'image', src: 'components/1.gif' },
+        { type: 'text', action: 'manifesto' },
+        { type: 'image', src: 'components/3.gif' },
+        { type: 'text', action: 'quote' },
+        { type: 'image', src: 'components/4.gif' },
+        { type: 'image', src: 'components/5.gif' },
+        { type: 'image', src: 'components/6.gif' },
+        { type: 'image', src: 'components/7.gif' },
+        { type: 'image', src: 'components/8.gif' },
+        { type: 'video', src: 'components/2.mp4' }
+    ];
+
     function showSlide(index) {
         const image = document.getElementById('manifestoImage');
+        const video = document.getElementById('manifestoVideo');
         const text = document.getElementById('manifestoText');
         const loader = document.querySelector('#manifestoPanel .manifesto-loader');
         const loaderText = document.querySelector('#manifestoPanel .manifesto-loader-text');
         const indicator = document.getElementById('manifestoIndicator');
         const overlay = document.getElementById('pixelOverlay');
+        const panel = document.getElementById('manifestoPanel');
+        const slide = manifestoSlides[index];
 
         currentManifestoSlide = index;
-        
-        // Set attribute for CSS selectors
-        const panel = document.getElementById('manifestoPanel');
-        if (panel) {
-            panel.setAttribute('data-slide', index);
-        }
-        
-        if (indicator) {
-            indicator.textContent = (index + 1) + ' / 4';
-        }
 
-        if (index === 0) {
-            if (loader) loader.style.display = 'none';
-            if (loaderText) loaderText.style.display = 'none';
-            if (text) {
-                text.style.display = 'none';
-            }
+        if (panel) panel.setAttribute('data-slide', index);
+        if (indicator) indicator.textContent = (index + 1) + ' / ' + manifestoSlides.length;
+        if (loader) loader.style.display = 'none';
+        if (loaderText) loaderText.style.display = 'none';
+        if (overlay) { overlay.style.display = 'none'; overlay.innerHTML = ''; }
+
+        // Hide all media first
+        if (image) image.style.display = 'none';
+        if (video) { video.style.display = 'none'; video.pause(); }
+        if (text) { text.style.display = 'none'; }
+
+        if (slide.type === 'image') {
             if (image) {
-                image.src = 'pages/2Large.jpeg';
+                image.src = slide.src;
                 image.style.display = 'block';
             }
-            if (overlay) {
-                overlay.innerHTML = '';
-                overlay.style.display = 'grid';
-                const rows = 20;
-                const cols = 20;
-                overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-                for (let i = 0; i < rows * cols; i++) {
-                    const block = document.createElement('div');
-                    block.className = 'pixel-block';
-                    overlay.appendChild(block);
+        } else if (slide.type === 'video') {
+            if (video) {
+                video.src = slide.src;
+                video.style.display = 'block';
+                video.play();
+            }
+        } else if (slide.type === 'text') {
+            if (slide.action === 'manifesto') {
+                startManifestoLoading();
+            } else if (slide.action === 'quote') {
+                if (text) {
+                    text.style.display = 'block';
+                    text.innerHTML = '';
+                    setTimeout(() => { typeManifestoTextSlide3(text); }, 100);
                 }
-                revealPixels(overlay);
-            }
-        } else if (index === 1) {
-            if (image) {
-                image.style.display = 'none';
-            }
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.innerHTML = '';
-            }
-            startManifestoLoading();
-        } else if (index === 2) {
-            if (loader) loader.style.display = 'none';
-            if (loaderText) loaderText.style.display = 'none';
-            if (text) {
-                text.style.display = 'none';
-                text.innerHTML = '';
-            }
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.innerHTML = '';
-            }
-            if (image) {
-                image.src = 'components/3scene-terminator-draw.gif.gif?v=3';
-                image.style.display = 'block';
-            }
-        } else if (index === 3) {
-            if (loader) loader.style.display = 'none';
-            if (loaderText) loaderText.style.display = 'none';
-            if (image) {
-                image.style.display = 'none';
-            }
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.innerHTML = '';
-            }
-            if (text) {
-                text.style.display = 'block';
-                text.innerHTML = "";
-                // Typing animation for slide 4
-                setTimeout(() => {
-                    typeManifestoTextSlide3(text);
-                }, 100);
             }
         }
     }
 
     function changeSlide(delta) {
-        const total = 4;
+        const total = manifestoSlides.length;
         currentManifestoSlide = (currentManifestoSlide + delta + total) % total;
         showSlide(currentManifestoSlide);
     }
