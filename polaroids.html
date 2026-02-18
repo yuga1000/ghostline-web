@@ -608,13 +608,12 @@
             .holo-space::before { display: none; }
 
             .polaroid {
-                transition: left 0.2s ease, top 0.2s ease, width 0.2s ease, opacity 0.2s ease;
-                will-change: auto;
+                transition: opacity 0.15s ease;
+                will-change: opacity;
             }
 
             .polaroid.background {
-                opacity: 0.15 !important;
-                filter: none !important;
+                display: none !important;
             }
 
             .cv-box { display: none !important; }
@@ -839,8 +838,9 @@
         // GENERATE PARTICLES
         // =============================================
         function generateParticles() {
+            if (window.innerWidth < 768) return; // skip on mobile entirely
             const space = document.getElementById('holoSpace');
-            const count = window.innerWidth < 768 ? 8 : 30;
+            const count = 30;
             for (let i = 0; i < count; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
@@ -1000,8 +1000,8 @@
             const centerX = w / 2 - ACTIVE_SIZE / 2 + offsetX;
             const centerY = isMobile ? 20 : h / 2 - (ACTIVE_SIZE + 40) / 2;
 
-            // Limit visible background polaroids on mobile for performance
-            const maxBg = isMobile ? 3 : polaroidData.length;
+            // No background polaroids on mobile — only active one for performance
+            const maxBg = isMobile ? 0 : polaroidData.length;
             let bgCount = 0;
 
             polaroids.forEach((el, i) => {
@@ -1015,6 +1015,10 @@
                     el.style.transform = 'scale(1)';
                     el.style.display = 'block';
                 } else {
+                    if (isMobile) {
+                        el.style.display = 'none';
+                        return;
+                    }
                     if (bgCount >= maxBg) {
                         el.style.display = 'none';
                         return;
@@ -1032,9 +1036,7 @@
                         el.style.left = (pos.x - size / 2) + 'px';
                         el.style.top = (pos.y - size / 2) + 'px';
                         el.style.opacity = (0.15 + pos.depth * 0.3) + '';
-                        if (!isMobile) {
-                            el.style.filter = `brightness(${0.3 + pos.depth * 0.3}) saturate(0.3)`;
-                        }
+                        el.style.filter = `brightness(${0.3 + pos.depth * 0.3}) saturate(0.3)`;
                         el.style.transform = `scale(${pos.depth})`;
                     }
                 }
@@ -1060,8 +1062,8 @@
             const spaceTop = space.offsetTop;
 
             if (isMobile) {
-                // use actual rendered height of polaroid element
-                const actualH = activeEl ? activeEl.offsetHeight : (ACTIVE_SIZE + 52);
+                // fixed height calculation to avoid forcing layout reads
+                const actualH = ACTIVE_SIZE + 52;
                 infoPanel.style.left = '50%';
                 infoPanel.style.transform = 'translateX(-50%)';
                 infoPanel.style.top = (spaceTop + centerY + actualH + 14) + 'px';
