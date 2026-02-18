@@ -343,21 +343,15 @@
         <div class="counter" id="polaroidCounter"></div>
     </div>
 
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="supabase-env.js"></script>
+
     <script>
         // =============================================
-        // POLAROID DATA - ADD YOUR IMAGES HERE
+        // POLAROID DATA - loaded from Supabase
         // =============================================
-        // status: 'green' or 'red'
-        // src: path to image file
-        // label: short text under the polaroid image
-        const polaroidData = [
-            // Example entries (uncomment and edit):
-            // { src: 'components/photo1.jpg', label: 'FRAGMENT_001', status: 'green' },
-            // { src: 'components/photo2.jpg', label: 'FRAGMENT_002', status: 'red' },
-            // { src: 'components/photo3.jpg', label: 'FRAGMENT_003', status: 'green' },
-            // { src: 'components/photo4.jpg', label: 'LOST_SIGNAL', status: 'red' },
-            // { src: 'components/photo5.jpg', label: 'ECHO_005', status: 'green' },
-        ];
+        let polaroidData = [];
 
         // =============================================
         // CONFIG
@@ -658,9 +652,42 @@
         });
 
         // =============================================
+        // LOAD FROM SUPABASE
+        // =============================================
+        async function loadPolaroids() {
+            try {
+                if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+                    const client = window.supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+
+                    const { data, error } = await client
+                        .from('images')
+                        .select('*')
+                        .eq('category', 'polaroid')
+                        .order('created_at', { ascending: false });
+
+                    if (!error && data) {
+                        polaroidData = data.map(item => ({
+                            src: item.url,
+                            label: (item.title || 'UNTITLED').toUpperCase(),
+                            status: item.status === 'sold' ? 'red' : 'green'
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load polaroids:', e);
+            }
+        }
+
+        // =============================================
         // START
         // =============================================
-        runBoot();
+        (async () => {
+            await loadPolaroids();
+            runBoot();
+        })();
     </script>
 </body>
 </html>
