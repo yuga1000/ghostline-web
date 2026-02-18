@@ -317,22 +317,25 @@
             top: 10px;
             right: 12px;
             z-index: 110;
-            background: transparent;
-            border: none;
-            color: rgba(0, 255, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: rgba(0, 255, 0, 0.6);
             font-family: 'Share Tech Mono', monospace;
             font-size: 8px;
-            padding: 2px 4px;
+            padding: 2px 6px;
             cursor: pointer;
-            transition: color 0.3s;
+            transition: all 0.3s;
             letter-spacing: 1px;
         }
 
         .buy-btn:hover {
+            border-color: #00ff00;
             color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
         }
 
         .buy-btn.sold {
+            border-color: rgba(255, 0, 64, 0.3);
             color: rgba(255, 0, 64, 0.5);
             cursor: default;
         }
@@ -682,7 +685,7 @@
                 <h3>ACQUIRE POLAROID</h3>
                 <div id="buyItemName" style="font-size: 12px; color: #44ff44; margin-bottom: 4px;"></div>
                 <div class="buy-price-tag" id="buyPrice"></div>
-                <div style="font-size: 9px; color: #006600; text-align: center; margin: 4px 0 8px;">WORLDWIDE SHIPPING INCLUDED // ENVELOPE MAIL 5-14 DAYS</div>
+                <div style="font-size: 9px; color: #006600; text-align: center; margin: 4px 0 8px;">PRICE INCLUDES WORLDWIDE SHIPPING // ENVELOPE MAIL 7-21 DAYS</div>
 
                 <label>PAYMENT METHOD</label>
                 <div class="crypto-tabs">
@@ -772,12 +775,12 @@
                     line.style.fontWeight = 'bold';
                 }
                 bootText.appendChild(line);
-                await sleep(200 + Math.random() * 150);
+                await sleep(100 + Math.random() * 75);
             }
 
-            await sleep(400);
+            await sleep(200);
             bootScreen.classList.add('hidden');
-            setTimeout(() => bootScreen.remove(), 600);
+            setTimeout(() => bootScreen.remove(), 300);
 
             initScene();
         }
