@@ -637,6 +637,7 @@
                 text-align: center;
                 max-width: 80vw;
                 overflow: hidden;
+                max-height: 120px;
             }
 
             .info-panel .title { font-size: 10px; }
@@ -785,7 +786,7 @@
             const w = window.innerWidth;
             const isMobile = w < 768;
             // On mobile, size polaroid to ~75% of screen width minus padding
-            ACTIVE_SIZE = isMobile ? Math.min(w * 0.7, 220) : 280;
+            ACTIVE_SIZE = isMobile ? Math.min(w * 0.55, 180) : 280;
             BG_SIZE_MIN = isMobile ? 50 : 100;
             BG_SIZE_MAX = isMobile ? 80 : 160;
         }
@@ -997,7 +998,7 @@
             // On mobile: center polaroid, text below
             const offsetX = isMobile ? 0 : -80;
             const centerX = w / 2 - ACTIVE_SIZE / 2 + offsetX;
-            const centerY = h / 2 - (ACTIVE_SIZE + 40) / 2;
+            const centerY = isMobile ? h * 0.28 - (ACTIVE_SIZE + 40) / 2 : h / 2 - (ACTIVE_SIZE + 40) / 2;
 
             // Limit visible background polaroids on mobile for performance
             const maxBg = isMobile ? 3 : polaroidData.length;
@@ -1059,7 +1060,7 @@
             if (isMobile) {
                 infoPanel.style.left = '50%';
                 infoPanel.style.transform = 'translateX(-50%)';
-                infoPanel.style.top = (centerY + polaroidVisualH + 8) + 'px';
+                infoPanel.style.top = (centerY + polaroidVisualH + 14) + 'px';
                 infoPanel.style.maxWidth = '90vw';
             } else {
                 const rightEdge = centerX + polaroidVisualW + 20;
