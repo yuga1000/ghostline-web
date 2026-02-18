@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE - Polaroids</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #000000 !important;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .terminal-border {
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .pixel-text {
+            font-family: 'Press Start 2P', cursive;
+            image-rendering: pixelated;
+        }
+
+        .scanlines {
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+            background-size: 100% 3px;
+            animation: scanlines 0.1s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 3px; }
+        }
+
+        .nav-link {
+            color: #00ff00;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-active {
+            color: #ffffff;
+        }
+
+        /* === HOLOGRAPHIC SPACE === */
+        .holo-space {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 120px);
+            perspective: 1200px;
+            overflow: hidden;
+        }
+
+        /* Grid lines on the floor for depth */
+        .holo-space::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -50%;
+            width: 200%;
+            height: 60%;
+            background:
+                linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 80px 80px;
+            transform: rotateX(60deg);
+            transform-origin: bottom center;
+            pointer-events: none;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ff00;
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-particle 8s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float-particle {
+            0% { opacity: 0; transform: translateY(0) translateX(0); }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-200px) translateX(30px); }
+        }
+
+        /* === POLAROID CARD === */
+        .polaroid {
+            position: absolute;
+            background: #f5f5f0;
+            padding: 12px 12px 40px 12px;
+            cursor: pointer;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            user-select: none;
+        }
+
+        .polaroid.active {
+            z-index: 100;
+            box-shadow:
+                0 0 40px rgba(0, 255, 0, 0.3),
+                0 0 80px rgba(0, 255, 0, 0.1),
+                0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .polaroid.background {
+            opacity: 0.35;
+            filter: brightness(0.5) saturate(0.3);
+        }
+
+        .polaroid.background:hover {
+            opacity: 0.6;
+            filter: brightness(0.7) saturate(0.5);
+        }
+
+        .polaroid-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            background: #111;
+        }
+
+        /* Status indicator - green or red square */
+        .polaroid-status {
+            position: absolute;
+            bottom: 14px;
+            right: 14px;
+            width: 10px;
+            height: 10px;
+        }
+
+        .polaroid-status.green {
+            background: #00ff00;
+            box-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
+        }
+
+        .polaroid-status.red {
+            background: #ff0040;
+            box-shadow: 0 0 6px rgba(255, 0, 64, 0.8);
+        }
+
+        /* Label under polaroid image */
+        .polaroid-label {
+            position: absolute;
+            bottom: 12px;
+            left: 14px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Holographic scan line over active polaroid */
+        .polaroid.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: holo-scan 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes holo-scan {
+            0% { top: 0; opacity: 1; }
+            100% { top: 100%; opacity: 0.3; }
+        }
+
+        /* Connection lines between background polaroids */
+        .connection-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.15), transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* === NAV ARROWS === */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 200;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-arrow:hover {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .nav-arrow.left { left: 20px; }
+        .nav-arrow.right { right: 20px; }
+
+        /* === INFO PANEL === */
+        .info-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .info-panel .counter {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            color: #00ff00;
+            margin-top: 8px;
+        }
+
+        .info-panel .title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            opacity: 0.7;
+        }
+
+        /* Scan overlay */
+        .scan-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 999;
+            background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.01) 50%);
+            background-size: 100% 3px;
+        }
+
+        /* Boot sequence */
+        .boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+
+        .boot-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .boot-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            color: #00ff00;
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        /* Empty state */
+        .empty-state {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .empty-state .pixel-text {
+            font-size: 12px;
+            color: #00ff00;
+            margin-bottom: 16px;
+        }
+
+        .empty-state .sub {
+            font-size: 12px;
+            color: #006600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot sequence -->
+    <div class="boot-screen" id="bootScreen">
+        <div class="boot-text" id="bootText"></div>
+    </div>
+
+    <!-- Scan overlay -->
+    <div class="scan-overlay"></div>
+
+    <!-- Navigation -->
+    <div class="scanlines" style="padding: 12px 20px; border-bottom: 1px solid #003300;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 20px; font-size: 12px;" class="pixel-text">
+                <a href="index.html" class="nav-link">[HOME]</a>
+                <a href="gallery.html" class="nav-link">[GALLERY]</a>
+                <a href="lost-archive.html" class="nav-link">[LOST ARCHIVE]</a>
+                <span class="nav-link nav-active">[POLAROIDS]</span>
+                <a href="stream.html" class="nav-link">[STREAM]</a>
+                <a href="order.html" class="nav-link">[ORDER]</a>
+            </div>
+            <div class="pixel-text" style="font-size: 10px; color: #006600;">
+                HOLOGRAPHIC_VIEWER v2.1
+            </div>
+        </div>
+    </div>
+
+    <!-- Holographic space -->
+    <div class="holo-space" id="holoSpace">
+        <!-- Particles generated by JS -->
+        <!-- Polaroids rendered by JS -->
+        <!-- Connection lines rendered by JS -->
+    </div>
+
+    <!-- Nav arrows -->
+    <div class="nav-arrow left" id="prevBtn" onclick="navigate(-1)">&#9664;</div>
+    <div class="nav-arrow right" id="nextBtn" onclick="navigate(1)">&#9654;</div>
+
+    <!-- Info panel -->
+    <div class="info-panel" id="infoPanel">
+        <div class="title" id="polaroidTitle"></div>
+        <div class="counter" id="polaroidCounter"></div>
+    </div>
+
+    <script>
+        // =============================================
+        // POLAROID DATA - ADD YOUR IMAGES HERE
+        // =============================================
+        // status: 'green' or 'red'
+        // src: path to image file
+        // label: short text under the polaroid image
+        const polaroidData = [
+            // Example entries (uncomment and edit):
+            // { src: 'components/photo1.jpg', label: 'FRAGMENT_001', status: 'green' },
+            // { src: 'components/photo2.jpg', label: 'FRAGMENT_002', status: 'red' },
+            // { src: 'components/photo3.jpg', label: 'FRAGMENT_003', status: 'green' },
+            // { src: 'components/photo4.jpg', label: 'LOST_SIGNAL', status: 'red' },
+            // { src: 'components/photo5.jpg', label: 'ECHO_005', status: 'green' },
+        ];
+
+        // =============================================
+        // CONFIG
+        // =============================================
+        const ACTIVE_SIZE = 280;      // active polaroid width in px
+        const BG_SIZE_MIN = 100;      // min size for background polaroids
+        const BG_SIZE_MAX = 160;      // max size for background polaroids
+
+        let currentIndex = 0;
+        let polaroids = [];
+        let bgPositions = [];
+
+        // =============================================
+        // BOOT SEQUENCE
+        // =============================================
+        const bootLines = [
+            '> GHOSTLINE HOLOGRAPHIC VIEWER',
+            '> initializing projection matrix...',
+            '> loading polaroid fragments...',
+            '> mapping spatial coordinates...',
+            '> depth buffer: ACTIVE',
+            '> rendering constellation...',
+            '> READY'
+        ];
+
+        async function runBoot() {
+            const bootText = document.getElementById('bootText');
+            const bootScreen = document.getElementById('bootScreen');
+
+            for (let i = 0; i < bootLines.length; i++) {
+                const line = document.createElement('div');
+                line.textContent = bootLines[i];
+                if (i === bootLines.length - 1) {
+                    line.style.color = '#44ff44';
+                    line.style.fontWeight = 'bold';
+                }
+                bootText.appendChild(line);
+                await sleep(200 + Math.random() * 150);
+            }
+
+            await sleep(400);
+            bootScreen.classList.add('hidden');
+            setTimeout(() => bootScreen.remove(), 600);
+
+            initScene();
+        }
+
+        function sleep(ms) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        // =============================================
+        // GENERATE PARTICLES
+        // =============================================
+        function generateParticles() {
+            const space = document.getElementById('holoSpace');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = (40 + Math.random() * 60) + '%';
+                p.style.animationDelay = (Math.random() * 8) + 's';
+                p.style.animationDuration = (6 + Math.random() * 6) + 's';
+                space.appendChild(p);
+            }
+        }
+
+        // =============================================
+        // INIT SCENE
+        // =============================================
+        function initScene() {
+            generateParticles();
+
+            if (polaroidData.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Generate stable background positions
+            generateBgPositions();
+
+            // Create polaroid elements
+            createPolaroids();
+
+            // Show first slide
+            arrangeScene(0);
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+            });
+
+            // Touch/swipe support
+            let touchStartX = 0;
+            document.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+            });
+            document.addEventListener('touchend', (e) => {
+                const diff = touchStartX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) {
+                    navigate(diff > 0 ? 1 : -1);
+                }
+            });
+        }
+
+        // =============================================
+        // EMPTY STATE
+        // =============================================
+        function showEmptyState() {
+            const space = document.getElementById('holoSpace');
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('infoPanel').style.display = 'none';
+
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.innerHTML = `
+                <div class="pixel-text">NO POLAROIDS LOADED</div>
+                <div class="sub">// add images to polaroidData array</div>
+                <div class="sub" style="margin-top: 8px; color: #004400;">// { src: 'path.jpg', label: 'NAME', status: 'green' }</div>
+            `;
+            space.appendChild(empty);
+        }
+
+        // =============================================
+        // GENERATE BACKGROUND POSITIONS
+        // =============================================
+        function generateBgPositions() {
+            // Pre-calculate positions for background polaroids
+            // spread them around the edges and depths
+            const space = document.getElementById('holoSpace');
+            const w = space.offsetWidth;
+            const h = space.offsetHeight;
+            bgPositions = [];
+
+            const count = polaroidData.length;
+            for (let i = 0; i < count; i++) {
+                // Distribute around the edges, avoiding center
+                const angle = (i / count) * Math.PI * 2;
+                const radiusX = w * 0.3 + Math.random() * w * 0.15;
+                const radiusY = h * 0.25 + Math.random() * h * 0.1;
+
+                const x = w / 2 + Math.cos(angle) * radiusX;
+                const y = h / 2 + Math.sin(angle) * radiusY;
+                const size = BG_SIZE_MIN + Math.random() * (BG_SIZE_MAX - BG_SIZE_MIN);
+                const depth = 0.3 + Math.random() * 0.5; // scale factor for "distance"
+
+                bgPositions.push({ x, y, size, depth });
+            }
+        }
+
+        // =============================================
+        // CREATE POLAROID ELEMENTS
+        // =============================================
+        function createPolaroids() {
+            const space = document.getElementById('holoSpace');
+            polaroids = [];
+
+            polaroidData.forEach((data, i) => {
+                const el = document.createElement('div');
+                el.className = 'polaroid background';
+                el.dataset.index = i;
+
+                el.innerHTML = `
+                    <img class="polaroid-image" src="${data.src}" alt="${data.label}" loading="lazy" decoding="async">
+                    <div class="polaroid-label">${data.label}</div>
+                    <div class="polaroid-status ${data.status}"></div>
+                `;
+
+                el.addEventListener('click', () => {
+                    if (parseInt(el.dataset.index) !== currentIndex) {
+                        navigateTo(parseInt(el.dataset.index));
+                    }
+                });
+
+                space.appendChild(el);
+                polaroids.push(el);
+            });
+        }
+
+        // =============================================
+        // ARRANGE SCENE
+        // =============================================
+        function arrangeScene(activeIdx) {
+            const space = document.getElementById('holoSpace');
+            const w = space.offsetWidth;
+            const h = space.offsetHeight;
+
+            // Center position for active polaroid
+            const centerX = w / 2 - ACTIVE_SIZE / 2;
+            const centerY = h / 2 - (ACTIVE_SIZE + 40) / 2;
+
+            polaroids.forEach((el, i) => {
+                if (i === activeIdx) {
+                    // Active: large, centered, bright
+                    el.className = 'polaroid active';
+                    el.style.width = ACTIVE_SIZE + 'px';
+                    el.style.left = centerX + 'px';
+                    el.style.top = centerY + 'px';
+                    el.style.opacity = '1';
+                    el.style.filter = 'none';
+                    el.style.transform = 'scale(1)';
+                } else {
+                    // Background: small, scattered, dim
+                    el.className = 'polaroid background';
+
+                    // Use position shifted by the difference from active
+                    const posIdx = ((i - activeIdx + polaroidData.length) % polaroidData.length) - 1;
+                    const pos = bgPositions[posIdx >= 0 ? posIdx : polaroidData.length - 1 + posIdx];
+
+                    if (pos) {
+                        const size = pos.size * pos.depth;
+                        el.style.width = size + 'px';
+                        el.style.left = (pos.x - size / 2) + 'px';
+                        el.style.top = (pos.y - size / 2) + 'px';
+                        el.style.opacity = (0.15 + pos.depth * 0.3) + '';
+                        el.style.filter = `brightness(${0.3 + pos.depth * 0.3}) saturate(0.3)`;
+                        el.style.transform = `scale(${pos.depth})`;
+                    }
+                }
+            });
+
+            // Update info panel
+            const data = polaroidData[activeIdx];
+            document.getElementById('polaroidTitle').textContent = data.label;
+            document.getElementById('polaroidCounter').textContent =
+                (activeIdx + 1) + ' / ' + polaroidData.length;
+
+            // Draw connection lines
+            drawConnections(activeIdx);
+        }
+
+        // =============================================
+        // DRAW CONNECTION LINES
+        // =============================================
+        function drawConnections(activeIdx) {
+            // Remove old lines
+            document.querySelectorAll('.connection-line').forEach(l => l.remove());
+
+            if (polaroidData.length < 3) return;
+
+            const space = document.getElementById('holoSpace');
+
+            // Connect some background polaroids with faint lines
+            for (let i = 0; i < polaroids.length; i++) {
+                if (i === activeIdx) continue;
+                const next = (i + 1) % polaroids.length;
+                if (next === activeIdx) continue;
+
+                const el1 = polaroids[i];
+                const el2 = polaroids[next];
+
+                const x1 = parseFloat(el1.style.left) + parseFloat(el1.style.width) / 2;
+                const y1 = parseFloat(el1.style.top) + parseFloat(el1.style.width) / 2;
+                const x2 = parseFloat(el2.style.left) + parseFloat(el2.style.width) / 2;
+                const y2 = parseFloat(el2.style.top) + parseFloat(el2.style.width) / 2;
+
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+                const line = document.createElement('div');
+                line.className = 'connection-line';
+                line.style.width = dist + 'px';
+                line.style.left = x1 + 'px';
+                line.style.top = y1 + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+                line.style.transformOrigin = '0 0';
+                space.appendChild(line);
+            }
+        }
+
+        // =============================================
+        // NAVIGATION
+        // =============================================
+        function navigate(dir) {
+            if (polaroidData.length === 0) return;
+            currentIndex = (currentIndex + dir + polaroidData.length) % polaroidData.length;
+            arrangeScene(currentIndex);
+        }
+
+        function navigateTo(idx) {
+            if (idx < 0 || idx >= polaroidData.length) return;
+            currentIndex = idx;
+            arrangeScene(currentIndex);
+        }
+
+        // =============================================
+        // HANDLE RESIZE
+        // =============================================
+        window.addEventListener('resize', () => {
+            if (polaroidData.length > 0) {
+                generateBgPositions();
+                arrangeScene(currentIndex);
+            }
+        });
+
+        // =============================================
+        // START
+        // =============================================
+        runBoot();
+    </script>
+</body>
+</html>
