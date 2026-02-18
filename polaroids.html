@@ -786,7 +786,7 @@
             const w = window.innerWidth;
             const isMobile = w < 768;
             // On mobile, size polaroid to ~75% of screen width minus padding
-            ACTIVE_SIZE = isMobile ? Math.min(w * 0.55, 180) : 280;
+            ACTIVE_SIZE = isMobile ? Math.min(w * 0.48, 170) : 280;
             BG_SIZE_MIN = isMobile ? 50 : 100;
             BG_SIZE_MAX = isMobile ? 80 : 160;
         }
@@ -998,7 +998,7 @@
             // On mobile: center polaroid, text below
             const offsetX = isMobile ? 0 : -80;
             const centerX = w / 2 - ACTIVE_SIZE / 2 + offsetX;
-            const centerY = isMobile ? h * 0.28 - (ACTIVE_SIZE + 40) / 2 : h / 2 - (ACTIVE_SIZE + 40) / 2;
+            const centerY = isMobile ? h * 0.22 - (ACTIVE_SIZE + 40) / 2 : h / 2 - (ACTIVE_SIZE + 40) / 2;
 
             // Limit visible background polaroids on mobile for performance
             const maxBg = isMobile ? 3 : polaroidData.length;
@@ -1054,15 +1054,17 @@
 
             // Position info panel: side on desktop, below on mobile
             const infoPanel = document.getElementById('infoPanel');
-            const polaroidVisualW = ACTIVE_SIZE + 24;
-            const polaroidVisualH = ACTIVE_SIZE + 52;
+            const activeEl = polaroids[activeIdx];
 
             if (isMobile) {
+                // use actual rendered height of polaroid element
+                const actualH = activeEl ? activeEl.offsetHeight : (ACTIVE_SIZE + 52);
                 infoPanel.style.left = '50%';
                 infoPanel.style.transform = 'translateX(-50%)';
-                infoPanel.style.top = (centerY + polaroidVisualH + 14) + 'px';
-                infoPanel.style.maxWidth = '90vw';
+                infoPanel.style.top = (centerY + actualH + 16) + 'px';
+                infoPanel.style.maxWidth = '85vw';
             } else {
+                const polaroidVisualW = ACTIVE_SIZE + 24;
                 const rightEdge = centerX + polaroidVisualW + 20;
                 infoPanel.style.left = rightEdge + 'px';
                 infoPanel.style.transform = 'none';
