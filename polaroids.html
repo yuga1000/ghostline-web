@@ -314,27 +314,26 @@
         /* === BUY PANEL === */
         .buy-btn {
             position: absolute;
-            top: 12px;
-            right: 14px;
+            top: 10px;
+            right: 12px;
             z-index: 110;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #00ff00;
-            color: #00ff00;
+            background: transparent;
+            border: none;
+            color: rgba(0, 255, 0, 0.5);
             font-family: 'Share Tech Mono', monospace;
-            font-size: 9px;
-            padding: 3px 8px;
+            font-size: 8px;
+            padding: 2px 4px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: color 0.3s;
+            letter-spacing: 1px;
         }
 
         .buy-btn:hover {
-            background: #00ff00;
-            color: #000;
+            color: #00ff00;
         }
 
         .buy-btn.sold {
-            border-color: #ff0040;
-            color: #ff0040;
+            color: rgba(255, 0, 64, 0.5);
             cursor: default;
         }
 
@@ -570,31 +569,40 @@
         @media (max-width: 768px) {
             .holo-space {
                 height: calc(100vh - 80px);
+                perspective: none;
             }
 
+            .holo-space::before { display: none; }
+
             .polaroid {
-                transition: left 0.3s ease, top 0.3s ease, width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+                transition: left 0.2s ease, top 0.2s ease, width 0.2s ease, opacity 0.2s ease;
+                will-change: auto;
             }
 
             .polaroid.background {
-                filter: none !important;
-                opacity: 0.2 !important;
+                display: none !important;
             }
 
+            .polaroid.active::after { display: none; }
+
+            .particle { display: none !important; }
             .connection-line { display: none !important; }
+            .scan-overlay { display: none; }
+
+            .polaroid-label { display: none; }
 
             .nav-arrow {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
             }
 
-            .nav-arrow.left { left: 4px; }
-            .nav-arrow.right { right: 4px; }
+            .nav-arrow.left { left: 8px; }
+            .nav-arrow.right { right: 8px; }
 
             .info-panel {
                 text-align: center;
-                max-width: 90vw;
+                max-width: 85vw;
             }
 
             .info-panel .title { font-size: 11px; }
@@ -616,8 +624,7 @@
             .crypto-tabs { flex-wrap: wrap; }
             .crypto-tab { font-size: 10px; padding: 5px; }
 
-            .polaroid-label { font-size: 7px; }
-            .buy-btn { font-size: 8px; padding: 2px 6px; }
+            .buy-btn { font-size: 7px; padding: 2px 5px; }
         }
     </style>
 </head>
@@ -675,6 +682,7 @@
                 <h3>ACQUIRE POLAROID</h3>
                 <div id="buyItemName" style="font-size: 12px; color: #44ff44; margin-bottom: 4px;"></div>
                 <div class="buy-price-tag" id="buyPrice"></div>
+                <div style="font-size: 9px; color: #006600; text-align: center; margin: 4px 0 8px;">WORLDWIDE SHIPPING INCLUDED // ENVELOPE MAIL 5-14 DAYS</div>
 
                 <label>PAYMENT METHOD</label>
                 <div class="crypto-tabs">
@@ -726,8 +734,10 @@
         let BG_SIZE_MAX = 160;
 
         function updateSizes() {
-            const isMobile = window.innerWidth < 768;
-            ACTIVE_SIZE = isMobile ? 180 : 280;
+            const w = window.innerWidth;
+            const isMobile = w < 768;
+            // On mobile, size polaroid to ~75% of screen width minus padding
+            ACTIVE_SIZE = isMobile ? Math.min(w * 0.7, 220) : 280;
             BG_SIZE_MIN = isMobile ? 50 : 100;
             BG_SIZE_MAX = isMobile ? 80 : 160;
         }
