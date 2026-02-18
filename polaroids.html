@@ -889,20 +889,60 @@
                 if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
             });
 
-            // Touch/swipe support
+            // Touch/swipe with drag feedback
             let touchStartX = 0;
             let touchStartY = 0;
+            let touchDragging = false;
+            let touchLocked = false; // locked to horizontal once determined
+
             document.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
+                touchDragging = false;
+                touchLocked = false;
+                // disable transition during drag for instant response
+                const active = document.querySelector('.polaroid.active');
+                if (active) active.style.transition = 'none';
             }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                const dx = e.touches[0].clientX - touchStartX;
+                const dy = e.touches[0].clientY - touchStartY;
+
+                // determine direction lock after 10px movement
+                if (!touchLocked && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+                    touchLocked = true;
+                    touchDragging = Math.abs(dx) > Math.abs(dy); // horizontal = drag
+                }
+
+                if (touchDragging) {
+                    e.preventDefault(); // prevent vertical scroll during swipe
+                    const active = document.querySelector('.polaroid.active');
+                    if (active) {
+                        const clamp = Math.max(-120, Math.min(120, dx));
+                        const rot = clamp * 0.05;
+                        const opa = 1 - Math.abs(clamp) / 300;
+                        active.style.transform = `translateX(${clamp}px) rotate(${rot}deg)`;
+                        active.style.opacity = opa;
+                    }
+                }
+            }, { passive: false });
+
             document.addEventListener('touchend', (e) => {
                 const dx = touchStartX - e.changedTouches[0].clientX;
-                const dy = touchStartY - e.changedTouches[0].clientY;
-                // Only swipe if horizontal movement is dominant
-                if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
+                const active = document.querySelector('.polaroid.active');
+
+                if (touchDragging && Math.abs(dx) > 50) {
+                    // swipe threshold met — navigate
                     navigate(dx > 0 ? 1 : -1);
+                } else if (active) {
+                    // snap back
+                    active.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+                    active.style.transform = 'scale(1)';
+                    active.style.opacity = '1';
                 }
+                touchDragging = false;
+                touchLocked = false;
             }, { passive: true });
         }
 
@@ -957,6 +997,7 @@
         // =============================================
         function createPolaroids() {
             const space = document.getElementById('holoSpace');
+            const isMob = window.innerWidth < 768;
             polaroids = [];
 
             polaroidData.forEach((data, i) => {
@@ -965,8 +1006,10 @@
                 el.dataset.index = i;
 
                 const isSold = data.status === 'red';
+                // on mobile: defer image src, load only nearby ones later
+                const imgSrc = isMob ? '' : data.src;
                 el.innerHTML = `
-                    <img class="polaroid-image" src="${data.src}" alt="${data.label}" loading="lazy" decoding="async">
+                    <img class="polaroid-image" ${imgSrc ? `src="${imgSrc}"` : ''} data-src="${data.src}" alt="${data.label}" decoding="async">
                     <div class="polaroid-label">${data.label}</div>
                     <div class="polaroid-status ${data.status}"></div>
                     ${data.price && !isSold ? `<button class="buy-btn" onclick="event.stopPropagation(); openBuy(${i})">BUY</button>` : ''}
@@ -982,6 +1025,18 @@
                 space.appendChild(el);
                 polaroids.push(el);
             });
+        }
+
+        // load images for current + neighbors only (mobile optimization)
+        function preloadNearby(idx) {
+            const range = 2; // preload 2 ahead and behind
+            for (let offset = -range; offset <= range; offset++) {
+                const j = (idx + offset + polaroidData.length) % polaroidData.length;
+                const img = polaroids[j]?.querySelector('.polaroid-image');
+                if (img && !img.src && img.dataset.src) {
+                    img.src = img.dataset.src;
+                }
+            }
         }
 
         // =============================================
@@ -1005,6 +1060,8 @@
             let bgCount = 0;
 
             polaroids.forEach((el, i) => {
+                // restore CSS transition (drag disables it)
+                el.style.transition = '';
                 if (i === activeIdx) {
                     el.className = 'polaroid active';
                     el.style.width = ACTIVE_SIZE + 'px';
@@ -1014,6 +1071,7 @@
                     el.style.filter = 'none';
                     el.style.transform = 'scale(1)';
                     el.style.display = 'block';
+                    el.style.pointerEvents = '';
                 } else {
                     if (isMobile) {
                         // crossfade: keep in DOM at same position, just invisible
@@ -1050,6 +1108,9 @@
                     }
                 }
             });
+
+            // preload nearby images (mobile lazy loading)
+            if (isMobile) preloadNearby(activeIdx);
 
             // Update info panel
             const data = polaroidData[activeIdx];
