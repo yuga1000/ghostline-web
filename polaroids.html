@@ -1058,12 +1058,39 @@
         // =============================================
         const WALLETS = {
             USDT: 'TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU',
-            ETH: '0x2451A14572F67C587eEfca42C1F4C414FA2ca6a',
+            ETH: '0xa51016d30eb205b93539aa46bdc8e4411b133ae4',
             BTC: '1LwghpsSDNYoXPKmmX1rdTSq4DAP3UhqUH'
         };
 
+        // Crypto prices (USD)
+        let cryptoPrices = { ETH: 0, BTC: 0 };
+
+        async function fetchCryptoPrices() {
+            try {
+                const resp = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=usd');
+                const data = await resp.json();
+                cryptoPrices.ETH = data.ethereum?.usd || 0;
+                cryptoPrices.BTC = data.bitcoin?.usd || 0;
+            } catch (e) {
+                console.error('Price fetch error:', e);
+            }
+        }
+        fetchCryptoPrices();
+
         let selectedCrypto = 'USDT';
         let buyingIndex = -1;
+
+        function updatePriceDisplay(priceUSD, crypto) {
+            const priceEl = document.getElementById('buyPrice');
+            if (crypto === 'USDT') {
+                priceEl.textContent = '$' + priceUSD;
+            } else if (cryptoPrices[crypto] > 0) {
+                const converted = (priceUSD / cryptoPrices[crypto]).toFixed(crypto === 'BTC' ? 6 : 4);
+                priceEl.innerHTML = '$' + priceUSD + '<br><span style="font-size:11px; opacity:0.7;">\u2248 ' + converted + ' ' + crypto + '</span>';
+            } else {
+                priceEl.textContent = '$' + priceUSD;
+            }
+        }
 
         function openBuy(index) {
             const item = polaroidData[index];
@@ -1071,7 +1098,6 @@
 
             buyingIndex = index;
             document.getElementById('buyItemName').textContent = item.label;
-            document.getElementById('buyPrice').textContent = '$' + item.price;
             document.getElementById('buyForm').style.display = 'block';
             document.getElementById('buySuccess').style.display = 'none';
             document.getElementById('buyEmail').value = '';
@@ -1090,6 +1116,14 @@
             document.querySelectorAll('.crypto-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             document.getElementById('walletAddr').textContent = WALLETS[crypto];
+
+            // Update price with conversion
+            if (buyingIndex >= 0) {
+                const item = polaroidData[buyingIndex];
+                if (item && item.price) {
+                    updatePriceDisplay(item.price, crypto);
+                }
+            }
         }
 
         function copyWallet() {
