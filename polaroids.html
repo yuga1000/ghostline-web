@@ -596,7 +596,7 @@
         }
 
         .stats-bar .stat-green { color: #00ff00; }
-        .stats-bar .stat-red { color: #ff0040; }
+        .stats-bar .stat-blue { color: #000BFF; }
 
         /* === MOBILE === */
         @media (max-width: 768px) {
@@ -862,7 +862,7 @@
             document.getElementById('statsBar').innerHTML =
                 'TOTAL: ' + total +
                 ' // <span class="stat-green">AVAILABLE: ' + available + '</span>' +
-                ' // <span class="stat-red">SOLD: ' + sold + '</span>';
+                ' // <span class="stat-blue">SOLD: ' + sold + '</span>';
         }
 
         function initScene() {
@@ -1072,15 +1072,14 @@
                 infoPanel.style.maxWidth = '280px';
             }
 
-            // Draw connection lines (skip on mobile)
+            // Draw connection lines + CV boxes (skip entirely on mobile)
             if (!isMobile) {
                 drawConnections(activeIdx);
+                updateCvBoxes(activeIdx);
             } else {
-                document.querySelectorAll('.connection-line').forEach(l => l.remove());
+                // clear CV interval on mobile
+                if (cvInterval) { clearInterval(cvInterval); cvInterval = null; }
             }
-
-            // CV detection boxes on active polaroid
-            updateCvBoxes(activeIdx);
         }
 
         let cvInterval = null;
@@ -1168,6 +1167,13 @@
             if (!text) return;
 
             const fullText = '[ ' + text + ' ]';
+
+            // on mobile: instant text, no animation
+            if (window.innerWidth < 768) {
+                el.innerHTML = fullText;
+                return;
+            }
+
             let i = 0;
             typewriterTimer = setInterval(() => {
                 el.innerHTML = fullText.substring(0, i + 1) + '<span class="blink-cursor">&#9608;</span>';
@@ -1182,10 +1188,14 @@
         // =============================================
         // NAVIGATION
         // =============================================
+        let navLock = false;
         function navigate(dir) {
-            if (polaroidData.length === 0) return;
+            if (polaroidData.length === 0 || navLock) return;
+            navLock = true;
             currentIndex = (currentIndex + dir + polaroidData.length) % polaroidData.length;
             arrangeScene(currentIndex);
+            // debounce: unlock after transition
+            setTimeout(() => { navLock = false; }, window.innerWidth < 768 ? 250 : 100);
         }
 
         function navigateTo(idx) {
