@@ -1056,19 +1056,22 @@
             const infoPanel = document.getElementById('infoPanel');
             const activeEl = polaroids[activeIdx];
 
+            // info panel is OUTSIDE holoSpace, so offset by holoSpace position
+            const spaceTop = space.offsetTop;
+
             if (isMobile) {
                 // use actual rendered height of polaroid element
                 const actualH = activeEl ? activeEl.offsetHeight : (ACTIVE_SIZE + 52);
                 infoPanel.style.left = '50%';
                 infoPanel.style.transform = 'translateX(-50%)';
-                infoPanel.style.top = (centerY + actualH + 16) + 'px';
+                infoPanel.style.top = (spaceTop + centerY + actualH + 14) + 'px';
                 infoPanel.style.maxWidth = '85vw';
             } else {
                 const polaroidVisualW = ACTIVE_SIZE + 24;
                 const rightEdge = centerX + polaroidVisualW + 20;
                 infoPanel.style.left = rightEdge + 'px';
                 infoPanel.style.transform = 'none';
-                infoPanel.style.top = centerY + 'px';
+                infoPanel.style.top = (spaceTop + centerY) + 'px';
                 infoPanel.style.maxWidth = '280px';
             }
 
