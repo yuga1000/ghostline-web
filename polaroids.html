@@ -6,6 +6,10 @@
     <title>GHOSTLINE - Polaroids</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        emailjs.init("1JlW1oH_5J37ZtpDV");
+    </script>
     <style>
         body {
             background: #000000 !important;
@@ -316,6 +320,199 @@
             letter-spacing: 1px;
         }
 
+        /* === BUY PANEL === */
+        .buy-btn {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            z-index: 110;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            padding: 3px 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .buy-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .buy-btn.sold {
+            border-color: #ff0040;
+            color: #ff0040;
+            cursor: default;
+        }
+
+        .buy-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .buy-overlay.active {
+            display: flex;
+        }
+
+        .buy-panel {
+            background: #000;
+            border: 2px solid #00ff00;
+            padding: 24px;
+            max-width: 440px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .buy-panel h3 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            color: #00ff00;
+            margin-bottom: 16px;
+        }
+
+        .buy-panel label {
+            font-size: 11px;
+            color: #00ff00;
+            display: block;
+            margin-bottom: 4px;
+            margin-top: 12px;
+        }
+
+        .buy-panel input {
+            width: 100%;
+            background: #000;
+            border: 1px solid #003300;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            padding: 6px 8px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .buy-panel input:focus {
+            border-color: #00ff00;
+        }
+
+        .crypto-tabs {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .crypto-tab {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #003300;
+            background: #000;
+            color: #006600;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .crypto-tab.active {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .wallet-display {
+            background: #001100;
+            border: 1px solid #003300;
+            padding: 8px;
+            margin: 8px 0;
+            font-size: 10px;
+            color: #00ff00;
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wallet-display .copy-btn {
+            background: none;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            padding: 2px 6px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .wallet-display .copy-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .buy-submit {
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px;
+            background: #000;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .buy-submit:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .buy-close {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: none;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            width: 24px; height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .buy-close:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .buy-success {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .buy-success .order-id {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: #44ff44;
+            margin: 12px 0;
+        }
+
+        .buy-price-tag {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            color: #00ff00;
+            text-align: center;
+            margin: 8px 0;
+        }
+
         /* Scan overlay */
         .scan-overlay {
             position: fixed;
@@ -422,6 +619,47 @@
         <div class="title" id="polaroidTitle"></div>
         <div class="description" id="polaroidDesc"></div>
         <div class="counter" id="polaroidCounter"></div>
+    </div>
+
+    <!-- Buy overlay -->
+    <div class="buy-overlay" id="buyOverlay">
+        <div class="buy-panel" id="buyPanel">
+            <button class="buy-close" onclick="closeBuy()">&times;</button>
+            <div id="buyForm">
+                <h3>ACQUIRE POLAROID</h3>
+                <div id="buyItemName" style="font-size: 12px; color: #44ff44; margin-bottom: 4px;"></div>
+                <div class="buy-price-tag" id="buyPrice"></div>
+
+                <label>PAYMENT METHOD</label>
+                <div class="crypto-tabs">
+                    <div class="crypto-tab active" onclick="selectCrypto('USDT', this)">USDT (TRC-20)</div>
+                    <div class="crypto-tab" onclick="selectCrypto('ETH', this)">ETH</div>
+                    <div class="crypto-tab" onclick="selectCrypto('BTC', this)">BTC</div>
+                </div>
+
+                <label>WALLET ADDRESS</label>
+                <div class="wallet-display">
+                    <span id="walletAddr">TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</span>
+                    <button class="copy-btn" onclick="copyWallet()">COPY</button>
+                </div>
+
+                <label>YOUR EMAIL</label>
+                <input type="email" id="buyEmail" placeholder="your@email.com">
+
+                <label>TX HASH (after payment)</label>
+                <input type="text" id="buyTxHash" placeholder="Transaction hash...">
+
+                <button class="buy-submit" onclick="submitPurchase()">CONFIRM PURCHASE</button>
+            </div>
+            <div id="buySuccess" class="buy-success" style="display:none;">
+                <div style="font-size: 11px; color: #00ff00;">ORDER CONFIRMED</div>
+                <div class="order-id" id="buyOrderId"></div>
+                <div style="font-size: 11px; color: #006600; margin-top: 12px;">
+                    Notification sent. We will ship your polaroid within 1-5 business days.
+                </div>
+                <button class="buy-submit" style="margin-top: 16px;" onclick="closeBuy()">CLOSE</button>
+            </div>
+        </div>
     </div>
 
     <!-- Supabase -->
@@ -597,11 +835,14 @@
                 el.className = 'polaroid background';
                 el.dataset.index = i;
 
+                const isSold = data.status === 'red';
                 el.innerHTML = `
                     <img class="polaroid-image" src="${data.src}" alt="${data.label}" loading="lazy" decoding="async">
                     <div class="polaroid-label">${data.label}</div>
                     ${data.price ? `<div class="polaroid-price">$${data.price}</div>` : ''}
                     <div class="polaroid-status ${data.status}"></div>
+                    ${data.price && !isSold ? `<button class="buy-btn" onclick="event.stopPropagation(); openBuy(${i})">BUY</button>` : ''}
+                    ${isSold ? `<div class="buy-btn sold">SOLD</div>` : ''}
                 `;
 
                 el.addEventListener('click', () => {
@@ -766,6 +1007,143 @@
                 generateBgPositions();
                 arrangeScene(currentIndex);
             }
+        });
+
+        // =============================================
+        // PAYMENT SYSTEM
+        // =============================================
+        const WALLETS = {
+            USDT: 'TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU',
+            ETH: '0x2451A14572F67C587eEfca42C1F4C414FA2ca6a',
+            BTC: '1LwghpsSDNYoXPKmmX1rdTSq4DAP3UhqUH'
+        };
+
+        let selectedCrypto = 'USDT';
+        let buyingIndex = -1;
+
+        function openBuy(index) {
+            const item = polaroidData[index];
+            if (!item || !item.price || item.status === 'red') return;
+
+            buyingIndex = index;
+            document.getElementById('buyItemName').textContent = item.label;
+            document.getElementById('buyPrice').textContent = '$' + item.price;
+            document.getElementById('buyForm').style.display = 'block';
+            document.getElementById('buySuccess').style.display = 'none';
+            document.getElementById('buyEmail').value = '';
+            document.getElementById('buyTxHash').value = '';
+            selectCrypto('USDT', document.querySelector('.crypto-tab'));
+            document.getElementById('buyOverlay').classList.add('active');
+        }
+
+        function closeBuy() {
+            document.getElementById('buyOverlay').classList.remove('active');
+            buyingIndex = -1;
+        }
+
+        function selectCrypto(crypto, el) {
+            selectedCrypto = crypto;
+            document.querySelectorAll('.crypto-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('walletAddr').textContent = WALLETS[crypto];
+        }
+
+        function copyWallet() {
+            const addr = document.getElementById('walletAddr').textContent;
+            navigator.clipboard.writeText(addr).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'COPIED';
+                setTimeout(() => btn.textContent = 'COPY', 1500);
+            });
+        }
+
+        async function submitPurchase() {
+            const email = document.getElementById('buyEmail').value.trim();
+            const txHash = document.getElementById('buyTxHash').value.trim();
+            const item = polaroidData[buyingIndex];
+
+            if (!email) { alert('Please enter your email'); return; }
+            if (!txHash) { alert('Please enter the transaction hash'); return; }
+            if (!item) return;
+
+            const orderId = 'PL-' + Date.now().toString(36).toUpperCase();
+
+            // Send email via EmailJS
+            try {
+                await emailjs.send('service_1ni4wkp', 'template_5vvlo2b', {
+                    order_id: orderId,
+                    timestamp: new Date().toISOString(),
+                    size: '8.8x10.7 cm (Polaroid)',
+                    custom_width: 'N/A',
+                    custom_height: 'N/A',
+                    vibes: item.label,
+                    format: 'Polaroid Print',
+                    total_price: '$' + item.price + ' ' + selectedCrypto,
+                    customer_email: email,
+                    tx_hash: txHash
+                });
+            } catch (e) {
+                console.error('Email error:', e);
+            }
+
+            // Send to Google Sheets
+            try {
+                await fetch('https://script.google.com/macros/s/AKfycbymDrsIlwgHzC_nkEO2KDqzGB-0w-6EbbyMnOS4FqAsgUF1VQ0B8Zs7GqkoWsE8JDtJiw/exec', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        timestamp: new Date().toISOString(),
+                        size: '8.8x10.7 cm (Polaroid)',
+                        customWidth: '',
+                        customHeight: '',
+                        vibes: item.label,
+                        format: 'Polaroid Print',
+                        totalPrice: '$' + item.price + ' ' + selectedCrypto,
+                        email: email,
+                        txHash: txHash,
+                        status: 'Pending'
+                    })
+                });
+            } catch (e) {
+                console.error('Sheets error:', e);
+            }
+
+            // Update status to sold in Supabase
+            try {
+                if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY && item.id) {
+                    const client = window.supabase.createClient(
+                        window.SUPABASE_URL,
+                        window.SUPABASE_ANON_KEY
+                    );
+                    await client
+                        .from('images')
+                        .update({ status: 'sold' })
+                        .eq('id', item.id);
+
+                    // Update local data
+                    item.status = 'red';
+                    // Rebuild polaroids to reflect sold status
+                    document.querySelectorAll('.polaroid').forEach(p => p.remove());
+                    document.querySelectorAll('.connection-line').forEach(l => l.remove());
+                    polaroids = [];
+                    createPolaroids();
+                    arrangeScene(currentIndex);
+                }
+            } catch (e) {
+                console.error('Status update error:', e);
+            }
+
+            // Show success
+            document.getElementById('buyForm').style.display = 'none';
+            document.getElementById('buySuccess').style.display = 'block';
+            document.getElementById('buyOrderId').textContent = orderId;
+        }
+
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && buyingIndex >= 0) closeBuy();
         });
 
         // =============================================
