@@ -54,3 +54,4 @@ temp/
 # Backup files
 *.bak
 *.backuptemp-lost/
+temp-lost/

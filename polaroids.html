@@ -998,7 +998,7 @@
             // On mobile: center polaroid, text below
             const offsetX = isMobile ? 0 : -80;
             const centerX = w / 2 - ACTIVE_SIZE / 2 + offsetX;
-            const centerY = isMobile ? h * 0.22 - (ACTIVE_SIZE + 40) / 2 : h / 2 - (ACTIVE_SIZE + 40) / 2;
+            const centerY = isMobile ? 20 : h / 2 - (ACTIVE_SIZE + 40) / 2;
 
             // Limit visible background polaroids on mobile for performance
             const maxBg = isMobile ? 3 : polaroidData.length;
