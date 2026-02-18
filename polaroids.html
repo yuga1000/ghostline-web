@@ -608,12 +608,12 @@
             .holo-space::before { display: none; }
 
             .polaroid {
-                transition: opacity 0.15s ease;
-                will-change: opacity;
+                transition: opacity 0.25s ease, transform 0.25s ease;
+                will-change: opacity, transform;
             }
 
             .polaroid.background {
-                display: none !important;
+                pointer-events: none;
             }
 
             .cv-box { display: none !important; }
@@ -998,7 +998,7 @@
             // On mobile: center polaroid, text below
             const offsetX = isMobile ? 0 : -80;
             const centerX = w / 2 - ACTIVE_SIZE / 2 + offsetX;
-            const centerY = isMobile ? 20 : h / 2 - (ACTIVE_SIZE + 40) / 2;
+            const centerY = isMobile ? 60 : h / 2 - (ACTIVE_SIZE + 40) / 2;
 
             // No background polaroids on mobile — only active one for performance
             const maxBg = isMobile ? 0 : polaroidData.length;
@@ -1016,7 +1016,16 @@
                     el.style.display = 'block';
                 } else {
                     if (isMobile) {
-                        el.style.display = 'none';
+                        // crossfade: keep in DOM at same position, just invisible
+                        el.className = 'polaroid background';
+                        el.style.width = ACTIVE_SIZE + 'px';
+                        el.style.left = centerX + 'px';
+                        el.style.top = centerY + 'px';
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.92)';
+                        el.style.filter = 'none';
+                        el.style.display = 'block';
+                        el.style.pointerEvents = 'none';
                         return;
                     }
                     if (bgCount >= maxBg) {

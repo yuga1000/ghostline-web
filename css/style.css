@@ -593,11 +593,12 @@
         }
         
         .console-button {
-            padding: 16px 32px;
-            font-size: 16px;
-            margin-bottom: 16px;
-            min-height: 50px;
+            padding: 10px 16px;
+            font-size: 13px;
+            margin-bottom: 0;
+            min-height: auto;
             touch-action: manipulation;
+            width: auto;
         }
         
         .enlarged-logo {
@@ -677,9 +678,9 @@
         }
         
         .console-button {
-            padding: 10px 16px;
-            font-size: 13px;
-            width: 100%;
+            padding: 8px 12px;
+            font-size: 11px;
+            width: auto;
             max-width: none;
             text-align: center;
         }
