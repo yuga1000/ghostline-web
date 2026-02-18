@@ -103,7 +103,8 @@
             background: #f5f5f0;
             padding: 12px 12px 40px 12px;
             cursor: pointer;
-            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: left 0.5s ease, top 0.5s ease, width 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
+            will-change: left, top, width, opacity, transform;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
             user-select: none;
         }
@@ -221,53 +222,61 @@
         .nav-arrow.left { left: 20px; }
         .nav-arrow.right { right: 20px; }
 
-        /* === INFO PANEL (under active polaroid) === */
+        /* === INFO PANEL (side of polaroid) === */
         .info-panel {
             position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
             z-index: 200;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.75);
-            border: 1px solid rgba(0, 255, 0, 0.2);
-            padding: 8px 16px;
-            max-width: 320px;
-            width: max-content;
-        }
-
-        .info-panel .counter {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 10px;
-            color: #00ff00;
+            text-align: left;
+            max-width: 280px;
         }
 
         .info-panel .title {
             font-family: 'Share Tech Mono', monospace;
-            font-size: 14px;
+            font-size: 13px;
             color: #00ff00;
-            opacity: 0.7;
+            opacity: 0.8;
+            line-height: 1.4;
         }
 
         .info-panel .description {
             font-family: 'Share Tech Mono', monospace;
-            font-size: 13px;
+            font-size: 12px;
             color: #00ff00;
-            opacity: 0.8;
+            opacity: 0.7;
             font-weight: bold;
-            margin-top: 4px;
-            min-height: 18px;
-            text-shadow: 0 0 4px rgba(0, 255, 0, 0.4);
+            margin-top: 6px;
+            min-height: 16px;
+            text-shadow: 0 0 4px rgba(0, 255, 0, 0.3);
+            line-height: 1.4;
         }
 
-        .counter-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+        .info-panel .info-price {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            color: #00ff00;
+            margin-top: 8px;
+        }
+
+        .info-panel .counter {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            color: #00ff00;
+            opacity: 0.5;
             margin-top: 6px;
         }
 
-        .counter-row input {
+        /* Number input - bottom right */
+        .num-input-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .num-input-panel input {
             width: 40px;
             background: rgba(0, 0, 0, 0.9);
             border: 1px solid #00ff00;
@@ -275,21 +284,21 @@
             font-family: 'Share Tech Mono', monospace;
             font-size: 12px;
             text-align: center;
-            padding: 2px;
+            padding: 3px;
             outline: none;
         }
 
-        .counter-row button {
+        .num-input-panel button {
             background: rgba(0, 0, 0, 0.9);
             border: 1px solid #00ff00;
             color: #00ff00;
             font-family: 'Share Tech Mono', monospace;
             font-size: 9px;
-            padding: 2px 6px;
+            padding: 3px 8px;
             cursor: pointer;
         }
 
-        .counter-row button:hover {
+        .num-input-panel button:hover {
             background: #00ff00;
             color: #000;
         }
@@ -300,18 +309,6 @@
 
         @keyframes blink {
             50% { opacity: 0; }
-        }
-
-        /* Price tag */
-        .polaroid-price {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            color: #333;
-            letter-spacing: 1px;
         }
 
         /* === BUY PANEL === */
@@ -570,30 +567,48 @@
         }
 
         /* === MOBILE === */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .holo-space {
                 height: calc(100vh - 80px);
             }
 
+            .polaroid {
+                transition: left 0.3s ease, top 0.3s ease, width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+            }
+
+            .polaroid.background {
+                filter: none !important;
+                opacity: 0.2 !important;
+            }
+
+            .connection-line { display: none !important; }
+
             .nav-arrow {
-                width: 24px;
-                height: 24px;
+                width: 28px;
+                height: 28px;
                 font-size: 12px;
             }
 
-            .nav-arrow.left { left: 6px; }
-            .nav-arrow.right { right: 6px; }
+            .nav-arrow.left { left: 4px; }
+            .nav-arrow.right { right: 4px; }
 
             .info-panel {
-                max-width: 240px;
-                padding: 6px 10px;
+                text-align: center;
+                max-width: 90vw;
             }
 
-            .info-panel .title { font-size: 12px; }
-            .info-panel .description { font-size: 11px; }
-            .info-panel .counter { font-size: 8px; }
-            .counter-row input { width: 32px; font-size: 10px; }
-            .counter-row button { font-size: 8px; }
+            .info-panel .title { font-size: 11px; }
+            .info-panel .description { font-size: 10px; }
+            .info-panel .info-price { font-size: 10px; }
+            .info-panel .counter { font-size: 7px; }
+
+            .num-input-panel {
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .num-input-panel input { width: 32px; font-size: 10px; }
+            .num-input-panel button { font-size: 8px; }
 
             .buy-panel { padding: 16px; }
             .buy-panel h3 { font-size: 9px; }
@@ -602,7 +617,6 @@
             .crypto-tab { font-size: 10px; padding: 5px; }
 
             .polaroid-label { font-size: 7px; }
-            .polaroid-price { font-size: 8px; }
             .buy-btn { font-size: 8px; padding: 2px 6px; }
         }
     </style>
@@ -639,15 +653,18 @@
     <div class="nav-arrow left" id="prevBtn" onclick="navigate(-1)">&#9664;</div>
     <div class="nav-arrow right" id="nextBtn" onclick="navigate(1)">&#9654;</div>
 
-    <!-- Info panel (under active polaroid) -->
+    <!-- Info panel (side of polaroid) -->
     <div class="info-panel" id="infoPanel">
         <div class="title" id="polaroidTitle"></div>
         <div class="description" id="polaroidDesc"></div>
-        <div class="counter-row">
-            <div class="counter" id="polaroidCounter"></div>
-            <input type="number" id="jumpNumber" min="1" placeholder="#" onkeypress="if(event.key==='Enter')jumpTo()">
-            <button onclick="jumpTo()">GO</button>
-        </div>
+        <div class="info-price" id="polaroidInfoPrice"></div>
+        <div class="counter" id="polaroidCounter"></div>
+    </div>
+
+    <!-- Number input -->
+    <div class="num-input-panel" id="numInput">
+        <input type="number" id="jumpNumber" min="1" placeholder="#" onkeypress="if(event.key==='Enter')jumpTo()">
+        <button onclick="jumpTo()">GO</button>
     </div>
 
     <!-- Buy overlay -->
@@ -709,10 +726,10 @@
         let BG_SIZE_MAX = 160;
 
         function updateSizes() {
-            const isMobile = window.innerWidth < 640;
-            ACTIVE_SIZE = isMobile ? 200 : 280;
-            BG_SIZE_MIN = isMobile ? 60 : 100;
-            BG_SIZE_MAX = isMobile ? 100 : 160;
+            const isMobile = window.innerWidth < 768;
+            ACTIVE_SIZE = isMobile ? 180 : 280;
+            BG_SIZE_MIN = isMobile ? 50 : 100;
+            BG_SIZE_MAX = isMobile ? 80 : 160;
         }
         updateSizes();
 
@@ -764,7 +781,8 @@
         // =============================================
         function generateParticles() {
             const space = document.getElementById('holoSpace');
-            for (let i = 0; i < 30; i++) {
+            const count = window.innerWidth < 768 ? 8 : 30;
+            for (let i = 0; i < count; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
                 p.style.left = Math.random() * 100 + '%';
@@ -803,15 +821,19 @@
 
             // Touch/swipe support
             let touchStartX = 0;
+            let touchStartY = 0;
             document.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
-            });
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
             document.addEventListener('touchend', (e) => {
-                const diff = touchStartX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 50) {
-                    navigate(diff > 0 ? 1 : -1);
+                const dx = touchStartX - e.changedTouches[0].clientX;
+                const dy = touchStartY - e.changedTouches[0].clientY;
+                // Only swipe if horizontal movement is dominant
+                if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
+                    navigate(dx > 0 ? 1 : -1);
                 }
-            });
+            }, { passive: true });
         }
 
         // =============================================
@@ -876,7 +898,6 @@
                 el.innerHTML = `
                     <img class="polaroid-image" src="${data.src}" alt="${data.label}" loading="lazy" decoding="async">
                     <div class="polaroid-label">${data.label}</div>
-                    ${data.price ? `<div class="polaroid-price">$${data.price}</div>` : ''}
                     <div class="polaroid-status ${data.status}"></div>
                     ${data.price && !isSold ? `<button class="buy-btn" onclick="event.stopPropagation(); openBuy(${i})">BUY</button>` : ''}
                     ${isSold ? `<div class="buy-btn sold">SOLD</div>` : ''}
@@ -901,13 +922,20 @@
             const w = space.offsetWidth;
             const h = space.offsetHeight;
 
-            // Center position for active polaroid
-            const centerX = w / 2 - ACTIVE_SIZE / 2;
+            const isMobile = window.innerWidth < 768;
+
+            // On desktop: shift polaroid left to make room for side text
+            // On mobile: center polaroid, text below
+            const offsetX = isMobile ? 0 : -80;
+            const centerX = w / 2 - ACTIVE_SIZE / 2 + offsetX;
             const centerY = h / 2 - (ACTIVE_SIZE + 40) / 2;
+
+            // Limit visible background polaroids on mobile for performance
+            const maxBg = isMobile ? 4 : polaroidData.length;
+            let bgCount = 0;
 
             polaroids.forEach((el, i) => {
                 if (i === activeIdx) {
-                    // Active: large, centered, bright
                     el.className = 'polaroid active';
                     el.style.width = ACTIVE_SIZE + 'px';
                     el.style.left = centerX + 'px';
@@ -915,11 +943,16 @@
                     el.style.opacity = '1';
                     el.style.filter = 'none';
                     el.style.transform = 'scale(1)';
+                    el.style.display = 'block';
                 } else {
-                    // Background: small, scattered, dim
+                    if (bgCount >= maxBg) {
+                        el.style.display = 'none';
+                        return;
+                    }
+                    bgCount++;
                     el.className = 'polaroid background';
+                    el.style.display = 'block';
 
-                    // Use position shifted by the difference from active
                     const posIdx = ((i - activeIdx + polaroidData.length) % polaroidData.length) - 1;
                     const pos = bgPositions[posIdx >= 0 ? posIdx : polaroidData.length - 1 + posIdx];
 
@@ -929,7 +962,9 @@
                         el.style.left = (pos.x - size / 2) + 'px';
                         el.style.top = (pos.y - size / 2) + 'px';
                         el.style.opacity = (0.15 + pos.depth * 0.3) + '';
-                        el.style.filter = `brightness(${0.3 + pos.depth * 0.3}) saturate(0.3)`;
+                        if (!isMobile) {
+                            el.style.filter = `brightness(${0.3 + pos.depth * 0.3}) saturate(0.3)`;
+                        }
                         el.style.transform = `scale(${pos.depth})`;
                     }
                 }
@@ -940,16 +975,37 @@
             document.getElementById('polaroidTitle').textContent = data.label;
             document.getElementById('polaroidCounter').textContent =
                 (activeIdx + 1) + ' / ' + polaroidData.length;
+
+            // Price in info panel
+            const priceEl = document.getElementById('polaroidInfoPrice');
+            priceEl.textContent = data.price ? '$' + data.price : '';
+
             typewrite(data.description);
 
-            // Position info panel directly under the active polaroid
+            // Position info panel: side on desktop, below on mobile
             const infoPanel = document.getElementById('infoPanel');
-            const polaroidVisualHeight = ACTIVE_SIZE + 52; // content + padding (12 top + 40 bottom)
-            const infoTop = centerY + polaroidVisualHeight + 8;
-            infoPanel.style.top = infoTop + 'px';
+            const polaroidVisualW = ACTIVE_SIZE + 24;
+            const polaroidVisualH = ACTIVE_SIZE + 52;
 
-            // Draw connection lines
-            drawConnections(activeIdx);
+            if (isMobile) {
+                infoPanel.style.left = '50%';
+                infoPanel.style.transform = 'translateX(-50%)';
+                infoPanel.style.top = (centerY + polaroidVisualH + 8) + 'px';
+                infoPanel.style.maxWidth = '90vw';
+            } else {
+                const rightEdge = centerX + polaroidVisualW + 20;
+                infoPanel.style.left = rightEdge + 'px';
+                infoPanel.style.transform = 'none';
+                infoPanel.style.top = centerY + 'px';
+                infoPanel.style.maxWidth = '280px';
+            }
+
+            // Draw connection lines (skip on mobile)
+            if (!isMobile) {
+                drawConnections(activeIdx);
+            } else {
+                document.querySelectorAll('.connection-line').forEach(l => l.remove());
+            }
         }
 
         // =============================================
