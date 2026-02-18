@@ -608,12 +608,43 @@
             .holo-space::before { display: none; }
 
             .polaroid {
-                transition: opacity 0.25s ease, transform 0.25s ease;
+                transition: none;
                 will-change: opacity, transform;
             }
 
             .polaroid.background {
                 pointer-events: none;
+                opacity: 0 !important;
+            }
+
+            .polaroid.slide-in-right {
+                animation: slideInRight 0.3s ease forwards;
+            }
+            .polaroid.slide-in-left {
+                animation: slideInLeft 0.3s ease forwards;
+            }
+            .polaroid.slide-out-right {
+                animation: slideOutRight 0.25s ease forwards;
+            }
+            .polaroid.slide-out-left {
+                animation: slideOutLeft 0.25s ease forwards;
+            }
+
+            @keyframes slideInRight {
+                from { opacity: 0; transform: translateX(80px) scale(0.93); }
+                to { opacity: 1; transform: translateX(0) scale(1); }
+            }
+            @keyframes slideInLeft {
+                from { opacity: 0; transform: translateX(-80px) scale(0.93); }
+                to { opacity: 1; transform: translateX(0) scale(1); }
+            }
+            @keyframes slideOutRight {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(80px) scale(0.93); }
+            }
+            @keyframes slideOutLeft {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(-80px) scale(0.93); }
             }
 
             .cv-box { display: none !important; }
@@ -889,60 +920,22 @@
                 if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
             });
 
-            // Touch/swipe with drag feedback
+            // Touch/swipe — simple and reliable
             let touchStartX = 0;
             let touchStartY = 0;
-            let touchDragging = false;
-            let touchLocked = false; // locked to horizontal once determined
 
             document.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
-                touchDragging = false;
-                touchLocked = false;
-                // disable transition during drag for instant response
-                const active = document.querySelector('.polaroid.active');
-                if (active) active.style.transition = 'none';
             }, { passive: true });
-
-            document.addEventListener('touchmove', (e) => {
-                const dx = e.touches[0].clientX - touchStartX;
-                const dy = e.touches[0].clientY - touchStartY;
-
-                // determine direction lock after 10px movement
-                if (!touchLocked && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
-                    touchLocked = true;
-                    touchDragging = Math.abs(dx) > Math.abs(dy); // horizontal = drag
-                }
-
-                if (touchDragging) {
-                    e.preventDefault(); // prevent vertical scroll during swipe
-                    const active = document.querySelector('.polaroid.active');
-                    if (active) {
-                        const clamp = Math.max(-120, Math.min(120, dx));
-                        const rot = clamp * 0.05;
-                        const opa = 1 - Math.abs(clamp) / 300;
-                        active.style.transform = `translateX(${clamp}px) rotate(${rot}deg)`;
-                        active.style.opacity = opa;
-                    }
-                }
-            }, { passive: false });
 
             document.addEventListener('touchend', (e) => {
                 const dx = touchStartX - e.changedTouches[0].clientX;
-                const active = document.querySelector('.polaroid.active');
-
-                if (touchDragging && Math.abs(dx) > 50) {
-                    // swipe threshold met — navigate
+                const dy = touchStartY - e.changedTouches[0].clientY;
+                // horizontal swipe with enough distance
+                if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
                     navigate(dx > 0 ? 1 : -1);
-                } else if (active) {
-                    // snap back
-                    active.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
-                    active.style.transform = 'scale(1)';
-                    active.style.opacity = '1';
                 }
-                touchDragging = false;
-                touchLocked = false;
             }, { passive: true });
         }
 
@@ -1063,24 +1056,28 @@
                 // restore CSS transition (drag disables it)
                 el.style.transition = '';
                 if (i === activeIdx) {
-                    el.className = 'polaroid active';
+                    // determine slide animation class on mobile
+                    let slideClass = '';
+                    if (isMobile && lastNavDir !== 0) {
+                        slideClass = lastNavDir > 0 ? ' slide-in-right' : ' slide-in-left';
+                    }
+                    el.className = 'polaroid active' + slideClass;
                     el.style.width = ACTIVE_SIZE + 'px';
                     el.style.left = centerX + 'px';
                     el.style.top = centerY + 'px';
-                    el.style.opacity = '1';
+                    el.style.opacity = isMobile && lastNavDir !== 0 ? '' : '1';
                     el.style.filter = 'none';
-                    el.style.transform = 'scale(1)';
+                    el.style.transform = isMobile && lastNavDir !== 0 ? '' : 'scale(1)';
                     el.style.display = 'block';
                     el.style.pointerEvents = '';
                 } else {
                     if (isMobile) {
-                        // crossfade: keep in DOM at same position, just invisible
                         el.className = 'polaroid background';
                         el.style.width = ACTIVE_SIZE + 'px';
                         el.style.left = centerX + 'px';
                         el.style.top = centerY + 'px';
                         el.style.opacity = '0';
-                        el.style.transform = 'scale(0.92)';
+                        el.style.transform = '';
                         el.style.filter = 'none';
                         el.style.display = 'block';
                         el.style.pointerEvents = 'none';
@@ -1264,17 +1261,20 @@
         // NAVIGATION
         // =============================================
         let navLock = false;
+        let lastNavDir = 0; // -1 = left, 1 = right, 0 = none (initial)
         function navigate(dir) {
             if (polaroidData.length === 0 || navLock) return;
             navLock = true;
+            lastNavDir = dir;
             currentIndex = (currentIndex + dir + polaroidData.length) % polaroidData.length;
             arrangeScene(currentIndex);
-            // debounce: unlock after transition
-            setTimeout(() => { navLock = false; }, window.innerWidth < 768 ? 250 : 100);
+            // debounce: unlock after animation
+            setTimeout(() => { navLock = false; }, window.innerWidth < 768 ? 350 : 100);
         }
 
         function navigateTo(idx) {
             if (idx < 0 || idx >= polaroidData.length) return;
+            lastNavDir = idx > currentIndex ? 1 : -1;
             currentIndex = idx;
             arrangeScene(currentIndex);
         }
