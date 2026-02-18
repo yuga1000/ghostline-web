@@ -1191,30 +1191,7 @@
     margin: auto !important;
 }
 
-/* ПРИНУДИТЕЛЬНЫЕ СТИЛИ ДЛЯ СЛАЙДОВ */
-#manifestoPanel[data-slide="0"] #manifestoText {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-#manifestoPanel[data-slide="1"] #manifestoImage {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-#manifestoPanel[data-slide="2"] #manifestoText {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-#manifestoPanel[data-slide="3"] #manifestoImage {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
+/* Slide visibility is handled by JS in showSlide() */
 
 /* Адаптация размера мануала для мобильных */
 @media (max-width: 768px) {
