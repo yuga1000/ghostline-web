@@ -244,11 +244,76 @@
 
         .info-panel .description {
             font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
+            font-size: 13px;
             color: #00ff00;
-            opacity: 0.5;
+            opacity: 0.8;
+            font-weight: bold;
             margin-top: 6px;
-            min-height: 16px;
+            min-height: 18px;
+            text-shadow: 0 0 4px rgba(0, 255, 0, 0.4);
+        }
+
+        .blink-cursor {
+            animation: blink 0.6s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Number input */
+        .num-input-panel {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .num-input-panel input {
+            width: 50px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            text-align: center;
+            padding: 4px;
+            outline: none;
+        }
+
+        .num-input-panel input:focus {
+            box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+        }
+
+        .num-input-panel button {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+
+        .num-input-panel button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        /* Price tag */
+        .polaroid-price {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: #333;
+            letter-spacing: 1px;
         }
 
         /* Scan overlay */
@@ -345,6 +410,12 @@
     <!-- Nav arrows -->
     <div class="nav-arrow left" id="prevBtn" onclick="navigate(-1)">&#9664;</div>
     <div class="nav-arrow right" id="nextBtn" onclick="navigate(1)">&#9654;</div>
+
+    <!-- Number input -->
+    <div class="num-input-panel" id="numInput">
+        <input type="number" id="jumpNumber" min="1" placeholder="#" onkeypress="if(event.key==='Enter')jumpTo()">
+        <button onclick="jumpTo()">GO</button>
+    </div>
 
     <!-- Info panel -->
     <div class="info-panel" id="infoPanel">
@@ -529,6 +600,7 @@
                 el.innerHTML = `
                     <img class="polaroid-image" src="${data.src}" alt="${data.label}" loading="lazy" decoding="async">
                     <div class="polaroid-label">${data.label}</div>
+                    ${data.price ? `<div class="polaroid-price">$${data.price}</div>` : ''}
                     <div class="polaroid-status ${data.status}"></div>
                 `;
 
@@ -645,17 +717,20 @@
         function typewrite(text) {
             const el = document.getElementById('polaroidDesc');
             if (typewriterTimer) clearInterval(typewriterTimer);
-            el.textContent = '';
+            el.innerHTML = '';
 
             if (!text) return;
 
-            const fullText = '[' + text + ']';
+            const fullText = '[ ' + text + ' ]';
             let i = 0;
             typewriterTimer = setInterval(() => {
-                el.textContent = fullText.substring(0, i + 1);
+                el.innerHTML = fullText.substring(0, i + 1) + '<span class="blink-cursor">&#9608;</span>';
                 i++;
-                if (i >= fullText.length) clearInterval(typewriterTimer);
-            }, 40);
+                if (i >= fullText.length) {
+                    clearInterval(typewriterTimer);
+                    el.innerHTML = fullText;
+                }
+            }, 8);
         }
 
         // =============================================
@@ -671,6 +746,16 @@
             if (idx < 0 || idx >= polaroidData.length) return;
             currentIndex = idx;
             arrangeScene(currentIndex);
+        }
+
+        function jumpTo() {
+            const input = document.getElementById('jumpNumber');
+            const num = parseInt(input.value);
+            if (num >= 1 && num <= polaroidData.length) {
+                navigateTo(num - 1);
+                input.value = '';
+                input.blur();
+            }
         }
 
         // =============================================
@@ -702,10 +787,12 @@
 
                     if (!error && data) {
                         polaroidData = data.map(item => ({
+                            id: item.id,
                             src: item.url,
                             label: (item.title || 'UNTITLED').toUpperCase(),
                             status: item.status === 'sold' ? 'red' : 'green',
-                            description: item.description || ''
+                            description: item.description || '',
+                            price: item.price || null
                         }));
                     }
                 }
