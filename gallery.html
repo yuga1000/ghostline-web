@@ -696,6 +696,8 @@ async function loadGallery() {
                 const { data, error } = await supabaseClient
                     .from('images')
                     .select('*')
+                    .neq('category', 'lost-archive')
+                    .neq('category', 'polaroid')
                     .order('created_at', { ascending: false });
                 
                 if (!error && data) {

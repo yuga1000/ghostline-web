@@ -16,100 +16,87 @@
             min-height: 100vh;
         }
 
-        .terminal-border {
-            border: 2px solid #00ff00;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        }
-
         .pixel-text {
             font-family: 'Press Start 2P', cursive;
-            image-rendering: pixelated;
         }
 
         .scanlines {
             background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
             background-size: 100% 3px;
-            animation: scanlines 0.1s linear infinite;
         }
 
-        @keyframes scanlines {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 3px; }
+        .terminal-border {
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
         }
 
         .nav-link {
             color: #00ff00;
             text-decoration: none;
-            cursor: pointer;
+        }
+        .nav-active { color: #ffffff; }
+
+        /* Boot log */
+        .boot-log {
+            font-size: 11px;
+            color: #004400;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #002200;
+            max-height: 100px;
+            overflow: hidden;
+        }
+        .boot-line { opacity: 0; animation: bootFade 0.3s ease forwards; }
+        @keyframes bootFade { to { opacity: 1; } }
+        .boot-ok { color: #00ff00; }
+        .boot-warn { color: #ffaa00; }
+
+        /* Stats */
+        .archive-stats {
+            font-size: 10px;
+            color: #004400;
+            padding: 4px 20px;
+            border-bottom: 1px solid #001a00;
+            margin-bottom: 1rem;
+        }
+        .stat-green { color: #00ff00; }
+
+        /* ========== CHAOTIC MOSAIC ========== */
+        .mosaic {
+            column-count: 4;
+            column-gap: 8px;
+            padding: 0 10px;
         }
 
-        .nav-active {
-            color: #ffffff;
-        }
-
-        /* Archive grid item */
-        .archive-item {
-            background: #000000;
-            border: 2px solid #003300;
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            min-height: 220px;
+        .mosaic-item {
+            break-inside: avoid;
+            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
-            transition: border-color 0.5s ease;
+            cursor: pointer;
+            border: 1px solid #001a00;
+            transition: border-color 0.3s ease;
+            background: #050505;
         }
 
-        .archive-item:hover {
+        .mosaic-item:hover {
             border-color: #00ff00;
         }
 
-        .archive-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 50, 0, 0.1) 2px,
-                rgba(0, 50, 0, 0.1) 4px
-            );
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.5;
-        }
-
-        .archive-image {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0a0a0a;
-            margin-bottom: 0.75rem;
-            min-height: 200px;
-            max-height: 240px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .archive-image img {
+        .mosaic-item img {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
+            display: block;
             opacity: 0;
-            transition: opacity 0.8s ease;
+            transition: opacity 0.6s ease;
         }
 
-        .archive-image img.loaded {
+        .mosaic-item img.loaded {
             opacity: 1;
         }
 
-        /* Glitch effect on hover */
-        .archive-item:hover .archive-image img.loaded {
+        /* Glitch on hover */
+        .mosaic-item:hover img.loaded {
             animation: glitchImg 0.3s ease;
         }
 
@@ -122,80 +109,39 @@
             100% { transform: translate(0); filter: none; }
         }
 
-        /* Status badge */
-        .archive-status {
+        /* Fragment ID overlay */
+        .mosaic-id {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 9px;
-            padding: 2px 6px;
-            border: 1px solid;
-            font-family: 'Share Tech Mono', monospace;
-            z-index: 2;
-        }
-
-        .status-recovered {
-            color: #00ff00;
-            border-color: #003300;
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        .status-corrupted {
-            color: #ff3300;
-            border-color: #330000;
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        .status-partial {
-            color: #ffaa00;
-            border-color: #332200;
-            background: rgba(0, 0, 0, 0.8);
-        }
-
-        /* Meta info under image */
-        .archive-meta {
-            border-top: 1px solid #002200;
-            padding-top: 0.5rem;
-            font-size: 11px;
-            color: #005500;
-            z-index: 2;
-            position: relative;
-        }
-
-        .archive-meta .file-id {
-            color: #00ff00;
-            opacity: 0.7;
-        }
-
-        .archive-meta .file-date {
-            color: #004400;
-            font-size: 10px;
-        }
-
-        /* Terminal boot sequence */
-        .boot-log {
-            font-size: 11px;
-            color: #004400;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border: 1px solid #002200;
-            max-height: 120px;
-            overflow: hidden;
-        }
-
-        .boot-line {
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 4px 6px;
+            font-size: 8px;
+            color: #003300;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
             opacity: 0;
-            animation: bootFade 0.3s ease forwards;
+            transition: opacity 0.3s;
         }
 
-        @keyframes bootFade {
-            to { opacity: 1; }
+        .mosaic-item:hover .mosaic-id {
+            opacity: 1;
+            color: #00ff00;
         }
 
-        .boot-ok { color: #00ff00; }
-        .boot-warn { color: #ffaa00; }
-        .boot-err { color: #ff3300; }
+        /* Scan line effect on individual items */
+        .mosaic-item::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 50, 0, 0.08) 2px,
+                rgba(0, 50, 0, 0.08) 4px
+            );
+            pointer-events: none;
+        }
 
         /* Lightbox */
         .lightbox {
@@ -211,7 +157,6 @@
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
         }
-
         .lightbox.show { opacity: 1; }
 
         .lightbox-frame {
@@ -228,17 +173,13 @@
         }
 
         .lightbox-frame img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: contain;
-            max-width: 100%;
-            max-height: 100%;
         }
 
         .lightbox-close {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 20px; right: 20px;
             color: #00ff00;
             font-size: 30px;
             cursor: pointer;
@@ -248,56 +189,41 @@
             border: 1px solid #003300;
         }
 
-        /* Blinking cursor */
-        .cursor-blink {
-            animation: blink 1s step-end infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* Static noise placeholder */
-        .static-noise {
-            width: 100%;
-            height: 100%;
+        /* Lightbox nav arrows */
+        .lb-arrow {
             position: absolute;
-            top: 0;
-            left: 0;
-            background:
-                repeating-linear-gradient(
-                    0deg,
-                    rgba(0, 255, 0, 0.03) 0px,
-                    transparent 1px,
-                    transparent 2px
-                ),
-                repeating-linear-gradient(
-                    90deg,
-                    rgba(0, 255, 0, 0.02) 0px,
-                    transparent 1px,
-                    transparent 3px
-                );
-            pointer-events: none;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00ff00;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 20px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid #003300;
+            z-index: 3001;
         }
+        .lb-arrow:hover { background: rgba(0,50,0,0.4); }
+        .lb-arrow.left { left: 10px; }
+        .lb-arrow.right { right: 10px; }
+
+        /* Empty state */
+        .cursor-blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         /* Responsive */
+        @media (max-width: 1200px) { .mosaic { column-count: 3; } }
         @media (max-width: 768px) {
-            .archive-item {
-                min-height: 180px;
-            }
-            .archive-image {
-                min-height: 160px;
-                max-height: 200px;
-            }
+            .mosaic { column-count: 2; column-gap: 6px; padding: 0 6px; }
+            .mosaic-item { margin-bottom: 6px; }
         }
+        @media (max-width: 480px) { .mosaic { column-count: 2; } }
     </style>
 </head>
 <body class="scanlines">
 
 <div class="terminal-border bg-black p-2 m-4 flex flex-col items-center">
     <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
-    <nav class="flex gap-4 mt-2 text-xs">
+    <nav class="flex gap-4 mt-2 text-xs flex-wrap justify-center">
         <a href="index.html" class="nav-link">[HOME]</a>
         <a href="gallery.html" class="nav-link">[GALLERY]</a>
         <span class="nav-link nav-active">[LOST ARCHIVE]</span>
@@ -307,20 +233,21 @@
     </nav>
 </div>
 
-<div class="container mx-auto px-4 pb-8">
+<div class="container mx-auto pb-8">
     <!-- Title -->
-    <div class="text-center mb-6">
-        <h1 class="pixel-text text-2xl mb-2" style="color: #005500;">LOST ARCHIVE</h1>
+    <div class="text-center mb-4">
+        <h1 class="pixel-text text-xl mb-2" style="color: #005500;">LOST ARCHIVE</h1>
         <p class="text-xs" style="color: #003300;">// recovering deleted fragments from corrupted storage</p>
     </div>
 
     <!-- Boot log -->
     <div class="boot-log" id="bootLog"></div>
 
-    <!-- Archive Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="archiveGrid">
-        <!-- Items injected by JS -->
-    </div>
+    <!-- Stats -->
+    <div class="archive-stats" id="archiveStats"></div>
+
+    <!-- Mosaic Grid -->
+    <div class="mosaic" id="mosaicGrid"></div>
 
     <!-- Empty state -->
     <div id="emptyArchive" class="text-center py-16" style="display:none;">
@@ -332,64 +259,91 @@
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <div class="lightbox-close" onclick="closeLightbox()">x</div>
+    <div class="lb-arrow left" onclick="event.stopPropagation(); lbNav(-1)">&#9664;</div>
+    <div class="lb-arrow right" onclick="event.stopPropagation(); lbNav(1)">&#9654;</div>
     <div class="lightbox-frame" onclick="event.stopPropagation()">
         <img id="lightboxImage" src="" alt="">
     </div>
 </div>
 
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-env.js"></script>
+
 <script>
-    // =============================================
-    // LOST ARCHIVE DATA
-    // Add your images here. Each item needs:
-    //   src: path to image
-    //   id: file identifier (shown under image)
-    //   status: 'recovered' | 'corrupted' | 'partial'
-    //   date: when it was "found"
-    // =============================================
-    const archiveItems = [
-        // Example (uncomment and add your images):
-        // { src: 'pages/2Large.jpeg', id: 'FRG-0001', status: 'recovered', date: '2024.03.15' },
-        // { src: 'pages/3Large.jpeg', id: 'FRG-0002', status: 'partial', date: '2024.01.22' },
-        // { src: 'pages/4 Large.jpeg', id: 'FRG-0003', status: 'corrupted', date: '2023.11.08' },
-    ];
+    let archiveItems = [];
+    let currentLbIndex = 0;
 
     // =============================================
     // BOOT SEQUENCE
     // =============================================
-    const bootMessages = [
-        { text: '> mounting /dev/ghost/archive...', cls: '' },
-        { text: '[OK] filesystem detected: GHOSTFS v2.1', cls: 'boot-ok' },
-        { text: '[WARN] 47 sectors marked as damaged', cls: 'boot-warn' },
-        { text: '> scanning for recoverable fragments...', cls: '' },
-        { text: '[OK] recovery engine initialized', cls: 'boot-ok' },
-        { text: `[OK] ${archiveItems.length} fragments found`, cls: 'boot-ok' },
-        { text: '> rendering recovered data...', cls: '' },
-    ];
-
-    function runBootSequence() {
+    function runBootSequence(count) {
         const log = document.getElementById('bootLog');
-        bootMessages.forEach((msg, i) => {
+        const msgs = [
+            { text: '> mounting /dev/ghost/archive...', cls: '' },
+            { text: '[OK] filesystem detected: GHOSTFS v2.1', cls: 'boot-ok' },
+            { text: '[WARN] sectors marked as damaged', cls: 'boot-warn' },
+            { text: '> deep scan: recovering fragments...', cls: '' },
+            { text: `[OK] ${count} fragments recovered`, cls: 'boot-ok' },
+        ];
+        msgs.forEach((msg, i) => {
             setTimeout(() => {
                 const line = document.createElement('div');
                 line.className = 'boot-line ' + msg.cls;
-                line.style.animationDelay = '0s';
                 line.textContent = msg.text;
                 log.appendChild(line);
                 log.scrollTop = log.scrollHeight;
-
-                // After last message, render grid
-                if (i === bootMessages.length - 1) {
-                    setTimeout(renderArchive, 400);
-                }
-            }, i * 300);
+            }, i * 200);
         });
     }
 
     // =============================================
-    // RENDER ARCHIVE GRID
+    // FETCH FROM SUPABASE
     // =============================================
-    function renderArchive() {
-        const grid = document.getElementById('archiveGrid');
+    async function loadArchive() {
+        if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+            try {
+                const client = window.supabase.createClient(
+                    window.SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY
+                );
+                const { data, error } = await client
+                    .from('images')
+                    .select('*')
+                    .eq('category', 'lost-archive')
+                    .order('created_at', { ascending: false });
+
+                if (!error && data) {
+                    archiveItems = data;
+                }
+            } catch (e) {
+                console.error('Supabase error:', e);
+            }
+        }
+
+        runBootSequence(archiveItems.length);
+
+        // wait for boot to finish then render
+        setTimeout(() => {
+            renderMosaic();
+            updateStats();
+        }, 1200);
+    }
+
+    // =============================================
+    // STATS
+    // =============================================
+    function updateStats() {
+        const el = document.getElementById('archiveStats');
+        el.innerHTML = '<span class="stat-green">FRAGMENTS RECOVERED: ' + archiveItems.length + '</span>' +
+            ' // STORAGE: CORRUPTED // STATUS: PARTIAL RECOVERY';
+    }
+
+    // =============================================
+    // RENDER MOSAIC
+    // =============================================
+    function renderMosaic() {
+        const grid = document.getElementById('mosaicGrid');
         const empty = document.getElementById('emptyArchive');
 
         if (archiveItems.length === 0) {
@@ -397,36 +351,44 @@
             return;
         }
 
-        grid.innerHTML = archiveItems.map((item, i) => `
-            <div class="archive-item" onclick="openLightbox('${item.src}')" style="cursor:pointer;">
-                <div class="archive-status status-${item.status}">${item.status.toUpperCase()}</div>
-                <div class="archive-image">
-                    <div class="static-noise"></div>
+        // shuffle for chaotic feel (seeded by day so consistent within a day)
+        const shuffled = [...archiveItems];
+        const daySeed = Math.floor(Date.now() / 86400000);
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(((daySeed * (i + 1) * 9301 + 49297) % 233280) / 233280 * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        grid.innerHTML = shuffled.map((item, i) => {
+            const fragId = 'FRG-' + String(i + 1).padStart(4, '0');
+            const sector = String(((daySeed * (i+1) * 7919) % 9999)).padStart(4, '0');
+            return `
+                <div class="mosaic-item" onclick="openLightbox(${i})">
                     <img
-                        src="${item.src}"
-                        alt="Fragment ${item.id}"
+                        src="${item.url}"
+                        alt="Fragment ${fragId}"
                         loading="lazy"
                         onload="this.classList.add('loaded')"
-                        onerror="this.parentElement.innerHTML='<div style=\\'color:#330000;font-size:10px;text-align:center;padding:2rem;\\'>// data unreadable //</div>'"
+                        onerror="this.style.display='none'"
                     >
+                    <div class="mosaic-id">
+                        ${fragId} // sector:${sector}
+                    </div>
                 </div>
-                <div class="archive-meta">
-                    <div class="file-id">fragment_${item.id}.dat</div>
-                    <div class="file-date">recovered: ${item.date} | sector: ${Math.floor(Math.random() * 9999).toString().padStart(4, '0')}</div>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // =============================================
     // LIGHTBOX
     // =============================================
-    function openLightbox(src) {
+    function openLightbox(idx) {
+        currentLbIndex = idx;
         const lb = document.getElementById('lightbox');
         const img = document.getElementById('lightboxImage');
         lb.style.display = 'flex';
         setTimeout(() => lb.classList.add('show'), 10);
-        img.src = src;
+        img.src = archiveItems[idx].url;
         document.body.style.overflow = 'hidden';
     }
 
@@ -439,12 +401,29 @@
         }, 300);
     }
 
+    function lbNav(dir) {
+        currentLbIndex = (currentLbIndex + dir + archiveItems.length) % archiveItems.length;
+        document.getElementById('lightboxImage').src = archiveItems[currentLbIndex].url;
+    }
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') lbNav(-1);
+        if (e.key === 'ArrowRight') lbNav(1);
     });
 
+    // touch swipe in lightbox
+    let lbTouchX = 0;
+    document.getElementById('lightbox').addEventListener('touchstart', (e) => {
+        lbTouchX = e.touches[0].clientX;
+    }, { passive: true });
+    document.getElementById('lightbox').addEventListener('touchend', (e) => {
+        const dx = lbTouchX - e.changedTouches[0].clientX;
+        if (Math.abs(dx) > 40) lbNav(dx > 0 ? 1 : -1);
+    }, { passive: true });
+
     // Start
-    document.addEventListener('DOMContentLoaded', runBootSequence);
+    document.addEventListener('DOMContentLoaded', loadArchive);
 </script>
 
 </body>
