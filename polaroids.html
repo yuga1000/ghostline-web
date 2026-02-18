@@ -194,13 +194,13 @@
             top: 50%;
             transform: translateY(-50%);
             z-index: 200;
-            width: 50px;
-            height: 50px;
-            border: 2px solid #00ff00;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #00ff00;
             background: rgba(0, 0, 0, 0.8);
             color: #00ff00;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 24px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -240,6 +240,15 @@
             font-size: 14px;
             color: #00ff00;
             opacity: 0.7;
+        }
+
+        .info-panel .description {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #00ff00;
+            opacity: 0.5;
+            margin-top: 6px;
+            min-height: 16px;
         }
 
         /* Scan overlay */
@@ -340,6 +349,7 @@
     <!-- Info panel -->
     <div class="info-panel" id="infoPanel">
         <div class="title" id="polaroidTitle"></div>
+        <div class="description" id="polaroidDesc"></div>
         <div class="counter" id="polaroidCounter"></div>
     </div>
 
@@ -580,6 +590,7 @@
             document.getElementById('polaroidTitle').textContent = data.label;
             document.getElementById('polaroidCounter').textContent =
                 (activeIdx + 1) + ' / ' + polaroidData.length;
+            typewrite(data.description);
 
             // Draw connection lines
             drawConnections(activeIdx);
@@ -624,6 +635,27 @@
                 line.style.transformOrigin = '0 0';
                 space.appendChild(line);
             }
+        }
+
+        // =============================================
+        // TYPEWRITER EFFECT
+        // =============================================
+        let typewriterTimer = null;
+
+        function typewrite(text) {
+            const el = document.getElementById('polaroidDesc');
+            if (typewriterTimer) clearInterval(typewriterTimer);
+            el.textContent = '';
+
+            if (!text) return;
+
+            const fullText = '[' + text + ']';
+            let i = 0;
+            typewriterTimer = setInterval(() => {
+                el.textContent = fullText.substring(0, i + 1);
+                i++;
+                if (i >= fullText.length) clearInterval(typewriterTimer);
+            }, 40);
         }
 
         // =============================================
@@ -672,7 +704,8 @@
                         polaroidData = data.map(item => ({
                             src: item.url,
                             label: (item.title || 'UNTITLED').toUpperCase(),
-                            status: item.status === 'sold' ? 'red' : 'green'
+                            status: item.status === 'sold' ? 'red' : 'green',
+                            description: item.description || ''
                         }));
                     }
                 }
