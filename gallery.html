@@ -816,8 +816,7 @@ function renderGallery() {
     // Добавляем обработчики кликов для изображений
     addImageClickHandlers();
     
-    // Принудительно загружаем все изображения для отладки
-    setTimeout(forceLoadAllImages, 1000);
+    // forceLoadAllImages removed - was debug code killing lazy loading
 }
 
 // Принудительная загрузка всех изображений для отладки
@@ -993,7 +992,7 @@ function addImageClickHandlers() {
 // Preload first few images for better UX
 function preloadFirstImages() {
     const firstImages = document.querySelectorAll('.lazy-image');
-    const preloadCount = Math.min(3, firstImages.length);
+    const preloadCount = Math.min(6, firstImages.length);
     
     for (let i = 0; i < preloadCount; i++) {
         const img = firstImages[i];
@@ -1041,7 +1040,7 @@ function initLazyLoading() {
             }
         });
     }, {
-        rootMargin: '200px' // Start loading 200px before image appears
+        rootMargin: '400px' // Start loading 400px before image appears
     });
     
     lazyImages.forEach(img => imageObserver.observe(img));
