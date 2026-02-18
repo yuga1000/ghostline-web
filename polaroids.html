@@ -610,11 +610,21 @@
             .polaroid {
                 transition: none;
                 will-change: opacity, transform;
+                /* fixed center position for all polaroids on mobile */
+                left: 50% !important;
+                top: 60px !important;
+                transform: translateX(-50%) scale(1) !important;
+            }
+
+            .polaroid.active {
+                opacity: 1;
+                z-index: 100;
             }
 
             .polaroid.background {
                 pointer-events: none;
                 opacity: 0 !important;
+                z-index: 1;
             }
 
             .polaroid.slide-in-right {
@@ -631,20 +641,20 @@
             }
 
             @keyframes slideInRight {
-                from { opacity: 0; transform: translateX(80px) scale(0.93); }
-                to { opacity: 1; transform: translateX(0) scale(1); }
+                from { opacity: 0; transform: translateX(calc(-50% + 80px)) scale(0.93); }
+                to { opacity: 1; transform: translateX(-50%) scale(1); }
             }
             @keyframes slideInLeft {
-                from { opacity: 0; transform: translateX(-80px) scale(0.93); }
-                to { opacity: 1; transform: translateX(0) scale(1); }
+                from { opacity: 0; transform: translateX(calc(-50% - 80px)) scale(0.93); }
+                to { opacity: 1; transform: translateX(-50%) scale(1); }
             }
             @keyframes slideOutRight {
-                from { opacity: 1; transform: translateX(0); }
-                to { opacity: 0; transform: translateX(80px) scale(0.93); }
+                from { opacity: 1; transform: translateX(-50%) scale(1); }
+                to { opacity: 0; transform: translateX(calc(-50% + 80px)) scale(0.93); }
             }
             @keyframes slideOutLeft {
-                from { opacity: 1; transform: translateX(0); }
-                to { opacity: 0; transform: translateX(-80px) scale(0.93); }
+                from { opacity: 1; transform: translateX(-50%) scale(1); }
+                to { opacity: 0; transform: translateX(calc(-50% - 80px)) scale(0.93); }
             }
 
             .cv-box { display: none !important; }
@@ -1053,36 +1063,30 @@
             let bgCount = 0;
 
             polaroids.forEach((el, i) => {
-                // restore CSS transition (drag disables it)
+                if (isMobile) {
+                    // mobile: CSS handles position, JS only toggles classes
+                    el.style.width = ACTIVE_SIZE + 'px';
+                    if (i === activeIdx) {
+                        const slideClass = lastNavDir > 0 ? ' slide-in-right' : lastNavDir < 0 ? ' slide-in-left' : '';
+                        el.className = 'polaroid active' + slideClass;
+                    } else {
+                        el.className = 'polaroid background';
+                    }
+                    return;
+                }
+                // desktop: full positioning
                 el.style.transition = '';
                 if (i === activeIdx) {
-                    // determine slide animation class on mobile
-                    let slideClass = '';
-                    if (isMobile && lastNavDir !== 0) {
-                        slideClass = lastNavDir > 0 ? ' slide-in-right' : ' slide-in-left';
-                    }
-                    el.className = 'polaroid active' + slideClass;
+                    el.className = 'polaroid active';
                     el.style.width = ACTIVE_SIZE + 'px';
                     el.style.left = centerX + 'px';
                     el.style.top = centerY + 'px';
-                    el.style.opacity = isMobile && lastNavDir !== 0 ? '' : '1';
+                    el.style.opacity = '1';
                     el.style.filter = 'none';
-                    el.style.transform = isMobile && lastNavDir !== 0 ? '' : 'scale(1)';
+                    el.style.transform = 'scale(1)';
                     el.style.display = 'block';
                     el.style.pointerEvents = '';
                 } else {
-                    if (isMobile) {
-                        el.className = 'polaroid background';
-                        el.style.width = ACTIVE_SIZE + 'px';
-                        el.style.left = centerX + 'px';
-                        el.style.top = centerY + 'px';
-                        el.style.opacity = '0';
-                        el.style.transform = '';
-                        el.style.filter = 'none';
-                        el.style.display = 'block';
-                        el.style.pointerEvents = 'none';
-                        return;
-                    }
                     if (bgCount >= maxBg) {
                         el.style.display = 'none';
                         return;
