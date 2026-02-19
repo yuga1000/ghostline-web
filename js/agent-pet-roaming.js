@@ -847,26 +847,26 @@
     function scheduleNextMove() {
         if (isMoving || isSleeping || spiderModeActive) return;
 
-        // Random delay: 30-180 seconds
-        const delay = 30000 + Math.random() * 150000;
+        // Random delay: 8-40 seconds (was 30-180, now much more lively)
+        const delay = 8000 + Math.random() * 32000;
         console.log('[Roaming Pet] Next move in', Math.floor(delay / 1000), 'seconds');
 
         setTimeout(() => {
             // Check if still awake
             if (isSleeping) return;
 
-            // 20% chance to just do animation without moving
-            if (Math.random() < 0.2) {
+            // 35% chance to just do animation without moving (was 20%)
+            if (Math.random() < 0.35) {
                 console.log('[Roaming Pet] Doing animation in place');
-                const randomAnims = ['waving', 'blinking', 'dancing', 'growing', 'playing'];
+                const randomAnims = ['waving', 'blinking', 'dancing', 'growing', 'playing', 'jumping'];
                 const anim = randomAnims[Math.floor(Math.random() * randomAnims.length)];
                 setAnimation(anim);
 
-                // Hold for 3-5 seconds then return to idle
+                // Hold for 2-4 seconds then return to idle
                 setTimeout(() => {
                     setAnimation('idle');
                     scheduleNextMove();
-                }, 3000 + Math.random() * 2000);
+                }, 2000 + Math.random() * 2000);
                 return;
             }
 
@@ -874,8 +874,8 @@
             if (target) {
                 currentTarget = target;
 
-                // 30% chance to jump, 70% to walk (more walking!)
-                if (Math.random() < 0.3) {
+                // 40% chance to jump, 60% to walk
+                if (Math.random() < 0.4) {
                     jumpToTarget(target);
                 } else {
                     moveToTarget(target);
@@ -903,6 +903,58 @@
                 }
             }
         }, 5000);
+    }
+
+    // React to user interacting with page elements (hover & click)
+    function setupPageInteractions() {
+        // Target elements to react to
+        const interactiveIds = ['logo', 'galleryBtn', 'streamBtn', 'orderBtn', 'socialToggle', 'titleContainer'];
+
+        interactiveIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            // On hover: pet reacts if close enough or randomly
+            el.addEventListener('mouseenter', () => {
+                if (isSleeping || spiderModeActive || isMoving) return;
+                // 50% chance to react
+                if (Math.random() < 0.5) {
+                    const reactions = ['waving', 'blinking', 'playing'];
+                    const anim = reactions[Math.floor(Math.random() * reactions.length)];
+                    setAnimation(anim);
+                    setTimeout(() => {
+                        if (!isMoving) setAnimation('idle');
+                    }, 1200 + Math.random() * 800);
+                }
+            });
+
+            // On click: pet always reacts with excitement
+            el.addEventListener('click', () => {
+                if (isSleeping || spiderModeActive) return;
+                // Cancel current movement and react
+                if (moveInterval) {
+                    clearInterval(moveInterval);
+                    moveInterval = null;
+                    isMoving = false;
+                }
+                // Jump or wave excitedly
+                const reactions = ['jumping', 'waving', 'dancing'];
+                const anim = reactions[Math.floor(Math.random() * reactions.length)];
+                setAnimation(anim);
+                setTimeout(() => {
+                    setAnimation('idle');
+                    // Then move toward the clicked element
+                    const target = targets.find(t => t.id === id);
+                    if (target) {
+                        setTimeout(() => moveToTarget(target), 500);
+                    } else {
+                        scheduleNextMove();
+                    }
+                }, 1500);
+            });
+        });
+
+        console.log('[Roaming Pet] Page interactions set up');
     }
 
     // Check sleep cycle every 5 minutes
@@ -1043,13 +1095,8 @@
         // Start spider mode checker (checks if it's time to hunt)
         startSpiderModeChecker();
 
-        // TEST: Auto-start spider mode after 5 seconds for testing
-        setTimeout(() => {
-            if (!spiderModeActive && !isSleeping) {
-                console.log('[Roaming Pet] AUTO-STARTING SPIDER MODE FOR TEST');
-                enterSpiderMode();
-            }
-        }, 5000);
+        // Set up reactions to page element interactions
+        setupPageInteractions();
 
         // If it's night, go to sleep immediately
         if (isNightTime()) {

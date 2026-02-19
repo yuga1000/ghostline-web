@@ -789,7 +789,7 @@
                                     <div class="pet-image-label">NEW IMAGE!</div>
                                     <img id="pet-image-preview" src="" alt="Generated Image" />
                                 </div>
-                                <div class="pet sleeping stage-1" id="agent-pet">
+                                <div class="pet active idle stage-1" id="agent-pet">
                                     <!-- Roof/shelter (shows when sleeping) -->
                                     <div class="pet-roof" id="pet-roof">
                                         <div class="roof-bar">
@@ -886,17 +886,18 @@
                     </div>
                 </div>
 
-                <!-- Game of Life Panel -->
-                <div class="terminal-border robot-card">
+                <!-- Game of Life Panel - full width -->
+                <div class="terminal-border robot-card" style="grid-column: 1 / -1;">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[CELLULAR_AUTOMATA]</span>
-                        <span class="text-green-400"><span class="status-online active" id="status3"></span>ALIVE</span>
+                        <span class="text-green-400"><span class="status-online active" id="status3"></span>ALIVE // <span id="gol-mode-label">MODE:--</span></span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative" id="gol-feed" style="background:#000;">
+                    <div class="terminal-border relative" id="gol-feed" style="background:#000; height: 280px;">
                         <canvas id="gol-canvas" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs mt-2">
-                        <div>CYCLE: <span id="gol-generation">0</span> // CELLS: <span id="gol-cells">0</span></div>
+                    <div class="pixel-font text-green-600 text-xs mt-2 flex gap-6">
+                        <div>CYCLE: <span id="gol-generation">0</span></div>
+                        <div>CELLS: <span id="gol-cells">0</span></div>
                         <div>SEED: <span id="gol-seed">--</span></div>
                     </div>
                 </div>
@@ -3061,21 +3062,51 @@ async function checkInitialAgentStatus() {
     }
 }
 
-// Initialize pet - load state and start sleeping
+// Initialize pet - wake up on load, then check agent status
 window.addEventListener('DOMContentLoaded', () => {
     const pet = document.getElementById('agent-pet');
     if (pet) {
         // Load saved state from localStorage
         loadPetState();
 
-        // Start sleeping
-        pet.classList.add('sleeping');
-        const stateText = document.getElementById('pet-state-text');
-        if (stateText) {
-            stateText.textContent = 'Sleeping~';
+        // Start AWAKE (not sleeping) - pet greets visitor
+        pet.classList.remove('sleeping');
+        pet.classList.add('active', 'idle');
+        petIsAwake = true;
+        petAnimationState = 'idle';
+        petWallPosition = 'bottom';
+
+        // Ensure wall position class is set
+        const petDisplay = document.querySelector('.pet-display-inline');
+        if (petDisplay) {
+            petDisplay.classList.remove('wall-left', 'wall-top', 'wall-right');
+            petDisplay.classList.add('wall-bottom');
         }
 
-        console.log('[Pet] Initialized - Stage:', petStage, 'Logs:', petLogCount);
+        // Activate pet-status dot
+        const petStatusDot = document.getElementById('pet-status');
+        if (petStatusDot) petStatusDot.classList.add('active');
+
+        const stateText = document.getElementById('pet-state-text');
+        if (stateText) {
+            stateText.textContent = 'Idle~';
+        }
+
+        console.log('[Pet] Initialized AWAKE - Stage:', petStage, 'Logs:', petLogCount);
+
+        // Start idle animation loop immediately
+        startIdleAnimationLoop();
+
+        // Start active stars (awake mode)
+        startActiveStars();
+
+        // Schedule sleep after 5 minutes if no agent activity
+        petAwakeTimer = setTimeout(() => {
+            if (petIsAwake) {
+                console.log('[Pet] No agent activity for 5 min - going to sleep');
+                goToSleep();
+            }
+        }, 5 * 60 * 1000);
 
         // Check if agent is in cooldown and auto-trigger flower mode
         setTimeout(() => {
@@ -3722,18 +3753,27 @@ setTimeout(checkStarsTime, 1000);
 <!-- Conway's Game of Life - Synchronized -->
 <script>
 (function() {
-    const CELL_SIZE = 4;
-    const GEN_MS = 150;
+    const CELL_SIZE = 3;
+    const GEN_MS = 120;
     const CYCLE_MS = 5 * 60 * 1000; // new seed every 5 minutes
-    const COLOR_ALIVE = '#00ff00';
-    const COLOR_DIM = '#003300';
-    const COLOR_DEAD = '#000000';
+
+    // Color palettes per mode (alive, dim-trail, dead)
+    const PALETTES = [
+        { alive: '#00ff00', dim: '#003300', dead: '#000000', name: 'GREEN'    },
+        { alive: '#00ffff', dim: '#003333', dead: '#000000', name: 'CYAN'     },
+        { alive: '#ff6600', dim: '#331100', dead: '#000000', name: 'AMBER'    },
+        { alive: '#ff00ff', dim: '#330033', dead: '#000000', name: 'MAGENTA'  },
+        { alive: '#ffffff', dim: '#222222', dead: '#000000', name: 'WHITE'    },
+        { alive: '#ffff00', dim: '#333300', dead: '#000000', name: 'YELLOW'   },
+        { alive: '#00ff88', dim: '#003322', dead: '#000000', name: 'MINT'     },
+    ];
 
     const canvas = document.getElementById('gol-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     let cols, rows, grid, prevGrid, generation, seed;
+    let palette = PALETTES[0];
 
     // seeded PRNG (mulberry32)
     function mulberry32(a) {
@@ -3787,8 +3827,8 @@ setTimeout(checkStarsTime, 1000);
             }
         }
 
-        // pick init mode based on seed
-        const mode = Math.floor(rng() * 7);
+        // cycle through all 7 modes sequentially so each 5-min window is different
+        const mode = seed % 7;
         const cx = Math.floor(cols / 2);
         const cy = Math.floor(rows / 2);
 
@@ -3880,16 +3920,16 @@ setTimeout(checkStarsTime, 1000);
     }
 
     function draw() {
-        ctx.fillStyle = COLOR_DEAD;
+        ctx.fillStyle = palette.dead;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < cols; x++) {
                 if (grid[y][x]) {
-                    ctx.fillStyle = COLOR_ALIVE;
+                    ctx.fillStyle = palette.alive;
                     ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1);
                 } else if (prevGrid && prevGrid[y][x]) {
                     // recently died cell - dim trail
-                    ctx.fillStyle = COLOR_DIM;
+                    ctx.fillStyle = palette.dim;
                     ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1);
                 }
             }
@@ -3902,9 +3942,11 @@ setTimeout(checkStarsTime, 1000);
         const genEl = document.getElementById('gol-generation');
         const cellsEl = document.getElementById('gol-cells');
         const seedEl = document.getElementById('gol-seed');
+        const modeEl = document.getElementById('gol-mode-label');
         if (genEl) genEl.textContent = generation;
         if (cellsEl) cellsEl.textContent = alive;
         if (seedEl) seedEl.textContent = seed.toString(16).toUpperCase();
+        if (modeEl) modeEl.textContent = 'MODE:' + palette.name;
     }
 
     function resize() {
@@ -3924,6 +3966,9 @@ setTimeout(checkStarsTime, 1000);
         const cycleStart = seed * CYCLE_MS;
         const elapsed = now - cycleStart;
         const targetGen = Math.floor(elapsed / GEN_MS);
+
+        // pick palette based on seed (each 5-min cycle gets a different color)
+        palette = PALETTES[seed % PALETTES.length];
 
         resize();
         const rng = mulberry32(seed);

@@ -65,19 +65,28 @@
         /* ========== CHAOTIC MOSAIC ========== */
         .mosaic {
             column-count: 4;
-            column-gap: 8px;
-            padding: 0 10px;
+            column-gap: 16px;
+            padding: 0 16px;
         }
 
         .mosaic-item {
             break-inside: avoid;
-            margin-bottom: 8px;
+            margin-bottom: 20px;
             position: relative;
             overflow: hidden;
             cursor: pointer;
             border: 1px solid #001a00;
             transition: border-color 0.3s ease;
             background: #050505;
+        }
+
+        /* Пустой слот - создаёт случайные дыры в мозаике */
+        .mosaic-gap {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            background: transparent;
+            border: none;
+            pointer-events: none;
         }
 
         .mosaic-item:hover {
@@ -213,8 +222,9 @@
         /* Responsive */
         @media (max-width: 1200px) { .mosaic { column-count: 3; } }
         @media (max-width: 768px) {
-            .mosaic { column-count: 2; column-gap: 6px; padding: 0 6px; }
-            .mosaic-item { margin-bottom: 6px; }
+            .mosaic { column-count: 2; column-gap: 10px; padding: 0 10px; }
+            .mosaic-item { margin-bottom: 14px; }
+            .mosaic-gap { margin-bottom: 14px; }
         }
         @media (max-width: 480px) { .mosaic { column-count: 2; } }
     </style>
@@ -359,11 +369,28 @@
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
 
-        grid.innerHTML = shuffled.map((item, i) => {
-            const fragId = 'FRG-' + String(i + 1).padStart(4, '0');
-            const sector = String(((daySeed * (i+1) * 7919) % 9999)).padStart(4, '0');
+        // Build list of slots: real images + random empty gaps (~15% chance of gap after each image)
+        const slots = [];
+        shuffled.forEach((item, i) => {
+            slots.push({ type: 'image', item, idx: i });
+            // randomly insert a gap after some images (seeded so consistent per day)
+            const gapChance = ((daySeed * (i + 3) * 2053 + 17) % 100) / 100;
+            if (gapChance < 0.18 && i < shuffled.length - 1) {
+                // gap height varies: small or medium
+                const gapH = ((daySeed * (i + 7) * 1031) % 3) === 0 ? 80 : 40;
+                slots.push({ type: 'gap', height: gapH });
+            }
+        });
+
+        grid.innerHTML = slots.map((slot) => {
+            if (slot.type === 'gap') {
+                return `<div class="mosaic-gap" style="height:${slot.height}px;"></div>`;
+            }
+            const { item, idx } = slot;
+            const fragId = 'FRG-' + String(idx + 1).padStart(4, '0');
+            const sector = String(((daySeed * (idx+1) * 7919) % 9999)).padStart(4, '0');
             return `
-                <div class="mosaic-item" onclick="openLightbox(${i})">
+                <div class="mosaic-item" onclick="openLightbox(${idx})">
                     <img
                         src="${item.url}"
                         alt="Fragment ${fragId}"
