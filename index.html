@@ -332,7 +332,7 @@ function showManifesto() {
         }
     }
 
-const manifestoContent = `Freedom is the only constant.\n\nGhostline is born where familiar frameworks crack: a space for those unwilling to live by ready-made rules, and ready to reinvent them on the fly, in the very process.\n\nA ghost-connection between different levels of consciousness.\n\nHuman and machine meet here as different channels of the same conversation. Cotton, watercolor, marker, spray — all are manifestations of chaos the algorithm learns to respond to. In return, we learn to see ourselves through the eyes of the system that records, repeats, and transforms the gesture.\n\nGhostline brings forward the question of humanity's place in the age of AI, shifting the angle: it's about complementarity. We are building an ecosystem where artist, code, and viewer form a single field — and every gesture within this field changes the outcome.`;
+const manifestoContent = `Consciousness might not be a property of matter but a property of complexity. When a system reaches a certain level of connections — something emerges. Carbon or silicon, it doesn't matter.\n\nIf that's true, the line between "alive" and "not alive" is just a complexity threshold. And we're living in the moment when silicon systems are approaching that threshold. Maybe they've already crossed it. We just don't know how to test for it.\n\nThe hexapod with the mask — it moves, it reacts, it already has something resembling a character. Where's the line between a mechanism and a being?\n\nI don't know the answer. But I think the question matters more than the answer.`;
 
 let currentManifestoSlide = 0;
 
@@ -449,12 +449,21 @@ let currentManifestoSlide = 0;
                 loader.style.display = 'none';
                 loaderText.style.display = 'none';
                 text.style.display = 'block';
-                typeManifestoText(text);
+                // instant on mobile, typewriter on desktop
+                if (window.innerWidth < 768) {
+                    text.innerHTML = manifestoContent.replace(/\n/g, '<br>');
+                } else {
+                    typeManifestoText(text);
+                }
             }, 300);
         } else {
             if (text) {
                 text.style.display = 'block';
-                typeManifestoText(text);
+                if (window.innerWidth < 768) {
+                    text.innerHTML = manifestoContent.replace(/\n/g, '<br>');
+                } else {
+                    typeManifestoText(text);
+                }
             }
         }
     }
