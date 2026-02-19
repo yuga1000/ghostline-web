@@ -3745,12 +3745,105 @@ setTimeout(checkStarsTime, 1000);
         };
     }
 
+    // place a pattern at (ox, oy) on the grid
+    function placePattern(pattern, ox, oy) {
+        pattern.forEach(([dy, dx]) => {
+            const y = (oy + dy + rows) % rows;
+            const x = (ox + dx + cols) % cols;
+            grid[y][x] = 1;
+        });
+    }
+
+    // known patterns that produce long-lived evolution
+    const GLIDER = [[0,1],[1,2],[2,0],[2,1],[2,2]];
+    const LWSS = [[0,1],[0,4],[1,0],[2,0],[2,4],[3,0],[3,1],[3,2],[3,3]]; // lightweight spaceship
+    const RPENTOMINO = [[0,1],[0,2],[1,0],[1,1],[2,1]]; // evolves for 1100+ gens
+    const ACORN = [[0,1],[1,3],[2,0],[2,1],[2,4],[2,5],[2,6]]; // evolves for 5000+ gens
+    const DIEHARD = [[0,6],[1,0],[1,1],[2,1],[2,5],[2,6],[2,7]]; // 130 gens then dies
+    // gosper glider gun — produces infinite gliders
+    const GLIDER_GUN = [
+        [0,24],[1,22],[1,24],[2,12],[2,13],[2,20],[2,21],[2,34],[2,35],
+        [3,11],[3,15],[3,20],[3,21],[3,34],[3,35],[4,0],[4,1],[4,10],
+        [4,16],[4,20],[4,21],[5,0],[5,1],[5,10],[5,14],[5,16],[5,17],
+        [5,22],[5,24],[6,10],[6,16],[6,24],[7,11],[7,15],[8,12],[8,13]
+    ];
+    const PULSAR = [
+        [-6,-4],[-6,-3],[-6,-2],[-6,2],[-6,3],[-6,4],
+        [-4,-6],[-3,-6],[-2,-6],[-4,-1],[-3,-1],[-2,-1],
+        [-4,1],[-3,1],[-2,1],[-4,6],[-3,6],[-2,6],
+        [-1,-4],[-1,-3],[-1,-2],[-1,2],[-1,3],[-1,4],
+        [1,-4],[1,-3],[1,-2],[1,2],[1,3],[1,4],
+        [2,-6],[3,-6],[4,-6],[2,-1],[3,-1],[4,-1],
+        [2,1],[3,1],[4,1],[2,6],[3,6],[4,6],
+        [6,-4],[6,-3],[6,-2],[6,2],[6,3],[6,4]
+    ];
+
     function initGrid(rng) {
         grid = [];
         for (let y = 0; y < rows; y++) {
             grid[y] = [];
             for (let x = 0; x < cols; x++) {
-                grid[y][x] = rng() < 0.3 ? 1 : 0;
+                grid[y][x] = 0;
+            }
+        }
+
+        // pick init mode based on seed
+        const mode = Math.floor(rng() * 7);
+        const cx = Math.floor(cols / 2);
+        const cy = Math.floor(rows / 2);
+
+        if (mode === 0) {
+            // random soup (classic)
+            for (let y = 0; y < rows; y++)
+                for (let x = 0; x < cols; x++)
+                    grid[y][x] = rng() < 0.3 ? 1 : 0;
+        } else if (mode === 1) {
+            // symmetric soup — mirror horizontally
+            for (let y = 0; y < rows; y++)
+                for (let x = 0; x < Math.ceil(cols / 2); x++) {
+                    const v = rng() < 0.25 ? 1 : 0;
+                    grid[y][x] = v;
+                    grid[y][cols - 1 - x] = v;
+                }
+        } else if (mode === 2) {
+            // glider gun + scattered R-pentominoes
+            placePattern(GLIDER_GUN, 2, 2);
+            for (let i = 0; i < 5; i++) {
+                placePattern(RPENTOMINO, Math.floor(rng() * cols), Math.floor(rng() * rows));
+            }
+        } else if (mode === 3) {
+            // acorns + pulsars scattered
+            for (let i = 0; i < 4; i++) {
+                placePattern(ACORN, Math.floor(rng() * cols), Math.floor(rng() * rows));
+            }
+            placePattern(PULSAR, cx, cy);
+        } else if (mode === 4) {
+            // diagonal stripes with gaps — creates maze-like evolution
+            for (let y = 0; y < rows; y++)
+                for (let x = 0; x < cols; x++)
+                    grid[y][x] = ((x + y) % 7 < 2 && rng() < 0.6) ? 1 : 0;
+        } else if (mode === 5) {
+            // clusters — dense blobs separated by space
+            const numClusters = 3 + Math.floor(rng() * 5);
+            for (let c = 0; c < numClusters; c++) {
+                const bx = Math.floor(rng() * cols);
+                const by = Math.floor(rng() * rows);
+                const r = 4 + Math.floor(rng() * 8);
+                for (let dy = -r; dy <= r; dy++)
+                    for (let dx = -r; dx <= r; dx++)
+                        if (dx*dx + dy*dy < r*r && rng() < 0.45) {
+                            const yy = (by + dy + rows) % rows;
+                            const xx = (bx + dx + cols) % cols;
+                            grid[yy][xx] = 1;
+                        }
+            }
+        } else {
+            // spaceships + diehards — lots of movement
+            for (let i = 0; i < 8; i++) {
+                const px = Math.floor(rng() * cols);
+                const py = Math.floor(rng() * rows);
+                const pat = [GLIDER, LWSS, DIEHARD, RPENTOMINO][Math.floor(rng() * 4)];
+                placePattern(pat, px, py);
             }
         }
     }
