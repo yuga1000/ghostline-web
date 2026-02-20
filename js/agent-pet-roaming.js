@@ -666,20 +666,17 @@
 
         isMoving = true;
 
-        // Get current and target positions
         const containerRect = container.getBoundingClientRect();
-        const targetRect = targetElement.getBoundingClientRect();
+        const currentX = parseFloat(container.style.left) || containerRect.left;
+        const currentY = parseFloat(container.style.top)  || containerRect.top;
 
-        const currentX = containerRect.left;
-        const currentY = containerRect.top;
+        // Land on top of the target element
+        const landing = getLandingPoint(targetElement);
+        const targetX = landing.x;
+        const targetY = landing.y;
 
-        // Target position: near the element but with random offset
-        const offsetX = (Math.random() - 0.5) * 100;
-        const offsetY = (Math.random() - 0.5) * 100;
-        const targetX = targetRect.left + targetRect.width / 2 + offsetX - 20;
-        const targetY = targetRect.top + targetRect.height / 2 + offsetY - 20;
-
-        console.log('[Roaming Pet] Jumping from', currentX, currentY, 'to', targetX, targetY);
+        console.log('[Roaming Pet] Jumping from', Math.round(currentX), Math.round(currentY),
+                    'to', Math.round(targetX), Math.round(targetY), '(on top of', target.name, ')');
 
         // Calculate distance and number of jumps (60-80px per jump)
         const deltaX = targetX - currentX;
@@ -724,7 +721,24 @@
         performNextJump();
     }
 
-    // Move to target with discrete walking steps
+    // Get the "landing point" on top of an element (pet sits on its top edge)
+    // Returns {x, y} in viewport coords (for fixed positioning)
+    function getLandingPoint(el) {
+        const rect = el.getBoundingClientRect();
+        const petW = 30; // approximate pet width
+        const petH = 28; // approximate pet height
+        // Pet lands centered on element top edge with small random offset
+        const offsetX = (Math.random() - 0.5) * Math.min(rect.width * 0.5, 60);
+        const x = Math.max(4, Math.min(
+            window.innerWidth - petW - 4,
+            rect.left + rect.width / 2 + offsetX - petW / 2
+        ));
+        // Sit on the top surface of the element
+        const y = Math.max(4, rect.top - petH);
+        return { x, y };
+    }
+
+    // Move to target walking along element surfaces (2-phase: horizontal then vertical)
     function moveToTarget(target) {
         // Block movement during spider mode
         if (spiderModeActive) return;
@@ -740,64 +754,60 @@
         isMoving = true;
         setAnimation('walking');
 
-        // Get current and target positions
         const containerRect = container.getBoundingClientRect();
-        const targetRect = targetElement.getBoundingClientRect();
+        const startX = parseFloat(container.style.left) || containerRect.left;
+        const startY = parseFloat(container.style.top) || containerRect.top;
 
-        // Calculate target position (near the element, with some offset)
-        const currentX = containerRect.left;
-        const currentY = containerRect.top;
+        // Land on top of the target element
+        const landing = getLandingPoint(targetElement);
+        const endX = landing.x;
+        const endY = landing.y;
 
-        // Target position: near the element but with random offset
-        const offsetX = (Math.random() - 0.5) * 100;
-        const offsetY = (Math.random() - 0.5) * 100;
-        const targetX = targetRect.left + targetRect.width / 2 + offsetX - 20;
-        const targetY = targetRect.top + targetRect.height / 2 + offsetY - 20;
-
-        console.log('[Roaming Pet] Walking from', currentX, currentY, 'to', targetX, targetY);
-
-        // Calculate distance and steps
-        const deltaX = targetX - currentX;
-        const deltaY = targetY - currentY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-        // Discrete steps: move 12px at a time (4 pixels * 3px = 12px per step)
-        const stepSize = 12;
-        const numSteps = Math.ceil(distance / stepSize);
-        const stepX = deltaX / numSteps;
-        const stepY = deltaY / numSteps;
-
-        let currentStep = 0;
+        console.log('[Roaming Pet] Walking from', Math.round(startX), Math.round(startY),
+                    'to', Math.round(endX), Math.round(endY), '(on top of', target.name, ')');
 
         // Clear any existing movement
         if (moveInterval) {
             clearInterval(moveInterval);
+            moveInterval = null;
         }
 
-        // Move in discrete steps (8 fps = 125ms per frame)
-        moveInterval = setInterval(() => {
-            if (currentStep >= numSteps) {
-                // Reached target
-                clearInterval(moveInterval);
-                moveInterval = null;
+        // Helper: animate from (x1,y1) to (x2,y2), then call onDone
+        function animateSegment(x1, y1, x2, y2, onDone) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 2) { onDone(); return; }
+
+            const stepSize = 10;
+            const steps = Math.ceil(dist / stepSize);
+            const sx = dx / steps;
+            const sy = dy / steps;
+            let step = 0;
+
+            moveInterval = setInterval(() => {
+                step++;
+                container.style.left = (x1 + sx * step) + 'px';
+                container.style.top  = (y1 + sy * step) + 'px';
+                if (step >= steps) {
+                    clearInterval(moveInterval);
+                    moveInterval = null;
+                    onDone();
+                }
+            }, 100); // ~10fps
+        }
+
+        // 2-phase movement: walk horizontally first, then vertically (like a platform game)
+        // Phase 1: move horizontally at current Y
+        // Phase 2: move vertically to target Y
+        animateSegment(startX, startY, endX, startY, () => {
+            if (!isMoving) return; // aborted
+            animateSegment(endX, startY, endX, endY, () => {
                 isMoving = false;
-
                 console.log('[Roaming Pet] Reached target:', target.name);
-
-                // Decide what to do at target
                 decideTargetAction(target);
-                return;
-            }
-
-            // Move one step
-            const newX = currentX + stepX * (currentStep + 1);
-            const newY = currentY + stepY * (currentStep + 1);
-
-            container.style.left = newX + 'px';
-            container.style.top = newY + 'px';
-
-            currentStep++;
-        }, 125); // 8 fps
+            });
+        });
     }
 
     // Decide what action to perform at target
@@ -1079,12 +1089,22 @@
             }
         }
 
-        // Set random initial position
-        const randomX = 20 + Math.random() * (window.innerWidth - 100);
-        const randomY = 20 + Math.random() * (window.innerHeight - 100);
-        container.style.left = randomX + 'px';
-        container.style.top = randomY + 'px';
-        console.log('[Roaming Pet] Starting at random position:', randomX, randomY);
+        // Start on top of a random available element (not in empty space)
+        {
+            const startTargets = targets.filter(t => document.getElementById(t.id));
+            const startTarget = startTargets[Math.floor(Math.random() * startTargets.length)];
+            if (startTarget) {
+                const el = document.getElementById(startTarget.id);
+                const landing = getLandingPoint(el);
+                container.style.left = landing.x + 'px';
+                container.style.top  = landing.y + 'px';
+                console.log('[Roaming Pet] Starting on top of', startTarget.name, landing);
+            } else {
+                // fallback - bottom center
+                container.style.left = (window.innerWidth / 2 - 15) + 'px';
+                container.style.top  = (window.innerHeight - 80) + 'px';
+            }
+        }
 
         // Start blinking (works for both awake and asleep)
         startBlinking();
