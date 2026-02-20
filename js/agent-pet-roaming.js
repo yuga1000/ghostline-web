@@ -10,6 +10,9 @@
     let moveInterval = null;
     let isSleeping = false;
 
+    // Current element the pet is anchored to (for scroll tracking)
+    let currentAnchorEl = null;
+
     // Movement targets on index.html
     const targets = [
         { id: 'logo', name: 'logo', animations: ['playing', 'idle', 'waving', 'growing'], walkEdges: false, preferGrowing: true },
@@ -812,6 +815,9 @@
 
     // Decide what action to perform at target
     function decideTargetAction(target) {
+        // Track which element the pet is now anchored to
+        currentAnchorEl = document.getElementById(target.id) || null;
+
         // Priority for growing on logo/title
         if (target.preferGrowing && Math.random() < 0.7) {
             // 70% chance to grow on logo/title
@@ -1098,6 +1104,7 @@
                 const landing = getLandingPoint(el);
                 container.style.left = landing.x + 'px';
                 container.style.top  = landing.y + 'px';
+                currentAnchorEl = el; // Track starting anchor for scroll repositioning
                 console.log('[Roaming Pet] Starting on top of', startTarget.name, landing);
             } else {
                 // fallback - bottom center
@@ -1117,6 +1124,21 @@
 
         // Set up reactions to page element interactions
         setupPageInteractions();
+
+        // Reposition pet to its anchor element whenever the page scrolls
+        // (keeps pet sitting on top of its element rather than drifting in viewport)
+        function onPageScroll() {
+            if (!currentAnchorEl || isMoving || spiderModeActive) return;
+            const c = document.getElementById('roaming-pet-container');
+            if (!c) return;
+            const pos = getLandingPoint(currentAnchorEl);
+            c.style.left = pos.x + 'px';
+            c.style.top  = pos.y + 'px';
+        }
+        window.addEventListener('scroll', onPageScroll, { passive: true });
+        // Also cover the case where #main-content (slide-container) is the actual scroll container
+        const mainContent = document.getElementById('main-content');
+        if (mainContent) mainContent.addEventListener('scroll', onPageScroll, { passive: true });
 
         // If it's night, go to sleep immediately
         if (isNightTime()) {

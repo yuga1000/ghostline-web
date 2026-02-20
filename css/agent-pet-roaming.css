@@ -1,13 +1,16 @@
 /* ===== ROAMING AGENT PET STYLES (for index.html) ===== */
 
 .roaming-pet-container {
-    position: fixed;
-    /* Initial position will be set randomly by JS */
-    bottom: 20px;
-    left: 20px;
+    position: fixed !important;
+    /* bottom/left defaults overridden by JS */
+    top: 0;
+    left: 0;
     z-index: 9998;
     pointer-events: none;
     transition: none; /* No smooth transitions - discrete only */
+    /* Force own layer to avoid being affected by parent compositing */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .roaming-pet {
