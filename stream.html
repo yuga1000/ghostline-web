@@ -891,24 +891,20 @@
                     </div>
                 </div>
 
-                <!-- MODULE_02 Placeholder -->
+                <!-- SPIDER FEED -->
                 <div class="terminal-border robot-card" id="module02-panel">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
-                        <span>[MODULE_02]</span>
-                        <span style="color:#002200;">▒▒▒ STANDBY</span>
+                        <span>[SPIDER_FEED]</span>
+                        <span><span class="status-online" id="feed-status-dot" style="background:#444;"></span><span id="feed-status-text">CONNECTING</span></span>
                     </div>
-                    <div class="agent-terminal h-40 terminal-border relative" style="display:flex;align-items:center;justify-content:center;">
-                        <div class="noise-mask" style="opacity:0.5;"></div>
-                        <div class="pixel-font text-xs" style="color:#002200;text-align:center;position:relative;z-index:1;padding:12px;">
-                            <div style="margin-bottom:8px;">// CHANNEL RESERVED</div>
-                            <div style="font-size:8px;line-height:1.8;color:#001500;">
-                                ░░░░░░░░░░░░░░░░░░░░<br>
-                                ░░  SIGNAL PENDING  ░░<br>
-                                ░░░░░░░░░░░░░░░░░░░░
-                            </div>
-                        </div>
+                    <div class="agent-terminal h-40 terminal-border relative" id="feed-terminal">
+                        <div class="noise-mask" id="feed-noise-mask"></div>
+                        <div class="agent-terminal-content pixel-font text-xs p-2" id="feed-log-content"></div>
                     </div>
-                    <div class="pixel-font text-xs mt-2" style="color:#001500;">// awaiting feed initialization</div>
+                    <div class="pixel-font text-xs mt-2" style="color:#003300;">
+                        <span id="feed-event-count">// —</span>
+                        <span style="float:right;" id="feed-last-update"></span>
+                    </div>
                 </div>
 
                 <!-- Game of Life Panel - full width -->
@@ -3905,6 +3901,115 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(fetchDivisionStatus, 800);
     // Re-fetch every 5 minutes
     setInterval(fetchDivisionStatus, 5 * 60 * 1000);
+});
+
+// ==================== SPIDER FEED ====================
+
+let spiderFeedData = null;
+let spiderFeedShownEvents = new Set();
+
+function feedAddLog(text, cls) {
+    const log = document.getElementById('feed-log-content');
+    if (!log) return;
+    const line = document.createElement('div');
+    line.className = 'log-line ' + (cls || 'log-dim');
+    line.textContent = text;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+    while (log.children.length > 60) log.removeChild(log.firstChild);
+}
+
+function feedShowSignalLost() {
+    const dot  = document.getElementById('feed-status-dot');
+    const txt  = document.getElementById('feed-status-text');
+    const nm   = document.getElementById('feed-noise-mask');
+    if (dot) { dot.style.background = '#333'; dot.classList.remove('active'); }
+    if (txt) txt.textContent = 'OFFLINE';
+    if (nm)  { nm.style.display = 'block'; nm.style.opacity = '0.8'; }
+    const cnt = document.getElementById('feed-event-count');
+    if (cnt) cnt.textContent = '// spider offline or no log today';
+}
+
+function feedUpdateDisplay(data) {
+    spiderFeedData = data;
+
+    const dot   = document.getElementById('feed-status-dot');
+    const txt   = document.getElementById('feed-status-text');
+    const nm    = document.getElementById('feed-noise-mask');
+    const cntEl = document.getElementById('feed-event-count');
+    const updEl = document.getElementById('feed-last-update');
+
+    // Status — green if we have events
+    const hasEvents = data.events && data.events.length > 0;
+    if (dot) {
+        dot.style.background = hasEvents ? '#00ff00' : '#444';
+        if (hasEvents) dot.classList.add('active'); else dot.classList.remove('active');
+    }
+    if (txt) txt.textContent = hasEvents ? 'LIVE' : 'STANDBY';
+    if (nm)  nm.style.display = 'none';
+
+    if (cntEl) cntEl.textContent = `// ${data.event_count || 0} events today`;
+
+    if (updEl && data.generated_at) {
+        try {
+            const dt = new Date(data.generated_at);
+            updEl.textContent = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        } catch(e) {}
+    }
+
+    // Add new events to log
+    if (data.events && Array.isArray(data.events)) {
+        let hasNew = false;
+        // events are newest-first — show them in order
+        // but only add ones we haven't shown yet
+        const toAdd = [];
+        data.events.forEach(ev => {
+            const key = (ev.time || '') + '|' + (ev.event || '');
+            if (!spiderFeedShownEvents.has(key)) {
+                spiderFeedShownEvents.add(key);
+                toAdd.push(ev);
+                hasNew = true;
+            }
+        });
+
+        // Add oldest-first so log reads top→bottom chronologically
+        toAdd.reverse().forEach(ev => {
+            const isHot  = (ev.event || '').toLowerCase().includes('hot');
+            const isErr  = (ev.event || '').startsWith('[ERR]') || (ev.event || '').startsWith('[!]');
+            const isScan = (ev.event || '').toLowerCase().includes('scan') ||
+                           (ev.event || '').toLowerCase().includes('sector');
+            const cls = isHot ? 'log-success' : isErr ? 'log-warning' : isScan ? 'log-action' : 'log-dim';
+            feedAddLog(`> [${ev.time}] ${ev.event}`, cls);
+        });
+
+        // Pet reacts to new spider events
+        if (hasNew && typeof petIsAwake !== 'undefined' && petIsAwake) {
+            const hotEv = toAdd.find(e => (e.event||'').toLowerCase().includes('hot'));
+            const scanEv = toAdd.find(e => (e.event||'').toLowerCase().includes('scan cycle'));
+            if (hotEv) {
+                setTimeout(() => triggerPetAnimation('waving', 2000), 400);
+            } else if (scanEv) {
+                setTimeout(() => triggerPetAnimation('excited-bounce', 1200), 200);
+            }
+        }
+    }
+}
+
+async function fetchSpiderFeed() {
+    try {
+        const resp = await fetch('/api/spider-log.json?' + Date.now());
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        feedUpdateDisplay(data);
+    } catch (e) {
+        console.warn('[SpiderFeed] fetch failed:', e.message);
+        if (!spiderFeedData) feedShowSignalLost();
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(fetchSpiderFeed, 1200);
+    setInterval(fetchSpiderFeed, 2 * 60 * 1000); // re-fetch every 2 min
 });
 
 </script>
