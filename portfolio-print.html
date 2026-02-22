@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE — Portfolio Print</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================
+           SCREEN STYLES
+        ========================================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+        }
+
+        /* Top control bar — hidden in print */
+        .controls {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #000;
+            border-bottom: 1px solid #003300;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .controls-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 9px;
+            color: #00ff00;
+            letter-spacing: 2px;
+        }
+
+        .controls-meta {
+            font-size: 10px;
+            color: #004400;
+        }
+        .controls-meta span { color: #00ff00; }
+
+        .btn-print {
+            margin-left: auto;
+            padding: 10px 24px;
+            background: #00ff00;
+            color: #000;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 2px;
+        }
+        .btn-print:hover { background: #44ff44; }
+
+        .status-line {
+            width: 100%;
+            font-size: 10px;
+            color: #004400;
+            padding-top: 4px;
+        }
+        .status-line.ok  { color: #00aa00; }
+        .status-line.err { color: #ff4400; }
+
+        /* Loading / empty state */
+        .loading-screen {
+            text-align: center;
+            padding: 80px 20px;
+            font-size: 12px;
+            color: #003300;
+        }
+
+        /* ==========================================
+           PORTFOLIO LAYOUT (screen preview)
+        ========================================== */
+        .portfolio-cover {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            border-bottom: 1px solid #003300;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .cover-label {
+            font-size: 10px;
+            color: #003300;
+            letter-spacing: 4px;
+            margin-bottom: 24px;
+        }
+
+        .cover-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 28px;
+            color: #00ff00;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .cover-sub {
+            font-size: 11px;
+            color: #004400;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+
+        .cover-count {
+            font-size: 10px;
+            color: #003300;
+            letter-spacing: 3px;
+        }
+        .cover-count span { color: #00ff00; }
+
+        /* Works grid */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+        }
+
+        .work-item {
+            border: 1px solid #001100;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 420px;
+        }
+
+        .work-item:hover { border-color: #003300; }
+
+        .work-img-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #050505;
+            min-height: 280px;
+        }
+
+        .work-img-wrap img {
+            max-width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .work-img-wrap img.loaded { opacity: 1; }
+
+        .work-meta {
+            border-top: 1px solid #001a00;
+            padding-top: 10px;
+        }
+
+        .work-index {
+            font-size: 8px;
+            color: #002200;
+            margin-bottom: 4px;
+            letter-spacing: 2px;
+        }
+
+        .work-title {
+            font-size: 11px;
+            color: #00cc00;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .work-details {
+            font-size: 9px;
+            color: #003300;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .work-status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .work-status-dot.available { background: #00ff00; }
+        .work-status-dot.sold      { background: #ff4400; }
+        .work-status-dot.ghost     { background: #444; }
+
+        /* ==========================================
+           PRINT STYLES
+        ========================================== */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 12mm 10mm;
+            }
+
+            body {
+                background: #fff;
+                color: #000;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .controls { display: none !important; }
+            .loading-screen { display: none !important; }
+
+            /* Cover page */
+            .portfolio-cover {
+                height: 100vh;
+                border-bottom: none;
+                page-break-after: always;
+                break-after: page;
+                background: #000;
+                color: #00ff00;
+            }
+
+            .cover-label  { color: #004400; }
+            .cover-title  { color: #00ff00; font-size: 20px; }
+            .cover-sub    { color: #003300; }
+            .cover-count  { color: #003300; }
+            .cover-count span { color: #00ff00; }
+
+            /* Grid: 2 per page */
+            .portfolio-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0;
+            }
+
+            .work-item {
+                border: 1px solid #eee;
+                padding: 12px;
+                min-height: 0;
+                height: calc((297mm - 24mm) / 2 - 2px); /* half A4 page */
+                page-break-inside: avoid;
+                break-inside: avoid;
+                background: #fff;
+            }
+
+            .work-img-wrap {
+                background: #f8f8f8;
+                min-height: 0;
+                flex: 1;
+            }
+
+            .work-img-wrap img {
+                opacity: 1 !important;
+                max-height: 240px;
+            }
+
+            .work-meta { border-top: 1px solid #eee; }
+            .work-index { color: #aaa; }
+            .work-title { color: #000; }
+            .work-details { color: #666; }
+
+            .work-status-dot.available { background: #00aa00; }
+            .work-status-dot.sold      { background: #cc2200; }
+            .work-status-dot.ghost     { background: #999; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ====== CONTROL BAR (screen only) ====== -->
+<div class="controls" id="controls">
+    <div class="controls-title">GHOSTLINE // PORTFOLIO PRINT</div>
+    <div class="controls-meta">works: <span id="countDisplay">—</span></div>
+    <button class="btn-print" onclick="window.print()">CMD+P → SAVE AS PDF</button>
+    <div class="status-line" id="statusLine">// loading works from gallery...</div>
+</div>
+
+<!-- ====== LOADING ====== -->
+<div class="loading-screen" id="loadingScreen">
+    <p>// fetching works from supabase...</p>
+</div>
+
+<!-- ====== PORTFOLIO OUTPUT ====== -->
+<div id="portfolioOutput" style="display:none;">
+
+    <!-- Cover page -->
+    <div class="portfolio-cover">
+        <div class="cover-label">// CATALOG //</div>
+        <div class="cover-title">GHOSTLINE</div>
+        <div class="cover-sub">VISUAL SYSTEM // DIGITAL ART</div>
+        <div class="cover-count">
+            <span id="coverCount">0</span> WORKS // <span id="coverYear"></span>
+        </div>
+    </div>
+
+    <!-- Works -->
+    <div class="portfolio-grid" id="portfolioGrid"></div>
+
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-env.js"></script>
+<script>
+    async function loadPortfolio() {
+        const statusLine = document.getElementById('statusLine');
+        const loading    = document.getElementById('loadingScreen');
+        const output     = document.getElementById('portfolioOutput');
+        const grid       = document.getElementById('portfolioGrid');
+        const countEl    = document.getElementById('countDisplay');
+        const coverCount = document.getElementById('coverCount');
+        const coverYear  = document.getElementById('coverYear');
+
+        coverYear.textContent = new Date().getFullYear();
+
+        if (!window.supabase || !window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+            statusLine.textContent = '// ERROR: supabase credentials not found';
+            statusLine.className = 'status-line err';
+            loading.innerHTML = '<p style="color:#ff4400">// no supabase credentials — open via ghostline.live server</p>';
+            return;
+        }
+
+        try {
+            const client = window.supabase.createClient(
+                window.SUPABASE_URL,
+                window.SUPABASE_ANON_KEY
+            );
+
+            // Same query as gallery.html — all categories except lost-archive and polaroid
+            const { data, error } = await client
+                .from('images')
+                .select('*')
+                .neq('category', 'lost-archive')
+                .neq('category', 'polaroid')
+                .order('created_at', { ascending: true }); // oldest first = chronological catalog
+
+            if (error) throw error;
+
+            const works = data || [];
+
+            statusLine.textContent = `// ${works.length} works loaded — press CMD+P to save as PDF`;
+            statusLine.className = 'status-line ok';
+            countEl.textContent = works.length;
+            coverCount.textContent = works.length;
+
+            if (works.length === 0) {
+                loading.innerHTML = '<p style="color:#004400">// no gallery works found</p>';
+                return;
+            }
+
+            // Render grid
+            grid.innerHTML = works.map((item, i) => {
+                const num    = String(i + 1).padStart(3, '0');
+                const title  = item.title || 'UNTITLED';
+                const size   = item.size  || '';
+                const status = item.status || 'available';
+                const date   = item.created_at
+                    ? new Date(item.created_at).toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })
+                    : '';
+
+                return `
+                <div class="work-item">
+                    <div class="work-img-wrap">
+                        <img
+                            src="${item.url}"
+                            alt="${title}"
+                            loading="lazy"
+                            onload="this.classList.add('loaded')"
+                            onerror="this.style.opacity='0.2'; this.alt='[image unavailable]'"
+                        >
+                    </div>
+                    <div class="work-meta">
+                        <div class="work-index">// ${num}</div>
+                        <div class="work-title">${title}</div>
+                        <div class="work-details">
+                            ${size ? `<span>${size}</span>` : ''}
+                            <span>
+                                <span class="work-status-dot ${status}"></span>${status.toUpperCase()}
+                            </span>
+                            ${date ? `<span>${date}</span>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            loading.style.display = 'none';
+            output.style.display  = 'block';
+
+        } catch (e) {
+            console.error(e);
+            statusLine.textContent = '// ERROR: ' + e.message;
+            statusLine.className = 'status-line err';
+            loading.innerHTML = `<p style="color:#ff4400">// fetch error: ${e.message}</p>`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadPortfolio);
+</script>
+
+</body>
+</html>
