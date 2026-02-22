@@ -4019,29 +4019,21 @@ window.addEventListener('DOMContentLoaded', () => {
         if (ts - lastTick > interval) frameIdx++;
     }
 
-    // ── State scheduler ──
-    function scheduleNextState() {
-        const delay = 3000 + Math.random() * 5000;
-        if (petTimer) clearTimeout(petTimer);
-        petTimer = setTimeout(pickRandomState, delay);
+    // ── Loop: hatch → idle pause 5s → hatch → ... ──
+    function runHatchLoop() {
+        playAnim('hatch', () => {
+            // after hatch: show idle for 5 seconds then repeat
+            playAnim('idle');
+            setState('idle');
+            petTimer = setTimeout(runHatchLoop, 5000);
+        });
+        setState('hatching...');
     }
 
-    function pickRandomState() {
-        const roll = Math.random();
-        if (roll < 0.40) {
-            playAnim('idle'); setState('idle');
-            scheduleNextState();
-        } else if (roll < 0.65) {
-            // hatch sequence: plays once then back to idle
-            playAnim('hatch', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
-            setState('hatching...');
-        } else if (roll < 0.85) {
-            playAnim('sleep'); setState('sleeping');
-            setTimeout(() => { playAnim('idle'); setState('idle'); scheduleNextState(); }, 5000);
-        } else {
-            playAnim('happy', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
-            setState('!');
-        }
+    // keep these as no-ops so triggerPetAnimation can call scheduleNextState
+    function scheduleNextState() {
+        if (petTimer) clearTimeout(petTimer);
+        petTimer = setTimeout(runHatchLoop, 5000);
     }
 
     // ── Public trigger (called from division/feed monitors) ──
@@ -4066,9 +4058,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Start
     sprite.onload = () => {
         requestAnimationFrame(draw);
-        playAnim('idle');
-        setState('idle');
-        scheduleNextState();
+        runHatchLoop();
     };
     sprite.onerror = () => {
         console.warn('[Pet] sprite not found:', SPRITE_URL);
