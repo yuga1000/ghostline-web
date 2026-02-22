@@ -3939,22 +3939,39 @@ function feedUpdateDisplay(data) {
     const cntEl = document.getElementById('feed-event-count');
     const updEl = document.getElementById('feed-last-update');
 
-    // Status — green if we have events
+    // Status — figure out if spider is currently active or sleeping
     const hasEvents = data.events && data.events.length > 0;
-    if (dot) {
-        dot.style.background = hasEvents ? '#00ff00' : '#444';
-        if (hasEvents) dot.classList.add('active'); else dot.classList.remove('active');
+    let spiderSleeping = true;
+    let lastActiveAgo  = '';
+
+    if (data.generated_at) {
+        try {
+            const genDt    = new Date(data.generated_at);
+            const ageMin   = (Date.now() - genDt.getTime()) / 60000;
+            // If log was generated within last 3 hours → spider recently active
+            spiderSleeping = ageMin > 180;
+            if (ageMin < 60) {
+                lastActiveAgo = Math.round(ageMin) + 'm ago';
+            } else {
+                lastActiveAgo = Math.round(ageMin / 60) + 'h ago';
+            }
+        } catch(e) {}
     }
-    if (txt) txt.textContent = hasEvents ? 'LIVE' : 'STANDBY';
+
+    if (dot) {
+        // Green = active recently, amber = sleeping, grey = no data
+        dot.style.background = !hasEvents ? '#333' : spiderSleeping ? '#ffaa00' : '#00ff00';
+        if (!spiderSleeping && hasEvents) dot.classList.add('active');
+        else dot.classList.remove('active');
+    }
+    if (txt) txt.textContent = !hasEvents ? 'STANDBY' : spiderSleeping ? 'SLEEPING' : 'LIVE';
     if (nm)  nm.style.display = 'none';
 
     if (cntEl) cntEl.textContent = `// ${data.event_count || 0} events today`;
 
-    if (updEl && data.generated_at) {
-        try {
-            const dt = new Date(data.generated_at);
-            updEl.textContent = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        } catch(e) {}
+    if (updEl) {
+        updEl.textContent = lastActiveAgo ? 'last active: ' + lastActiveAgo : '';
+        updEl.style.color = spiderSleeping ? '#443300' : '#003300';
     }
 
     // Add new events to log
