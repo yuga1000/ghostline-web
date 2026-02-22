@@ -775,8 +775,8 @@
                         <!-- ZZZ sleep bubbles -->
                         <div id="pet-zzz" style="display:none;position:absolute;top:10px;right:20px;font-family:'Share Tech Mono',monospace;font-size:14px;color:#00ff00;opacity:0.7;animation:petZzz 2s ease-in-out infinite;">z z z</div>
                         <!-- Sprite canvas -->
-                        <canvas id="pet-sprite-canvas" width="128" height="128"
-                            style="image-rendering:pixelated;image-rendering:crisp-edges;"></canvas>
+                        <canvas id="pet-sprite-canvas" width="64" height="64"
+                            style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;"></canvas>
                     </div>
                     <div class="pixel-font text-xs mt-2" style="color:#003300;">
                         <span id="pet-state-label">// idle</span>
@@ -3927,8 +3927,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const SPRITE_URL = '/assets/pet_sprite.png';
     const FW = 64;   // frame width in spritesheet
     const FH = 64;   // frame height in spritesheet
-    const DW = 128;  // display size (canvas)
-    const DH = 128;
+    const DW = 64;   // display size (canvas)
+    const DH = 64;
 
     // Frame indices in spritesheet (x = i * FW)
     const F = {
@@ -3946,19 +3946,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Animation sequences: [frames], fps, loop
     const ANIMS = {
-        idle:  { frames: [F.IDLE_0, F.IDLE_1],           fps: 2,  loop: true  },
-        walk:  { frames: [F.WALK_0, F.IDLE_0, F.WALK_1, F.IDLE_1], fps: 4, loop: true },
-        happy: { frames: [F.HAPPY_0, F.HAPPY_1, F.HAPPY_0, F.IDLE_0], fps: 6, loop: false },
-        sad:   { frames: [F.SAD_0, F.SAD_1],              fps: 1,  loop: true  },
-        sleep: { frames: [F.SLEEP_0, F.SLEEP_1],          fps: 1,  loop: true  },
+        idle:  { frames: [F.IDLE_0, F.IDLE_1],                              fps: 2,  loop: true  },
+        hatch: { frames: [F.IDLE_0, F.IDLE_1, F.WALK_0, F.WALK_1, F.HAPPY_0, F.HAPPY_1, F.WALK_1, F.IDLE_1], fps: 4, loop: false },
+        happy: { frames: [F.HAPPY_0, F.HAPPY_1, F.HAPPY_0, F.IDLE_0],      fps: 6,  loop: false },
+        sad:   { frames: [F.SAD_0, F.SAD_1],                                fps: 1,  loop: true  },
+        sleep: { frames: [F.SLEEP_0, F.SLEEP_1],                            fps: 1,  loop: true  },
     };
 
     // State machine
     let currentAnim = 'idle';
     let frameIdx    = 0;
     let lastTick    = 0;
-    let petX        = 0;    // horizontal position (for walk)
-    let walkDir     = 1;    // 1 = right, -1 = left
     let petTimer    = null;
     let stateTimer  = null;
 
@@ -4014,23 +4012,6 @@ window.addEventListener('DOMContentLoaded', () => {
         // Clear
         ctx.clearRect(0, 0, DW, DH);
 
-        // Walk: move horizontally
-        if (currentAnim === 'walk') {
-            const container = document.getElementById('pet-feed');
-            const cw = container ? container.clientWidth : 200;
-            petX += walkDir * 0.5;
-            const maxX = cw - DW;
-            if (petX > maxX) { petX = maxX; walkDir = -1; }
-            if (petX < 0)    { petX = 0;    walkDir = 1;  }
-            canvas.style.transform = walkDir < 0 ? 'scaleX(-1)' : 'scaleX(1)';
-            canvas.style.position = 'absolute';
-            canvas.style.left = petX + 'px';
-        } else {
-            canvas.style.position = 'static';
-            canvas.style.transform = 'scaleX(1)';
-            petX = 0;
-        }
-
         // Draw frame
         ctx.drawImage(sprite, sx, 0, FW, FH, 0, 0, DW, DH);
 
@@ -4047,20 +4028,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function pickRandomState() {
         const roll = Math.random();
-        if (roll < 0.45) {
+        if (roll < 0.40) {
             playAnim('idle'); setState('idle');
-        } else if (roll < 0.75) {
-            playAnim('walk'); setState('walking');
-        } else if (roll < 0.9) {
+            scheduleNextState();
+        } else if (roll < 0.65) {
+            // hatch sequence: plays once then back to idle
+            playAnim('hatch', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
+            setState('hatching...');
+        } else if (roll < 0.85) {
             playAnim('sleep'); setState('sleeping');
-            setTimeout(() => { playAnim('idle'); setState('idle'); scheduleNextState(); }, 6000);
-            return;
+            setTimeout(() => { playAnim('idle'); setState('idle'); scheduleNextState(); }, 5000);
         } else {
             playAnim('happy', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
-            setState('happy');
-            return;
+            setState('!');
         }
-        scheduleNextState();
     }
 
     // ── Public trigger (called from division/feed monitors) ──
