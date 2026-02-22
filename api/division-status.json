@@ -1,0 +1,56 @@
+{
+  "division": "GHOSTLINE ACQUISITION DIVISION",
+  "version": "2.0",
+  "generated_at": "2026-02-22T14:32:00Z",
+  "status": "ACTIVE",
+  "uptime_hours": 343,
+
+  "metrics": {
+    "total_leads": 2872,
+    "hot_leads": 113,
+    "warm_leads": 136,
+    "validated": 150,
+    "llm_analyzed": 145,
+    "applications_sent": 4,
+    "applications_won": 0,
+    "dead_filtered": 826
+  },
+
+  "pipeline": {
+    "scanning": 0.78,
+    "validating": 0.61,
+    "analyzing": 0.45,
+    "submitting": 0.04
+  },
+
+  "search_vectors": [
+    {"name": "Asia-Pacific", "detail": "14 countries", "status": "active"},
+    {"name": "Crypto / Web3", "detail": "NFT, onchain art", "status": "active"},
+    {"name": "Contests & Prizes", "detail": "awards, grants", "status": "active"},
+    {"name": "Brand Collabs", "detail": "fashion, tech, games", "status": "active"},
+    {"name": "Direct Buyers", "detail": "commissions, collectors", "status": "active"}
+  ],
+
+  "activity_log": [
+    {"time": "14:32", "event": "Spider completed scan cycle #847"},
+    {"time": "14:30", "event": "Validator checked 45 leads ... 12 confirmed OPEN"},
+    {"time": "14:28", "event": "LLM analyzed 38 opportunities"},
+    {"time": "12:15", "event": "New HOT lead detected in Asia-Pacific sector"},
+    {"time": "08:00", "event": "Full scan cycle started"},
+    {"time": "yesterday", "event": "Application #4 submitted to international contest"}
+  ],
+
+  "scan_history": {
+    "today": {"scans": 6, "new_leads": 12, "hot_found": 3},
+    "week":  {"scans": 42, "new_leads": 87, "hot_found": 18},
+    "month": {"scans": 180, "new_leads": 340, "hot_found": 76}
+  },
+
+  "tech_stack": {
+    "scrapers": 3,
+    "search_queries": 255,
+    "niches": 25,
+    "llm_model": "llama3.2",
+    "scoring_signals": 20
+  }
+}
