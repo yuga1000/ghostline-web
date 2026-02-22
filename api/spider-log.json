@@ -1,0 +1,127 @@
+{
+  "generated_at": "2026-02-22T13:22:33.628050Z",
+  "log_source": "spider_2026-02-22.log",
+  "event_count": 30,
+  "events": [
+    {
+      "time": "21:19",
+      "event": "Scanning sector: luxury lifestyle collabs"
+    },
+    {
+      "time": "21:19",
+      "event": "Collab finder: sector 'tech collabs' — 20 opportunities"
+    },
+    {
+      "time": "21:16",
+      "event": "Collab finder: 10 results indexed"
+    },
+    {
+      "time": "21:16",
+      "event": "Scanning sector: tech collabs"
+    },
+    {
+      "time": "21:16",
+      "event": "Collab finder: sector 'beverage collabs' — 20 opportunities"
+    },
+    {
+      "time": "21:12",
+      "event": "Scanning sector: beverage collabs"
+    },
+    {
+      "time": "21:12",
+      "event": "Collab finder: sector 'fashion collabs' — 20 opportunities"
+    },
+    {
+      "time": "21:09",
+      "event": "Collab finder: 10 results indexed"
+    },
+    {
+      "time": "21:09",
+      "event": "Scanning sector: fashion collabs"
+    },
+    {
+      "time": "20:23",
+      "event": "Validator: checking 30 candidates"
+    },
+    {
+      "time": "20:23",
+      "event": "Rescored 3202 opportunities"
+    },
+    {
+      "time": "20:23",
+      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
+    },
+    {
+      "time": "20:20",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "20:20",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "20:19",
+      "event": "Scanning sector: direct buyers"
+    },
+    {
+      "time": "20:19",
+      "event": "Collector scanner: sector 'asia collectors' — 20 opportunities"
+    },
+    {
+      "time": "20:16",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "20:14",
+      "event": "Scanning sector: asia collectors"
+    },
+    {
+      "time": "20:14",
+      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
+    },
+    {
+      "time": "19:34",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "19:33",
+      "event": "Scanning sector: crypto collectors"
+    },
+    {
+      "time": "19:33",
+      "event": "Brand Collab scanner: 8 results indexed"
+    },
+    {
+      "time": "18:27",
+      "event": "Brand Collab scanner: 7 results indexed"
+    },
+    {
+      "time": "18:14",
+      "event": "Brand Collab scanner: 10 results indexed"
+    },
+    {
+      "time": "18:11",
+      "event": "Open Calls scanner: 8 results indexed"
+    },
+    {
+      "time": "16:07",
+      "event": "Anti-block system: fetch success"
+    },
+    {
+      "time": "16:07",
+      "event": "Validator: checking 30 candidates"
+    },
+    {
+      "time": "16:07",
+      "event": "Rescored 3064 opportunities"
+    },
+    {
+      "time": "16:07",
+      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
+    },
+    {
+      "time": "16:04",
+      "event": "Scanning sector: direct buyers"
+    }
+  ]
+}
