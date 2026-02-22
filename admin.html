@@ -622,6 +622,9 @@ padding: 0.5rem;
         loadArtworks();
         resetForm();
         alert(editingId ? 'Artwork updated!' : 'Artwork saved!');
+
+        // Regenerate portfolio PDF in background (non-blocking)
+        setTimeout(() => generatePortfolioPDF(), 200);
     }
 
     function resetForm() {
@@ -753,6 +756,202 @@ padding: 0.5rem;
 <script src="supabase-admin.js"></script>
 
 <script src="js/manual-modal.js"></script>
+
+<!-- jsPDF for portfolio PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// =============================================
+// AUTO PORTFOLIO PDF GENERATOR
+// Triggered after every artwork save.
+// Builds PDF from all gallery images and
+// uploads to Supabase Storage as portfolio/portfolio.pdf
+// =============================================
+
+const PDF_STORAGE_PATH = 'portfolio/portfolio.pdf';
+
+function showPdfToast(msg, state) {
+    // state: 'busy' | 'ok' | 'err'
+    let el = document.getElementById('pdfToast');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'pdfToast';
+        el.style.cssText = [
+            'position:fixed', 'bottom:20px', 'right:20px', 'z-index:9999',
+            'font-family:Share Tech Mono,monospace', 'font-size:11px',
+            'padding:10px 18px', 'background:#000', 'border:1px solid #003300',
+            'color:#00ff00', 'letter-spacing:1px', 'max-width:300px',
+            'transition:opacity 0.3s', 'display:none'
+        ].join(';');
+        document.body.appendChild(el);
+    }
+    const colors = { busy: '#00ff00', ok: '#00ff88', err: '#ff4400' };
+    const borders = { busy: '#003300', ok: '#003322', err: '#330000' };
+    el.style.color       = colors[state]  || colors.busy;
+    el.style.borderColor = borders[state] || borders.busy;
+    el.textContent = '// PDF: ' + msg;
+    el.style.display = 'block';
+    el.style.opacity = '1';
+    if (state === 'ok' || state === 'err') {
+        setTimeout(() => { el.style.opacity = '0'; setTimeout(() => { el.style.display = 'none'; }, 300); }, 5000);
+    }
+}
+
+async function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+// Fetch images in parallel (max `concurrency` at a time)
+async function fetchAllImages(works, onProgress) {
+    const results = new Array(works.length).fill(null);
+    let done = 0;
+    let idx  = 0;
+    const CONCURRENCY = 6;
+
+    async function worker() {
+        while (idx < works.length) {
+            const i = idx++;
+            try {
+                const resp = await fetch(works[i].url, { mode: 'cors' });
+                if (!resp.ok) throw new Error('http ' + resp.status);
+                const blob = await resp.blob();
+                const dataUrl = await blobToDataUrl(blob);
+                const fmt = blob.type.includes('png') ? 'PNG' : 'JPEG';
+                // Get natural dimensions for aspect-ratio preserve
+                const dims = await new Promise(res => {
+                    const img = new Image();
+                    img.onload  = () => res({ w: img.naturalWidth, h: img.naturalHeight });
+                    img.onerror = () => res(null);
+                    img.src = dataUrl;
+                });
+                results[i] = { dataUrl, fmt, dims };
+            } catch(e) {
+                results[i] = null; // broken image — will be skipped
+            }
+            done++;
+            if (onProgress) onProgress(done, works.length);
+        }
+    }
+
+    await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+    return results;
+}
+
+async function generatePortfolioPDF() {
+    if (!window.jspdf || !window.supabaseAdmin) return;
+
+    showPdfToast('starting...', 'busy');
+
+    try {
+        const { jsPDF } = window.jspdf;
+
+        // ── 1. Fetch all gallery works ──────────────────────
+        const { data: works, error } = await window.supabaseAdmin.supabase
+            .from('images')
+            .select('*')
+            .neq('category', 'lost-archive')
+            .neq('category', 'polaroid')
+            .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        if (!works || works.length === 0) { showPdfToast('no works found', 'err'); return; }
+
+        showPdfToast(`fetching ${works.length} images...`, 'busy');
+
+        // ── 2. Download all images in parallel ───────────────
+        const images = await fetchAllImages(works, (done, total) => {
+            showPdfToast(`${done} / ${total} images`, 'busy');
+        });
+
+        showPdfToast('building pdf...', 'busy');
+
+        // ── 3. Build PDF ─────────────────────────────────────
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const W = 210, H = 297;
+        const margin  = 14;
+        const slotH   = (H - 3 * margin) / 2; // 2 works per page
+        const imgAreaW = W - 2 * margin;
+        const imgAreaH = slotH - 16;           // leave 16mm for title/meta
+
+        // ── Cover ────────────────────────────────────────────
+        doc.setFillColor(0, 0, 0);
+        doc.rect(0, 0, W, H, 'F');
+        doc.setFont('courier', 'bold');
+        doc.setFontSize(26); doc.setTextColor(0, 200, 0);
+        doc.text('GHOSTLINE', W / 2, H / 2 - 14, { align: 'center' });
+        doc.setFontSize(9);  doc.setTextColor(0, 80, 0);
+        doc.text('VISUAL SYSTEM // DIGITAL ART', W / 2, H / 2 + 2, { align: 'center' });
+        doc.setFontSize(8);
+        doc.text(`${works.length} WORKS // ${new Date().getFullYear()}`, W / 2, H / 2 + 14, { align: 'center' });
+
+        // ── Works (2 per page) ───────────────────────────────
+        for (let i = 0; i < works.length; i++) {
+            const item   = works[i];
+            const slot   = i % 2;        // 0 = top half, 1 = bottom half
+            const yTop   = margin + slot * (slotH + margin);
+
+            if (slot === 0) {
+                doc.addPage();
+                doc.setFillColor(0, 0, 0);
+                doc.rect(0, 0, W, H, 'F');
+            }
+
+            const imgData = images[i];
+            if (imgData && imgData.dims) {
+                // Preserve aspect ratio inside the slot
+                const aspect = imgData.dims.w / imgData.dims.h;
+                let dw = imgAreaW, dh = dw / aspect;
+                if (dh > imgAreaH) { dh = imgAreaH; dw = dh * aspect; }
+                const dx = margin + (imgAreaW - dw) / 2;
+                doc.addImage(imgData.dataUrl, imgData.fmt, dx, yTop, dw, dh, '', 'FAST');
+            } else {
+                // Placeholder for broken image
+                doc.setFillColor(10, 10, 10);
+                doc.rect(margin, yTop, imgAreaW, imgAreaH, 'F');
+                doc.setTextColor(40, 40, 40); doc.setFontSize(7);
+                doc.text('[image unavailable]', W / 2, yTop + imgAreaH / 2, { align: 'center' });
+            }
+
+            // Title + meta
+            const metaY = yTop + imgAreaH + 5;
+            doc.setFont('courier', 'bold'); doc.setFontSize(8); doc.setTextColor(0, 180, 0);
+            doc.text((item.title || 'UNTITLED').toUpperCase(), margin, metaY);
+
+            const metaParts = [item.size, item.status, item.created_at ? new Date(item.created_at).getFullYear() : ''].filter(Boolean);
+            if (metaParts.length) {
+                doc.setFont('courier', 'normal'); doc.setFontSize(6); doc.setTextColor(0, 70, 0);
+                doc.text(metaParts.join(' // '), margin, metaY + 5);
+            }
+        }
+
+        // ── 4. Upload PDF to Supabase Storage ────────────────
+        showPdfToast('uploading...', 'busy');
+        const pdfBlob = doc.output('blob');
+
+        const { error: upErr } = await window.supabaseAdmin.supabase.storage
+            .from('images')
+            .upload(PDF_STORAGE_PATH, pdfBlob, {
+                contentType: 'application/pdf',
+                upsert: true,
+                cacheControl: '60'
+            });
+
+        if (upErr) throw upErr;
+
+        showPdfToast(`done — ${works.length} works`, 'ok');
+        console.log('[Portfolio PDF] Updated:', PDF_STORAGE_PATH);
+
+    } catch(e) {
+        console.error('[Portfolio PDF] Error:', e);
+        showPdfToast('error: ' + e.message, 'err');
+    }
+}
+</script>
 
 </body>
 </html>
