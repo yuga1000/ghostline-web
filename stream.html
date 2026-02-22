@@ -699,6 +699,12 @@
         animation: none !important;
     }
 
+    @keyframes petZzz {
+        0%   { opacity: 0.2; transform: translateY(0px) scale(0.8); }
+        50%  { opacity: 0.8; transform: translateY(-6px) scale(1.1); }
+        100% { opacity: 0.2; transform: translateY(0px) scale(0.8); }
+    }
+
 </style>
 
 
@@ -759,132 +765,22 @@
                     <div class="pixel-font text-xs mt-2" style="color:#001500;">// stream coming soon</div>
                 </div>
 
-                <!-- Agent Pet -->
+                <!-- Agent Pet — sprite version -->
                 <div class="terminal-border robot-card">
                     <div class="pixel-font text-xs mb-2 flex justify-between">
                         <span>[AGENT_PET]</span>
-                        <span><span class="status-online" id="pet-status"></span><span id="pet-mood">▓▒░</span></span>
+                        <span><span class="status-online active" id="pet-status"></span><span id="pet-mood">IDLE</span></span>
                     </div>
-                    <div class="video-feed h-40 terminal-border relative" id="pet-feed">
-                        <div class="pet-container-inline">
-                            <!-- Stars container (for night sky) -->
-                            <div class="stars-container" id="stars-container"></div>
-                            <!-- Rain container (for rain effect) -->
-                            <div class="rain-container" id="rain-container"></div>
-                            <div class="pet-display-inline">
-                                <!-- Sleep mask (shows when sleeping) -->
-                                <div class="pet-sleep-mask" id="pet-sleep-mask"></div>
-                                <!-- Falling stars container -->
-                                <div id="falling-stars-container"></div>
-                                <!-- Toy pixel (shows when playing) -->
-                                <div class="pet-toy-pixel" id="pet-toy"></div>
-                                <!-- Tongue for hunting (shoots out like chameleon) -->
-                                <div class="pet-tongue" id="pet-tongue"></div>
-                                <!-- Sleep pixels (shows when sleeping) -->
-                                <div class="pet-sleep-pixels" id="pet-sleep-pixels">
-                                    <div class="sleep-pixel"></div>
-                                    <div class="sleep-pixel"></div>
-                                    <div class="sleep-pixel"></div>
-                                </div>
-                                <!-- Image preview window -->
-                                <div class="pet-image-window" id="pet-image-window">
-                                    <div class="pet-image-label">NEW IMAGE!</div>
-                                    <img id="pet-image-preview" src="" alt="Generated Image" />
-                                </div>
-                                <div class="pet active idle stage-1" id="agent-pet">
-                                    <!-- Roof/shelter (shows when sleeping) -->
-                                    <div class="pet-roof" id="pet-roof">
-                                        <div class="roof-bar">
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                            <div class="roof-pixel"></div>
-                                        </div>
-                                    </div>
-                                    <!-- Body container (animated) -->
-                                    <div class="pet-body-container">
-                                        <!-- Fractal branches container (for advanced bloom stages) -->
-                                        <div class="pet-branches" id="pet-branches"></div>
-                                        <!-- Petals container (for full bloom) -->
-                                        <div class="pet-petals" id="pet-petals"></div>
-                                        <!-- Arms row (with body top) -->
-                                        <div class="pet-arms">
-                                            <!-- 🕷️ Spider legs - 3 left arms -->
-                                            <div class="pixel arm arm-extra spider-leg-3"></div>
-                                            <div class="pixel arm arm-extra spider-leg-2"></div>
-                                            <div class="pixel arm"></div>
-
-                                            <!-- Body (12x6 grid + flower crown pixels) -->
-                                            <div class="pet-body">
-                                                <!-- 🕷️ SPIDER MANDIBLES (жвала) - hidden by default, shown in spider mode -->
-                                                <div class="pixel mandible mandible-left"></div>
-                                                <div class="pixel mandible mandible-right"></div>
-
-                                                <!-- FLOWER CROWN - Row -3 (only visible in flower phase 5-6) -->
-                                                <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-5"></div>
-                                                <!-- FLOWER CROWN - Row -2 (visible in flower phase 4-6) -->
-                                                <div class="pixel body flower-crown crown-5"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-5"></div>
-                                                <!-- FLOWER CROWN - Row -1 (visible in flower phase 3-6) -->
-                                                <div class="pixel body flower-crown crown-4"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-3"></div><div class="pixel body flower-crown crown-4"></div>
-
-                                                <!-- Row 1 (breathing layer - outer pixels appear/disappear) -->
-                                                <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
-                                                <!-- Row 2 (extra eyes row for stage 4) -->
-                                                <div class="pixel body breath-outer"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-inner"></div><div class="pixel eye eye-extra"></div><div class="pixel body breath-inner"></div><div class="pixel body breath-outer"></div>
-                                                <!-- Row 3 (eyes row) -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel eye"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
-                                                <!-- Row 4 -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
-                                                <!-- Row 5 -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
-                                                <!-- Row 6 -->
-                                                <div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div><div class="pixel body"></div>
-                                            </div>
-
-                                            <!-- Right arm -->
-                                            <div class="pixel arm"></div>
-                                            <!-- 🕷️ Spider legs - 3 right arms -->
-                                            <div class="pixel arm arm-extra spider-leg-2"></div>
-                                            <div class="pixel arm arm-extra spider-leg-3"></div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Legs (4 legs, 2px tall each) - STATIC, don't move -->
-                                    <div class="pet-legs">
-                                        <div class="pixel leg"></div>
-                                        <div style="width: 4px;"></div>
-                                        <div class="pixel leg"></div>
-                                        <div style="width: 16px;"></div>
-                                        <div class="pixel leg"></div>
-                                        <div style="width: 4px;"></div>
-                                        <div class="pixel leg"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Progress bar -->
-                            <div class="pet-progress-bar">
-                                <div class="pet-progress-fill" id="pet-progress" style="width: 0%;"></div>
-                            </div>
-                        </div>
+                    <div class="h-40 terminal-border relative" id="pet-feed" style="background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                        <!-- ZZZ sleep bubbles -->
+                        <div id="pet-zzz" style="display:none;position:absolute;top:10px;right:20px;font-family:'Share Tech Mono',monospace;font-size:14px;color:#00ff00;opacity:0.7;animation:petZzz 2s ease-in-out infinite;">z z z</div>
+                        <!-- Sprite canvas -->
+                        <canvas id="pet-sprite-canvas" width="128" height="128"
+                            style="image-rendering:pixelated;image-rendering:crisp-edges;"></canvas>
                     </div>
-                    <div class="pixel-font text-green-600 text-xs mt-2">
-                        <div>STAGE: <span id="pet-stage-text">1</span> / 4</div>
-                        <div id="rest-countdown-container" style="display: none;">
-                            <span style="color: #ffaa00;">REST: </span>
-                            <span id="rest-countdown-text">--:--</span>
-                        </div>
+                    <div class="pixel-font text-xs mt-2" style="color:#003300;">
+                        <span id="pet-state-label">// idle</span>
+                        <span style="float:right;color:#002200;" id="pet-event-label"></span>
                     </div>
                 </div>
 
@@ -4025,6 +3921,178 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(fetchSpiderFeed, 1200);
     setInterval(fetchSpiderFeed, 2 * 60 * 1000); // re-fetch every 2 min
 });
+
+// ==================== SPRITE PET ====================
+(function() {
+    const SPRITE_URL = '/assets/pet_sprite.png';
+    const FW = 64;   // frame width in spritesheet
+    const FH = 64;   // frame height in spritesheet
+    const DW = 128;  // display size (canvas)
+    const DH = 128;
+
+    // Frame indices in spritesheet (x = i * FW)
+    const F = {
+        IDLE_0:  0,
+        IDLE_1:  1,
+        WALK_0:  2,
+        WALK_1:  3,
+        HAPPY_0: 4,
+        HAPPY_1: 5,
+        SAD_0:   6,
+        SAD_1:   7,
+        SLEEP_0: 8,
+        SLEEP_1: 9,
+    };
+
+    // Animation sequences: [frames], fps, loop
+    const ANIMS = {
+        idle:  { frames: [F.IDLE_0, F.IDLE_1],           fps: 2,  loop: true  },
+        walk:  { frames: [F.WALK_0, F.IDLE_0, F.WALK_1, F.IDLE_1], fps: 4, loop: true },
+        happy: { frames: [F.HAPPY_0, F.HAPPY_1, F.HAPPY_0, F.IDLE_0], fps: 6, loop: false },
+        sad:   { frames: [F.SAD_0, F.SAD_1],              fps: 1,  loop: true  },
+        sleep: { frames: [F.SLEEP_0, F.SLEEP_1],          fps: 1,  loop: true  },
+    };
+
+    // State machine
+    let currentAnim = 'idle';
+    let frameIdx    = 0;
+    let lastTick    = 0;
+    let petX        = 0;    // horizontal position (for walk)
+    let walkDir     = 1;    // 1 = right, -1 = left
+    let petTimer    = null;
+    let stateTimer  = null;
+
+    const canvas = document.getElementById('pet-sprite-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    const sprite = new Image();
+    sprite.src = SPRITE_URL;
+
+    const moodEl      = document.getElementById('pet-mood');
+    const stateEl     = document.getElementById('pet-state-label');
+    const eventEl     = document.getElementById('pet-event-label');
+    const zzzEl       = document.getElementById('pet-zzz');
+
+    function setMood(text) { if (moodEl) moodEl.textContent = text; }
+    function setState(text) { if (stateEl) stateEl.textContent = '// ' + text; }
+    function setEvent(text) {
+        if (!eventEl) return;
+        eventEl.textContent = text;
+        if (text) setTimeout(() => { eventEl.textContent = ''; }, 4000);
+    }
+
+    function playAnim(name, onDone) {
+        currentAnim = name;
+        frameIdx = 0;
+        if (zzzEl) zzzEl.style.display = (name === 'sleep') ? 'block' : 'none';
+        if (stateTimer) clearTimeout(stateTimer);
+        if (!ANIMS[name].loop && onDone) {
+            const dur = (ANIMS[name].frames.length / ANIMS[name].fps) * 1000;
+            stateTimer = setTimeout(onDone, dur);
+        }
+    }
+
+    function draw(ts) {
+        requestAnimationFrame(draw);
+        if (!sprite.complete) return;
+
+        const anim = ANIMS[currentAnim];
+        const interval = 1000 / anim.fps;
+        if (ts - lastTick > interval) {
+            lastTick = ts;
+            if (frameIdx >= anim.frames.length) {
+                if (anim.loop) frameIdx = 0;
+                else { frameIdx = anim.frames.length - 1; }
+            }
+        }
+
+        const fi = anim.frames[Math.min(frameIdx, anim.frames.length - 1)];
+        const sx = fi * FW;
+
+        // Clear
+        ctx.clearRect(0, 0, DW, DH);
+
+        // Walk: move horizontally
+        if (currentAnim === 'walk') {
+            const container = document.getElementById('pet-feed');
+            const cw = container ? container.clientWidth : 200;
+            petX += walkDir * 0.5;
+            const maxX = cw - DW;
+            if (petX > maxX) { petX = maxX; walkDir = -1; }
+            if (petX < 0)    { petX = 0;    walkDir = 1;  }
+            canvas.style.transform = walkDir < 0 ? 'scaleX(-1)' : 'scaleX(1)';
+            canvas.style.position = 'absolute';
+            canvas.style.left = petX + 'px';
+        } else {
+            canvas.style.position = 'static';
+            canvas.style.transform = 'scaleX(1)';
+            petX = 0;
+        }
+
+        // Draw frame
+        ctx.drawImage(sprite, sx, 0, FW, FH, 0, 0, DW, DH);
+
+        // Advance frame
+        if (ts - lastTick > interval) frameIdx++;
+    }
+
+    // ── State scheduler ──
+    function scheduleNextState() {
+        const delay = 3000 + Math.random() * 5000;
+        if (petTimer) clearTimeout(petTimer);
+        petTimer = setTimeout(pickRandomState, delay);
+    }
+
+    function pickRandomState() {
+        const roll = Math.random();
+        if (roll < 0.45) {
+            playAnim('idle'); setState('idle');
+        } else if (roll < 0.75) {
+            playAnim('walk'); setState('walking');
+        } else if (roll < 0.9) {
+            playAnim('sleep'); setState('sleeping');
+            setTimeout(() => { playAnim('idle'); setState('idle'); scheduleNextState(); }, 6000);
+            return;
+        } else {
+            playAnim('happy', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
+            setState('happy');
+            return;
+        }
+        scheduleNextState();
+    }
+
+    // ── Public trigger (called from division/feed monitors) ──
+    window.triggerPetAnimation = function(type, duration) {
+        if (type === 'waving' || type === 'excited-bounce') {
+            playAnim('happy', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
+            setState('excited!');
+            setEvent(type === 'waving' ? '★ HOT LEAD' : '✓ scan done');
+            setMood('HOT!');
+            setTimeout(() => setMood('IDLE'), duration || 2500);
+        } else if (type === 'nervous') {
+            playAnim('sad', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
+            setState('nervous');
+            setEvent('signal lost');
+            setMood('???');
+            setTimeout(() => { playAnim('idle'); setState('idle'); setMood('IDLE'); scheduleNextState(); }, duration || 3000);
+        }
+    };
+
+    window.petIsAwake = true;
+
+    // Start
+    sprite.onload = () => {
+        requestAnimationFrame(draw);
+        playAnim('idle');
+        setState('idle');
+        scheduleNextState();
+    };
+    sprite.onerror = () => {
+        console.warn('[Pet] sprite not found:', SPRITE_URL);
+    };
+})();
 
 </script>
 
