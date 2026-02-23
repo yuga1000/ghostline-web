@@ -3912,124 +3912,206 @@ function feedUpdateDisplay(data) {
     }
 }
 
-// ── ASCII art for sleeping state ──
+// ── ASCII art engine for sleeping state ──
 let asciiArtTimer = null;
 let asciiArtRunning = false;
+let asciiTick = 0;
 
-const ASCII_FRAMES = [
-    // web + spider
-    [
-        '    .  *  .      .  *  .',
-        '  \\  |  /    \\  |  / ',
-        '  --(  )--  --(  )--  ',
-        '  /  |  \\    /  |  \\ ',
-        '    *  .  *    *  .  * ',
-        '        \\ (.) /        ',
-        '         >|<           ',
-        '        / | \\         ',
-    ],
-    [
-        '  *  .  *      *  .  * ',
-        '    \\  |  /  \\  |  / ',
-        '  --(  )--  --(  )--  ',
-        '    /  |  \\  /  |  \\ ',
-        '  .  *  .      .  *  . ',
-        '        \\ (o) /        ',
-        '         >|<           ',
-        '        / | \\         ',
-    ],
-    [
-        '  .  *  .      .  *  . ',
-        '  \\  |  /    \\  |  / ',
-        '  --(  )--  --(  )--  ',
-        '  /  |  \\    /  |  \\ ',
-        '  *  .  *      *  .  * ',
-        '        \\ (-) /        ',
-        '         >|<           ',
-        '        / | \\         ',
-    ],
-    // scan pulse
-    [
-        ' ░░░░░░░░░░░░░░░░░░░░░ ',
-        ' ░  SCANNING  . . .  ░ ',
-        ' ░░░░░░░░░░░░░░░░░░░░░ ',
-        '                       ',
-        ' > system dormant      ',
-        ' > next scan: ~2h      ',
-        ' > standby . . .  _    ',
-        '                       ',
-    ],
-    [
-        ' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ ',
-        ' ▒  SCANNING  . . .  ▒ ',
-        ' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ ',
-        '                       ',
-        ' > system dormant      ',
-        ' > next scan: ~2h      ',
-        ' > standby . . . __    ',
-        '                       ',
-    ],
-    // web geometry
-    [
-        '   ___....---""""---...',
-        '  /   \\              / ',
-        ' | ( ) |-----+------/  ',
-        '  \\___/      |  z z    ',
-        '      \\      |         ',
-        '  -----+-----+-----    ',
-        '        \\    |         ',
-        '         \\___/         ',
-    ],
-    [
-        '   ___....---""""---...',
-        '  /   \\              / ',
-        ' | (o) |-----+------/  ',
-        '  \\___/      |  Z Z    ',
-        '      \\      |         ',
-        '  -----+-----+-----    ',
-        '        \\    |         ',
-        '         \\___/         ',
-    ],
+// ── SCENES ── each scene has frames + speed + color per line (optional)
+const SCENES = [
+
+    // ── SCENE 1: Radar sweep ──
+    { speed: 120, frames: (t) => {
+        const W = 22, H = 8;
+        const cx = 10, cy = 3;
+        const angle = (t * 18) % 360;
+        const rad = angle * Math.PI / 180;
+        const lines = [];
+        for (let y = 0; y < H; y++) {
+            let row = '';
+            for (let x = 0; x < W; x++) {
+                const dx = x - cx, dy = y - cy * 2;
+                const dist = Math.sqrt(dx*dx + dy*dy*4);
+                const a = ((Math.atan2(dy*2, dx) * 180 / Math.PI) + 360) % 360;
+                const sweep = ((angle - a + 360) % 360);
+                if (dist < 1.5) { row += '⊕'; continue; }
+                if (Math.abs(dist - 4) < 0.8) { row += '·'; continue; }
+                if (Math.abs(dist - 8) < 0.8) { row += '·'; continue; }
+                if (sweep < 40 && dist < 10) {
+                    const bright = 1 - sweep/40;
+                    row += bright > 0.6 ? '█' : bright > 0.3 ? '▓' : '░';
+                } else { row += ' '; }
+            }
+            lines.push(row);
+        }
+        lines.push(`  RADAR  ${String(angle).padStart(3,'0')}°  SCANNING`);
+        return lines;
+    }, color: (i, t) => i === 8 ? '#00ff00' : `hsl(120,100%,${15 + ((((t*18)%360)/360)*25)}%)` },
+
+    // ── SCENE 2: Matrix rain ──
+    { speed: 80, frames: (t) => {
+        const COLS = 22, ROWS = 8;
+        const chars = '01アイウエオカキクケコゴ░▒▓█∴∵※';
+        const grid = Array.from({length: ROWS}, () => Array(COLS).fill(' '));
+        // deterministic "rain" from tick
+        for (let c = 0; c < COLS; c++) {
+            const speed = 1 + (c * 7) % 3;
+            const head = Math.floor((t * speed / 3 + c * 13) % (ROWS + 4)) - 2;
+            for (let r = 0; r < ROWS; r++) {
+                const dist = head - r;
+                if (dist === 0) grid[r][c] = chars[(t*3+c*7)%chars.length];
+                else if (dist > 0 && dist < 5) grid[r][c] = chars[(t+c*3+r*5)%chars.length];
+            }
+        }
+        return grid.map(row => row.join(''));
+    }, color: (i, t) => `hsl(120,100%,${20 + (i/8)*30}%)` },
+
+    // ── SCENE 3: Spider web breathing ──
+    { speed: 200, frames: (t) => {
+        const phase = t % 6;
+        const webs = [
+            ['        ╲  │  ╱        ',
+             '    ╲    ╲ │ ╱    ╱    ',
+             '  ───╲────╲│╱────╱───  ',
+             '  ────╲────┼────╱────  ',
+             '  ───╱────╱│╲────╲───  ',
+             '    ╱    ╱ │ ╲    ╲    ',
+             '        ╱  │  ╲        ',
+             '     ◈  GHOST  ◈       '],
+            ['       ·╲  │  ╱·       ',
+             '    ╲  · ╲ │ ╱ ·  ╱   ',
+             '  ─·─╲────╲│╱────╱─·─ ',
+             '  ─·──╲────┼────╱──·─ ',
+             '  ─·─╱────╱│╲────╲─·─ ',
+             '    ╱  · ╱ │ ╲ ·  ╲   ',
+             '       ·╱  │  ╲·       ',
+             '     ◈  GHOST  ◈       '],
+            ['      ★╲  │  ╱★       ',
+             '   ╲  ★·╲ │ ╱·★  ╱   ',
+             ' ─★─╲────╲│╱────╱─★─  ',
+             ' ─★──╲────┼────╱──★─  ',
+             ' ─★─╱────╱│╲────╲─★─  ',
+             '   ╱  ★·╱ │ ╲·★  ╲   ',
+             '      ★╱  │  ╲★       ',
+             '     ◈  GHOST  ◈       '],
+        ];
+        return webs[phase % webs.length];
+    }, color: (i, t) => i === 7 ? '#00ff00' : ['#00ff00','#00dd00','#00bb00','#009900','#00bb00','#00dd00','#00ff00','#00ff00'][i] },
+
+    // ── SCENE 4: Glitch corruption ──
+    { speed: 60, frames: (t) => {
+        const base = [
+            '> GHOSTLINE SPIDER v2.0',
+            '> STATUS: DORMANT      ',
+            '> NEXT CYCLE: T-120min ',
+            '> LEADS DB: 3,202      ',
+            '> HOT QUEUE: 57        ',
+            '> ALL SCRAPERS: STANDBY',
+            '> AWAITING WAKE SIGNAL ',
+            '> ░░░░░░░░░░░░░░░░░░░░ ',
+        ];
+        const glitchChars = '▓▒░█▄▀■□◆◇';
+        return base.map((line, i) => {
+            // every few ticks corrupt random lines
+            const corrupt = Math.sin(t * 0.7 + i * 1.3) > 0.6;
+            if (!corrupt) return line;
+            return line.split('').map((c, j) => {
+                const glitch = Math.sin(t * 2.1 + j * 0.9 + i) > 0.5;
+                return glitch ? glitchChars[(t*3+j*7+i*11) % glitchChars.length] : c;
+            }).join('');
+        });
+    }, color: (i, t) => {
+        const corrupt = Math.sin(t * 0.7 + i * 1.3) > 0.6;
+        return corrupt ? '#ff4400' : i % 2 === 0 ? '#00ff00' : '#00cc00';
+    }},
+
+    // ── SCENE 5: Pulse / sonar rings ──
+    { speed: 150, frames: (t) => {
+        const rings = ['·', '░', '▒', '▓', '█', '▓', '▒', '░', '·', ' '];
+        const r = t % rings.length;
+        return [
+            `        ${rings[(r+0)%10]}${rings[(r+0)%10]}${rings[(r+0)%10]}${rings[(r+0)%10]}${rings[(r+0)%10]}       `,
+            `      ${rings[(r+2)%10]}           ${rings[(r+2)%10]}     `,
+            `    ${rings[(r+4)%10]}               ${rings[(r+4)%10]}   `,
+            `   ${rings[(r+5)%10]}    ◈  GHOST  ◈  ${rings[(r+5)%10]}  `,
+            `    ${rings[(r+4)%10]}               ${rings[(r+4)%10]}   `,
+            `      ${rings[(r+2)%10]}           ${rings[(r+2)%10]}     `,
+            `        ${rings[(r+0)%10]}${rings[(r+0)%10]}${rings[(r+0)%10]}${rings[(r+0)%10]}${rings[(r+0)%10]}       `,
+            `  PULSE ${String(t%999).padStart(3,'0')}  ●  DORMANT  `,
+        ];
+    }, color: (i, t) => {
+        const bright = [40,30,25,50,25,30,40,60][i];
+        return `hsl(120,100%,${bright}%)`;
+    }},
 ];
 
-let asciiFrameIdx = 0;
+let currentScene = 0;
+let sceneTimer = null;
+
+function getSceneFrame() {
+    const scene = SCENES[currentScene];
+    return scene.frames(asciiTick);
+}
+
+function getLineColor(lineIdx) {
+    const scene = SCENES[currentScene];
+    return scene.color ? scene.color(lineIdx, asciiTick) : '#00aa00';
+}
 
 function renderAsciiFrame() {
     const log = document.getElementById('feed-log-content');
     if (!log) return;
 
-    const frame = ASCII_FRAMES[asciiFrameIdx % ASCII_FRAMES.length];
-    asciiFrameIdx++;
+    asciiTick++;
+    const frame = getSceneFrame();
 
-    // Clear and render frame
     log.innerHTML = '';
-    frame.forEach(line => {
+    frame.forEach((line, i) => {
         const div = document.createElement('div');
-        div.className = 'log-line log-dim';
-        div.style.color = '#002800';
+        div.style.color = getLineColor(i);
         div.style.fontFamily = 'Share Tech Mono, monospace';
         div.style.whiteSpace = 'pre';
+        div.style.fontSize = '10px';
+        div.style.lineHeight = '1.6';
         div.textContent = line;
         log.appendChild(div);
     });
 }
 
+function nextScene() {
+    currentScene = (currentScene + 1) % SCENES.length;
+    asciiTick = 0;
+    // schedule next scene change in 6-10s
+    sceneTimer = setTimeout(nextScene, 6000 + Math.random() * 4000);
+}
+
 function startFeedAsciiArt() {
     if (asciiArtRunning) return;
     asciiArtRunning = true;
-    renderAsciiFrame();
-    asciiArtTimer = setInterval(renderAsciiFrame, 1800);
+    asciiTick = 0;
+    currentScene = 0;
+
+    function tick() {
+        if (!asciiArtRunning) return;
+        renderAsciiFrame();
+        asciiArtTimer = setTimeout(tick, SCENES[currentScene].speed);
+    }
+    tick();
+
+    // rotate scenes
+    sceneTimer = setTimeout(nextScene, 7000);
 }
 
 function stopFeedAsciiArt() {
     if (!asciiArtRunning) return;
     asciiArtRunning = false;
-    clearInterval(asciiArtTimer);
+    clearTimeout(asciiArtTimer);
+    clearTimeout(sceneTimer);
     asciiArtTimer = null;
-    // clear ascii, real logs will fill in
+    sceneTimer = null;
     const log = document.getElementById('feed-log-content');
     if (log) log.innerHTML = '';
-    spiderFeedShownEvents.clear(); // re-show all real events
+    spiderFeedShownEvents.clear();
 }
 
 async function fetchSpiderFeed() {
