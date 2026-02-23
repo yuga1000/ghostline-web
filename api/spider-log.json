@@ -1,127 +1,91 @@
 {
-  "generated_at": "2026-02-23T22:11:20.940741Z",
-  "log_source": "nohup_spider.log",
-  "event_count": 30,
+  "generated_at": "2026-02-23T23:55:03.134084Z",
+  "log_source": "spider_2026-02-23.log",
+  "event_count": 21,
   "events": [
     {
-      "time": "06:10",
-      "event": "Validator: checking 30 candidates"
-    },
-    {
-      "time": "06:10",
-      "event": "Rescored 3898 opportunities"
-    },
-    {
-      "time": "06:10",
-      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
-    },
-    {
-      "time": "06:07",
-      "event": "Scanning sector: direct buyers"
-    },
-    {
-      "time": "06:07",
-      "event": "Collector scanner: sector 'asia collectors' — 20 opportunities"
-    },
-    {
-      "time": "06:02",
-      "event": "Scanning sector: asia collectors"
-    },
-    {
-      "time": "06:02",
-      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
-    },
-    {
-      "time": "05:58",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "05:58",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "05:58",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "05:57",
-      "event": "Scanning sector: crypto collectors"
-    },
-    {
-      "time": "05:57",
-      "event": "Brand Collab scanner: 2 results indexed"
-    },
-    {
-      "time": "05:14",
+      "time": "07:53",
       "event": "Brand Collab scanner: 9 results indexed"
     },
     {
-      "time": "04:55",
-      "event": "Brand Collab scanner: 6 results indexed"
+      "time": "07:53",
+      "event": "Brand Collab scanner: 5 results indexed"
     },
     {
-      "time": "04:55",
-      "event": "Brand Collab scanner: 8 results indexed"
-    },
-    {
-      "time": "04:40",
+      "time": "07:52",
       "event": "Brand Collab scanner: 7 results indexed"
     },
     {
-      "time": "04:39",
-      "event": "Brand Collab scanner: 10 results indexed"
-    },
-    {
-      "time": "04:36",
-      "event": "Open Calls scanner: 8 results indexed"
-    },
-    {
-      "time": "02:33",
-      "event": "Validator: checking 30 candidates"
-    },
-    {
-      "time": "02:33",
-      "event": "Rescored 3867 opportunities"
-    },
-    {
-      "time": "02:33",
-      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
-    },
-    {
-      "time": "02:29",
-      "event": "Scanning sector: direct buyers"
-    },
-    {
-      "time": "02:29",
-      "event": "Collector scanner: sector 'asia collectors' — 20 opportunities"
-    },
-    {
-      "time": "02:24",
-      "event": "Scanning sector: asia collectors"
-    },
-    {
-      "time": "02:24",
-      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
-    },
-    {
-      "time": "02:20",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "02:20",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "02:20",
-      "event": "Scanning sector: crypto collectors"
-    },
-    {
-      "time": "02:14",
+      "time": "07:52",
       "event": "Brand Collab scanner: 8 results indexed"
     },
     {
-      "time": "02:01",
-      "event": "Brand Collab scanner: 10 results indexed"
+      "time": "07:51",
+      "event": "Open Calls scanner: 3 results indexed"
+    },
+    {
+      "time": "07:49",
+      "event": "Open Calls scanner: 4 results indexed"
+    },
+    {
+      "time": "07:49",
+      "event": "Open Calls scanner: 8 results indexed"
+    },
+    {
+      "time": "07:49",
+      "event": "Open Calls scanner: 5 results indexed"
+    },
+    {
+      "time": "07:49",
+      "event": "Open Calls scanner: 7 results indexed"
+    },
+    {
+      "time": "07:49",
+      "event": "Open Calls scanner: 6 results indexed"
+    },
+    {
+      "time": "07:49",
+      "event": "Brand Collab scanner: 9 results indexed"
+    },
+    {
+      "time": "07:48",
+      "event": "Brand Collab scanner: 8 results indexed"
+    },
+    {
+      "time": "07:48",
+      "event": "Brand Collab scanner: 7 results indexed"
+    },
+    {
+      "time": "07:48",
+      "event": "Brand Collab scanner: 5 results indexed"
+    },
+    {
+      "time": "07:48",
+      "event": "Brand Collab scanner: 6 results indexed"
+    },
+    {
+      "time": "07:46",
+      "event": "Open Calls scanner: 3 results indexed"
+    },
+    {
+      "time": "07:45",
+      "event": "Open Calls scanner: 5 results indexed"
+    },
+    {
+      "time": "07:45",
+      "event": "Open Calls scanner: 7 results indexed"
+    },
+    {
+      "time": "07:44",
+      "event": "Open Calls scanner: 4 results indexed"
+    },
+    {
+      "time": "07:44",
+      "event": "Open Calls scanner: 6 results indexed"
+    },
+    {
+      "time": "07:44",
+      "event": "Open Calls scanner: 8 results indexed"
     }
   ]
 }
