@@ -3916,6 +3916,7 @@ function feedUpdateDisplay(data) {
 let asciiArtTimer = null;
 let asciiArtRunning = false;
 let asciiTick = 0;
+let asciiGeneration = 0; // increments on every scene change/stop — kills stale ticks
 
 // ── SCENES ── each scene has frames + speed + color per line (optional)
 const SCENES = [
@@ -4095,8 +4096,8 @@ const SCENES = [
         return `hsl(120,100%,${light}%)`;
     }},
 
-    // ── SCENE 8: Falling kanji / symbols waterfall (fast, short) ──
-    { speed: 55, duration: 12000, frames: (t) => {
+    // ── SCENE 8: Falling kanji / symbols waterfall (medium pace) ──
+    { speed: 95, duration: 18000, frames: (t) => {
         const cols = 22, rows = 8;
         const sets = [
             '夢眠休止待機沈黙暗闇静寂',
@@ -4119,7 +4120,7 @@ const SCENES = [
         }
         return grid;
     }, color: (i, t) => {
-        const bright = 20 + ((rows - i) / 8) * 45;
+        const bright = 20 + ((8 - i) / 8) * 45;
         return `hsl(120,100%,${Math.min(65, bright)}%)`;
     }},
 
@@ -4506,6 +4507,15 @@ function nextScene() {
     asciiTick = 0;
     // reset cellular automaton grid on scene entry
     if (SCENES[currentScene]._grid) SCENES[currentScene]._grid = null;
+    // bump generation — kills the previous tick chain, starts a fresh one
+    asciiGeneration++;
+    const myGen = asciiGeneration;
+    function tick() {
+        if (!asciiArtRunning || asciiGeneration !== myGen) return;
+        renderAsciiFrame();
+        asciiArtTimer = setTimeout(tick, SCENES[currentScene].speed);
+    }
+    tick();
     const dur = SCENES[currentScene].duration || 8000;
     sceneTimer = setTimeout(nextScene, dur);
 }
@@ -4516,9 +4526,11 @@ function startFeedAsciiArt() {
     asciiTick = 0;
     sceneOrderIdx = 0;
     currentScene = SCENE_ORDER[0];
+    asciiGeneration++;
+    const myGen = asciiGeneration;
 
     function tick() {
-        if (!asciiArtRunning) return;
+        if (!asciiArtRunning || asciiGeneration !== myGen) return; // die if stale
         renderAsciiFrame();
         asciiArtTimer = setTimeout(tick, SCENES[currentScene].speed);
     }
@@ -4531,6 +4543,7 @@ function startFeedAsciiArt() {
 function stopFeedAsciiArt() {
     if (!asciiArtRunning) return;
     asciiArtRunning = false;
+    asciiGeneration++; // kill any lingering tick chain
     clearTimeout(asciiArtTimer);
     clearTimeout(sceneTimer);
     asciiArtTimer = null;
