@@ -5041,6 +5041,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function syncStart() {
+        resize();
+        // guard: if container not rendered yet, retry after 100ms
+        if (!cols || !rows) { setTimeout(syncStart, 100); return; }
+
         const now = Date.now();
         seed = Math.floor(now / CYCLE_MS);
         const cycleStart = seed * CYCLE_MS;
@@ -5051,10 +5055,10 @@ window.addEventListener('DOMContentLoaded', () => {
         currentRules = RULES[seed % RULES.length];
         const genMs  = currentRules.genMs || DEFAULT_GEN_MS;
 
-        // fast-forward to where we'd be now (using this rule's speed)
-        const targetGen = Math.floor(elapsed / genMs);
+        // fast-forward — capped at 300 steps to avoid blocking the main thread
+        const rawTarget = Math.floor(elapsed / genMs);
+        const targetGen = Math.min(rawTarget, 300);
 
-        resize();
         const rng = mulberry32(seed);
         initGrid(rng);
         generation = 0;
@@ -5084,7 +5088,7 @@ window.addEventListener('DOMContentLoaded', () => {
         setTimeout(function() {
             syncStart();
             lastSeed = seed;
-            setTimeout(tick, GEN_MS);
+            setTimeout(tick, DEFAULT_GEN_MS);
         }, 500);
     });
 
