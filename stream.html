@@ -4718,7 +4718,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <script>
 (function() {
     const CELL_SIZE = 3;
-    const DEFAULT_GEN_MS = 120;
+    const DEFAULT_GEN_MS = 156;
     const CYCLE_MS = 5 * 60 * 1000; // new seed every 5 minutes
 
     // Color palettes per mode (alive, dim-trail, dead)
@@ -4741,31 +4741,31 @@ window.addEventListener('DOMContentLoaded', () => {
     // genMs controls animation speed (slower = more meditative, faster = explosive)
     const RULES = [
         // B3/S23 — Conway: classic. Gliders, guns, still lifes. The foundation.
-        { birth: new Set([3]),           survive: new Set([2,3]),          name: 'CONWAY',    genMs: 80  },
+        { birth: new Set([3]),           survive: new Set([2,3]),          name: 'CONWAY',    genMs: 104 },
         // B36/S23 — HighLife: Conway + explosive self-replicators. Gets chaotic fast.
-        { birth: new Set([3,6]),         survive: new Set([2,3]),          name: 'HIGHLIFE',  genMs: 100 },
+        { birth: new Set([3,6]),         survive: new Set([2,3]),          name: 'HIGHLIFE',  genMs: 130 },
         // B3/S12345 — Maze: cells rarely die. Corridors grow slowly into organic labyrinths.
-        { birth: new Set([3]),           survive: new Set([1,2,3,4,5]),    name: 'MAZE',      genMs: 220 },
+        { birth: new Set([3]),           survive: new Set([1,2,3,4,5]),    name: 'MAZE',      genMs: 286 },
         // B3678/S34678 — Day & Night: symmetric rule. Dense blobs persist dramatically.
-        { birth: new Set([3,6,7,8]),     survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT',  genMs: 130 },
+        { birth: new Set([3,6,7,8]),     survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT',  genMs: 169 },
         // B4678/S35678 — Anneal: smooth dissolving organic blobs. Slow and meditative.
-        { birth: new Set([4,6,7,8]),     survive: new Set([3,5,6,7,8]),    name: 'ANNEAL',    genMs: 200 },
+        { birth: new Set([4,6,7,8]),     survive: new Set([3,5,6,7,8]),    name: 'ANNEAL',    genMs: 260 },
         // B36/S125 — 2×2: chunky geometric block tilings. Very different texture.
-        { birth: new Set([3,6]),         survive: new Set([1,2,5]),        name: '2X2',       genMs: 120 },
+        { birth: new Set([3,6]),         survive: new Set([1,2,5]),        name: '2X2',       genMs: 156 },
         // B2/S — Seeds: nothing survives. Cells explode outward in fractal bursts.
-        { birth: new Set([2]),           survive: new Set([]),             name: 'SEEDS',     genMs: 55  },
+        { birth: new Set([2]),           survive: new Set([]),             name: 'SEEDS',     genMs: 72  },
         // B3/S45678 — Coral: cells survive in dense clusters, die when isolated.
         //   Creates organic coral-reef growth that slowly expands then stabilizes.
-        { birth: new Set([3]),           survive: new Set([4,5,6,7,8]),    name: 'CORAL',     genMs: 160 },
+        { birth: new Set([3]),           survive: new Set([4,5,6,7,8]),    name: 'CORAL',     genMs: 208 },
         // B1357/S1357 — Replicator: a single cell spawns geometric diamond copies of itself.
         //   One of the most mathematically beautiful rules. Very hypnotic.
-        { birth: new Set([1,3,5,7]),     survive: new Set([1,3,5,7]),      name: 'REPLICA',   genMs: 90  },
+        { birth: new Set([1,3,5,7]),     survive: new Set([1,3,5,7]),      name: 'REPLICA',   genMs: 117 },
         // B378/S235678 — Coagulations: dense blobs spread and coagulate like ink in water.
-        { birth: new Set([3,7,8]),       survive: new Set([2,3,5,6,7,8]), name: 'COAGULATE', genMs: 140 },
+        { birth: new Set([3,7,8]),       survive: new Set([2,3,5,6,7,8]), name: 'COAGULATE', genMs: 182 },
         // B34/S34 — 34 Life: symmetric crystalline growth. Very geometric, slow.
-        { birth: new Set([3,4]),         survive: new Set([3,4]),          name: '34LIFE',    genMs: 170 },
+        { birth: new Set([3,4]),         survive: new Set([3,4]),          name: '34LIFE',    genMs: 221 },
         // B1/S1 — Gnarl: fractal branching from a single point. Sparse & cosmic.
-        { birth: new Set([1]),           survive: new Set([1]),            name: 'GNARL',     genMs: 70  },
+        { birth: new Set([1]),           survive: new Set([1]),            name: 'GNARL',     genMs: 91  },
     ];
 
     const canvas = document.getElementById('gol-canvas');
