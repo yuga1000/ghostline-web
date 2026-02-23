@@ -3924,33 +3924,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ==================== SPRITE PET ====================
 (function() {
-    const SPRITE_URL = '/assets/pet_sprite.png';
-    const FW = 64;   // frame width in spritesheet
-    const FH = 64;   // frame height in spritesheet
-    const DW = 64;   // display size (canvas)
+    const SPRITE_URL = '/assets/pet/hatch.png';
+    const FW = 64;  // frame width in spritesheet
+    const FH = 64;  // frame height
+    const DW = 64;  // display size
     const DH = 64;
+    const TOTAL_FRAMES = 8; // frames 0-7 in hatch.png
 
-    // Frame indices in spritesheet (x = i * FW)
-    const F = {
-        IDLE_0:  0,
-        IDLE_1:  1,
-        WALK_0:  2,
-        WALK_1:  3,
-        HAPPY_0: 4,
-        HAPPY_1: 5,
-        SAD_0:   6,
-        SAD_1:   7,
-        SLEEP_0: 8,
-        SLEEP_1: 9,
-    };
-
-    // Animation sequences: [frames], fps, loop
+    // Animation sequences: just frame indices 0..7
     const ANIMS = {
-        idle:  { frames: [F.IDLE_0, F.IDLE_1],                              fps: 2,  loop: true  },
-        hatch: { frames: [F.IDLE_0, F.IDLE_1, F.WALK_0, F.WALK_1, F.HAPPY_0, F.HAPPY_1, F.SAD_0, F.SAD_1, F.SLEEP_0, F.SLEEP_1, F.SLEEP_0, F.SAD_1, F.HAPPY_0, F.WALK_0, F.IDLE_1, F.IDLE_0], fps: 5, loop: false },
-        happy: { frames: [F.HAPPY_0, F.HAPPY_1, F.HAPPY_0, F.IDLE_0],      fps: 6,  loop: false },
-        sad:   { frames: [F.SAD_0, F.SAD_1],                                fps: 1,  loop: true  },
-        sleep: { frames: [F.SLEEP_0, F.SLEEP_1],                            fps: 1,  loop: true  },
+        idle:  { frames: [0, 1],                   fps: 2, loop: true  },
+        hatch: { frames: [0,1,2,3,4,5,6,7],        fps: 4, loop: false },
+        happy: { frames: [4,5,4,5,3,2,1,0],        fps: 6, loop: false },
+        sad:   { frames: [6, 7],                   fps: 1, loop: true  },
     };
 
     // State machine
