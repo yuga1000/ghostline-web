@@ -3984,25 +3984,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
         const anim = ANIMS[currentAnim];
         const interval = 1000 / anim.fps;
-        if (ts - lastTick > interval) {
+
+        // Advance frame on tick
+        if (ts - lastTick >= interval) {
             lastTick = ts;
+            frameIdx++;
             if (frameIdx >= anim.frames.length) {
-                if (anim.loop) frameIdx = 0;
-                else { frameIdx = anim.frames.length - 1; }
+                frameIdx = anim.loop ? 0 : anim.frames.length - 1;
             }
         }
 
-        const fi = anim.frames[Math.min(frameIdx, anim.frames.length - 1)];
-        const sx = fi * FW;
-
-        // Clear
+        // Draw current frame
+        const fi = anim.frames[frameIdx] || 0;
         ctx.clearRect(0, 0, DW, DH);
-
-        // Draw frame
-        ctx.drawImage(sprite, sx, 0, FW, FH, 0, 0, DW, DH);
-
-        // Advance frame
-        if (ts - lastTick > interval) frameIdx++;
+        ctx.drawImage(sprite, fi * FW, 0, FW, FH, 0, 0, DW, DH);
     }
 
     // ── Loop: hatch → idle pause 5s → hatch → ... ──
