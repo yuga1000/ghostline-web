@@ -4718,7 +4718,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <script>
 (function() {
     const CELL_SIZE = 3;
-    const GEN_MS = 120;
+    const DEFAULT_GEN_MS = 120;
     const CYCLE_MS = 5 * 60 * 1000; // new seed every 5 minutes
 
     // Color palettes per mode (alive, dim-trail, dead)
@@ -4730,25 +4730,42 @@ window.addEventListener('DOMContentLoaded', () => {
         { alive: '#ffffff', dim: '#222222', dead: '#000000', name: 'WHITE'    },
         { alive: '#ffff00', dim: '#333300', dead: '#000000', name: 'YELLOW'   },
         { alive: '#00ff88', dim: '#003322', dead: '#000000', name: 'MINT'     },
+        { alive: '#ff4488', dim: '#330022', dead: '#000000', name: 'ROSE'     },
+        { alive: '#88aaff', dim: '#111133', dead: '#000000', name: 'INDIGO'   },
+        { alive: '#ffaa00', dim: '#332200', dead: '#000000', name: 'GOLD'     },
+        { alive: '#44ffdd', dim: '#003330', dead: '#000000', name: 'TEAL'     },
+        { alive: '#ff8800', dim: '#221100', dead: '#000000', name: 'FIRE'     },
     ];
 
-    // Cellular automaton rulesets (Birth/Survival) — each produces radically different patterns
-    // Notation: birth = number of live neighbours that create a cell; survive = neighbours to survive
+    // Cellular automaton rulesets — each has radically different visual character
+    // genMs controls animation speed (slower = more meditative, faster = explosive)
     const RULES = [
-        // B3/S23 — Conway's Game of Life: classic, sparse, gliders & stable structures
-        { birth: new Set([3]),         survive: new Set([2,3]),          name: 'CONWAY'   },
-        // B36/S23 — HighLife: like Conway but adds explosive replicators
-        { birth: new Set([3,6]),       survive: new Set([2,3]),          name: 'HIGHLIFE' },
-        // B3/S12345 — Maze: cells very rarely die, forms organic corridor networks
-        { birth: new Set([3]),         survive: new Set([1,2,3,4,5]),    name: 'MAZE'     },
-        // B3678/S34678 — Day & Night: symmetric, dense areas persist dramatically
-        { birth: new Set([3,6,7,8]),   survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT' },
-        // B4678/S35678 — Anneal: smooth dissolving organic blobs, slow & meditative
-        { birth: new Set([4,6,7,8]),   survive: new Set([3,5,6,7,8]),    name: 'ANNEAL'   },
-        // B36/S125 — 2×2: chunky block-like tilings, very geometric
-        { birth: new Set([3,6]),       survive: new Set([1,2,5]),        name: '2X2'      },
-        // B2/S — Seeds: nothing survives, cells explode outward from any live cell
-        { birth: new Set([2]),         survive: new Set([]),             name: 'SEEDS'    },
+        // B3/S23 — Conway: classic. Gliders, guns, still lifes. The foundation.
+        { birth: new Set([3]),           survive: new Set([2,3]),          name: 'CONWAY',    genMs: 80  },
+        // B36/S23 — HighLife: Conway + explosive self-replicators. Gets chaotic fast.
+        { birth: new Set([3,6]),         survive: new Set([2,3]),          name: 'HIGHLIFE',  genMs: 100 },
+        // B3/S12345 — Maze: cells rarely die. Corridors grow slowly into organic labyrinths.
+        { birth: new Set([3]),           survive: new Set([1,2,3,4,5]),    name: 'MAZE',      genMs: 220 },
+        // B3678/S34678 — Day & Night: symmetric rule. Dense blobs persist dramatically.
+        { birth: new Set([3,6,7,8]),     survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT',  genMs: 130 },
+        // B4678/S35678 — Anneal: smooth dissolving organic blobs. Slow and meditative.
+        { birth: new Set([4,6,7,8]),     survive: new Set([3,5,6,7,8]),    name: 'ANNEAL',    genMs: 200 },
+        // B36/S125 — 2×2: chunky geometric block tilings. Very different texture.
+        { birth: new Set([3,6]),         survive: new Set([1,2,5]),        name: '2X2',       genMs: 120 },
+        // B2/S — Seeds: nothing survives. Cells explode outward in fractal bursts.
+        { birth: new Set([2]),           survive: new Set([]),             name: 'SEEDS',     genMs: 55  },
+        // B3/S45678 — Coral: cells survive in dense clusters, die when isolated.
+        //   Creates organic coral-reef growth that slowly expands then stabilizes.
+        { birth: new Set([3]),           survive: new Set([4,5,6,7,8]),    name: 'CORAL',     genMs: 160 },
+        // B1357/S1357 — Replicator: a single cell spawns geometric diamond copies of itself.
+        //   One of the most mathematically beautiful rules. Very hypnotic.
+        { birth: new Set([1,3,5,7]),     survive: new Set([1,3,5,7]),      name: 'REPLICA',   genMs: 90  },
+        // B378/S235678 — Coagulations: dense blobs spread and coagulate like ink in water.
+        { birth: new Set([3,7,8]),       survive: new Set([2,3,5,6,7,8]), name: 'COAGULATE', genMs: 140 },
+        // B34/S34 — 34 Life: symmetric crystalline growth. Very geometric, slow.
+        { birth: new Set([3,4]),         survive: new Set([3,4]),          name: '34LIFE',    genMs: 170 },
+        // B1/S1 — Gnarl: fractal branching from a single point. Sparse & cosmic.
+        { birth: new Set([1]),           survive: new Set([1]),            name: 'GNARL',     genMs: 70  },
     ];
 
     const canvas = document.getElementById('gol-canvas');
@@ -4778,19 +4795,22 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // known patterns that produce long-lived evolution
-    const GLIDER = [[0,1],[1,2],[2,0],[2,1],[2,2]];
-    const LWSS = [[0,1],[0,4],[1,0],[2,0],[2,4],[3,0],[3,1],[3,2],[3,3]]; // lightweight spaceship
-    const RPENTOMINO = [[0,1],[0,2],[1,0],[1,1],[2,1]]; // evolves for 1100+ gens
-    const ACORN = [[0,1],[1,3],[2,0],[2,1],[2,4],[2,5],[2,6]]; // evolves for 5000+ gens
-    const DIEHARD = [[0,6],[1,0],[1,1],[2,1],[2,5],[2,6],[2,7]]; // 130 gens then dies
-    // gosper glider gun — produces infinite gliders
+    // ── Known patterns ────────────────────────────────────────────────────
+    const GLIDER     = [[0,1],[1,2],[2,0],[2,1],[2,2]]; // NE glider
+    const LWSS       = [[0,1],[0,4],[1,0],[2,0],[2,4],[3,0],[3,1],[3,2],[3,3]]; // lightweight spaceship (E)
+    const MWSS       = [[0,2],[1,0],[1,4],[2,0],[3,0],[3,4],[4,1],[4,2],[4,3],[4,4],[3,1],[3,2]]; // medium spaceship
+    const RPENTOMINO = [[0,1],[0,2],[1,0],[1,1],[2,1]]; // 1100+ generation methuselah
+    const ACORN      = [[0,1],[1,3],[2,0],[2,1],[2,4],[2,5],[2,6]]; // 5206 gen methuselah
+    const DIEHARD    = [[0,6],[1,0],[1,1],[2,1],[2,5],[2,6],[2,7]]; // 130 gens, then vanishes
+    const BLINKER    = [[0,0],[0,1],[0,2]]; // simplest oscillator
+    // Gosper Glider Gun — fires an infinite stream of gliders east
     const GLIDER_GUN = [
         [0,24],[1,22],[1,24],[2,12],[2,13],[2,20],[2,21],[2,34],[2,35],
         [3,11],[3,15],[3,20],[3,21],[3,34],[3,35],[4,0],[4,1],[4,10],
         [4,16],[4,20],[4,21],[5,0],[5,1],[5,10],[5,14],[5,16],[5,17],
         [5,22],[5,24],[6,10],[6,16],[6,24],[7,11],[7,15],[8,12],[8,13]
     ];
+    // Pulsar — gorgeous period-3 oscillator, star-like
     const PULSAR = [
         [-6,-4],[-6,-3],[-6,-2],[-6,2],[-6,3],[-6,4],
         [-4,-6],[-3,-6],[-2,-6],[-4,-1],[-3,-1],[-2,-1],
@@ -4801,81 +4821,147 @@ window.addEventListener('DOMContentLoaded', () => {
         [2,1],[3,1],[4,1],[2,6],[3,6],[4,6],
         [6,-4],[6,-3],[6,-2],[6,2],[6,3],[6,4]
     ];
+    // Pentadecathlon — period-15 oscillator that looks like a spinning barbell
+    const PENTADECATHLON = [
+        [0,0],[1,0],[2,-1],[2,1],[3,0],[4,0],[5,0],[6,0],[7,-1],[7,1],[8,0],[9,0]
+    ];
+    // Eater 1 — useful still life, absorbs gliders
+    const EATER = [[0,0],[0,1],[1,1],[2,1],[2,2],[3,2],[3,3],[3,4],[4,4]];
+
+    // helper: fill a circular region at (cx, cy) with given density
+    function fillCircle(cx, cy, r, density, rng) {
+        for (let dy = -r; dy <= r; dy++)
+            for (let dx = -r; dx <= r; dx++)
+                if (dx*dx + dy*dy <= r*r && rng() < density)
+                    grid[(cy+dy+rows)%rows][(cx+dx+cols)%cols] = 1;
+    }
 
     function initGrid(rng) {
         grid = [];
         for (let y = 0; y < rows; y++) {
-            grid[y] = [];
-            for (let x = 0; x < cols; x++) {
-                grid[y][x] = 0;
-            }
+            grid[y] = new Uint8Array(cols); // typed array = faster step()
         }
 
-        // Each mode is tuned for its ruleset's ideal starting conditions
-        const mode = seed % 7;
+        const mode = seed % RULES.length; // one mode per ruleset
 
         if (mode === 0) {
-            // CONWAY B3/S23 — classic random soup at 30% density
-            for (let y = 0; y < rows; y++)
-                for (let x = 0; x < cols; x++)
-                    grid[y][x] = rng() < 0.30 ? 1 : 0;
+            // CONWAY — armada mode: 2 glider guns + scattered spaceships + random soup islands
+            placePattern(GLIDER_GUN, 4, 4);
+            placePattern(GLIDER_GUN, rows - 14, Math.floor(cols / 2) - 18);
+            // row of LWSS ships traversing the grid
+            for (let i = 0; i < 4; i++)
+                placePattern(LWSS, Math.floor(rows * (0.2 + i * 0.18)), 3 + i * 12);
+            // scatter pulsars
+            placePattern(PULSAR, Math.floor(rows/2), Math.floor(cols*0.6));
+            placePattern(PULSAR, Math.floor(rows*0.25), Math.floor(cols*0.75));
+            // small random soup islands
+            for (let i = 0; i < 5; i++) {
+                const cx = Math.floor(rng() * cols);
+                const cy = Math.floor(rng() * rows);
+                fillCircle(cx, cy, 4, 0.45, rng);
+            }
 
         } else if (mode === 1) {
-            // HIGHLIFE B36/S23 — sparse symmetric soup; triggers self-replicating patterns
+            // HIGHLIFE — mirror-symmetric soup; triggers built-in self-replicators
             for (let y = 0; y < rows; y++)
                 for (let x = 0; x < Math.ceil(cols / 2); x++) {
-                    const v = rng() < 0.18 ? 1 : 0;
+                    const v = rng() < 0.20 ? 1 : 0;
                     grid[y][x] = v;
                     grid[y][cols - 1 - x] = v;
                 }
 
         } else if (mode === 2) {
-            // MAZE B3/S12345 — medium density; cells rarely die so corridors grow organically
-            for (let y = 0; y < rows; y++)
-                for (let x = 0; x < cols; x++)
-                    grid[y][x] = rng() < 0.38 ? 1 : 0;
+            // MAZE — sparse clusters; corridors grow slowly outward from each island
+            const numSeeds = 6 + Math.floor(rng() * 6);
+            for (let i = 0; i < numSeeds; i++) {
+                const cx = Math.floor(rng() * cols);
+                const cy = Math.floor(rng() * rows);
+                fillCircle(cx, cy, 3 + Math.floor(rng() * 4), 0.55, rng);
+            }
 
         } else if (mode === 3) {
-            // DAY&NIGHT B3678/S34678 — 50% density + 4-fold symmetry for dramatic blobs
-            for (let y = 0; y < Math.ceil(rows / 2); y++)
-                for (let x = 0; x < Math.ceil(cols / 2); x++) {
+            // DAY & NIGHT — 4-fold symmetry, 50% density; creates dramatic mirror-image blobs
+            for (let y = 0; y < Math.ceil(rows/2); y++)
+                for (let x = 0; x < Math.ceil(cols/2); x++) {
                     const v = rng() < 0.50 ? 1 : 0;
                     grid[y][x] = v;
-                    grid[rows - 1 - y][x] = v;
-                    grid[y][cols - 1 - x] = v;
-                    grid[rows - 1 - y][cols - 1 - x] = v;
+                    grid[rows-1-y][x] = v;
+                    grid[y][cols-1-x] = v;
+                    grid[rows-1-y][cols-1-x] = v;
                 }
 
         } else if (mode === 4) {
-            // ANNEAL B4678/S35678 — dense random soup; slowly smooths into organic blobs
+            // ANNEAL — dense uniform soup that slowly smooths into organic blobs
             for (let y = 0; y < rows; y++)
                 for (let x = 0; x < cols; x++)
                     grid[y][x] = rng() < 0.55 ? 1 : 0;
 
         } else if (mode === 5) {
-            // 2x2 B36/S125 — dense circular clusters; rule creates chunky geometric tilings
-            const numClusters = 4 + Math.floor(rng() * 5);
-            for (let c = 0; c < numClusters; c++) {
-                const bx = Math.floor(rng() * cols);
-                const by = Math.floor(rng() * rows);
-                const r = 5 + Math.floor(rng() * 10);
-                for (let dy = -r; dy <= r; dy++)
-                    for (let dx = -r; dx <= r; dx++)
-                        if (dx*dx + dy*dy < r*r && rng() < 0.55) {
-                            const yy = (by + dy + rows) % rows;
-                            const xx = (bx + dx + cols) % cols;
-                            grid[yy][xx] = 1;
-                        }
+            // 2×2 — chunky circular clusters; rule creates geometric tilings
+            const n = 5 + Math.floor(rng() * 6);
+            for (let i = 0; i < n; i++) {
+                const cx = Math.floor(rng() * cols);
+                const cy = Math.floor(rng() * rows);
+                fillCircle(cx, cy, 5 + Math.floor(rng() * 9), 0.55, rng);
             }
 
+        } else if (mode === 6) {
+            // SEEDS — 3 staggered glider guns + sparse sparks; explosions fill the void
+            placePattern(GLIDER_GUN, 3, 2);
+            placePattern(GLIDER_GUN, Math.floor(rows * 0.45), Math.floor(cols * 0.3));
+            placePattern(GLIDER_GUN, Math.floor(rows * 0.75), Math.floor(cols * 0.6));
+            for (let i = 0; i < Math.floor(cols * rows * 0.025); i++)
+                grid[Math.floor(rng()*rows)][Math.floor(rng()*cols)] = 1;
+
+        } else if (mode === 7) {
+            // CORAL — very sparse random 15%; watch coral-like growth spread from tiny seeds
+            for (let y = 0; y < rows; y++)
+                for (let x = 0; x < cols; x++)
+                    grid[y][x] = rng() < 0.15 ? 1 : 0;
+
+        } else if (mode === 8) {
+            // REPLICATOR (B1357/S1357) — 4 seed points at compass positions
+            //   each spawns diamond replicators that multiply across the grid
+            const mx = Math.floor(cols / 2), my = Math.floor(rows / 2);
+            const off = Math.min(mx, my) - 5;
+            grid[my][mx] = 1;           // center
+            grid[my - off][mx] = 1;     // N
+            grid[my + off][mx] = 1;     // S
+            grid[my][mx - off] = 1;     // W
+            grid[my][mx + off] = 1;     // E
+
+        } else if (mode === 9) {
+            // COAGULATIONS — dense 60% soup; blobs spread then coagulate like ink in water
+            for (let y = 0; y < rows; y++)
+                for (let x = 0; x < cols; x++)
+                    grid[y][x] = rng() < 0.60 ? 1 : 0;
+
+        } else if (mode === 10) {
+            // 34 LIFE — radially symmetric sparse seeds; crystalline geometric growth
+            const n = 8 + Math.floor(rng() * 8);
+            for (let i = 0; i < n; i++) {
+                const angle = (i / n) * Math.PI * 2;
+                const r = Math.min(rows, cols) * 0.3;
+                const cx = Math.floor(cols/2 + Math.cos(angle) * r);
+                const cy = Math.floor(rows/2 + Math.sin(angle) * r);
+                fillCircle(cx, cy, 3, 0.5, rng);
+            }
+            // center cluster
+            fillCircle(Math.floor(cols/2), Math.floor(rows/2), 5, 0.4, rng);
+
         } else {
-            // SEEDS B2/S — nothing survives; place very sparse seeds and watch explosions
-            // Glider gun gives a structured source, plus sparse random sparks
-            placePattern(GLIDER_GUN, 2, 2);
-            for (let i = 0; i < cols * rows * 0.04; i++) {
-                const px = Math.floor(rng() * cols);
-                const py = Math.floor(rng() * rows);
-                grid[py][px] = 1;
+            // GNARL (B1/S1) — 2-3 isolated seed points; fractal branching fills the grid
+            //   Each point grows into a cosmic fractal tree, interference creates beauty
+            const seedPoints = 2 + Math.floor(rng() * 2);
+            for (let i = 0; i < seedPoints; i++) {
+                const cx = Math.floor(rng() * cols);
+                const cy = Math.floor(rng() * rows);
+                grid[cy][cx] = 1;
+                // tiny cross seed helps gnarl bootstrap
+                if (cy > 0)           grid[cy-1][cx] = 1;
+                if (cy < rows-1)      grid[cy+1][cx] = 1;
+                if (cx > 0)           grid[cy][cx-1] = 1;
+                if (cx < cols-1)      grid[cy][cx+1] = 1;
             }
         }
     }
@@ -4898,7 +4984,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const birth   = currentRules.birth;
         const survive = currentRules.survive;
         for (let y = 0; y < rows; y++) {
-            next[y] = [];
+            next[y] = new Uint8Array(cols);
             for (let x = 0; x < cols; x++) {
                 const n = countNeighbors(grid, x, y);
                 if (grid[y][x]) {
@@ -4959,11 +5045,14 @@ window.addEventListener('DOMContentLoaded', () => {
         seed = Math.floor(now / CYCLE_MS);
         const cycleStart = seed * CYCLE_MS;
         const elapsed = now - cycleStart;
-        const targetGen = Math.floor(elapsed / GEN_MS);
 
-        // pick palette + ruleset based on seed (each 5-min cycle is visually & behaviorally different)
+        // pick palette + ruleset based on seed (each 5-min window is visually unique)
         palette      = PALETTES[seed % PALETTES.length];
         currentRules = RULES[seed % RULES.length];
+        const genMs  = currentRules.genMs || DEFAULT_GEN_MS;
+
+        // fast-forward to where we'd be now (using this rule's speed)
+        const targetGen = Math.floor(elapsed / genMs);
 
         resize();
         const rng = mulberry32(seed);
@@ -4971,14 +5060,11 @@ window.addEventListener('DOMContentLoaded', () => {
         generation = 0;
         prevGrid = null;
 
-        // fast-forward to current generation
-        for (let i = 0; i < targetGen; i++) {
-            step();
-        }
+        for (let i = 0; i < targetGen; i++) step();
         draw();
     }
 
-    // main loop
+    // main loop — uses per-rule genMs for timing
     let lastSeed = 0;
     function tick() {
         const currentSeed = Math.floor(Date.now() / CYCLE_MS);
@@ -4989,7 +5075,8 @@ window.addEventListener('DOMContentLoaded', () => {
             step();
             draw();
         }
-        setTimeout(tick, GEN_MS);
+        const genMs = currentRules.genMs || DEFAULT_GEN_MS;
+        setTimeout(tick, genMs);
     }
 
     // init on load
