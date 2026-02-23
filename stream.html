@@ -4476,17 +4476,25 @@ function getLineColor(lineIdx) {
     return scene.color ? scene.color(lineIdx, asciiTick) : '#00aa00';
 }
 
+// scene order — slow organic scenes (13-17) woven between fast ones
+const SCENE_ORDER = [0, 13, 1, 17, 2, 14, 8, 3, 16, 11, 4, 15, 7, 5, 9, 6, 10, 12];
+let sceneOrderIdx = 0;
+
 function renderAsciiFrame() {
     const log = document.getElementById('feed-log-content');
     if (!log) return;
-
     asciiTick++;
-    const frame = getSceneFrame();
+
+    let frame;
+    try { frame = getSceneFrame(); } catch(e) { frame = null; }
+    if (!Array.isArray(frame) || frame.length === 0) return;
 
     log.innerHTML = '';
     frame.forEach((line, i) => {
         const div = document.createElement('div');
-        div.style.color = getLineColor(i);
+        let color = '#00aa00';
+        try { color = getLineColor(i); } catch(e) {}
+        div.style.color = color;
         div.style.fontFamily = 'Share Tech Mono, monospace';
         div.style.whiteSpace = 'pre';
         div.style.fontSize = '10px';
@@ -4496,28 +4504,30 @@ function renderAsciiFrame() {
     });
 }
 
-// scene order — slow organic scenes (13-17) woven between fast ones
-// fast: 0,1,2,3,4,7,9,10,11  slow: 5,6,8,12,13,14,15,16,17
-const SCENE_ORDER = [0, 13, 1, 17, 2, 14, 8, 3, 16, 11, 4, 15, 7, 5, 9, 6, 10, 12];
-let sceneOrderIdx = 0;
+// ── Single central loop using requestAnimationFrame ──
+let asciiRAF = null;
+let asciiSceneEndTime = 0;
 
-function nextScene() {
-    sceneOrderIdx = (sceneOrderIdx + 1) % SCENE_ORDER.length;
-    currentScene = SCENE_ORDER[sceneOrderIdx];
-    asciiTick = 0;
-    // reset cellular automaton grid on scene entry
-    if (SCENES[currentScene]._grid) SCENES[currentScene]._grid = null;
-    // bump generation — kills the previous tick chain, starts a fresh one
-    asciiGeneration++;
-    const myGen = asciiGeneration;
-    function tick() {
-        if (!asciiArtRunning || asciiGeneration !== myGen) return;
-        renderAsciiFrame();
-        asciiArtTimer = setTimeout(tick, SCENES[currentScene].speed);
+function asciiLoop(ts) {
+    if (!asciiArtRunning) return;
+    asciiRAF = requestAnimationFrame(asciiLoop);
+
+    // scene switch check
+    if (ts >= asciiSceneEndTime) {
+        sceneOrderIdx = (sceneOrderIdx + 1) % SCENE_ORDER.length;
+        currentScene = SCENE_ORDER[sceneOrderIdx];
+        asciiTick = 0;
+        if (SCENES[currentScene]._grid) SCENES[currentScene]._grid = null;
+        const dur = SCENES[currentScene].duration || 8000;
+        asciiSceneEndTime = ts + dur;
     }
-    tick();
-    const dur = SCENES[currentScene].duration || 8000;
-    sceneTimer = setTimeout(nextScene, dur);
+
+    // throttle render to scene speed
+    const scene = SCENES[currentScene];
+    if (!scene._lastRender || ts - scene._lastRender >= scene.speed) {
+        scene._lastRender = ts;
+        renderAsciiFrame();
+    }
 }
 
 function startFeedAsciiArt() {
@@ -4526,32 +4536,32 @@ function startFeedAsciiArt() {
     asciiTick = 0;
     sceneOrderIdx = 0;
     currentScene = SCENE_ORDER[0];
-    asciiGeneration++;
-    const myGen = asciiGeneration;
-
-    function tick() {
-        if (!asciiArtRunning || asciiGeneration !== myGen) return; // die if stale
-        renderAsciiFrame();
-        asciiArtTimer = setTimeout(tick, SCENES[currentScene].speed);
-    }
-    tick();
-
-    const dur = SCENES[currentScene].duration || 8000;
-    sceneTimer = setTimeout(nextScene, dur);
+    asciiSceneEndTime = 0; // force immediate scene init on first frame
+    asciiRAF = requestAnimationFrame(asciiLoop);
 }
 
 function stopFeedAsciiArt() {
     if (!asciiArtRunning) return;
     asciiArtRunning = false;
-    asciiGeneration++; // kill any lingering tick chain
+    if (asciiRAF) { cancelAnimationFrame(asciiRAF); asciiRAF = null; }
     clearTimeout(asciiArtTimer);
     clearTimeout(sceneTimer);
     asciiArtTimer = null;
     sceneTimer = null;
+    // clear per-scene render timestamps
+    SCENES.forEach(s => { s._lastRender = 0; });
     const log = document.getElementById('feed-log-content');
     if (log) log.innerHTML = '';
     spiderFeedShownEvents.clear();
 }
+
+// watchdog — if tab is hidden and rAF is paused, restart on visibility
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && asciiArtRunning) {
+        // reset scene timing so we don't get an instant scene skip
+        asciiSceneEndTime = performance.now() + (SCENES[currentScene].duration || 8000);
+    }
+});
 
 async function fetchSpiderFeed() {
     try {
