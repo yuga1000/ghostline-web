@@ -4255,6 +4255,211 @@ const SCENES = [
         lines[7] = revealed > totalChars ? '> _ ' : '';
         return lines;
     }, color: (i, t) => i === 7 ? '#004400' : '#00ff00' },
+
+    // ── SCENE 13: Breathing skull / face (slow inhale-exhale, 90s) ──
+    { speed: 180, duration: 90000, frames: (t) => {
+        const breath = (Math.sin(t * 0.035) + 1) / 2; // 0..1, ~28t per cycle
+        const blink  = Math.sin(t * 0.11) > 0.92;     // rare blink
+        const mouth  = breath < 0.3 ? '   ───────   ' :
+                       breath < 0.6 ? '  ─────────  ' :
+                                      ' ───────────  ';
+        const eyeL = blink ? '─' : (breath < 0.5 ? '◉' : '●');
+        const eyeR = blink ? '─' : (breath < 0.5 ? '◉' : '●');
+        const cheek = breath < 0.4 ? '  ' : (breath < 0.7 ? ' ·' : '··');
+        const glow  = breath < 0.3 ? '    · · ·     ' :
+                      breath < 0.6 ? '   · · · ·    ' :
+                                     '  · · · · ·   ';
+        return [
+            `                       `,
+            `     ┌─────────┐       `,
+            `    ╱           ╲      `,
+            `   │  ${eyeL}  ${cheek}  ${eyeR}  │     `,
+            `    ╲           ╱      `,
+            `     │ ${mouth} │      `,
+            `      └───────┘        `,
+            `  ${glow}              `,
+        ];
+    }, color: (i, t) => {
+        const breath = (Math.sin(t * 0.035) + 1) / 2;
+        const lo = 12, hi = 45;
+        const b = lo + Math.floor(breath * (hi - lo));
+        if (i === 7) return `hsl(120,60%,${b * 0.5}%)`;
+        return `hsl(120,100%,${b}%)`;
+    }},
+
+    // ── SCENE 14: Floating jellyfish / creature (60s) ──
+    { speed: 140, duration: 60000, frames: (t) => {
+        const bob   = Math.sin(t * 0.045) * 0.5 + 0.5; // 0..1
+        const pulse = (Math.sin(t * 0.09) + 1) / 2;
+        const tentacleL = ['╲  ╲  ╲', ' ╲  ╲  ', '  ╲  ╲ '];
+        const tentacleR = ['╱  ╱  ╱', ' ╱  ╱  ', '  ╱  ╱ '];
+        const ti = Math.floor(t * 0.15) % 3;
+        const bell = pulse < 0.35 ? '  ╭─────╮  ' :
+                     pulse < 0.65 ? ' ╭───────╮ ' :
+                                    '╭─────────╮';
+        const inner = pulse < 0.35 ? '  │ · · │  ' :
+                      pulse < 0.65 ? ' │  · ·  │ ' :
+                                     '│   · ·   │';
+        const pad = Math.floor(bob * 2);
+        const sp = ' '.repeat(pad);
+        return [
+            `                       `,
+            `  ${sp}${bell}${sp}    `,
+            `  ${sp}${inner}${sp}    `,
+            `  ${sp}╰─────────╯${sp}  `,
+            `  ${sp} │       │ ${sp}  `,
+            `  ${sp}${tentacleL[ti]}   ${tentacleR[ti]}${sp}`,
+            `                       `,
+            `   // adrift           `,
+        ];
+    }, color: (i, t) => {
+        const pulse = (Math.sin(t * 0.09) + 1) / 2;
+        if (i === 7) return '#003300';
+        const hue = 120 + Math.sin(t * 0.02) * 20;
+        const b = 18 + pulse * 32;
+        return `hsl(${hue},100%,${b}%)`;
+    }},
+
+    // ── SCENE 15: Slow heartbeat / pulse line (75s) ──
+    { speed: 150, duration: 75000, frames: (t) => {
+        const bpm  = 52; // sleepy bpm
+        const beat = (t % Math.round(60000 / bpm / 150));
+        const W    = 22;
+        const ecg  = Array(W).fill(0);
+        // draw ECG spike at beat position
+        const pos = (t * 1.1) % W;
+        for (let i = 0; i < W; i++) {
+            const d = Math.abs(i - pos);
+            if (d === 0) ecg[i] = 8;
+            else if (d === 1) ecg[i] = 5;
+            else if (d === 2) ecg[i] = 2;
+            else ecg[i] = 0;
+        }
+        const chars  = [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+        const line   = ecg.map(v => chars[v]).join('');
+        const flat   = '─'.repeat(W);
+        const tick   = String(Math.floor(t * 0.05) % 999).padStart(3,'0');
+        const hr     = `${bpm} BPM`;
+        return [
+            `                       `,
+            `   ┌──────────────┐    `,
+            `   │${flat}│    `,
+            `   │ ${line} │   `,
+            `   │${flat}│    `,
+            `   └──────────────┘    `,
+            `                       `,
+            `   VITALS  ${hr}  ${tick}`,
+        ];
+    }, color: (i, t) => {
+        const spike = (Math.sin(t * 0.21) + 1) / 2 > 0.95;
+        if (i === 3) return spike ? '#00ff88' : '#00cc44';
+        if (i === 7) return '#005500';
+        return '#00aa33';
+    }},
+
+    // ── SCENE 16: Cocoon / pod metamorphosis (120s ultra-slow) ──
+    { speed: 250, duration: 120000, frames: (t) => {
+        const phase = Math.floor((t * 0.008) % 6); // 6 stages over ~750 ticks
+        const cocoons = [
+            // stage 0 — tight egg
+            ['                       ',
+             '       ╭─────╮         ',
+             '      │  ···  │        ',
+             '      │ ·   · │        ',
+             '      │  ···  │        ',
+             '       ╰─────╯         ',
+             '                       ',
+             '   // dormant          '],
+            // stage 1 — slight warmth
+            ['                       ',
+             '      ╭───────╮        ',
+             '     │  · · ·  │       ',
+             '     │ ·  ○  · │       ',
+             '     │  · · ·  │       ',
+             '      ╰───────╯        ',
+             '       · · ·           ',
+             '   // warming          '],
+            // stage 2 — cracks forming
+            ['                       ',
+             '     ╭─────╱──╮        ',
+             '    │  ·╲·   · │       ',
+             '    │ · ◎    · │       ',
+             '    │  ·  ╱·  │        ',
+             '     ╰──╲────╯         ',
+             '      · · · ·          ',
+             '   // stirring         '],
+            // stage 3 — glowing seams
+            ['                       ',
+             '    ╭──╱───╲───╮       ',
+             '   │ ·  ◉   ◉  │      ',
+             '   │  ·     ·  │       ',
+             '   │ ·  ───  · │       ',
+             '    ╰──╲───╱───╯       ',
+             '   · · · · · ·         ',
+             '   // dreaming         '],
+            // stage 4 — expanding
+            ['      · · · · ·        ',
+             '   ╭───────────╮       ',
+             '  │  ◉       ◉  │     ',
+             '  │             │      ',
+             '  │   ─────── │        ',
+             '   ╰───────────╯       ',
+             '  · · · · · · ·        ',
+             '   // emerging         '],
+            // stage 5 — back to start (loop)
+            ['                       ',
+             '       ╭─────╮         ',
+             '      │  ···  │        ',
+             '      │ ·   · │        ',
+             '      │  ···  │        ',
+             '       ╰─────╯         ',
+             '                       ',
+             '   // dormant          '],
+        ];
+        return cocoons[phase];
+    }, color: (i, t) => {
+        const phase = Math.floor((t * 0.008) % 6);
+        const bright = [14, 18, 22, 35, 42, 14][phase];
+        if (i === 7) return `hsl(120,80%,${bright * 0.6}%)`;
+        return `hsl(120,100%,${bright}%)`;
+    }},
+
+    // ── SCENE 17: Deep breath / rings expanding from center (80s) ──
+    { speed: 200, duration: 80000, frames: (t) => {
+        // slow expand outward, then collapse — one breath cycle ~80 ticks
+        const breathPhase = (t % 80) / 80; // 0..1
+        const expand = breathPhase < 0.45;
+        const p      = expand ? breathPhase / 0.45 : (1 - breathPhase) / 0.55;
+        // concentric rings  ·  ∘  ○  ◯  — based on p
+        const rings  = ['·', '∘', '○', '◯', '◯'];
+        const rCount = Math.floor(p * 5);
+        const center = p < 0.2 ? '·' : p < 0.5 ? '○' : '◉';
+        const r1 = rCount >= 1 ? rings[0] : ' ';
+        const r2 = rCount >= 2 ? rings[1] : ' ';
+        const r3 = rCount >= 3 ? rings[2] : ' ';
+        const r4 = rCount >= 4 ? rings[3] : ' ';
+        const phase_label = expand ? 'inhale' : 'exhale';
+        const cnt = String(Math.floor(t * 0.05) % 99).padStart(2,'0');
+        return [
+            `         ${r4}             `,
+            `      ${r4}  ${r3}  ${r4}        `,
+            `    ${r3}  ${r2}  ${r1}  ${r2}  ${r3}    `,
+            `   ${r3}  ${r1}  ${center}  ${r1}  ${r3}   `,
+            `    ${r3}  ${r2}  ${r1}  ${r2}  ${r3}    `,
+            `      ${r4}  ${r3}  ${r4}        `,
+            `         ${r4}             `,
+            `   // ${phase_label}  ${cnt}       `,
+        ];
+    }, color: (i, t) => {
+        const breathPhase = (t % 80) / 80;
+        const expand = breathPhase < 0.45;
+        const p = expand ? breathPhase / 0.45 : (1 - breathPhase) / 0.55;
+        const b = 10 + p * 40;
+        if (i === 7) return `hsl(120,60%,${b * 0.4}%)`;
+        // fade by row distance from center
+        const dist = Math.abs(i - 3);
+        return `hsl(120,100%,${Math.max(8, b - dist * 6)}%)`;
+    }},
 ];
 
 let currentScene = 0;
@@ -4290,8 +4495,9 @@ function renderAsciiFrame() {
     });
 }
 
-// scene order — shuffle for variety, keep glitch+ghost spaced out
-const SCENE_ORDER = [0, 5, 1, 8, 2, 6, 11, 3, 9, 7, 4, 10];
+// scene order — slow organic scenes (13-17) woven between fast ones
+// fast: 0,1,2,3,4,7,9,10,11  slow: 5,6,8,12,13,14,15,16,17
+const SCENE_ORDER = [0, 13, 1, 17, 2, 14, 8, 3, 16, 11, 4, 15, 7, 5, 9, 6, 10, 12];
 let sceneOrderIdx = 0;
 
 function nextScene() {
