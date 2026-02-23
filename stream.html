@@ -3860,6 +3860,13 @@ function feedUpdateDisplay(data) {
     if (txt) txt.textContent = !hasEvents ? 'STANDBY' : spiderSleeping ? 'SLEEPING' : 'LIVE';
     if (nm)  nm.style.display = 'none';
 
+    // ASCII art while sleeping
+    if (spiderSleeping) {
+        startFeedAsciiArt();
+    } else {
+        stopFeedAsciiArt();
+    }
+
     if (cntEl) cntEl.textContent = `// ${data.event_count || 0} events today`;
 
     if (updEl) {
@@ -3903,6 +3910,126 @@ function feedUpdateDisplay(data) {
             }
         }
     }
+}
+
+// ── ASCII art for sleeping state ──
+let asciiArtTimer = null;
+let asciiArtRunning = false;
+
+const ASCII_FRAMES = [
+    // web + spider
+    [
+        '    .  *  .      .  *  .',
+        '  \\  |  /    \\  |  / ',
+        '  --(  )--  --(  )--  ',
+        '  /  |  \\    /  |  \\ ',
+        '    *  .  *    *  .  * ',
+        '        \\ (.) /        ',
+        '         >|<           ',
+        '        / | \\         ',
+    ],
+    [
+        '  *  .  *      *  .  * ',
+        '    \\  |  /  \\  |  / ',
+        '  --(  )--  --(  )--  ',
+        '    /  |  \\  /  |  \\ ',
+        '  .  *  .      .  *  . ',
+        '        \\ (o) /        ',
+        '         >|<           ',
+        '        / | \\         ',
+    ],
+    [
+        '  .  *  .      .  *  . ',
+        '  \\  |  /    \\  |  / ',
+        '  --(  )--  --(  )--  ',
+        '  /  |  \\    /  |  \\ ',
+        '  *  .  *      *  .  * ',
+        '        \\ (-) /        ',
+        '         >|<           ',
+        '        / | \\         ',
+    ],
+    // scan pulse
+    [
+        ' ░░░░░░░░░░░░░░░░░░░░░ ',
+        ' ░  SCANNING  . . .  ░ ',
+        ' ░░░░░░░░░░░░░░░░░░░░░ ',
+        '                       ',
+        ' > system dormant      ',
+        ' > next scan: ~2h      ',
+        ' > standby . . .  _    ',
+        '                       ',
+    ],
+    [
+        ' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ ',
+        ' ▒  SCANNING  . . .  ▒ ',
+        ' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ ',
+        '                       ',
+        ' > system dormant      ',
+        ' > next scan: ~2h      ',
+        ' > standby . . . __    ',
+        '                       ',
+    ],
+    // web geometry
+    [
+        '   ___....---""""---...',
+        '  /   \\              / ',
+        ' | ( ) |-----+------/  ',
+        '  \\___/      |  z z    ',
+        '      \\      |         ',
+        '  -----+-----+-----    ',
+        '        \\    |         ',
+        '         \\___/         ',
+    ],
+    [
+        '   ___....---""""---...',
+        '  /   \\              / ',
+        ' | (o) |-----+------/  ',
+        '  \\___/      |  Z Z    ',
+        '      \\      |         ',
+        '  -----+-----+-----    ',
+        '        \\    |         ',
+        '         \\___/         ',
+    ],
+];
+
+let asciiFrameIdx = 0;
+
+function renderAsciiFrame() {
+    const log = document.getElementById('feed-log-content');
+    if (!log) return;
+
+    const frame = ASCII_FRAMES[asciiFrameIdx % ASCII_FRAMES.length];
+    asciiFrameIdx++;
+
+    // Clear and render frame
+    log.innerHTML = '';
+    frame.forEach(line => {
+        const div = document.createElement('div');
+        div.className = 'log-line log-dim';
+        div.style.color = '#002800';
+        div.style.fontFamily = 'Share Tech Mono, monospace';
+        div.style.whiteSpace = 'pre';
+        div.textContent = line;
+        log.appendChild(div);
+    });
+}
+
+function startFeedAsciiArt() {
+    if (asciiArtRunning) return;
+    asciiArtRunning = true;
+    renderAsciiFrame();
+    asciiArtTimer = setInterval(renderAsciiFrame, 1800);
+}
+
+function stopFeedAsciiArt() {
+    if (!asciiArtRunning) return;
+    asciiArtRunning = false;
+    clearInterval(asciiArtTimer);
+    asciiArtTimer = null;
+    // clear ascii, real logs will fill in
+    const log = document.getElementById('feed-log-content');
+    if (log) log.innerHTML = '';
+    spiderFeedShownEvents.clear(); // re-show all real events
 }
 
 async function fetchSpiderFeed() {
