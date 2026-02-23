@@ -4043,6 +4043,218 @@ const SCENES = [
         const bright = [40,30,25,50,25,30,40,60][i];
         return `hsl(120,100%,${bright}%)`;
     }},
+
+    // ── SCENE 6: Sine wave ocean (slow, meditative ~45s) ──
+    { speed: 90, duration: 45000, frames: (t) => {
+        const rows = 8, cols = 24;
+        const chars = ' ·∙•●◉⬤●◉•∙· ';
+        const lines = [];
+        for (let r = 0; r < rows; r++) {
+            let row = '';
+            for (let c = 0; c < cols; c++) {
+                const wave1 = Math.sin((c * 0.4 - t * 0.15) + r * 0.8);
+                const wave2 = Math.sin((c * 0.7 + t * 0.08) - r * 0.5) * 0.5;
+                const v = (wave1 + wave2 + 2) / 4;
+                const idx = Math.floor(v * (chars.length - 1));
+                row += chars[Math.max(0, Math.min(chars.length-1, idx))];
+            }
+            lines.push(row);
+        }
+        return lines;
+    }, color: (i, t) => {
+        const hue = 120 + Math.sin(t * 0.03 + i * 0.4) * 20;
+        const light = 25 + Math.sin(t * 0.05 + i * 0.7) * 20;
+        return `hsl(${hue},100%,${light}%)`;
+    }},
+
+    // ── SCENE 7: DNA helix (medium pace) ──
+    { speed: 110, duration: 20000, frames: (t) => {
+        const lines = [];
+        for (let r = 0; r < 8; r++) {
+            const offset = t * 0.2;
+            const a1 = Math.sin(r * 0.8 + offset);
+            const a2 = Math.sin(r * 0.8 + offset + Math.PI);
+            const x1 = Math.round((a1 + 1) * 9);
+            const x2 = Math.round((a2 + 1) * 9);
+            let row = Array(22).fill('─');
+            const node1 = Math.abs(Math.sin(r * 0.8 + offset)) > 0.85;
+            const node2 = Math.abs(Math.sin(r * 0.8 + offset + Math.PI)) > 0.85;
+            // draw connectors between strands
+            const lo = Math.min(x1, x2), hi = Math.max(x1, x2);
+            for (let x = lo; x <= hi; x++) row[x] = '·';
+            row[x1] = node1 ? '◈' : '●';
+            row[x2] = node2 ? '◈' : '●';
+            lines.push(row.join(''));
+        }
+        lines.push(`  SEQUENCE ${String(t%9999).padStart(4,'0')}  `);
+        return lines;
+    }, color: (i, t) => {
+        if (i === 8) return '#00ff00';
+        const phase = (t * 0.05 + i * 0.25) % 1;
+        const light = 25 + Math.sin(phase * Math.PI * 2) * 20;
+        return `hsl(120,100%,${light}%)`;
+    }},
+
+    // ── SCENE 8: Falling kanji / symbols waterfall (fast, short) ──
+    { speed: 55, duration: 12000, frames: (t) => {
+        const cols = 22, rows = 8;
+        const sets = [
+            '夢眠休止待機沈黙暗闇静寂',
+            '░▒▓█▄▀■□▪▫◆◇○●',
+            'αβγδεζηθιλμνξπσφψω',
+        ];
+        const charset = sets[Math.floor(t/50) % sets.length];
+        const grid = [];
+        for (let r = 0; r < rows; r++) {
+            let row = '';
+            for (let c = 0; c < cols; c++) {
+                const speed = 1 + (c * 3 + r) % 4;
+                const pos = (t * speed * 0.4 + c * 17 + r * 7) % (rows * 3);
+                const dist = Math.abs(pos % rows - r);
+                if (dist < 1) row += charset[(t*2+c*5+r*3) % charset.length];
+                else if (dist < 3) row += charset[(t+c*7) % charset.length];
+                else row += ' ';
+            }
+            grid.push(row);
+        }
+        return grid;
+    }, color: (i, t) => {
+        const bright = 20 + ((rows - i) / 8) * 45;
+        return `hsl(120,100%,${Math.min(65, bright)}%)`;
+    }},
+
+    // ── SCENE 9: Breathing eye (long, hypnotic ~60s) ──
+    { speed: 160, duration: 60000, frames: (t) => {
+        const pulse = (Math.sin(t * 0.06) + 1) / 2; // 0..1
+        const eyes = [
+            ['                      ',
+             '      ────────        ',
+             '    ╱          ╲      ',
+             '   │    ◉  ◉    │     ',
+             '    ╲          ╱      ',
+             '      ────────        ',
+             '                      ',
+             `   DREAMING  ${String(t%999).padStart(3,'0')}     `],
+            ['                      ',
+             '    ──────────        ',
+             '   ╱            ╲     ',
+             '  │   ◉      ◉   │    ',
+             '   ╲            ╱     ',
+             '    ──────────        ',
+             '                      ',
+             `   DREAMING  ${String(t%999).padStart(3,'0')}     `],
+            ['                      ',
+             '   ────────────       ',
+             '  ╱              ╲    ',
+             ' │  ◉          ◉  │   ',
+             '  ╲              ╱    ',
+             '   ────────────       ',
+             '                      ',
+             `   DREAMING  ${String(t%999).padStart(3,'0')}     `],
+            ['   ────────────       ',
+             '  ╱              ╲    ',
+             ' │                │   ',
+             ' │  ●          ●  │   ',
+             ' │                │   ',
+             '  ╲              ╱    ',
+             '   ────────────       ',
+             `   DREAMING  ${String(t%999).padStart(3,'0')}     `],
+            ['  ──────────────      ',
+             ' ╱                ╲   ',
+             '│                  │  ',
+             '│  ⊕            ⊕  │  ',
+             '│                  │  ',
+             ' ╲                ╱   ',
+             '  ──────────────      ',
+             `   DREAMING  ${String(t%999).padStart(3,'0')}     `],
+        ];
+        const phase = Math.floor(pulse * (eyes.length - 0.01));
+        return eyes[phase];
+    }, color: (i, t) => {
+        if (i === 7) return '#005500';
+        const pulse = (Math.sin(t * 0.06) + 1) / 2;
+        const bright = 15 + pulse * 40;
+        return `hsl(120,100%,${bright}%)`;
+    }},
+
+    // ── SCENE 10: Binary clock / data stream ──
+    { speed: 200, duration: 18000, frames: (t) => {
+        const now = new Date();
+        const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+        const toBin = (n, bits) => n.toString(2).padStart(bits, '0');
+        const bar = (v, max) => {
+            const pct = v / max;
+            return '█'.repeat(Math.floor(pct * 16)) + '░'.repeat(16 - Math.floor(pct * 16));
+        };
+        const glitch = Math.sin(t * 0.3) > 0.8;
+        return [
+            `  ${glitch ? '▓▒░' : 'HRS'} ${toBin(h,5)}  ${String(h).padStart(2,'0')}h`,
+            `  ${bar(h, 23)}`,
+            `  ${glitch ? '▓▒░' : 'MIN'} ${toBin(m,6)}  ${String(m).padStart(2,'0')}m`,
+            `  ${bar(m, 59)}`,
+            `  ${glitch ? '▓▒░' : 'SEC'} ${toBin(s,6)}  ${String(s).padStart(2,'0')}s`,
+            `  ${bar(s, 59)}`,
+            `                        `,
+            `  // SPIDER ASLEEP      `,
+        ];
+    }, color: (i, t) => {
+        const glitch = Math.sin(t * 0.3) > 0.8;
+        if (glitch && i % 2 === 0) return '#ffaa00';
+        return ['#00ff00','#006600','#00ff00','#006600','#00ff00','#006600','#002200','#004400'][i];
+    }},
+
+    // ── SCENE 11: Cellular automaton (Conway variant, slow) ──
+    { speed: 300, duration: 30000, frames: (t) => {
+        const W = 22, H = 8;
+        // init grid from tick seed
+        if (!SCENES[10]._grid || t === 0) {
+            SCENES[10]._grid = Array.from({length: H}, (_, r) =>
+                Array.from({length: W}, (_, c) => (Math.sin(r*7+c*13+42) > 0.3 ? 1 : 0))
+            );
+        }
+        const g = SCENES[10]._grid;
+        // step
+        const ng = Array.from({length: H}, () => Array(W).fill(0));
+        for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) {
+            let n = 0;
+            for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+                if (dr===0&&dc===0) continue;
+                n += g[(r+dr+H)%H][(c+dc+W)%W];
+            }
+            ng[r][c] = g[r][c] ? (n===2||n===3?1:0) : (n===3?1:0);
+        }
+        SCENES[10]._grid = ng;
+        const cellChars = [' ', '▓'];
+        return ng.map(row => row.map(c => cellChars[c]).join(''));
+    }, color: (i, t) => `hsl(120,100%,${25+i*4}%)`},
+
+    // ── SCENE 12: Ghost typing a message (theatrical, slow) ──
+    { speed: 80, duration: 25000, frames: (t) => {
+        const messages = [
+            '> i am hunting          ',
+            '> 3202 targets indexed  ',
+            '> sleeping now          ',
+            '> will wake in ~2h      ',
+            '> dreams of hot leads   ',
+            '> do not disturb        ',
+            '> zzz . . .             ',
+        ];
+        const charsPerTick = 0.4;
+        const totalChars = messages.reduce((a,m) => a + m.length + 1, 0);
+        const revealed = Math.floor(t * charsPerTick) % (totalChars + 40);
+        const lines = ['', '', '', '', '', '', '', ''];
+        let charCount = 0;
+        for (let i = 0; i < messages.length && i < 7; i++) {
+            for (let j = 0; j < messages[i].length; j++) {
+                if (charCount < revealed) lines[i] += messages[i][j];
+                else if (charCount === revealed) lines[i] += '█'; // cursor
+                charCount++;
+            }
+            charCount++; // newline
+        }
+        lines[7] = revealed > totalChars ? '> _ ' : '';
+        return lines;
+    }, color: (i, t) => i === 7 ? '#004400' : '#00ff00' },
 ];
 
 let currentScene = 0;
@@ -4078,18 +4290,26 @@ function renderAsciiFrame() {
     });
 }
 
+// scene order — shuffle for variety, keep glitch+ghost spaced out
+const SCENE_ORDER = [0, 5, 1, 8, 2, 6, 11, 3, 9, 7, 4, 10];
+let sceneOrderIdx = 0;
+
 function nextScene() {
-    currentScene = (currentScene + 1) % SCENES.length;
+    sceneOrderIdx = (sceneOrderIdx + 1) % SCENE_ORDER.length;
+    currentScene = SCENE_ORDER[sceneOrderIdx];
     asciiTick = 0;
-    // schedule next scene change in 6-10s
-    sceneTimer = setTimeout(nextScene, 6000 + Math.random() * 4000);
+    // reset cellular automaton grid on scene entry
+    if (SCENES[currentScene]._grid) SCENES[currentScene]._grid = null;
+    const dur = SCENES[currentScene].duration || 8000;
+    sceneTimer = setTimeout(nextScene, dur);
 }
 
 function startFeedAsciiArt() {
     if (asciiArtRunning) return;
     asciiArtRunning = true;
     asciiTick = 0;
-    currentScene = 0;
+    sceneOrderIdx = 0;
+    currentScene = SCENE_ORDER[0];
 
     function tick() {
         if (!asciiArtRunning) return;
@@ -4098,8 +4318,8 @@ function startFeedAsciiArt() {
     }
     tick();
 
-    // rotate scenes
-    sceneTimer = setTimeout(nextScene, 7000);
+    const dur = SCENES[currentScene].duration || 8000;
+    sceneTimer = setTimeout(nextScene, dur);
 }
 
 function stopFeedAsciiArt() {
