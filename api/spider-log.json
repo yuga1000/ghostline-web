@@ -1,8 +1,48 @@
 {
-  "generated_at": "2026-02-24T06:10:45.987653Z",
+  "generated_at": "2026-02-24T06:23:04.069543Z",
   "log_source": "spider_2026-02-24.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "14:23",
+      "event": "Division status deployed to ghostline.live"
+    },
+    {
+      "time": "14:20",
+      "event": "Anti-block system: fetch success"
+    },
+    {
+      "time": "14:20",
+      "event": "Validator: checking 30 candidates"
+    },
+    {
+      "time": "14:20",
+      "event": "Rescored 4197 opportunities"
+    },
+    {
+      "time": "14:20",
+      "event": "Collab finder: sector 'web3 brand collabs' — 20 opportunities"
+    },
+    {
+      "time": "14:16",
+      "event": "Scanning sector: web3 brand collabs"
+    },
+    {
+      "time": "14:16",
+      "event": "Collab finder: sector 'music entertainment collabs' — 20 opportunities"
+    },
+    {
+      "time": "14:13",
+      "event": "Collab finder: 8 results indexed"
+    },
+    {
+      "time": "14:13",
+      "event": "Scanning sector: music entertainment collabs"
+    },
+    {
+      "time": "14:13",
+      "event": "Collab finder: sector 'food packaging collabs' — 20 opportunities"
+    },
     {
       "time": "14:09",
       "event": "Collab finder: 9 results indexed"
@@ -82,46 +122,6 @@
     {
       "time": "13:42",
       "event": "Collector scanner: 4 results indexed"
-    },
-    {
-      "time": "13:42",
-      "event": "Scanning sector: asia collectors"
-    },
-    {
-      "time": "13:42",
-      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
-    },
-    {
-      "time": "13:40",
-      "event": "Collector scanner: 5 results indexed"
-    },
-    {
-      "time": "13:38",
-      "event": "Collector scanner: 6 results indexed"
-    },
-    {
-      "time": "13:38",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "13:38",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "13:38",
-      "event": "Scanning sector: crypto collectors"
-    },
-    {
-      "time": "13:16",
-      "event": "Brand Collab scanner: 4 results indexed"
-    },
-    {
-      "time": "12:38",
-      "event": "Brand Collab scanner: 6 results indexed"
-    },
-    {
-      "time": "12:24",
-      "event": "Brand Collab scanner: 8 results indexed"
     }
   ]
 }

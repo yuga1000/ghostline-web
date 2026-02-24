@@ -1,18 +1,18 @@
 {
   "division": "GHOSTLINE ACQUISITION DIVISION",
   "version": "2.0",
-  "generated_at": "2026-02-24T01:56:18.272016Z",
+  "generated_at": "2026-02-24T06:23:04.069888Z",
   "status": "ACTIVE",
   "uptime_hours": 1,
   "metrics": {
-    "total_leads": 4030,
-    "hot_leads": 128,
-    "warm_leads": 492,
+    "total_leads": 4197,
+    "hot_leads": 131,
+    "warm_leads": 540,
     "validated": 29,
     "llm_analyzed": 29,
-    "applications_sent": 6,
+    "applications_sent": 7,
     "applications_won": 0,
-    "dead_filtered": 866
+    "dead_filtered": 867
   },
   "pipeline": {
     "scanning": 1.0,
@@ -24,44 +24,44 @@
     {
       "name": "Asia-Pacific",
       "detail": "14 countries",
-      "leads": 654,
+      "leads": 696,
       "status": "active"
     },
     {
       "name": "Crypto / Web3",
       "detail": "NFT, onchain art",
-      "leads": 678,
+      "leads": 693,
       "status": "active"
     },
     {
       "name": "Contests & Prizes",
       "detail": "awards, grants",
-      "leads": 38,
+      "leads": 39,
       "status": "active"
     },
     {
       "name": "Brand Collabs",
       "detail": "fashion, tech, games",
-      "leads": 1456,
+      "leads": 1501,
       "status": "active"
     },
     {
       "name": "Direct Buyers",
       "detail": "commissions, collectors",
-      "leads": 606,
+      "leads": 620,
       "status": "active"
     },
     {
       "name": "Brand Outreach",
       "detail": "proactive collabs",
-      "leads": 226,
+      "leads": 294,
       "status": "active"
     }
   ],
   "activity_log": [
     {
       "time": "just now",
-      "event": "Validator checked 29 leads ... 21 confirmed HOT"
+      "event": "Validator checked 29 leads ... 23 confirmed HOT"
     },
     {
       "time": "just now",
@@ -69,22 +69,22 @@
     },
     {
       "time": "recent",
-      "event": "6 applications submitted to international contests"
+      "event": "7 applications submitted to international contests"
     },
     {
       "time": "just now",
-      "event": "Database: 4,030 leads indexed, all systems nominal"
+      "event": "Database: 4,197 leads indexed, all systems nominal"
     }
   ],
   "scan_history": {
-    "total_cycles": 86,
+    "total_cycles": 92,
     "today": {
-      "new_leads": 115,
-      "hot_found": 1
+      "new_leads": 282,
+      "hot_found": 4
     },
     "week": {
-      "new_leads": 4030,
-      "hot_found": 128
+      "new_leads": 4197,
+      "hot_found": 131
     }
   },
   "tech_stack": {
