@@ -1,8 +1,28 @@
 {
-  "generated_at": "2026-02-24T05:25:41.511610Z",
+  "generated_at": "2026-02-24T05:40:27.132776Z",
   "log_source": "spider_2026-02-24.log",
-  "event_count": 10,
+  "event_count": 15,
   "events": [
+    {
+      "time": "13:40",
+      "event": "Collector scanner: 5 results indexed"
+    },
+    {
+      "time": "13:38",
+      "event": "Collector scanner: 6 results indexed"
+    },
+    {
+      "time": "13:38",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "13:38",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "13:38",
+      "event": "Scanning sector: crypto collectors"
+    },
     {
       "time": "13:16",
       "event": "Brand Collab scanner: 4 results indexed"
