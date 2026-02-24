@@ -1,8 +1,44 @@
 {
-  "generated_at": "2026-02-24T11:55:03.295779Z",
+  "generated_at": "2026-02-24T12:11:21.174275Z",
   "log_source": "spider_daemon.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "20:09",
+      "event": "Scanning sector: asia collectors"
+    },
+    {
+      "time": "20:09",
+      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
+    },
+    {
+      "time": "20:07",
+      "event": "Collector scanner: 5 results indexed"
+    },
+    {
+      "time": "20:05",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "20:05",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "20:05",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "20:05",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "20:05",
+      "event": "Collector scanner: 6 results indexed"
+    },
+    {
+      "time": "20:05",
+      "event": "Scanning sector: crypto collectors"
+    },
     {
       "time": "19:16",
       "event": "Brand Collab scanner: 9 results indexed"
@@ -86,42 +122,6 @@
     {
       "time": "16:43",
       "event": "Rescored 4287 opportunities"
-    },
-    {
-      "time": "16:43",
-      "event": "Collab finder: sector 'web3 brand collabs' — 20 opportunities"
-    },
-    {
-      "time": "16:39",
-      "event": "Collab finder: 6 results indexed"
-    },
-    {
-      "time": "16:39",
-      "event": "Scanning sector: web3 brand collabs"
-    },
-    {
-      "time": "16:39",
-      "event": "Collab finder: sector 'music entertainment collabs' — 20 opportunities"
-    },
-    {
-      "time": "16:36",
-      "event": "Collab finder: 10 results indexed"
-    },
-    {
-      "time": "16:36",
-      "event": "Collab finder: 7 results indexed"
-    },
-    {
-      "time": "16:36",
-      "event": "Collab finder: 9 results indexed"
-    },
-    {
-      "time": "16:36",
-      "event": "Collab finder: 5 results indexed"
-    },
-    {
-      "time": "16:35",
-      "event": "Scanning sector: music entertainment collabs"
     }
   ]
 }
