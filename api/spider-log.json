@@ -1,8 +1,32 @@
 {
-  "generated_at": "2026-02-24T12:41:24.765032Z",
-  "log_source": "spider_daemon.log",
+  "generated_at": "2026-02-24T12:51:16.778152Z",
+  "log_source": "spider_2026-02-24.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "20:51",
+      "event": "Division status deployed to ghostline.live"
+    },
+    {
+      "time": "20:48",
+      "event": "Validator: checking 30 candidates"
+    },
+    {
+      "time": "20:48",
+      "event": "Rescored 4399 opportunities"
+    },
+    {
+      "time": "20:48",
+      "event": "Collab finder: sector 'web3 brand collabs' — 20 opportunities"
+    },
+    {
+      "time": "20:44",
+      "event": "Scanning sector: web3 brand collabs"
+    },
+    {
+      "time": "20:44",
+      "event": "Collab finder: sector 'music entertainment collabs' — 20 opportunities"
+    },
     {
       "time": "20:41",
       "event": "Collab finder: 8 results indexed"
@@ -98,30 +122,6 @@
     {
       "time": "20:09",
       "event": "Scanning sector: asia collectors"
-    },
-    {
-      "time": "20:09",
-      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
-    },
-    {
-      "time": "20:07",
-      "event": "Collector scanner: 5 results indexed"
-    },
-    {
-      "time": "20:05",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "20:05",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "20:05",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "20:05",
-      "event": "Collector scanner: 8 results indexed"
     }
   ]
 }

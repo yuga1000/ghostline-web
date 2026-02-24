@@ -1,18 +1,18 @@
 {
   "division": "GHOSTLINE ACQUISITION DIVISION",
   "version": "2.0",
-  "generated_at": "2026-02-24T08:46:01.115114Z",
+  "generated_at": "2026-02-24T12:51:16.778542Z",
   "status": "ACTIVE",
   "uptime_hours": 1,
   "metrics": {
-    "total_leads": 4287,
-    "hot_leads": 131,
-    "warm_leads": 552,
+    "total_leads": 4399,
+    "hot_leads": 130,
+    "warm_leads": 574,
     "validated": 29,
     "llm_analyzed": 29,
-    "applications_sent": 7,
+    "applications_sent": 6,
     "applications_won": 0,
-    "dead_filtered": 868
+    "dead_filtered": 867
   },
   "pipeline": {
     "scanning": 1.0,
@@ -24,37 +24,37 @@
     {
       "name": "Asia-Pacific",
       "detail": "14 countries",
-      "leads": 720,
+      "leads": 737,
       "status": "active"
     },
     {
       "name": "Crypto / Web3",
       "detail": "NFT, onchain art",
-      "leads": 694,
+      "leads": 696,
       "status": "active"
     },
     {
       "name": "Contests & Prizes",
       "detail": "awards, grants",
-      "leads": 39,
+      "leads": 40,
       "status": "active"
     },
     {
       "name": "Brand Collabs",
       "detail": "fashion, tech, games",
-      "leads": 1530,
+      "leads": 1568,
       "status": "active"
     },
     {
       "name": "Direct Buyers",
       "detail": "commissions, collectors",
-      "leads": 620,
+      "leads": 622,
       "status": "active"
     },
     {
       "name": "Brand Outreach",
       "detail": "proactive collabs",
-      "leads": 338,
+      "leads": 390,
       "status": "active"
     }
   ],
@@ -69,22 +69,22 @@
     },
     {
       "time": "recent",
-      "event": "7 applications submitted to international contests"
+      "event": "6 applications submitted to international contests"
     },
     {
       "time": "just now",
-      "event": "Database: 4,287 leads indexed, all systems nominal"
+      "event": "Database: 4,399 leads indexed, all systems nominal"
     }
   ],
   "scan_history": {
-    "total_cycles": 96,
+    "total_cycles": 100,
     "today": {
-      "new_leads": 372,
+      "new_leads": 484,
       "hot_found": 9
     },
     "week": {
-      "new_leads": 4287,
-      "hot_found": 131
+      "new_leads": 4399,
+      "hot_found": 130
     }
   },
   "tech_stack": {
