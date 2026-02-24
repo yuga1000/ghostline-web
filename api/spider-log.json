@@ -1,8 +1,56 @@
 {
-  "generated_at": "2026-02-24T05:40:27.132776Z",
+  "generated_at": "2026-02-24T05:55:43.464818Z",
   "log_source": "spider_2026-02-24.log",
-  "event_count": 15,
+  "event_count": 27,
   "events": [
+    {
+      "time": "13:54",
+      "event": "Scanning sector: beverage collabs"
+    },
+    {
+      "time": "13:54",
+      "event": "Collab finder: sector 'fashion collabs' — 20 opportunities"
+    },
+    {
+      "time": "13:51",
+      "event": "Collab finder: 9 results indexed"
+    },
+    {
+      "time": "13:51",
+      "event": "Collab finder: 8 results indexed"
+    },
+    {
+      "time": "13:51",
+      "event": "Collab finder: 10 results indexed"
+    },
+    {
+      "time": "13:51",
+      "event": "Scanning sector: fashion collabs"
+    },
+    {
+      "time": "13:51",
+      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
+    },
+    {
+      "time": "13:47",
+      "event": "Scanning sector: direct buyers"
+    },
+    {
+      "time": "13:47",
+      "event": "Collector scanner: sector 'asia collectors' — 20 opportunities"
+    },
+    {
+      "time": "13:42",
+      "event": "Collector scanner: 4 results indexed"
+    },
+    {
+      "time": "13:42",
+      "event": "Scanning sector: asia collectors"
+    },
+    {
+      "time": "13:42",
+      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
+    },
     {
       "time": "13:40",
       "event": "Collector scanner: 5 results indexed"
