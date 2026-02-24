@@ -1,8 +1,32 @@
 {
-  "generated_at": "2026-02-24T10:55:54.331899Z",
+  "generated_at": "2026-02-24T11:11:14.495006Z",
   "log_source": "spider_daemon.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "19:11",
+      "event": "Brand Collab scanner: 6 results indexed"
+    },
+    {
+      "time": "19:10",
+      "event": "Brand Collab scanner: 5 results indexed"
+    },
+    {
+      "time": "19:08",
+      "event": "Brand Collab scanner: 10 results indexed"
+    },
+    {
+      "time": "19:07",
+      "event": "Brand Collab scanner: 8 results indexed"
+    },
+    {
+      "time": "19:07",
+      "event": "Brand Collab scanner: 7 results indexed"
+    },
+    {
+      "time": "19:07",
+      "event": "Brand Collab scanner: 4 results indexed"
+    },
     {
       "time": "18:50",
       "event": "Brand Collab scanner: 9 results indexed"
@@ -98,30 +122,6 @@
     {
       "time": "16:31",
       "event": "Scanning sector: food packaging collabs"
-    },
-    {
-      "time": "16:31",
-      "event": "Collab finder: sector 'asia brand collabs' — 20 opportunities"
-    },
-    {
-      "time": "16:29",
-      "event": "Collab finder: 9 results indexed"
-    },
-    {
-      "time": "16:28",
-      "event": "Collab finder: 8 results indexed"
-    },
-    {
-      "time": "16:28",
-      "event": "Scanning sector: asia brand collabs"
-    },
-    {
-      "time": "16:28",
-      "event": "Collab finder: sector 'luxury lifestyle collabs' — 20 opportunities"
-    },
-    {
-      "time": "16:25",
-      "event": "Collab finder: 7 results indexed"
     }
   ]
 }
