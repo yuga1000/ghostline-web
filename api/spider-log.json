@@ -1,8 +1,80 @@
 {
-  "generated_at": "2026-02-24T01:08:27.288715Z",
+  "generated_at": "2026-02-24T01:25:23.503967Z",
   "log_source": "spider_2026-02-23.log",
-  "event_count": 29,
+  "event_count": 30,
   "events": [
+    {
+      "time": "09:24",
+      "event": "Collab finder: 6 results indexed"
+    },
+    {
+      "time": "09:24",
+      "event": "Collab finder: 10 results indexed"
+    },
+    {
+      "time": "09:24",
+      "event": "Scanning sector: fashion collabs"
+    },
+    {
+      "time": "09:24",
+      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
+    },
+    {
+      "time": "09:21",
+      "event": "Scanning sector: direct buyers"
+    },
+    {
+      "time": "09:21",
+      "event": "Collector scanner: sector 'asia collectors' — 20 opportunities"
+    },
+    {
+      "time": "09:17",
+      "event": "Collector scanner: 5 results indexed"
+    },
+    {
+      "time": "09:15",
+      "event": "Scanning sector: asia collectors"
+    },
+    {
+      "time": "09:15",
+      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
+    },
+    {
+      "time": "09:13",
+      "event": "Collector scanner: 3 results indexed"
+    },
+    {
+      "time": "09:13",
+      "event": "Collector scanner: 4 results indexed"
+    },
+    {
+      "time": "09:12",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "09:12",
+      "event": "Collector scanner: 6 results indexed"
+    },
+    {
+      "time": "09:12",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "09:11",
+      "event": "Collector scanner: 8 results indexed"
+    },
+    {
+      "time": "09:11",
+      "event": "Collector scanner: 7 results indexed"
+    },
+    {
+      "time": "09:11",
+      "event": "Scanning sector: crypto collectors"
+    },
+    {
+      "time": "09:11",
+      "event": "Brand Collab scanner: 1 results indexed"
+    },
     {
       "time": "08:36",
       "event": "Brand Collab scanner: 4 results indexed"
@@ -50,74 +122,6 @@
     {
       "time": "07:52",
       "event": "Brand Collab scanner: 8 results indexed"
-    },
-    {
-      "time": "07:51",
-      "event": "Open Calls scanner: 3 results indexed"
-    },
-    {
-      "time": "07:49",
-      "event": "Open Calls scanner: 4 results indexed"
-    },
-    {
-      "time": "07:49",
-      "event": "Open Calls scanner: 8 results indexed"
-    },
-    {
-      "time": "07:49",
-      "event": "Open Calls scanner: 5 results indexed"
-    },
-    {
-      "time": "07:49",
-      "event": "Open Calls scanner: 7 results indexed"
-    },
-    {
-      "time": "07:49",
-      "event": "Open Calls scanner: 6 results indexed"
-    },
-    {
-      "time": "07:49",
-      "event": "Brand Collab scanner: 9 results indexed"
-    },
-    {
-      "time": "07:48",
-      "event": "Brand Collab scanner: 8 results indexed"
-    },
-    {
-      "time": "07:48",
-      "event": "Brand Collab scanner: 7 results indexed"
-    },
-    {
-      "time": "07:48",
-      "event": "Brand Collab scanner: 5 results indexed"
-    },
-    {
-      "time": "07:48",
-      "event": "Brand Collab scanner: 6 results indexed"
-    },
-    {
-      "time": "07:46",
-      "event": "Open Calls scanner: 3 results indexed"
-    },
-    {
-      "time": "07:45",
-      "event": "Open Calls scanner: 5 results indexed"
-    },
-    {
-      "time": "07:45",
-      "event": "Open Calls scanner: 7 results indexed"
-    },
-    {
-      "time": "07:44",
-      "event": "Open Calls scanner: 4 results indexed"
-    },
-    {
-      "time": "07:44",
-      "event": "Open Calls scanner: 6 results indexed"
-    },
-    {
-      "time": "07:44",
-      "event": "Open Calls scanner: 8 results indexed"
     }
   ]
 }
