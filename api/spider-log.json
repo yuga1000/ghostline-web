@@ -1,8 +1,16 @@
 {
-  "generated_at": "2026-02-24T11:11:14.495006Z",
+  "generated_at": "2026-02-24T11:25:13.502257Z",
   "log_source": "spider_daemon.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "19:16",
+      "event": "Brand Collab scanner: 9 results indexed"
+    },
+    {
+      "time": "19:11",
+      "event": "Brand Collab scanner: 4 results indexed"
+    },
     {
       "time": "19:11",
       "event": "Brand Collab scanner: 6 results indexed"
@@ -114,14 +122,6 @@
     {
       "time": "16:35",
       "event": "Scanning sector: music entertainment collabs"
-    },
-    {
-      "time": "16:35",
-      "event": "Collab finder: sector 'food packaging collabs' — 20 opportunities"
-    },
-    {
-      "time": "16:31",
-      "event": "Scanning sector: food packaging collabs"
     }
   ]
 }
