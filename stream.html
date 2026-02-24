@@ -4741,31 +4741,31 @@ window.addEventListener('DOMContentLoaded', () => {
     // genMs controls animation speed (slower = more meditative, faster = explosive)
     const RULES = [
         // B3/S23 — Conway: classic. Gliders, guns, still lifes. The foundation.
-        { birth: new Set([3]),           survive: new Set([2,3]),          name: 'CONWAY',    genMs: 104 },
+        { birth: new Set([3]),           survive: new Set([2,3]),          name: 'CONWAY',    genMs: 104, maxFF: 120 },
         // B36/S23 — HighLife: Conway + explosive self-replicators. Gets chaotic fast.
-        { birth: new Set([3,6]),         survive: new Set([2,3]),          name: 'HIGHLIFE',  genMs: 130 },
+        { birth: new Set([3,6]),         survive: new Set([2,3]),          name: 'HIGHLIFE',  genMs: 130, maxFF: 100 },
         // B3/S12345 — Maze: cells rarely die. Corridors grow slowly into organic labyrinths.
-        { birth: new Set([3]),           survive: new Set([1,2,3,4,5]),    name: 'MAZE',      genMs: 286 },
+        { birth: new Set([3]),           survive: new Set([1,2,3,4,5]),    name: 'MAZE',      genMs: 286, maxFF: 80  },
         // B3678/S34678 — Day & Night: symmetric rule. Dense blobs persist dramatically.
-        { birth: new Set([3,6,7,8]),     survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT',  genMs: 169 },
+        { birth: new Set([3,6,7,8]),     survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT',  genMs: 169, maxFF: 100 },
         // B4678/S35678 — Anneal: smooth dissolving organic blobs. Slow and meditative.
-        { birth: new Set([4,6,7,8]),     survive: new Set([3,5,6,7,8]),    name: 'ANNEAL',    genMs: 260 },
+        { birth: new Set([4,6,7,8]),     survive: new Set([3,5,6,7,8]),    name: 'ANNEAL',    genMs: 260, maxFF: 60  },
         // B36/S125 — 2×2: chunky geometric block tilings. Very different texture.
-        { birth: new Set([3,6]),         survive: new Set([1,2,5]),        name: '2X2',       genMs: 156 },
+        { birth: new Set([3,6]),         survive: new Set([1,2,5]),        name: '2X2',       genMs: 156, maxFF: 100 },
         // B2/S — Seeds: nothing survives. Cells explode outward in fractal bursts.
-        { birth: new Set([2]),           survive: new Set([]),             name: 'SEEDS',     genMs: 72  },
+        { birth: new Set([2]),           survive: new Set([]),             name: 'SEEDS',     genMs: 72,  maxFF: 8   },
         // B3/S45678 — Coral: cells survive in dense clusters, die when isolated.
         //   Creates organic coral-reef growth that slowly expands then stabilizes.
-        { birth: new Set([3]),           survive: new Set([4,5,6,7,8]),    name: 'CORAL',     genMs: 208 },
+        { birth: new Set([3]),           survive: new Set([4,5,6,7,8]),    name: 'CORAL',     genMs: 208, maxFF: 80  },
         // B1357/S1357 — Replicator: a single cell spawns geometric diamond copies of itself.
         //   One of the most mathematically beautiful rules. Very hypnotic.
-        { birth: new Set([1,3,5,7]),     survive: new Set([1,3,5,7]),      name: 'REPLICA',   genMs: 117 },
+        { birth: new Set([1,3,5,7]),     survive: new Set([1,3,5,7]),      name: 'REPLICA',   genMs: 117, maxFF: 60  },
         // B378/S235678 — Coagulations: dense blobs spread and coagulate like ink in water.
-        { birth: new Set([3,7,8]),       survive: new Set([2,3,5,6,7,8]), name: 'COAGULATE', genMs: 182 },
+        { birth: new Set([3,7,8]),       survive: new Set([2,3,5,6,7,8]), name: 'COAGULATE', genMs: 182, maxFF: 100 },
         // B34/S34 — 34 Life: symmetric crystalline growth. Very geometric, slow.
-        { birth: new Set([3,4]),         survive: new Set([3,4]),          name: '34LIFE',    genMs: 221 },
+        { birth: new Set([3,4]),         survive: new Set([3,4]),          name: '34LIFE',    genMs: 221, maxFF: 80  },
         // B1/S1 — Gnarl: fractal branching from a single point. Sparse & cosmic.
-        { birth: new Set([1]),           survive: new Set([1]),            name: 'GNARL',     genMs: 91  },
+        { birth: new Set([1]),           survive: new Set([1]),            name: 'GNARL',     genMs: 91,  maxFF: 12  },
     ];
 
     const canvas = document.getElementById('gol-canvas');
@@ -5055,9 +5055,9 @@ window.addEventListener('DOMContentLoaded', () => {
         currentRules = RULES[seed % RULES.length];
         const genMs  = currentRules.genMs || DEFAULT_GEN_MS;
 
-        // fast-forward — capped at 300 steps to avoid blocking the main thread
+        // fast-forward — capped per-ruleset (explosive rules like SEEDS die out on small grids)
         const rawTarget = Math.floor(elapsed / genMs);
-        const targetGen = Math.min(rawTarget, 300);
+        const targetGen = Math.min(rawTarget, currentRules.maxFF || 100);
 
         const rng = mulberry32(seed);
         initGrid(rng);
@@ -5071,14 +5071,16 @@ window.addEventListener('DOMContentLoaded', () => {
     // main loop — uses per-rule genMs for timing
     let lastSeed = 0;
     function tick() {
-        const currentSeed = Math.floor(Date.now() / CYCLE_MS);
-        if (currentSeed !== lastSeed) {
-            lastSeed = currentSeed;
-            syncStart();
-        } else {
-            step();
-            draw();
-        }
+        try {
+            const currentSeed = Math.floor(Date.now() / CYCLE_MS);
+            if (currentSeed !== lastSeed) {
+                lastSeed = currentSeed;
+                syncStart();
+            } else {
+                step();
+                draw();
+            }
+        } catch(e) { /* keep loop alive even if a frame errors */ }
         const genMs = currentRules.genMs || DEFAULT_GEN_MS;
         setTimeout(tick, genMs);
     }
