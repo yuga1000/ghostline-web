@@ -1,8 +1,68 @@
 {
-  "generated_at": "2026-02-24T08:25:50.117322Z",
+  "generated_at": "2026-02-24T08:41:02.968316Z",
   "log_source": "spider_daemon.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "16:39",
+      "event": "Collab finder: 6 results indexed"
+    },
+    {
+      "time": "16:39",
+      "event": "Scanning sector: web3 brand collabs"
+    },
+    {
+      "time": "16:39",
+      "event": "Collab finder: sector 'music entertainment collabs' — 20 opportunities"
+    },
+    {
+      "time": "16:36",
+      "event": "Collab finder: 10 results indexed"
+    },
+    {
+      "time": "16:36",
+      "event": "Collab finder: 7 results indexed"
+    },
+    {
+      "time": "16:36",
+      "event": "Collab finder: 9 results indexed"
+    },
+    {
+      "time": "16:36",
+      "event": "Collab finder: 5 results indexed"
+    },
+    {
+      "time": "16:35",
+      "event": "Scanning sector: music entertainment collabs"
+    },
+    {
+      "time": "16:35",
+      "event": "Collab finder: sector 'food packaging collabs' — 20 opportunities"
+    },
+    {
+      "time": "16:31",
+      "event": "Scanning sector: food packaging collabs"
+    },
+    {
+      "time": "16:31",
+      "event": "Collab finder: sector 'asia brand collabs' — 20 opportunities"
+    },
+    {
+      "time": "16:29",
+      "event": "Collab finder: 9 results indexed"
+    },
+    {
+      "time": "16:28",
+      "event": "Collab finder: 8 results indexed"
+    },
+    {
+      "time": "16:28",
+      "event": "Scanning sector: asia brand collabs"
+    },
+    {
+      "time": "16:28",
+      "event": "Collab finder: sector 'luxury lifestyle collabs' — 20 opportunities"
+    },
     {
       "time": "16:25",
       "event": "Collab finder: 7 results indexed"
@@ -62,66 +122,6 @@
     {
       "time": "16:13",
       "event": "Scanning sector: fashion collabs"
-    },
-    {
-      "time": "16:13",
-      "event": "Collector scanner: sector 'direct buyers' — 20 opportunities"
-    },
-    {
-      "time": "16:09",
-      "event": "Scanning sector: direct buyers"
-    },
-    {
-      "time": "16:09",
-      "event": "Collector scanner: sector 'asia collectors' — 20 opportunities"
-    },
-    {
-      "time": "16:04",
-      "event": "Scanning sector: asia collectors"
-    },
-    {
-      "time": "16:04",
-      "event": "Collector scanner: sector 'crypto collectors' — 20 opportunities"
-    },
-    {
-      "time": "16:02",
-      "event": "Collector scanner: 5 results indexed"
-    },
-    {
-      "time": "16:02",
-      "event": "Collector scanner: 4 results indexed"
-    },
-    {
-      "time": "16:00",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "16:00",
-      "event": "Collector scanner: 6 results indexed"
-    },
-    {
-      "time": "16:00",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "16:00",
-      "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "16:00",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "16:00",
-      "event": "Scanning sector: crypto collectors"
-    },
-    {
-      "time": "16:00",
-      "event": "Brand Collab scanner: 1 results indexed"
-    },
-    {
-      "time": "15:29",
-      "event": "Brand Collab scanner: 4 results indexed"
     }
   ]
 }
