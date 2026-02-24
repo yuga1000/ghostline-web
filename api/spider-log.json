@@ -1,127 +1,39 @@
 {
-  "generated_at": "2026-02-24T04:10:10.080660Z",
-  "log_source": "spider_2026-02-23.log",
-  "event_count": 30,
+  "generated_at": "2026-02-24T04:24:34.167285Z",
+  "log_source": "spider_2026-02-24.log",
+  "event_count": 8,
   "events": [
     {
-      "time": "12:02",
-      "event": "Brand Collab scanner: 10 results indexed"
-    },
-    {
-      "time": "12:02",
+      "time": "12:24",
       "event": "Brand Collab scanner: 8 results indexed"
     },
     {
-      "time": "12:00",
+      "time": "12:22",
+      "event": "Brand Collab scanner: 10 results indexed"
+    },
+    {
+      "time": "12:21",
       "event": "Brand Collab scanner: 7 results indexed"
     },
     {
-      "time": "11:59",
-      "event": "Brand Collab scanner: 6 results indexed"
-    },
-    {
-      "time": "11:59",
+      "time": "12:21",
       "event": "Brand Collab scanner: 9 results indexed"
     },
     {
-      "time": "11:57",
+      "time": "12:19",
+      "event": "Open Calls scanner: 4 results indexed"
+    },
+    {
+      "time": "12:18",
       "event": "Open Calls scanner: 6 results indexed"
     },
     {
-      "time": "11:56",
-      "event": "Open Calls scanner: 7 results indexed"
-    },
-    {
-      "time": "11:56",
+      "time": "12:18",
       "event": "Open Calls scanner: 8 results indexed"
     },
     {
-      "time": "11:56",
-      "event": "Open Calls scanner: 5 results indexed"
-    },
-    {
-      "time": "09:56",
-      "event": "Division status deployed to ghostline.live"
-    },
-    {
-      "time": "09:56",
-      "event": "Division status deployed to ghostline.live"
-    },
-    {
-      "time": "09:53",
-      "event": "Anti-block system: fetch success"
-    },
-    {
-      "time": "09:53",
-      "event": "Validator: checking 30 candidates"
-    },
-    {
-      "time": "09:53",
-      "event": "Rescored 4030 opportunities"
-    },
-    {
-      "time": "09:53",
-      "event": "Collab finder: sector 'web3 brand collabs' — 20 opportunities"
-    },
-    {
-      "time": "09:50",
-      "event": "Collab finder: 10 results indexed"
-    },
-    {
-      "time": "09:49",
-      "event": "Scanning sector: web3 brand collabs"
-    },
-    {
-      "time": "09:49",
-      "event": "Collab finder: sector 'music entertainment collabs' — 20 opportunities"
-    },
-    {
-      "time": "09:46",
-      "event": "Collab finder: 7 results indexed"
-    },
-    {
-      "time": "09:46",
-      "event": "Collab finder: 9 results indexed"
-    },
-    {
-      "time": "09:46",
-      "event": "Collab finder: 5 results indexed"
-    },
-    {
-      "time": "09:46",
-      "event": "Scanning sector: music entertainment collabs"
-    },
-    {
-      "time": "09:46",
-      "event": "Collab finder: sector 'food packaging collabs' — 20 opportunities"
-    },
-    {
-      "time": "09:43",
-      "event": "Scanning sector: food packaging collabs"
-    },
-    {
-      "time": "09:43",
-      "event": "Collab finder: sector 'asia brand collabs' — 20 opportunities"
-    },
-    {
-      "time": "09:38",
-      "event": "Collab finder: 7 results indexed"
-    },
-    {
-      "time": "09:38",
-      "event": "Scanning sector: asia brand collabs"
-    },
-    {
-      "time": "09:38",
-      "event": "Collab finder: sector 'luxury lifestyle collabs' — 20 opportunities"
-    },
-    {
-      "time": "09:35",
-      "event": "Collab finder: 9 results indexed"
-    },
-    {
-      "time": "09:35",
-      "event": "Collab finder: 6 results indexed"
+      "time": "12:17",
+      "event": "Open Calls scanner: 7 results indexed"
     }
   ]
 }
