@@ -1,8 +1,68 @@
 {
-  "generated_at": "2026-02-24T01:25:23.503967Z",
+  "generated_at": "2026-02-24T01:40:21.847893Z",
   "log_source": "spider_2026-02-23.log",
   "event_count": 30,
   "events": [
+    {
+      "time": "09:38",
+      "event": "Collab finder: 7 results indexed"
+    },
+    {
+      "time": "09:38",
+      "event": "Scanning sector: asia brand collabs"
+    },
+    {
+      "time": "09:38",
+      "event": "Collab finder: sector 'luxury lifestyle collabs' — 20 opportunities"
+    },
+    {
+      "time": "09:35",
+      "event": "Collab finder: 9 results indexed"
+    },
+    {
+      "time": "09:35",
+      "event": "Collab finder: 6 results indexed"
+    },
+    {
+      "time": "09:35",
+      "event": "Collab finder: 10 results indexed"
+    },
+    {
+      "time": "09:35",
+      "event": "Scanning sector: luxury lifestyle collabs"
+    },
+    {
+      "time": "09:35",
+      "event": "Collab finder: sector 'tech collabs' — 20 opportunities"
+    },
+    {
+      "time": "09:31",
+      "event": "Collab finder: 8 results indexed"
+    },
+    {
+      "time": "09:31",
+      "event": "Scanning sector: tech collabs"
+    },
+    {
+      "time": "09:31",
+      "event": "Collab finder: sector 'beverage collabs' — 20 opportunities"
+    },
+    {
+      "time": "09:28",
+      "event": "Collab finder: 9 results indexed"
+    },
+    {
+      "time": "09:28",
+      "event": "Collab finder: 7 results indexed"
+    },
+    {
+      "time": "09:27",
+      "event": "Scanning sector: beverage collabs"
+    },
+    {
+      "time": "09:27",
+      "event": "Collab finder: sector 'fashion collabs' — 20 opportunities"
+    },
     {
       "time": "09:24",
       "event": "Collab finder: 6 results indexed"
@@ -62,66 +122,6 @@
     {
       "time": "09:11",
       "event": "Collector scanner: 8 results indexed"
-    },
-    {
-      "time": "09:11",
-      "event": "Collector scanner: 7 results indexed"
-    },
-    {
-      "time": "09:11",
-      "event": "Scanning sector: crypto collectors"
-    },
-    {
-      "time": "09:11",
-      "event": "Brand Collab scanner: 1 results indexed"
-    },
-    {
-      "time": "08:36",
-      "event": "Brand Collab scanner: 4 results indexed"
-    },
-    {
-      "time": "07:58",
-      "event": "Brand Collab scanner: 10 results indexed"
-    },
-    {
-      "time": "07:56",
-      "event": "Brand Collab scanner: 8 results indexed"
-    },
-    {
-      "time": "07:56",
-      "event": "Brand Collab scanner: 6 results indexed"
-    },
-    {
-      "time": "07:56",
-      "event": "Brand Collab scanner: 9 results indexed"
-    },
-    {
-      "time": "07:55",
-      "event": "Brand Collab scanner: 7 results indexed"
-    },
-    {
-      "time": "07:55",
-      "event": "Brand Collab scanner: 5 results indexed"
-    },
-    {
-      "time": "07:55",
-      "event": "Brand Collab scanner: 6 results indexed"
-    },
-    {
-      "time": "07:53",
-      "event": "Brand Collab scanner: 9 results indexed"
-    },
-    {
-      "time": "07:53",
-      "event": "Brand Collab scanner: 5 results indexed"
-    },
-    {
-      "time": "07:52",
-      "event": "Brand Collab scanner: 7 results indexed"
-    },
-    {
-      "time": "07:52",
-      "event": "Brand Collab scanner: 8 results indexed"
     }
   ]
 }
