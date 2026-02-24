@@ -1,8 +1,12 @@
 {
-  "generated_at": "2026-02-24T00:25:18.490160Z",
+  "generated_at": "2026-02-24T00:40:12.735462Z",
   "log_source": "spider_2026-02-23.log",
-  "event_count": 28,
+  "event_count": 29,
   "events": [
+    {
+      "time": "08:36",
+      "event": "Brand Collab scanner: 4 results indexed"
+    },
     {
       "time": "07:58",
       "event": "Brand Collab scanner: 10 results indexed"
