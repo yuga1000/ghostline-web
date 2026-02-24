@@ -1,90 +1,90 @@
 {
   "division": "GHOSTLINE ACQUISITION DIVISION",
   "version": "2.0",
-  "generated_at": "2026-02-22T13:22:33.575300Z",
+  "generated_at": "2026-02-24T01:56:18.272016Z",
   "status": "ACTIVE",
   "uptime_hours": 1,
   "metrics": {
-    "total_leads": 3202,
-    "hot_leads": 57,
-    "warm_leads": 269,
-    "validated": 28,
-    "llm_analyzed": 28,
-    "applications_sent": 5,
+    "total_leads": 4030,
+    "hot_leads": 128,
+    "warm_leads": 492,
+    "validated": 29,
+    "llm_analyzed": 29,
+    "applications_sent": 6,
     "applications_won": 0,
-    "dead_filtered": 922
+    "dead_filtered": 866
   },
   "pipeline": {
     "scanning": 1.0,
     "validating": 0.01,
     "analyzing": 1.0,
-    "submitting": 0.09
+    "submitting": 0.05
   },
   "search_vectors": [
     {
       "name": "Asia-Pacific",
       "detail": "14 countries",
-      "leads": 386,
+      "leads": 654,
       "status": "active"
     },
     {
       "name": "Crypto / Web3",
       "detail": "NFT, onchain art",
-      "leads": 592,
+      "leads": 678,
       "status": "active"
     },
     {
       "name": "Contests & Prizes",
       "detail": "awards, grants",
-      "leads": 36,
+      "leads": 38,
       "status": "active"
     },
     {
       "name": "Brand Collabs",
       "detail": "fashion, tech, games",
-      "leads": 1558,
+      "leads": 1456,
       "status": "active"
     },
     {
       "name": "Direct Buyers",
       "detail": "commissions, collectors",
-      "leads": 542,
+      "leads": 606,
       "status": "active"
     },
     {
       "name": "Brand Outreach",
       "detail": "proactive collabs",
-      "leads": 0,
+      "leads": 226,
       "status": "active"
     }
   ],
   "activity_log": [
     {
       "time": "just now",
-      "event": "Validator checked 28 leads ... 21 confirmed HOT"
+      "event": "Validator checked 29 leads ... 21 confirmed HOT"
     },
     {
       "time": "just now",
-      "event": "LLM has analyzed 28 opportunities total"
+      "event": "LLM has analyzed 29 opportunities total"
     },
     {
       "time": "recent",
-      "event": "5 applications submitted to international contests"
+      "event": "6 applications submitted to international contests"
     },
     {
       "time": "just now",
-      "event": "Database: 3,202 leads indexed, all systems nominal"
+      "event": "Database: 4,030 leads indexed, all systems nominal"
     }
   ],
   "scan_history": {
-    "total_cycles": 59,
+    "total_cycles": 86,
     "today": {
-      "new_leads": 456,
-      "hot_found": 12
+      "new_leads": 115,
+      "hot_found": 1
     },
     "week": {
-      "new_leads": 3202,
-      "hot_found": 57
+      "new_leads": 4030,
+      "hot_found": 128
     }
   },
   "tech_stack": {
