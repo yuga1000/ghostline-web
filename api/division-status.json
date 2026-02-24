@@ -1,18 +1,18 @@
 {
   "division": "GHOSTLINE ACQUISITION DIVISION",
   "version": "2.0",
-  "generated_at": "2026-02-24T06:23:04.069888Z",
+  "generated_at": "2026-02-24T08:46:01.115114Z",
   "status": "ACTIVE",
   "uptime_hours": 1,
   "metrics": {
-    "total_leads": 4197,
+    "total_leads": 4287,
     "hot_leads": 131,
-    "warm_leads": 540,
+    "warm_leads": 552,
     "validated": 29,
     "llm_analyzed": 29,
     "applications_sent": 7,
     "applications_won": 0,
-    "dead_filtered": 867
+    "dead_filtered": 868
   },
   "pipeline": {
     "scanning": 1.0,
@@ -24,13 +24,13 @@
     {
       "name": "Asia-Pacific",
       "detail": "14 countries",
-      "leads": 696,
+      "leads": 720,
       "status": "active"
     },
     {
       "name": "Crypto / Web3",
       "detail": "NFT, onchain art",
-      "leads": 693,
+      "leads": 694,
       "status": "active"
     },
     {
@@ -42,7 +42,7 @@
     {
       "name": "Brand Collabs",
       "detail": "fashion, tech, games",
-      "leads": 1501,
+      "leads": 1530,
       "status": "active"
     },
     {
@@ -54,7 +54,7 @@
     {
       "name": "Brand Outreach",
       "detail": "proactive collabs",
-      "leads": 294,
+      "leads": 338,
       "status": "active"
     }
   ],
@@ -73,17 +73,17 @@
     },
     {
       "time": "just now",
-      "event": "Database: 4,197 leads indexed, all systems nominal"
+      "event": "Database: 4,287 leads indexed, all systems nominal"
     }
   ],
   "scan_history": {
-    "total_cycles": 92,
+    "total_cycles": 96,
     "today": {
-      "new_leads": 282,
-      "hot_found": 4
+      "new_leads": 372,
+      "hot_found": 9
     },
     "week": {
-      "new_leads": 4197,
+      "new_leads": 4287,
       "hot_found": 131
     }
   },
