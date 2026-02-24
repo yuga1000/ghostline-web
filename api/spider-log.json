@@ -1,8 +1,12 @@
 {
-  "generated_at": "2026-02-24T06:55:51.474709Z",
+  "generated_at": "2026-02-24T07:10:51.862074Z",
   "log_source": "spider_daemon.log",
-  "event_count": 16,
+  "event_count": 17,
   "events": [
+    {
+      "time": "14:56",
+      "event": "Brand Collab scanner: 5 results indexed"
+    },
     {
       "time": "14:48",
       "event": "Brand Collab scanner: 7 results indexed"
