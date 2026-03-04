@@ -325,6 +325,37 @@ app.get('/api/visitors', (req, res) => {
   });
 });
 
+// Dynamic spider-log.json — transforms /api/logs into spider feed format
+// This overrides the static api/spider-log.json file
+app.get('/api/spider-log.json', (req, res) => {
+  // Filter spider logs only (from our stream handler)
+  const spiderLogs = recentLogs.filter(l =>
+    (l.metadata && l.metadata.source === 'spider') || l.level === 'ACTION' || l.level === 'THINKING' || l.level === 'ERROR'
+  );
+
+  // Convert to spider feed event format
+  const events = spiderLogs.slice(-50).reverse().map(l => {
+    const d = new Date(l.timestamp * 1000);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return {
+      time: `${hh}:${mm}`,
+      event: (l.message || '').replace(/^[▓⟡✓✗]\s*/, '') // strip StreamLogger prefixes
+    };
+  });
+
+  const lastTs = spiderLogs.length > 0
+    ? new Date(spiderLogs[spiderLogs.length - 1].timestamp * 1000).toISOString()
+    : null;
+
+  res.json({
+    generated_at: lastTs || new Date().toISOString(),
+    log_source: 'live_stream',
+    event_count: spiderLogs.length,
+    events
+  });
+});
+
 // Health check endpoint for StreamLogger
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
