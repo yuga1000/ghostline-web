@@ -272,6 +272,59 @@ app.get('/api/agent-status', (req, res) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════
+// VISITOR COUNTER (server-side, same number for everyone)
+// ═══════════════════════════════════════════════════════════════
+const visitors = new Map(); // ip -> lastSeen timestamp
+const VISITOR_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
+let totalVisitors = 0;
+
+// Load total from file if exists
+const VISITORS_FILE = path.join(__dirname, 'visitors.json');
+try {
+  if (fs.existsSync(VISITORS_FILE)) {
+    const data = JSON.parse(fs.readFileSync(VISITORS_FILE, 'utf8'));
+    totalVisitors = data.total || 0;
+    console.log('[Visitors] Loaded total:', totalVisitors);
+  }
+} catch (e) {
+  console.log('[Visitors] No saved data, starting from 0');
+}
+
+function cleanupVisitors() {
+  const now = Date.now();
+  for (const [ip, lastSeen] of visitors) {
+    if (now - lastSeen > VISITOR_TIMEOUT) {
+      visitors.delete(ip);
+    }
+  }
+}
+
+// Cleanup every minute
+setInterval(cleanupVisitors, 60 * 1000);
+
+app.get('/api/visitors', (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+
+  // Track new unique visitor (not seen before at all)
+  if (!visitors.has(ip)) {
+    totalVisitors++;
+    // Save total periodically
+    try {
+      fs.writeFileSync(VISITORS_FILE, JSON.stringify({ total: totalVisitors }), 'utf8');
+    } catch (e) { /* ignore */ }
+  }
+
+  visitors.set(ip, now);
+  cleanupVisitors();
+
+  res.json({
+    online: visitors.size,
+    total: totalVisitors
+  });
+});
+
 // Health check endpoint for StreamLogger
 app.get('/health', (req, res) => {
   res.status(200).send('OK');

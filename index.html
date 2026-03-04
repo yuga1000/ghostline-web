@@ -115,7 +115,7 @@
     <div class="flex justify-between items-center text-xs">
         <div class="flex items-center space-x-4">
             <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
-            <span class="text-green-400" id="randomNumbers">âââââ</span>
+            <span class="text-green-400" id="asciiGhost" style="font-size:11px;transition:opacity 0.15s">&#3665;(&#3665;&#9679;&#785;&#9697;&#9679;&#785;&#3665;)&#3665;</span>
         </div>
         <div class="flex items-center space-x-2">
             <span class="pixel-hearts" id="pixelHearts">◊◊◊</span>
@@ -710,59 +710,47 @@ let currentManifestoSlide = 0;
         }
     }
     
-    // Random numbers generator
-    function updateRandomNumbers() {
-        const element = safeGetElement('randomNumbers');
-        if (element) {
-            try {
-                let numbers = '';
-                for (let i = 0; i < 5; i++) {
-                    numbers += Math.floor(Math.random() * 10);
-                }
-                element.textContent = numbers;
-            } catch (e) {
-                console.log('Random numbers error:', e);
-            }
+    // Rotating ASCII pixel creatures
+    const asciiCreatures = [
+        '\u0e51(\u0e51\u25cf\u0311\u25e1\u25cf\u0311\u0e51)\u0e51',   // ๑(๑●̑◡●̑๑)๑  ghost
+        '\u0f3c\u0e51\u2022\u0300\u25e1\u2022\u0301\u0f3d\u3064',       // ༼๑•̀◡•́༽つ  reaching spirit
+        '\u2605\u309c\u30fb\u3002\u3002\u30fb\u309c\u309c\u30fb\u3002\u3002\u30fb\u309c\u2605', // ★゜・。。・゜゜・。。・゜★ sparkle
+        '[\u2588\u2593\u2592\u2591 \u2591\u2592\u2593\u2588]',          // [█▓▒░ ░▒▓█] pixel bar
+        '\u2560\u2550\u2550\u2563 \u03b8 \u2560\u2550\u2550\u2563',     // ╠══╣ θ ╠══╣ portal
+        '\u258c\u2580\u2584\u2588\u2584\u2580\u258c',                   // ▌▀▄█▄▀▌ pixel creature
+        '\u00ab\u2022\u0300\u2022\u0301\u00bb',                         // «•̀•́» watching
+        '\u256d\u2500\u2500\u256e\u2502\u25cf\u25cf\u2502\u2570\u25e0\u256f', // ╭──╮│●●│╰◠╯ pixel face
+        '\u2592\u2593\u2588(\u00ba_\u00ba)\u2588\u2593\u2592',           // ▒▓█(º_º)█▓▒ glitch face
+        '\u261e \u2022\u032b\u2022 \u261c',                             // ☞ •̫• ☜  looking around
+        '\u2234\u2235\u2234 \u03c8 \u2234\u2235\u2234',                 // ∴∵∴ ψ ∴∵∴ mystic
+        '\u2591\u2592\u2593\u2588 G\u039b \u2588\u2593\u2592\u2591',    // ░▒▓█ GΛ █▓▒░ ghostline
+    ];
+    let currentCreature = 0;
+
+    function rotateAsciiCreature() {
+        const el = safeGetElement('asciiGhost');
+        if (el) {
+            // Brief glitch effect
+            el.style.opacity = '0.3';
+            setTimeout(() => {
+                currentCreature = (currentCreature + 1) % asciiCreatures.length;
+                el.textContent = asciiCreatures[currentCreature];
+                el.style.opacity = '1';
+            }, 150);
         }
     }
-    
-    // User counter with realistic growth
-    function updateUserCounter() {
+
+    // Real server-side visitor counter
+    async function updateUserCounter() {
         const element = safeGetElement('userCounter');
         if (element) {
             try {
-                // Try to get real-time data from Google Analytics
-                if (typeof gtag !== 'undefined') {
-                    // Get current session data
-                    gtag('event', 'page_view', {
-                        'custom_parameter_1': 'user_counter_check'
-                    });
-                    
-                    // For now, show a realistic base number that will grow with real visitors
-                    let baseCount = parseInt(localStorage.getItem('ghostline_real_users') || '0');
-                    
-                    if (baseCount === 0) {
-                        // Start with a small realistic number
-                        baseCount = 12 + Math.floor(Math.random() * 8);
-                        localStorage.setItem('ghostline_real_users', baseCount.toString());
-                    }
-                    
-                    // Very slow growth to simulate real visitors
-                    if (Math.random() < 0.1) { // 10% chance every 30 seconds
-                        baseCount += 1;
-                        localStorage.setItem('ghostline_real_users', baseCount.toString());
-                    }
-                    
-                    element.textContent = `USERS: ${baseCount}`;
-                    updatePixelHearts(baseCount);
-                } else {
-                    // Fallback if Google Analytics not loaded
-                    element.textContent = 'USERS: --';
-                }
-                
+                const res = await fetch('/api/visitors');
+                const data = await res.json();
+                element.textContent = `VISITORS: ${data.online}`;
+                updatePixelHearts(data.online);
             } catch (e) {
-                console.log('User counter error:', e);
-                element.textContent = 'USERS: --';
+                element.textContent = 'VISITORS: --';
             }
         }
     }
@@ -1108,10 +1096,9 @@ let currentManifestoSlide = 0;
             setInterval(createFireflies, 300);
             createFireflies();
             
-            // Random numbers every 2 seconds
-            setInterval(updateRandomNumbers, 2000);
-            updateRandomNumbers();
-            
+            // Rotate ASCII creature every 3 seconds
+            setInterval(rotateAsciiCreature, 3000);
+
             // User counter every 30 seconds
             setInterval(updateUserCounter, 30000);
             updateUserCounter();
