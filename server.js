@@ -349,7 +349,7 @@ app.get('/api/spider-log.json', (req, res) => {
     : null;
 
   res.json({
-    generated_at: lastTs || new Date().toISOString(),
+    generated_at: lastTs, // null when no logs — frontend treats as sleeping
     log_source: 'live_stream',
     event_count: spiderLogs.length,
     events

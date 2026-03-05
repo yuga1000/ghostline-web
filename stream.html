@@ -3834,6 +3834,7 @@ function feedUpdateDisplay(data) {
 
     // Status — figure out if spider is currently active or sleeping
     const hasEvents = data.events && data.events.length > 0;
+    const hasEnoughEvents = data.events && data.events.length >= 3; // need several events to consider "active"
     let spiderSleeping = true;
     let lastActiveAgo  = '';
 
@@ -3841,8 +3842,8 @@ function feedUpdateDisplay(data) {
         try {
             const genDt    = new Date(data.generated_at);
             const ageMin   = (Date.now() - genDt.getTime()) / 60000;
-            // If log was generated within last 3 hours → spider recently active
-            spiderSleeping = ageMin > 180;
+            // Spider is active only if recent logs AND enough events to prove activity
+            spiderSleeping = ageMin > 180 || !hasEnoughEvents;
             if (ageMin < 60) {
                 lastActiveAgo = Math.round(ageMin) + 'm ago';
             } else {
@@ -3851,16 +3852,19 @@ function feedUpdateDisplay(data) {
         } catch(e) {}
     }
 
+    // No events at all → definitely sleeping
+    if (!hasEvents) spiderSleeping = true;
+
     if (dot) {
-        // Green = active recently, amber = sleeping, grey = no data
-        dot.style.background = !hasEvents ? '#333' : spiderSleeping ? '#ffaa00' : '#00ff00';
-        if (!spiderSleeping && hasEvents) dot.classList.add('active');
+        // Green = active recently, amber = sleeping/dreaming
+        dot.style.background = spiderSleeping ? '#ffaa00' : '#00ff00';
+        if (!spiderSleeping) dot.classList.add('active');
         else dot.classList.remove('active');
     }
-    if (txt) txt.textContent = !hasEvents ? 'STANDBY' : spiderSleeping ? 'SLEEPING' : 'LIVE';
+    if (txt) txt.textContent = spiderSleeping ? 'SLEEPING' : 'LIVE';
     if (nm)  nm.style.display = 'none';
 
-    // ASCII art while sleeping
+    // ASCII art dreams while sleeping
     if (spiderSleeping) {
         startFeedAsciiArt();
     } else {
