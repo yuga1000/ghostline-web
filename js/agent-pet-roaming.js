@@ -629,27 +629,10 @@
             const c = document.getElementById('roaming-pet-container');
             if (!c) return;
 
-            // Check if anchor element is still visible in viewport
-            const rect = currentAnchorEl.getBoundingClientRect();
-            const visible = (
-                rect.bottom > -PET_SIZE &&
-                rect.top < window.innerHeight + PET_SIZE &&
-                rect.right > -PET_SIZE &&
-                rect.left < window.innerWidth + PET_SIZE
-            );
-
-            // If anchor is off-screen, don't move pet (stay at last position)
-            if (!visible) return;
-
-            // Use stable edge position (center of current edge)
+            // Pet follows its anchor element — scrolls with it, even off-screen
             const pos = getStableEdgePosition(currentAnchorEl, currentEdge);
-
-            // Clamp to viewport
-            const clampedX = Math.max(0, Math.min(window.innerWidth - PET_SIZE, pos.x));
-            const clampedY = Math.max(0, Math.min(window.innerHeight - PET_SIZE, pos.y));
-
-            c.style.left = clampedX + 'px';
-            c.style.top = clampedY + 'px';
+            c.style.left = pos.x + 'px';
+            c.style.top = pos.y + 'px';
         }
 
         window.addEventListener('scroll', onScroll, { passive: true });
