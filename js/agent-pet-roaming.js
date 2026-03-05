@@ -207,8 +207,10 @@
 
     // ===== EDGE POSITION HELPERS =====
     // Get position for pet on a specific edge of an element
-    function getEdgePosition(el, edge, progress) {
+    function getEdgePosition(el, edge, progress, clamp) {
         // progress: 0..1 along the edge
+        // clamp: if true, restrict to viewport (default true for jumps, false for scroll tracking)
+        if (clamp === undefined) clamp = true;
         const rect = el.getBoundingClientRect();
         const m = 4; // margin from corners
         const overlap = 4; // slight overlap with element edge
@@ -233,9 +235,10 @@
                 break;
         }
 
-        // Clamp to viewport
-        x = Math.max(0, Math.min(window.innerWidth - PET_SIZE, x));
-        y = Math.max(0, Math.min(window.innerHeight - PET_SIZE, y));
+        if (clamp) {
+            x = Math.max(0, Math.min(window.innerWidth - PET_SIZE, x));
+            y = Math.max(0, Math.min(window.innerHeight - PET_SIZE, y));
+        }
 
         return { x, y };
     }
@@ -249,9 +252,9 @@
         return { ...pos, edge, progress };
     }
 
-    // Get stable position for scroll tracking (center of current edge)
+    // Get stable position for scroll tracking (center of current edge, no viewport clamp)
     function getStableEdgePosition(el, edge) {
-        const pos = getEdgePosition(el, edge, 0.5);
+        const pos = getEdgePosition(el, edge, 0.5, false);
         return pos;
     }
 
