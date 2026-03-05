@@ -4714,311 +4714,228 @@ window.addEventListener('DOMContentLoaded', () => {
 <!-- Pixel Pet Module - DISABLED, using integrated pet instead -->
 <!-- <script src="pet.js?v=1762247417"></script> -->
 
-<!-- Conway's Game of Life - Synchronized -->
+<!-- GoL Mandala v0.2 — Symmetric seed patterns with age coloring -->
 <script>
 (function() {
-    const CELL_SIZE = 5;
-    const DEFAULT_GEN_MS = 156;
-    const CYCLE_MS = 5 * 60 * 1000; // new seed every 5 minutes
+    const CYCLE_MS = 3 * 60 * 1000; // new seed every 3 minutes
 
-    // Color palettes per mode (alive, dim-trail, dead)
-    const PALETTES = [
-        { alive: '#00ff00', dim: '#003300', dead: '#000000', name: 'GREEN'    },
-        { alive: '#00ffff', dim: '#003333', dead: '#000000', name: 'CYAN'     },
-        { alive: '#ff6600', dim: '#331100', dead: '#000000', name: 'AMBER'    },
-        { alive: '#ff00ff', dim: '#330033', dead: '#000000', name: 'MAGENTA'  },
-        { alive: '#ffffff', dim: '#222222', dead: '#000000', name: 'WHITE'    },
-        { alive: '#ffff00', dim: '#333300', dead: '#000000', name: 'YELLOW'   },
-        { alive: '#00ff88', dim: '#003322', dead: '#000000', name: 'MINT'     },
-        { alive: '#ff4488', dim: '#330022', dead: '#000000', name: 'ROSE'     },
-        { alive: '#88aaff', dim: '#111133', dead: '#000000', name: 'INDIGO'   },
-        { alive: '#ffaa00', dim: '#332200', dead: '#000000', name: 'GOLD'     },
-        { alive: '#44ffdd', dim: '#003330', dead: '#000000', name: 'TEAL'     },
-        { alive: '#ff8800', dim: '#221100', dead: '#000000', name: 'FIRE'     },
-    ];
+    // === GoL MANDALA v0.2 — adapted for stream panel ===
+    // Symmetric seed patterns, age-based coloring, trail effects
 
-    // Cellular automaton rulesets — each has radically different visual character
-    // genMs controls animation speed (slower = more meditative, faster = explosive)
-    const RULES = [
-        // B3/S23 — Conway: classic. Gliders, guns, still lifes. The foundation.
-        { birth: new Set([3]),           survive: new Set([2,3]),          name: 'CONWAY',    genMs: 104, maxFF: 120 },
-        // B36/S23 — HighLife: Conway + explosive self-replicators. Gets chaotic fast.
-        { birth: new Set([3,6]),         survive: new Set([2,3]),          name: 'HIGHLIFE',  genMs: 130, maxFF: 100 },
-        // B3/S12345 — Maze: cells rarely die. Corridors grow slowly into organic labyrinths.
-        { birth: new Set([3]),           survive: new Set([1,2,3,4,5]),    name: 'MAZE',      genMs: 286, maxFF: 80  },
-        // B3678/S34678 — Day & Night: symmetric rule. Dense blobs persist dramatically.
-        { birth: new Set([3,6,7,8]),     survive: new Set([3,4,6,7,8]),    name: 'DAYNIGHT',  genMs: 169, maxFF: 100 },
-        // B4678/S35678 — Anneal: smooth dissolving organic blobs. Slow and meditative.
-        { birth: new Set([4,6,7,8]),     survive: new Set([3,5,6,7,8]),    name: 'ANNEAL',    genMs: 260, maxFF: 60  },
-        // B36/S125 — 2×2: chunky geometric block tilings. Very different texture.
-        { birth: new Set([3,6]),         survive: new Set([1,2,5]),        name: '2X2',       genMs: 156, maxFF: 100 },
-        // B2/S — Seeds: nothing survives. Cells explode outward in fractal bursts.
-        { birth: new Set([2]),           survive: new Set([]),             name: 'SEEDS',     genMs: 72,  maxFF: 8   },
-        // B3/S45678 — Coral: cells survive in dense clusters, die when isolated.
-        //   Creates organic coral-reef growth that slowly expands then stabilizes.
-        { birth: new Set([3]),           survive: new Set([4,5,6,7,8]),    name: 'CORAL',     genMs: 208, maxFF: 80  },
-        // B1357/S1357 — Replicator: a single cell spawns geometric diamond copies of itself.
-        //   One of the most mathematically beautiful rules. Very hypnotic.
-        { birth: new Set([1,3,5,7]),     survive: new Set([1,3,5,7]),      name: 'REPLICA',   genMs: 117, maxFF: 60  },
-        // B378/S235678 — Coagulations: dense blobs spread and coagulate like ink in water.
-        { birth: new Set([3,7,8]),       survive: new Set([2,3,5,6,7,8]), name: 'COAGULATE', genMs: 182, maxFF: 100 },
-        // B34/S34 — 34 Life: symmetric crystalline growth. Very geometric, slow.
-        { birth: new Set([3,4]),         survive: new Set([3,4]),          name: '34LIFE',    genMs: 221, maxFF: 80  },
-        // B1/S1 — Gnarl: fractal branching from a single point. Sparse & cosmic.
-        { birth: new Set([1]),           survive: new Set([1]),            name: 'GNARL',     genMs: 91,  maxFF: 12  },
+    const COLORS = [
+        { name: 'GREEN', ages: ['#001a00','#003300','#005500','#008800','#00aa00','#00cc00','#00ff00','#33ff33','#66ff66','#99ff99'] },
+        { name: 'RED',   ages: ['#1a0000','#330000','#550000','#880000','#aa0000','#cc0000','#ff0000','#ff3333','#ff6666','#ff9999'] },
+        { name: 'BLUE',  ages: ['#00001a','#000033','#000055','#000088','#0000aa','#0033cc','#0055ff','#3388ff','#66aaff','#99ccff'] },
+        { name: 'CYAN',  ages: ['#001a1a','#003333','#005555','#008888','#00aaaa','#00cccc','#00ffff','#33ffff','#66ffff','#99ffff'] },
+        { name: 'GOLD',  ages: ['#1a1a00','#333300','#555500','#888800','#aaaa00','#cccc00','#ffff00','#ffff33','#ffff66','#ffff99'] },
     ];
 
     const canvas = document.getElementById('gol-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    let cols, rows, grid, prevGrid, generation, seed;
-    let palette = PALETTES[0];
-    let currentRules = RULES[0];
+    let GRID, CELL_SIZE;
+    let grid, nextGrid, ageGrid;
+    let generation = 0;
+    let palette = COLORS[0];
+    let seed = 0;
+    let rng;
+    let currentSymType = '';
+    let currentSeedName = '';
 
-    // seeded PRNG (mulberry32)
-    function mulberry32(a) {
+    function createRNG(hash) {
+        let s = hash;
         return function() {
-            a |= 0; a = a + 0x6D2B79F5 | 0;
-            var t = Math.imul(a ^ a >>> 15, 1 | a);
-            t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+            s ^= s << 13; s ^= s >> 17; s ^= s << 5;
+            return ((s < 0 ? ~s + 1 : s) % 10000) / 10000;
         };
     }
 
-    // place a pattern at (ox, oy) on the grid
-    function placePattern(pattern, ox, oy) {
-        pattern.forEach(([dy, dx]) => {
-            const y = (oy + dy + rows) % rows;
-            const x = (ox + dx + cols) % cols;
-            grid[y][x] = 1;
-        });
-    }
-
-    // ── Known patterns ────────────────────────────────────────────────────
-    const GLIDER     = [[0,1],[1,2],[2,0],[2,1],[2,2]]; // NE glider
-    const LWSS       = [[0,1],[0,4],[1,0],[2,0],[2,4],[3,0],[3,1],[3,2],[3,3]]; // lightweight spaceship (E)
-    const MWSS       = [[0,2],[1,0],[1,4],[2,0],[3,0],[3,4],[4,1],[4,2],[4,3],[4,4],[3,1],[3,2]]; // medium spaceship
-    const RPENTOMINO = [[0,1],[0,2],[1,0],[1,1],[2,1]]; // 1100+ generation methuselah
-    const ACORN      = [[0,1],[1,3],[2,0],[2,1],[2,4],[2,5],[2,6]]; // 5206 gen methuselah
-    const DIEHARD    = [[0,6],[1,0],[1,1],[2,1],[2,5],[2,6],[2,7]]; // 130 gens, then vanishes
-    const BLINKER    = [[0,0],[0,1],[0,2]]; // simplest oscillator
-    // Gosper Glider Gun — fires an infinite stream of gliders east
-    const GLIDER_GUN = [
-        [0,24],[1,22],[1,24],[2,12],[2,13],[2,20],[2,21],[2,34],[2,35],
-        [3,11],[3,15],[3,20],[3,21],[3,34],[3,35],[4,0],[4,1],[4,10],
-        [4,16],[4,20],[4,21],[5,0],[5,1],[5,10],[5,14],[5,16],[5,17],
-        [5,22],[5,24],[6,10],[6,16],[6,24],[7,11],[7,15],[8,12],[8,13]
-    ];
-    // Pulsar — gorgeous period-3 oscillator, star-like
-    const PULSAR = [
-        [-6,-4],[-6,-3],[-6,-2],[-6,2],[-6,3],[-6,4],
-        [-4,-6],[-3,-6],[-2,-6],[-4,-1],[-3,-1],[-2,-1],
-        [-4,1],[-3,1],[-2,1],[-4,6],[-3,6],[-2,6],
-        [-1,-4],[-1,-3],[-1,-2],[-1,2],[-1,3],[-1,4],
-        [1,-4],[1,-3],[1,-2],[1,2],[1,3],[1,4],
-        [2,-6],[3,-6],[4,-6],[2,-1],[3,-1],[4,-1],
-        [2,1],[3,1],[4,1],[2,6],[3,6],[4,6],
-        [6,-4],[6,-3],[6,-2],[6,2],[6,3],[6,4]
-    ];
-    // Pentadecathlon — period-15 oscillator that looks like a spinning barbell
-    const PENTADECATHLON = [
-        [0,0],[1,0],[2,-1],[2,1],[3,0],[4,0],[5,0],[6,0],[7,-1],[7,1],[8,0],[9,0]
-    ];
-    // Eater 1 — useful still life, absorbs gliders
-    const EATER = [[0,0],[0,1],[1,1],[2,1],[2,2],[3,2],[3,3],[3,4],[4,4]];
-
-    // helper: fill a circular region at (cx, cy) with given density
-    function fillCircle(cx, cy, r, density, rng) {
-        for (let dy = -r; dy <= r; dy++)
-            for (let dx = -r; dx <= r; dx++)
-                if (dx*dx + dy*dy <= r*r && rng() < density)
-                    grid[(cy+dy+rows)%rows][(cx+dx+cols)%cols] = 1;
-    }
-
-    function initGrid(rng) {
-        grid = [];
-        for (let y = 0; y < rows; y++) {
-            grid[y] = new Uint8Array(cols); // typed array = faster step()
+    // === SYMMETRY ===
+    function mirrorPoints(x, y, cx, cy, type) {
+        const dx = x - cx, dy = y - cy;
+        const pts = [[x, y]];
+        if (type === 'vertical') { pts.push([cx - dx, y]); }
+        else if (type === 'horizontal') { pts.push([x, cy - dy]); }
+        else if (type === 'quad') { pts.push([cx-dx,y],[x,cy-dy],[cx-dx,cy-dy]); }
+        else if (type === 'diagonal') { pts.push([cx+dy, cy+dx]); }
+        else if (type === 'octal') {
+            pts.push([cx-dx,cy+dy],[cx+dx,cy-dy],[cx-dx,cy-dy],
+                     [cx+dy,cy+dx],[cx-dy,cy+dx],[cx+dy,cy-dx],[cx-dy,cy-dx]);
+        } else if (type === 'radial6') {
+            for (let i = 1; i < 6; i++) {
+                const a = (Math.PI*2/6)*i, cos=Math.cos(a), sin=Math.sin(a);
+                pts.push([Math.round(cx+dx*cos-dy*sin), Math.round(cy+dx*sin+dy*cos)]);
+            }
         }
+        return pts;
+    }
 
-        const mode = seed % RULES.length; // one mode per ruleset
+    function setPixel(x, y) {
+        if (x >= 0 && x < GRID && y >= 0 && y < GRID) {
+            grid[y * GRID + x] = 1;
+            ageGrid[y * GRID + x] = 1;
+        }
+    }
 
-        if (mode === 0) {
-            // CONWAY — armada mode: 2 glider guns + scattered spaceships + random soup islands
-            placePattern(GLIDER_GUN, 4, 4);
-            placePattern(GLIDER_GUN, rows - 14, Math.floor(cols / 2) - 18);
-            // row of LWSS ships traversing the grid
-            for (let i = 0; i < 4; i++)
-                placePattern(LWSS, Math.floor(rows * (0.2 + i * 0.18)), 3 + i * 12);
-            // scatter pulsars
-            placePattern(PULSAR, Math.floor(rows/2), Math.floor(cols*0.6));
-            placePattern(PULSAR, Math.floor(rows*0.25), Math.floor(cols*0.75));
-            // small random soup islands
-            for (let i = 0; i < 5; i++) {
-                const cx = Math.floor(rng() * cols);
-                const cy = Math.floor(rng() * rows);
-                fillCircle(cx, cy, 4, 0.45, rng);
-            }
-
-        } else if (mode === 1) {
-            // HIGHLIFE — mirror-symmetric soup; triggers built-in self-replicators
-            for (let y = 0; y < rows; y++)
-                for (let x = 0; x < Math.ceil(cols / 2); x++) {
-                    const v = rng() < 0.20 ? 1 : 0;
-                    grid[y][x] = v;
-                    grid[y][cols - 1 - x] = v;
-                }
-
-        } else if (mode === 2) {
-            // MAZE — sparse clusters; corridors grow slowly outward from each island
-            const numSeeds = 6 + Math.floor(rng() * 6);
-            for (let i = 0; i < numSeeds; i++) {
-                const cx = Math.floor(rng() * cols);
-                const cy = Math.floor(rng() * rows);
-                fillCircle(cx, cy, 3 + Math.floor(rng() * 4), 0.55, rng);
-            }
-
-        } else if (mode === 3) {
-            // DAY & NIGHT — 4-fold symmetry, 50% density; creates dramatic mirror-image blobs
-            for (let y = 0; y < Math.ceil(rows/2); y++)
-                for (let x = 0; x < Math.ceil(cols/2); x++) {
-                    const v = rng() < 0.50 ? 1 : 0;
-                    grid[y][x] = v;
-                    grid[rows-1-y][x] = v;
-                    grid[y][cols-1-x] = v;
-                    grid[rows-1-y][cols-1-x] = v;
-                }
-
-        } else if (mode === 4) {
-            // ANNEAL — dense uniform soup that slowly smooths into organic blobs
-            for (let y = 0; y < rows; y++)
-                for (let x = 0; x < cols; x++)
-                    grid[y][x] = rng() < 0.55 ? 1 : 0;
-
-        } else if (mode === 5) {
-            // 2×2 — chunky circular clusters; rule creates geometric tilings
-            const n = 5 + Math.floor(rng() * 6);
-            for (let i = 0; i < n; i++) {
-                const cx = Math.floor(rng() * cols);
-                const cy = Math.floor(rng() * rows);
-                fillCircle(cx, cy, 5 + Math.floor(rng() * 9), 0.55, rng);
-            }
-
-        } else if (mode === 6) {
-            // SEEDS — 3 staggered glider guns + sparse sparks; explosions fill the void
-            placePattern(GLIDER_GUN, 3, 2);
-            placePattern(GLIDER_GUN, Math.floor(rows * 0.45), Math.floor(cols * 0.3));
-            placePattern(GLIDER_GUN, Math.floor(rows * 0.75), Math.floor(cols * 0.6));
-            for (let i = 0; i < Math.floor(cols * rows * 0.025); i++)
-                grid[Math.floor(rng()*rows)][Math.floor(rng()*cols)] = 1;
-
-        } else if (mode === 7) {
-            // CORAL — very sparse random 15%; watch coral-like growth spread from tiny seeds
-            for (let y = 0; y < rows; y++)
-                for (let x = 0; x < cols; x++)
-                    grid[y][x] = rng() < 0.15 ? 1 : 0;
-
-        } else if (mode === 8) {
-            // REPLICATOR (B1357/S1357) — 4 seed points at compass positions
-            //   each spawns diamond replicators that multiply across the grid
-            const mx = Math.floor(cols / 2), my = Math.floor(rows / 2);
-            const off = Math.min(mx, my) - 5;
-            grid[my][mx] = 1;           // center
-            grid[my - off][mx] = 1;     // N
-            grid[my + off][mx] = 1;     // S
-            grid[my][mx - off] = 1;     // W
-            grid[my][mx + off] = 1;     // E
-
-        } else if (mode === 9) {
-            // COAGULATIONS — dense 60% soup; blobs spread then coagulate like ink in water
-            for (let y = 0; y < rows; y++)
-                for (let x = 0; x < cols; x++)
-                    grid[y][x] = rng() < 0.60 ? 1 : 0;
-
-        } else if (mode === 10) {
-            // 34 LIFE — radially symmetric sparse seeds; crystalline geometric growth
-            const n = 8 + Math.floor(rng() * 8);
-            for (let i = 0; i < n; i++) {
-                const angle = (i / n) * Math.PI * 2;
-                const r = Math.min(rows, cols) * 0.3;
-                const cx = Math.floor(cols/2 + Math.cos(angle) * r);
-                const cy = Math.floor(rows/2 + Math.sin(angle) * r);
-                fillCircle(cx, cy, 3, 0.5, rng);
-            }
-            // center cluster
-            fillCircle(Math.floor(cols/2), Math.floor(rows/2), 5, 0.4, rng);
-
-        } else {
-            // GNARL (B1/S1) — 2-3 isolated seed points; fractal branching fills the grid
-            //   Each point grows into a cosmic fractal tree, interference creates beauty
-            const seedPoints = 2 + Math.floor(rng() * 2);
-            for (let i = 0; i < seedPoints; i++) {
-                const cx = Math.floor(rng() * cols);
-                const cy = Math.floor(rng() * rows);
-                grid[cy][cx] = 1;
-                // tiny cross seed helps gnarl bootstrap
-                if (cy > 0)           grid[cy-1][cx] = 1;
-                if (cy < rows-1)      grid[cy+1][cx] = 1;
-                if (cx > 0)           grid[cy][cx-1] = 1;
-                if (cx < cols-1)      grid[cy][cx+1] = 1;
+    // === SEED GENERATORS ===
+    function seedLines(cx, cy, sym) {
+        const n = 1 + Math.floor(rng() * 8);
+        const thick = rng() < 0.4;
+        for (let l = 0; l < n; l++) {
+            const angle = rng() * Math.PI * 2;
+            const len = GRID * (0.1 + rng() * 0.4);
+            const w = thick ? (1 + Math.floor(rng() * 3)) : 1;
+            for (let t = 0; t < len; t += 0.5) {
+                const bx = Math.floor(cx + Math.cos(angle) * t);
+                const by = Math.floor(cy + Math.sin(angle) * t);
+                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym))
+                    for (let ww=0;ww<w;ww++) { setPixel(px+ww,py); if(w>1) setPixel(px,py+ww); }
             }
         }
     }
 
-    function countNeighbors(g, x, y) {
-        let sum = 0;
-        for (let dy = -1; dy <= 1; dy++) {
-            for (let dx = -1; dx <= 1; dx++) {
-                if (dx === 0 && dy === 0) continue;
-                const ny = (y + dy + rows) % rows;
-                const nx = (x + dx + cols) % cols;
-                sum += g[ny][nx];
+    function seedCross(cx, cy, sym) {
+        const armLen = Math.floor(GRID * (0.1 + rng() * 0.35));
+        const armW = 1 + Math.floor(rng() * 3);
+        const numArms = 2 + Math.floor(rng() * 4);
+        for (let a = 0; a < numArms; a++) {
+            const angle = (a / numArms) * Math.PI + rng() * 0.2;
+            for (let t = 0; t < armLen; t++) {
+                const bx = Math.floor(cx + Math.cos(angle) * t);
+                const by = Math.floor(cy + Math.sin(angle) * t);
+                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym))
+                    for (let w = -Math.floor(armW/2); w <= Math.floor(armW/2); w++) { setPixel(px+w,py); setPixel(px,py+w); }
             }
         }
-        return sum;
+    }
+
+    function seedRings(cx, cy, sym) {
+        const n = 2 + Math.floor(rng() * 6);
+        for (let r = 0; r < n; r++) {
+            const radius = 3 + r * (GRID * 0.4 / n) * (0.6 + rng() * 0.8);
+            const arcStart = rng() * Math.PI * 2;
+            const arcLen = Math.PI * (0.3 + rng() * 1.7);
+            const steps = Math.floor(radius * 3);
+            for (let s = 0; s < steps; s++) {
+                const a = arcStart + (s / steps) * arcLen;
+                const bx = Math.floor(cx + Math.cos(a) * radius);
+                const by = Math.floor(cy + Math.sin(a) * radius);
+                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    function seedSpiral(cx, cy, sym) {
+        const numArms = 1 + Math.floor(rng() * 4);
+        const tightness = 0.02 + rng() * 0.08;
+        const turns = 1 + rng() * 4;
+        for (let arm = 0; arm < numArms; arm++) {
+            const offset = (arm / numArms) * Math.PI * 2;
+            for (let t = 0; t < turns * Math.PI * 2; t += 0.05) {
+                const r = t / tightness * 0.3;
+                const bx = Math.floor(cx + Math.cos(t+offset) * r);
+                const by = Math.floor(cy + Math.sin(t+offset) * r);
+                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    function seedWeave(cx, cy, sym) {
+        const spacing = 2 + Math.floor(rng() * 6);
+        const extent = Math.floor(GRID * (0.15 + rng() * 0.3));
+        for (let i = -extent; i < extent; i += spacing) {
+            for (let t = 0; t < extent; t++) {
+                for (const [px,py] of mirrorPoints(cx+i+t, cy+t, cx, cy, sym)) setPixel(px,py);
+                if (rng() < 0.5)
+                    for (const [px,py] of mirrorPoints(cx+i+t, cy-t, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // === INIT GRID ===
+    function initGrid() {
+        grid = new Uint8Array(GRID * GRID);
+        nextGrid = new Uint8Array(GRID * GRID);
+        ageGrid = new Float32Array(GRID * GRID);
+        generation = 0;
+
+        const cx = Math.floor(GRID / 2), cy = Math.floor(GRID / 2);
+        const symTypes = ['vertical','horizontal','quad','diagonal','octal','radial6','none'];
+        const symType = symTypes[Math.floor(rng() * symTypes.length)];
+        currentSymType = symType;
+
+        const seedGens = [seedLines, seedCross, seedRings, seedSpiral, seedWeave];
+        const idx1 = Math.floor(rng() * seedGens.length);
+        const combo = rng() < 0.35;
+        const idx2 = Math.floor(rng() * seedGens.length);
+
+        seedGens[idx1](cx, cy, symType);
+        currentSeedName = seedGens[idx1].name;
+        if (combo) {
+            seedGens[idx2](cx, cy, symType);
+            currentSeedName += '+' + seedGens[idx2].name;
+        }
+    }
+
+    // === GAME OF LIFE ===
+    function getCell(x, y) {
+        x = ((x % GRID) + GRID) % GRID;
+        y = ((y % GRID) + GRID) % GRID;
+        return grid[y * GRID + x];
     }
 
     function step() {
-        const next = [];
-        const birth   = currentRules.birth;
-        const survive = currentRules.survive;
-        for (let y = 0; y < rows; y++) {
-            next[y] = new Uint8Array(cols);
-            for (let x = 0; x < cols; x++) {
-                const n = countNeighbors(grid, x, y);
-                if (grid[y][x]) {
-                    next[y][x] = survive.has(n) ? 1 : 0;
+        for (let y = 0; y < GRID; y++) {
+            for (let x = 0; x < GRID; x++) {
+                let n = 0;
+                for (let dy = -1; dy <= 1; dy++)
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (dx === 0 && dy === 0) continue;
+                        if (getCell(x+dx, y+dy) > 0) n++;
+                    }
+                const idx = y * GRID + x;
+                if (grid[idx] > 0) {
+                    nextGrid[idx] = (n === 2 || n === 3) ? 1 : 0;
+                    if (nextGrid[idx]) ageGrid[idx] = Math.min(ageGrid[idx]+1, 500);
+                    else ageGrid[idx] = ageGrid[idx] > 0 ? -1 : 0;
                 } else {
-                    next[y][x] = birth.has(n) ? 1 : 0;
+                    nextGrid[idx] = (n === 3) ? 1 : 0;
+                    if (nextGrid[idx]) ageGrid[idx] = 1;
+                    else if (ageGrid[idx] < 0) ageGrid[idx] = Math.min(ageGrid[idx]+0.05, 0);
                 }
             }
         }
-        prevGrid = grid;
-        grid = next;
+        [grid, nextGrid] = [nextGrid, grid];
         generation++;
     }
 
+    // === DRAW ===
     function draw() {
-        ctx.fillStyle = palette.dead;
+        ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                if (grid[y][x]) {
-                    ctx.fillStyle = palette.alive;
-                    ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1);
-                } else if (prevGrid && prevGrid[y][x]) {
-                    // recently died cell - dim trail
-                    ctx.fillStyle = palette.dim;
-                    ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE - 1, CELL_SIZE - 1);
+        const colors = palette.ages;
+        let alive = 0;
+
+        for (let y = 0; y < GRID; y++) {
+            for (let x = 0; x < GRID; x++) {
+                const age = ageGrid[y * GRID + x];
+                if (age > 0) {
+                    alive++;
+                    const ci = Math.min(Math.floor(age / 5), colors.length - 1);
+                    ctx.fillStyle = colors[ci];
+                    ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                } else if (age < 0) {
+                    const alpha = Math.max(0, -age * 0.3);
+                    ctx.fillStyle = colors[0];
+                    ctx.globalAlpha = alpha;
+                    ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    ctx.globalAlpha = 1;
                 }
             }
         }
-        // update stats
-        let alive = 0;
-        for (let y = 0; y < rows; y++)
-            for (let x = 0; x < cols; x++)
-                if (grid[y][x]) alive++;
+
+        // update panel stats
         const genEl = document.getElementById('gol-generation');
         const cellsEl = document.getElementById('gol-cells');
         const seedEl = document.getElementById('gol-seed');
@@ -5026,49 +4943,39 @@ window.addEventListener('DOMContentLoaded', () => {
         if (genEl) genEl.textContent = generation;
         if (cellsEl) cellsEl.textContent = alive;
         if (seedEl) seedEl.textContent = seed.toString(16).toUpperCase();
-        if (modeEl) modeEl.textContent = currentRules.name + '/' + palette.name;
+        if (modeEl) modeEl.textContent = currentSymType + '/' + palette.name;
     }
 
+    // === RESIZE / SYNC ===
     function resize() {
         const container = document.getElementById('gol-feed');
         if (!container) return;
         const w = container.clientWidth;
         const h = container.clientHeight;
-        canvas.width = w;
-        canvas.height = h;
-        cols = Math.floor(w / CELL_SIZE);
-        rows = Math.floor(h / CELL_SIZE);
+        const dim = Math.min(w, h);
+        // Pick grid size to fill panel nicely
+        const gridOptions = [48, 64, 80, 96];
+        GRID = gridOptions[Math.floor(rng() * gridOptions.length)];
+        CELL_SIZE = Math.max(1, Math.floor(dim / GRID));
+        canvas.width = GRID * CELL_SIZE;
+        canvas.height = GRID * CELL_SIZE;
+        // Center canvas in container
+        canvas.style.margin = 'auto';
     }
 
     function syncStart() {
-        resize();
-        // guard: if container not rendered yet, retry after 100ms
-        if (!cols || !rows) { setTimeout(syncStart, 100); return; }
-
         const now = Date.now();
         seed = Math.floor(now / CYCLE_MS);
-        const cycleStart = seed * CYCLE_MS;
-        const elapsed = now - cycleStart;
+        rng = createRNG(seed * 2654435761); // hash the seed
+        palette = COLORS[seed % COLORS.length];
 
-        // pick palette + ruleset based on seed (each 5-min window is visually unique)
-        palette      = PALETTES[seed % PALETTES.length];
-        currentRules = RULES[seed % RULES.length];
-        const genMs  = currentRules.genMs || DEFAULT_GEN_MS;
-
-        // fast-forward — capped per-ruleset (explosive rules like SEEDS die out on small grids)
-        const rawTarget = Math.floor(elapsed / genMs);
-        const targetGen = Math.min(rawTarget, currentRules.maxFF || 100);
-
-        const rng = mulberry32(seed);
-        initGrid(rng);
-        generation = 0;
-        prevGrid = null;
-
-        for (let i = 0; i < targetGen; i++) step();
+        resize();
+        if (!GRID) { setTimeout(syncStart, 100); return; }
+        initGrid();
         draw();
     }
 
-    // main loop — uses per-rule genMs for timing
+    // main loop
     let lastSeed = 0;
     function tick() {
         try {
@@ -5077,24 +4984,22 @@ window.addEventListener('DOMContentLoaded', () => {
                 lastSeed = currentSeed;
                 syncStart();
             } else {
-                step();
+                const speed = GRID > 80 ? 2 : 3;
+                for (let i = 0; i < speed; i++) step();
                 draw();
             }
-        } catch(e) { /* keep loop alive even if a frame errors */ }
-        const genMs = currentRules.genMs || DEFAULT_GEN_MS;
-        setTimeout(tick, genMs);
+        } catch(e) {}
+        requestAnimationFrame(tick);
     }
 
-    // init on load
     window.addEventListener('load', function() {
         setTimeout(function() {
             syncStart();
             lastSeed = seed;
-            setTimeout(tick, DEFAULT_GEN_MS);
+            requestAnimationFrame(tick);
         }, 500);
     });
 
-    // handle resize
     window.addEventListener('resize', function() {
         syncStart();
         lastSeed = seed;
