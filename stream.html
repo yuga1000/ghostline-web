@@ -774,9 +774,9 @@
                     <div class="h-40 terminal-border relative" id="pet-feed" style="background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;">
                         <!-- ZZZ sleep bubbles -->
                         <div id="pet-zzz" style="display:none;position:absolute;top:10px;right:20px;font-family:'Share Tech Mono',monospace;font-size:14px;color:#00ff00;opacity:0.7;animation:petZzz 2s ease-in-out infinite;">z z z</div>
-                        <!-- Sprite canvas -->
-                        <canvas id="pet-sprite-canvas" width="64" height="64"
-                            style="image-rendering:pixelated;image-rendering:crisp-edges;width:64px;height:64px;"></canvas>
+                        <!-- Pet sprite (real frames) -->
+                        <img id="pet-sprite-img" src="pet/newpetseq/stay/IMG_6072.PNG" alt="agent pet"
+                            style="image-rendering:pixelated;image-rendering:crisp-edges;width:100px;height:100px;">
                     </div>
                     <div class="pixel-font text-xs mt-2" style="color:#003300;">
                         <span id="pet-state-label">// idle</span>
@@ -3821,6 +3821,8 @@ function feedShowSignalLost() {
     if (nm)  { nm.style.display = 'block'; nm.style.opacity = '0.8'; }
     const cnt = document.getElementById('feed-event-count');
     if (cnt) cnt.textContent = '// spider offline or no log today';
+    // Spider offline = pet sleeps too
+    if (window.petGoToSleep) window.petGoToSleep();
 }
 
 function feedUpdateDisplay(data) {
@@ -3869,6 +3871,13 @@ function feedUpdateDisplay(data) {
         startFeedAsciiArt();
     } else {
         stopFeedAsciiArt();
+    }
+
+    // Sync pet with spider sleep state
+    if (spiderSleeping && window.petGoToSleep) {
+        window.petGoToSleep();
+    } else if (!spiderSleeping && window.petWakeUp) {
+        window.petWakeUp();
     }
 
     if (cntEl) cntEl.textContent = `// ${data.event_count || 0} events today`;
@@ -4584,44 +4593,64 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchSpiderFeed, 2 * 60 * 1000); // re-fetch every 2 min
 });
 
-// ==================== SPRITE PET ====================
+// ==================== SPRITE PET (v2 — real pet frames) ====================
 (function() {
-    const SPRITE_URL = '/assets/pet/hatch.png';
-    const FW = 64;  // frame width in spritesheet
-    const FH = 64;  // frame height
-    const DW = 64;  // display size
-    const DH = 64;
-    const TOTAL_FRAMES = 8; // frames 0-7 in hatch.png
-
-    // Animation sequences: just frame indices 0..7
-    const ANIMS = {
-        idle:  { frames: [0, 1],                   fps: 2, loop: true  },
-        hatch: { frames: [0,1,2,3,4,5,6,7],        fps: 4, loop: false },
-        happy: { frames: [4,5,4,5,3,2,1,0],        fps: 6, loop: false },
-        sad:   { frames: [6, 7],                   fps: 1, loop: true  },
+    // Frame definitions — real pet sprites from newpetseq
+    const FRAMES = {
+        stay: [
+            'pet/newpetseq/stay/IMG_6072.PNG',
+            'pet/newpetseq/stay/IMG_6073.PNG',
+            'pet/newpetseq/stay/IMG_6074.PNG',
+        ],
+        go: [
+            'pet/newpetseq/go/IMG_6075.PNG',
+            'pet/newpetseq/go/IMG_6076.PNG',
+            'pet/newpetseq/go/IMG_6077.PNG',
+            'pet/newpetseq/go/IMG_6078.PNG',
+            'pet/newpetseq/go/IMG_6079.PNG',
+        ],
+        sleep: [
+            'pet/newpetseq/sleep/IMG_6080.PNG',
+            'pet/newpetseq/sleep/IMG_6081.PNG',
+        ],
+        transformation: [
+            'pet/newpetseq/transformation/IMG_6082.PNG',
+            'pet/newpetseq/transformation/IMG_6083.PNG',
+            'pet/newpetseq/transformation/IMG_6084.PNG',
+            'pet/newpetseq/transformation/IMG_6085.PNG',
+            'pet/newpetseq/transformation/IMG_6086.PNG',
+        ],
     };
 
-    // State machine
-    let currentAnim = 'idle';
-    let frameIdx    = 0;
-    let lastTick    = 0;
-    let petTimer    = null;
-    let stateTimer  = null;
+    // Timing (ms per frame)
+    const TIMING = { stay: 300, go: 100, sleep: 600, transformation: 400 };
 
-    const canvas = document.getElementById('pet-sprite-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
+    // Preload all frames
+    const preloadCache = {};
+    for (const key of Object.keys(FRAMES)) {
+        for (const src of FRAMES[key]) {
+            const img = new Image(); img.src = src;
+            preloadCache[src] = img;
+        }
+    }
 
-    const sprite = new Image();
-    sprite.src = SPRITE_URL;
+    // State
+    let currentAnim = 'stay';
+    let frameIdx = 0;
+    let animTimer = null;
+    let petTimer = null;
+    let petSleeping = false;
 
-    const moodEl      = document.getElementById('pet-mood');
-    const stateEl     = document.getElementById('pet-state-label');
-    const eventEl     = document.getElementById('pet-event-label');
-    const zzzEl       = document.getElementById('pet-zzz');
+    const petImg   = document.getElementById('pet-sprite-img');
+    const moodEl   = document.getElementById('pet-mood');
+    const stateEl  = document.getElementById('pet-state-label');
+    const eventEl  = document.getElementById('pet-event-label');
+    const zzzEl    = document.getElementById('pet-zzz');
+    const feedEl   = document.getElementById('pet-feed');
 
-    function setMood(text) { if (moodEl) moodEl.textContent = text; }
+    if (!petImg) return;
+
+    function setMood(text)  { if (moodEl) moodEl.textContent = text; }
     function setState(text) { if (stateEl) stateEl.textContent = '// ' + text; }
     function setEvent(text) {
         if (!eventEl) return;
@@ -4629,83 +4658,121 @@ window.addEventListener('DOMContentLoaded', () => {
         if (text) setTimeout(() => { eventEl.textContent = ''; }, 4000);
     }
 
-    function playAnim(name, onDone) {
+    function startAnim(name) {
+        if (animTimer) { clearInterval(animTimer); animTimer = null; }
         currentAnim = name;
         frameIdx = 0;
-        if (zzzEl) zzzEl.style.display = (name === 'sleep') ? 'block' : 'none';
-        if (stateTimer) clearTimeout(stateTimer);
-        if (!ANIMS[name].loop && onDone) {
-            const dur = (ANIMS[name].frames.length / ANIMS[name].fps) * 1000;
-            stateTimer = setTimeout(onDone, dur);
+        const frames = FRAMES[name];
+        if (!frames || !frames.length) return;
+        petImg.src = frames[0];
+        if (frames.length > 1) {
+            animTimer = setInterval(() => {
+                frameIdx = (frameIdx + 1) % frames.length;
+                petImg.src = frames[frameIdx];
+            }, TIMING[name] || 300);
         }
     }
 
-    function draw(ts) {
-        requestAnimationFrame(draw);
-        if (!sprite.complete) return;
-
-        const anim = ANIMS[currentAnim];
-        const interval = 1000 / anim.fps;
-
-        // Advance frame on tick
-        if (ts - lastTick >= interval) {
-            lastTick = ts;
-            frameIdx++;
-            if (frameIdx >= anim.frames.length) {
-                frameIdx = anim.loop ? 0 : anim.frames.length - 1;
-            }
-        }
-
-        // Draw current frame
-        const fi = anim.frames[frameIdx] || 0;
-        ctx.clearRect(0, 0, DW, DH);
-        ctx.drawImage(sprite, fi * FW, 0, FW, FH, 0, 0, DW, DH);
+    function stopAnim() {
+        if (animTimer) { clearInterval(animTimer); animTimer = null; }
     }
 
-    // ── Loop: hatch → idle pause 5s → hatch → ... ──
-    function runHatchLoop() {
-        playAnim('hatch', () => {
-            // after hatch: show idle for 5 seconds then repeat
-            playAnim('idle');
-            setState('idle');
-            petTimer = setTimeout(runHatchLoop, 5000);
-        });
-        setState('hatching...');
+    // ── Idle loop: stay 4s → go 3s → stay 5s → repeat ──
+    function runIdleLoop() {
+        startAnim('stay');
+        setState('idle');
+        setMood('IDLE');
+
+        petTimer = setTimeout(() => {
+            // Walk for a bit
+            startAnim('go');
+            setState('roaming...');
+
+            petTimer = setTimeout(() => {
+                // Back to stay
+                startAnim('stay');
+                setState('idle');
+
+                petTimer = setTimeout(runIdleLoop, 4000 + Math.random() * 3000);
+            }, 2000 + Math.random() * 2000);
+        }, 3000 + Math.random() * 4000);
     }
 
-    // keep these as no-ops so triggerPetAnimation can call scheduleNextState
-    function scheduleNextState() {
-        if (petTimer) clearTimeout(petTimer);
-        petTimer = setTimeout(runHatchLoop, 5000);
+    function clearTimers() {
+        stopAnim();
+        if (petTimer) { clearTimeout(petTimer); petTimer = null; }
     }
 
-    // ── Public trigger (called from division/feed monitors) ──
+    // ── Pet sleep/wake (synced with spider) ──
+    function petGoToSleep() {
+        if (petSleeping) return;
+        petSleeping = true;
+        clearTimers();
+
+        startAnim('sleep');
+        setMood('SLEEPING');
+        setState('sleeping~');
+        if (zzzEl) zzzEl.style.display = 'block';
+        petImg.style.opacity = '0.6';
+
+        console.log('[Pet] Going to sleep (spider is sleeping)');
+    }
+
+    function petWakeUp() {
+        if (!petSleeping) return;
+        petSleeping = false;
+
+        if (zzzEl) zzzEl.style.display = 'none';
+        petImg.style.opacity = '1';
+
+        setMood('IDLE');
+        setState('waking up!');
+        setEvent('spider is active');
+
+        // Play transformation as wake-up effect, then resume idle loop
+        startAnim('transformation');
+        petTimer = setTimeout(() => {
+            runIdleLoop();
+        }, TIMING.transformation * FRAMES.transformation.length);
+
+        console.log('[Pet] Waking up (spider is active)');
+    }
+
+    // Expose globally
+    window.petGoToSleep = petGoToSleep;
+    window.petWakeUp = petWakeUp;
+
+    // ── Public trigger (called from feed monitors) ──
     window.triggerPetAnimation = function(type, duration) {
+        if (petSleeping) return;
+        clearTimers();
+
         if (type === 'waving' || type === 'excited-bounce') {
-            playAnim('happy', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
+            startAnim('go');
             setState('excited!');
-            setEvent(type === 'waving' ? '★ HOT LEAD' : '✓ scan done');
+            setEvent(type === 'waving' ? '* HOT LEAD' : '> scan done');
             setMood('HOT!');
-            setTimeout(() => setMood('IDLE'), duration || 2500);
+            petTimer = setTimeout(() => {
+                setMood('IDLE');
+                runIdleLoop();
+            }, duration || 2500);
         } else if (type === 'nervous') {
-            playAnim('sad', () => { playAnim('idle'); setState('idle'); scheduleNextState(); });
+            startAnim('sleep');
             setState('nervous');
             setEvent('signal lost');
             setMood('???');
-            setTimeout(() => { playAnim('idle'); setState('idle'); setMood('IDLE'); scheduleNextState(); }, duration || 3000);
+            petTimer = setTimeout(() => {
+                setMood('IDLE');
+                runIdleLoop();
+            }, duration || 3000);
         }
     };
 
     window.petIsAwake = true;
 
-    // Start
-    sprite.onload = () => {
-        requestAnimationFrame(draw);
-        runHatchLoop();
-    };
-    sprite.onerror = () => {
-        console.warn('[Pet] sprite not found:', SPRITE_URL);
-    };
+    // Start — begin in sleep mode (spider status will wake us up if needed)
+    petGoToSleep();
+    console.log('[Pet] v2 initialized (real sprites)');
 })();
 
 </script>
