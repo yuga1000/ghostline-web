@@ -1,8 +1,8 @@
 // ===== ROAMING AGENT PET MODULE (for index.html) =====
-// v4 — PNG sprite, smooth transforms, calm behavior, block anchoring
+// v5 — Jumping spider: 4-edge walking, discrete rotation, spider jumps
 
 (function() {
-    console.log('[Roaming Pet] Initializing v4...');
+    console.log('[Roaming Pet] Initializing v5...');
 
     // ===== SPRITE FRAME DEFINITIONS =====
     const FRAMES = {
@@ -39,7 +39,7 @@
         transformation: 400,
     };
 
-    const TRANSFORM_HOLD_TIME = 15000; // 15s hold on last frame
+    const TRANSFORM_HOLD_TIME = 15000;
     const PET_SIZE = 40;
 
     // ===== SPRITE ENGINE =====
@@ -49,7 +49,6 @@
     let spriteTimer = null;
     let isTransforming = false;
 
-    // Preload all frames
     const preloadCache = {};
     function preloadFrames() {
         for (const key of Object.keys(FRAMES)) {
@@ -61,14 +60,13 @@
         }
     }
 
-    // Smooth frame swap with brief crossfade
     function setFrame(src) {
         if (!spriteImg) return;
         spriteImg.src = src;
     }
 
     function startSpriteLoop(state) {
-        if (isTransforming) return; // never interrupt transformation
+        if (isTransforming) return;
         if (spriteState === state && spriteTimer) return;
         stopSpriteLoop();
         spriteState = state;
@@ -95,7 +93,7 @@
         }
     }
 
-    // Smooth transformation: forward -> hold 15s -> reverse -> callback
+    // Transformation: forward -> hold 15s -> reverse -> callback
     function playTransformation(onComplete) {
         stopSpriteLoop();
         isTransforming = true;
@@ -105,27 +103,19 @@
         const interval = TIMING.transformation;
         let idx = 0;
 
-        // Show first frame
         setFrame(frames[0]);
 
-        // Forward sequence using setTimeout chain (more predictable than setInterval)
         function nextForward() {
             idx++;
             if (idx >= frames.length) {
-                // Last frame reached — hold
                 idx = frames.length - 1;
                 setFrame(frames[idx]);
-                console.log('[Roaming Pet] Transform: holding last frame 15s...');
-
                 setTimeout(() => {
-                    // Reverse sequence
                     let rIdx = frames.length - 1;
                     function nextReverse() {
                         rIdx--;
                         if (rIdx < 0) {
-                            // Done
                             isTransforming = false;
-                            console.log('[Roaming Pet] Transform complete');
                             if (onComplete) onComplete();
                             return;
                         }
@@ -150,15 +140,17 @@
     let moveInterval = null;
     let isSleeping = false;
     let currentAnchorEl = null;
+    let currentEdge = 'top';       // which edge pet is sitting on: top/right/bottom/left
+    let currentRotation = 0;       // degrees: 0, 90, 180, 270
 
-    // Movement targets — includes nav buttons and content blocks
+    // All interactive elements — pet can walk on ALL edges
     const targets = [
-        { id: 'logo', name: 'logo', walkEdges: false, preferGrowing: true },
-        { id: 'galleryBtn', name: 'gallery', walkEdges: true, preferGrowing: false },
-        { id: 'streamBtn', name: 'stream', walkEdges: true, preferGrowing: false },
-        { id: 'orderBtn', name: 'order', walkEdges: true, preferGrowing: false },
-        { id: 'socialToggle', name: 'social', walkEdges: true, preferGrowing: false },
-        { id: 'titleContainer', name: 'title', walkEdges: false, preferGrowing: true },
+        { id: 'logo', name: 'logo', preferGrowing: true },
+        { id: 'galleryBtn', name: 'gallery', preferGrowing: false },
+        { id: 'streamBtn', name: 'stream', preferGrowing: false },
+        { id: 'orderBtn', name: 'order', preferGrowing: false },
+        { id: 'socialToggle', name: 'social', preferGrowing: false },
+        { id: 'titleContainer', name: 'title', preferGrowing: true },
     ];
 
     // Spider mode
@@ -176,7 +168,8 @@
             top: 0; left: 0;
             z-index: 9998;
             pointer-events: none;
-            transition: none;
+            width: ${PET_SIZE}px;
+            height: ${PET_SIZE}px;
         `;
 
         const img = document.createElement('img');
@@ -190,7 +183,6 @@
             display: block;
             pointer-events: auto;
             cursor: pointer;
-            transition: opacity 0.15s ease;
         `;
 
         container.appendChild(img);
@@ -198,6 +190,69 @@
 
         spriteImg = img;
         return container;
+    }
+
+    // ===== DISCRETE ROTATION =====
+    // Based on which edge the pet is on:
+    // top = 0deg (normal), right = 90deg, bottom = 180deg (upside down), left = 270deg
+    function setRotation(edge) {
+        currentEdge = edge;
+        const angles = { top: 0, right: 90, bottom: 180, left: 270 };
+        currentRotation = angles[edge] || 0;
+
+        if (!spriteImg) return;
+        // Discrete snap — no transition
+        spriteImg.style.transform = `rotate(${currentRotation}deg)`;
+    }
+
+    // ===== EDGE POSITION HELPERS =====
+    // Get position for pet on a specific edge of an element
+    function getEdgePosition(el, edge, progress) {
+        // progress: 0..1 along the edge
+        const rect = el.getBoundingClientRect();
+        const m = 4; // margin from corners
+        const overlap = 4; // slight overlap with element edge
+        let x, y;
+
+        switch (edge) {
+            case 'top':
+                x = rect.left + m + (rect.width - m * 2 - PET_SIZE) * progress;
+                y = rect.top - PET_SIZE + overlap;
+                break;
+            case 'bottom':
+                x = rect.left + m + (rect.width - m * 2 - PET_SIZE) * progress;
+                y = rect.bottom - overlap;
+                break;
+            case 'right':
+                x = rect.right - overlap;
+                y = rect.top + m + (rect.height - m * 2 - PET_SIZE) * progress;
+                break;
+            case 'left':
+                x = rect.left - PET_SIZE + overlap;
+                y = rect.top + m + (rect.height - m * 2 - PET_SIZE) * progress;
+                break;
+        }
+
+        // Clamp to viewport
+        x = Math.max(0, Math.min(window.innerWidth - PET_SIZE, x));
+        y = Math.max(0, Math.min(window.innerHeight - PET_SIZE, y));
+
+        return { x, y };
+    }
+
+    // Get a random edge landing point on an element
+    function getRandomEdgeLanding(el) {
+        const edges = ['top', 'right', 'bottom', 'left'];
+        const edge = edges[Math.floor(Math.random() * edges.length)];
+        const progress = 0.2 + Math.random() * 0.6; // land somewhere in the middle 60%
+        const pos = getEdgePosition(el, edge, progress);
+        return { ...pos, edge, progress };
+    }
+
+    // Get stable position for scroll tracking (center of current edge)
+    function getStableEdgePosition(el, edge) {
+        const pos = getEdgePosition(el, edge, 0.5);
+        return pos;
     }
 
     // ===== NIGHT TIME =====
@@ -209,18 +264,12 @@
     // ===== SET ANIMATION =====
     function setAnimation(animation) {
         if (spiderModeActive) return;
-        if (isTransforming && animation !== 'idle') return; // don't interrupt transform
+        if (isTransforming && animation !== 'idle') return;
         if (!spriteImg) return;
 
         if (animation === 'growing') {
             if (isTransforming) return;
             performGrowingAnimation();
-            return;
-        }
-
-        if (animation === 'jumping') {
-            if (isTransforming) return;
-            performJumpAnimation();
             return;
         }
 
@@ -241,32 +290,10 @@
         currentAnimation = animation;
     }
 
-    // ===== JUMP =====
-    function performJumpAnimation() {
-        if (!spriteImg || isTransforming) return;
-
-        startSpriteLoop('go');
-        currentAnimation = 'jumping';
-
-        const container = document.getElementById('roaming-pet-container');
-        if (container) {
-            const origTop = parseFloat(container.style.top) || 0;
-            container.style.top = (origTop - 14) + 'px';
-            setTimeout(() => {
-                container.style.top = origTop + 'px';
-            }, 250);
-        }
-
-        setTimeout(() => {
-            if (!isTransforming) setAnimation('idle');
-        }, 500);
-    }
-
     // ===== TRANSFORMATION =====
     function performGrowingAnimation() {
         if (!spriteImg || isTransforming) return;
 
-        // Lock pet in place during entire transformation
         isMoving = false;
         if (moveInterval) { clearInterval(moveInterval); moveInterval = null; }
 
@@ -293,22 +320,9 @@
 
         setAnimation('idle');
 
-        // Calm wake-up: just idle for a bit then start moving
         setTimeout(() => {
-            if (!isSleeping) moveToRandomTarget();
+            if (!isSleeping) spiderJumpToRandomTarget();
         }, 3000 + Math.random() * 2000);
-    }
-
-    function moveToRandomTarget() {
-        const target = getRandomTarget();
-        if (target) {
-            currentTarget = target;
-            // Mostly walk, rarely jump (25%)
-            if (Math.random() < 0.25) jumpToTarget(target);
-            else moveToTarget(target);
-        } else {
-            scheduleNextMove();
-        }
     }
 
     function checkSleepCycle() {
@@ -324,249 +338,248 @@
         return available[Math.floor(Math.random() * available.length)];
     }
 
-    // ===== LANDING POINT =====
-    // Pet sits ON TOP of element (centered horizontally, touching top edge)
-    function getLandingPoint(el) {
-        const rect = el.getBoundingClientRect();
-        const offsetX = (Math.random() - 0.5) * Math.min(rect.width * 0.4, 40);
-        const x = Math.max(4, Math.min(
-            window.innerWidth - PET_SIZE - 4,
-            rect.left + rect.width / 2 + offsetX - PET_SIZE / 2
-        ));
-        const y = Math.max(4, rect.top - PET_SIZE + 4); // sit just on top edge, slight overlap
-        return { x, y };
-    }
-
-    // Stable landing (no random offset — for scroll tracking)
-    function getStableLandingPoint(el) {
-        const rect = el.getBoundingClientRect();
-        const x = Math.max(4, Math.min(
-            window.innerWidth - PET_SIZE - 4,
-            rect.left + rect.width / 2 - PET_SIZE / 2
-        ));
-        const y = Math.max(4, rect.top - PET_SIZE + 4);
-        return { x, y };
-    }
-
-    // ===== MOVEMENT =====
-
-    function walkAllEdges(target) {
+    // ===== WALK ALONG EDGE =====
+    // Walk from current position along the current edge of the element
+    function walkEdge(target, edge, onDone) {
         const container = document.getElementById('roaming-pet-container');
-        const targetElement = document.getElementById(target.id);
-        if (!container || !targetElement || !target.walkEdges) return;
+        const el = document.getElementById(target.id);
+        if (!container || !el) { if (onDone) onDone(); return; }
 
         isMoving = true;
         setAnimation('walking');
+        setRotation(edge);
 
-        const r = targetElement.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
         const m = 6;
+        const overlap = 4;
 
-        // Walk only top edge (cleaner, less hyper)
-        const startX = r.left + m;
-        const startY = r.top - PET_SIZE + 4;
-        const endX = r.right - m - PET_SIZE;
-        const endY = startY;
+        let startPos, endPos;
 
-        container.style.left = startX + 'px';
-        container.style.top = startY + 'px';
+        // Walk from one end to the other (or partial)
+        const startProgress = Math.random() < 0.5 ? 0.05 : 0.95;
+        const endProgress = startProgress < 0.5 ? 0.95 : 0.05;
+
+        startPos = getEdgePosition(el, edge, startProgress);
+        endPos = getEdgePosition(el, edge, endProgress);
+
+        container.style.left = startPos.x + 'px';
+        container.style.top = startPos.y + 'px';
+
+        const dx = endPos.x - startPos.x;
+        const dy = endPos.y - startPos.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 4) { isMoving = false; if (onDone) onDone(); return; }
+
+        const steps = Math.ceil(dist / 6);
+        const sx = dx / steps;
+        const sy = dy / steps;
+        let step = 0;
+
+        if (moveInterval) clearInterval(moveInterval);
+        moveInterval = setInterval(() => {
+            step++;
+            if (step >= steps) {
+                clearInterval(moveInterval);
+                moveInterval = null;
+                isMoving = false;
+                container.style.left = endPos.x + 'px';
+                container.style.top = endPos.y + 'px';
+                currentAnchorEl = el;
+                if (onDone) onDone();
+                return;
+            }
+            container.style.left = (startPos.x + sx * step) + 'px';
+            container.style.top = (startPos.y + sy * step) + 'px';
+        }, 130);
+    }
+
+    // Walk around edges: walk one edge, maybe continue to next
+    function walkAroundElement(target) {
+        const edges = ['top', 'right', 'bottom', 'left'];
+        const startEdge = edges[Math.floor(Math.random() * edges.length)];
+
+        // Walk 1-3 edges
+        const numEdges = 1 + Math.floor(Math.random() * 3);
+        let edgeIdx = edges.indexOf(startEdge);
+        let walked = 0;
+
+        function walkNext() {
+            if (walked >= numEdges) {
+                // Done walking, idle
+                setAnimation('idle');
+                const holdTime = 3000 + Math.random() * 5000;
+                setTimeout(() => scheduleNextMove(), holdTime);
+                return;
+            }
+
+            const edge = edges[edgeIdx % edges.length];
+            walked++;
+            edgeIdx++;
+
+            walkEdge(target, edge, () => {
+                // Brief pause at corner before next edge
+                setTimeout(walkNext, 200 + Math.random() * 300);
+            });
+        }
+
+        walkNext();
+    }
+
+    // ===== SPIDER JUMP (main movement) =====
+    // Jumping spider: crouch (1 sleep frame) -> arc flight (stay frames) -> land
+    function spiderJumpTo(targetEl, landEdge, landProgress, onLand) {
+        if (spiderModeActive || isTransforming) return;
+        const container = document.getElementById('roaming-pet-container');
+        if (!container || !targetEl) return;
+
+        isMoving = true;
+
+        const startX = parseFloat(container.style.left) || 0;
+        const startY = parseFloat(container.style.top) || 0;
+        const landing = getEdgePosition(targetEl, landEdge, landProgress);
+
+        // Phase 1: Crouch (show 1 sleep frame for 200ms)
+        stopSpriteLoop();
+        setFrame(FRAMES.sleep[0]);
 
         setTimeout(() => {
-            const dx = endX - startX;
-            const dist = Math.abs(dx);
-            const steps = Math.ceil(dist / 8);
-            const sx = dx / steps;
+            // Phase 2: Jump arc — stay frames in flight
+            startSpriteLoop('stay');
+
+            // Reset rotation during flight (upright in air)
+            if (spriteImg) spriteImg.style.transform = 'rotate(0deg)';
+
+            const dx = landing.x - startX;
+            const dy = landing.y - startY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Discrete arc: N steps in a parabola
+            const jumpSteps = Math.max(5, Math.ceil(dist / 30));
+            const arcHeight = Math.min(80, dist * 0.3); // arc height proportional to distance
             let step = 0;
 
             if (moveInterval) clearInterval(moveInterval);
             moveInterval = setInterval(() => {
-                if (step >= steps) {
+                step++;
+                if (step > jumpSteps) {
                     clearInterval(moveInterval);
                     moveInterval = null;
+
+                    // Phase 3: Land — snap to edge position and rotate
+                    container.style.left = landing.x + 'px';
+                    container.style.top = landing.y + 'px';
+                    setRotation(landEdge);
                     isMoving = false;
-                    currentAnchorEl = targetElement;
+                    currentAnchorEl = targetEl;
+                    currentEdge = landEdge;
+
                     setAnimation('idle');
-                    // Calm pause: 4-8 seconds
-                    setTimeout(() => scheduleNextMove(), 4000 + Math.random() * 4000);
+                    if (onLand) onLand();
                     return;
                 }
-                container.style.left = (startX + sx * (step + 1)) + 'px';
-                step++;
-            }, 150); // slightly slower walk
-        }, 200);
+
+                // Parabolic arc: t goes 0..1
+                const t = step / jumpSteps;
+                const x = startX + dx * t;
+                // Parabola: -4 * arcHeight * t * (t - 1) peaks at t=0.5
+                const arcY = -4 * arcHeight * t * (t - 1);
+                const y = startY + dy * t - arcY;
+
+                container.style.left = Math.round(x) + 'px';
+                container.style.top = Math.round(y) + 'px';
+            }, 60); // discrete steps, fast enough to look snappy
+
+        }, 200); // crouch duration
     }
 
-    function walkSingleEdge(target) {
-        // Same as walkAllEdges for now — just walks top edge
-        walkAllEdges(target);
-    }
+    function spiderJumpToTarget(target) {
+        const el = document.getElementById(target.id);
+        if (!el) return;
 
-    function jumpToTarget(target) {
-        if (spiderModeActive || isTransforming) return;
-        const container = document.getElementById('roaming-pet-container');
-        const targetElement = document.getElementById(target.id);
-        if (!container || !targetElement) return;
+        const edges = ['top', 'right', 'bottom', 'left'];
+        const edge = edges[Math.floor(Math.random() * edges.length)];
+        const progress = 0.2 + Math.random() * 0.6;
 
-        isMoving = true;
-
-        const currentX = parseFloat(container.style.left) || 0;
-        const currentY = parseFloat(container.style.top) || 0;
-        const landing = getLandingPoint(targetElement);
-
-        const dx = landing.x - currentX;
-        const dy = landing.y - currentY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const jumpDist = 70 + Math.random() * 30;
-        const numJumps = Math.max(1, Math.ceil(dist / jumpDist));
-        const jx = dx / numJumps;
-        const jy = dy / numJumps;
-        let jump = 0;
-
-        // Use go frames during jump travel
-        startSpriteLoop('go');
-
-        function doJump() {
-            if (jump >= numJumps) {
-                isMoving = false;
-                currentAnchorEl = targetElement;
-                decideTargetAction(target);
-                return;
-            }
-
-            // Small vertical bounce
-            const newX = currentX + jx * (jump + 1);
-            const newY = currentY + jy * (jump + 1);
-            container.style.left = newX + 'px';
-            container.style.top = (newY - 10) + 'px'; // up
-            setTimeout(() => {
-                container.style.top = newY + 'px'; // down
-            }, 200);
-
-            jump++;
-            setTimeout(doJump, 500);
-        }
-
-        doJump();
-    }
-
-    function moveToTarget(target) {
-        if (spiderModeActive || isTransforming) return;
-        const container = document.getElementById('roaming-pet-container');
-        const targetElement = document.getElementById(target.id);
-        if (!container || !targetElement) return;
-
-        isMoving = true;
-        setAnimation('walking');
-
-        const startX = parseFloat(container.style.left) || 0;
-        const startY = parseFloat(container.style.top) || 0;
-        const landing = getLandingPoint(targetElement);
-
-        if (moveInterval) { clearInterval(moveInterval); moveInterval = null; }
-
-        function animSeg(x1, y1, x2, y2, cb) {
-            const dx = x2 - x1, dy = y2 - y1;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 2) { cb(); return; }
-            const steps = Math.ceil(dist / 8);
-            const sx = dx / steps, sy = dy / steps;
-            let s = 0;
-            moveInterval = setInterval(() => {
-                s++;
-                container.style.left = (x1 + sx * s) + 'px';
-                container.style.top = (y1 + sy * s) + 'px';
-                if (s >= steps) { clearInterval(moveInterval); moveInterval = null; cb(); }
-            }, 120); // slightly slower
-        }
-
-        // 2-phase: horizontal then vertical
-        animSeg(startX, startY, landing.x, startY, () => {
-            if (!isMoving) return;
-            animSeg(landing.x, startY, landing.x, landing.y, () => {
-                isMoving = false;
-                currentAnchorEl = targetElement;
-                decideTargetAction(target);
-            });
+        spiderJumpTo(el, edge, progress, () => {
+            decideTargetAction(target);
         });
     }
 
+    function spiderJumpToRandomTarget() {
+        const target = getRandomTarget();
+        if (target) {
+            currentTarget = target;
+            spiderJumpToTarget(target);
+        } else {
+            scheduleNextMove();
+        }
+    }
+
+    // ===== DECIDE ACTION AT TARGET =====
     function decideTargetAction(target) {
         currentAnchorEl = document.getElementById(target.id) || null;
 
-        // 30% chance to transform at preferred spots
-        if (target.preferGrowing && Math.random() < 0.3) {
+        // 25% chance to transform at preferred spots
+        if (target.preferGrowing && Math.random() < 0.25) {
             setAnimation('growing');
             return;
         }
 
-        // Walk along top edge of buttons
-        if (target.walkEdges && Math.random() < 0.5) {
-            setTimeout(() => walkAllEdges(target), 800);
+        // 50% chance to walk around the element edges
+        if (Math.random() < 0.5) {
+            setTimeout(() => walkAroundElement(target), 600);
             return;
         }
 
-        // Otherwise just idle and chill
+        // Otherwise idle, then move on
         setAnimation('idle');
-        // Calm hold: 5-10 seconds before next move
-        const holdTime = 5000 + Math.random() * 5000;
-        setTimeout(() => {
-            scheduleNextMove();
-        }, holdTime);
+        const holdTime = 3000 + Math.random() * 5000;
+        setTimeout(() => scheduleNextMove(), holdTime);
     }
 
-    // ===== SCHEDULE MOVEMENT (calmer) =====
+    // ===== SCHEDULE MOVEMENT =====
     function scheduleNextMove() {
         if (isMoving || isSleeping || spiderModeActive || isTransforming) return;
 
-        // 15-60 seconds between moves (was 8-40)
-        const delay = 15000 + Math.random() * 45000;
+        // 8-30 seconds between moves (more active than v4)
+        const delay = 8000 + Math.random() * 22000;
         console.log('[Roaming Pet] Next move in', Math.floor(delay / 1000), 's');
 
         setTimeout(() => {
             if (isSleeping || isTransforming) return;
 
-            // 20% chance for in-place action (was 35%)
-            if (Math.random() < 0.2) {
+            // 15% chance for in-place action
+            if (Math.random() < 0.15) {
                 const anims = ['idle', 'growing'];
                 const anim = anims[Math.floor(Math.random() * anims.length)];
                 setAnimation(anim);
                 if (anim !== 'growing') {
-                    setTimeout(() => { setAnimation('idle'); scheduleNextMove(); }, 3000 + Math.random() * 3000);
+                    setTimeout(() => { setAnimation('idle'); scheduleNextMove(); }, 2000 + Math.random() * 3000);
                 }
                 return;
             }
 
-            // Move to a target
-            const target = getRandomTarget();
-            if (target) {
-                currentTarget = target;
-                // Mostly walk (75%), sometimes jump (25%)
-                if (Math.random() < 0.25) jumpToTarget(target);
-                else moveToTarget(target);
-            } else {
-                scheduleNextMove();
-            }
+            // Jump to a new target (spider jump is the primary movement!)
+            spiderJumpToRandomTarget();
         }, delay);
     }
 
     // ===== PAGE INTERACTIONS =====
     function setupPageInteractions() {
-        const ids = ['logo', 'galleryBtn', 'streamBtn', 'orderBtn', 'socialToggle', 'titleContainer'];
+        const ids = targets.map(t => t.id);
         ids.forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
 
-            // Click: pet reacts calmly
             el.addEventListener('click', () => {
                 if (isSleeping || spiderModeActive || isTransforming) return;
                 if (moveInterval) { clearInterval(moveInterval); moveInterval = null; isMoving = false; }
-                // Small jump reaction
-                performJumpAnimation();
-                // Then calmly walk to clicked element
-                setTimeout(() => {
-                    const target = targets.find(t => t.id === id);
-                    if (target) setTimeout(() => moveToTarget(target), 1000);
-                    else scheduleNextMove();
-                }, 2000);
+
+                // Spider reacts: jump to clicked element
+                const target = targets.find(t => t.id === id);
+                if (target) {
+                    setTimeout(() => spiderJumpToTarget(target), 300);
+                }
             });
         });
     }
@@ -595,6 +608,7 @@
         if (moveInterval) { clearInterval(moveInterval); moveInterval = null; }
         isMoving = false;
 
+        setRotation('top'); // reset rotation for spider mode
         startSpriteLoop('go');
         window.SpiderWebSystem.start(spriteImg);
 
@@ -611,22 +625,26 @@
     // ===== SCROLL ANCHORING =====
     function setupScrollTracking() {
         function onScroll() {
-            // Reposition pet on its anchor during scroll (unless moving)
             if (!currentAnchorEl || isMoving || spiderModeActive) return;
             const c = document.getElementById('roaming-pet-container');
             if (!c) return;
-            const pos = getStableLandingPoint(currentAnchorEl);
-            c.style.left = pos.x + 'px';
-            c.style.top = pos.y + 'px';
+
+            // Use stable edge position (center of current edge)
+            const pos = getStableEdgePosition(currentAnchorEl, currentEdge);
+
+            // Clamp to viewport (fixes bottom-of-page sliding)
+            const clampedX = Math.max(0, Math.min(window.innerWidth - PET_SIZE, pos.x));
+            const clampedY = Math.max(0, Math.min(window.innerHeight - PET_SIZE, pos.y));
+
+            c.style.left = clampedX + 'px';
+            c.style.top = clampedY + 'px';
         }
 
         window.addEventListener('scroll', onScroll, { passive: true });
 
-        // Also handle slide-container scrolling
         const mainContent = document.getElementById('main-content');
         if (mainContent) mainContent.addEventListener('scroll', onScroll, { passive: true });
 
-        // Also track resize
         window.addEventListener('resize', onScroll, { passive: true });
     }
 
@@ -640,15 +658,17 @@
         preloadFrames();
         const container = createPetHTML();
 
-        // Start on top of a random element
+        // Start on a random edge of a random element
         const startTargets = targets.filter(t => document.getElementById(t.id));
         const startTarget = startTargets[Math.floor(Math.random() * startTargets.length)];
         if (startTarget) {
             const el = document.getElementById(startTarget.id);
-            const landing = getLandingPoint(el);
+            const landing = getRandomEdgeLanding(el);
             container.style.left = landing.x + 'px';
             container.style.top = landing.y + 'px';
             currentAnchorEl = el;
+            currentEdge = landing.edge;
+            setRotation(landing.edge);
         } else {
             container.style.left = (window.innerWidth / 2 - PET_SIZE / 2) + 'px';
             container.style.top = (window.innerHeight - 80) + 'px';
@@ -659,23 +679,22 @@
         setupPageInteractions();
         setupScrollTracking();
 
-        // Night check
         if (isNightTime()) {
             setAnimation('sleeping');
             isSleeping = true;
         } else {
             setAnimation('idle');
 
-            // Calm start: just idle for a while, then move
-            const initialDelay = 12000 + Math.random() * 10000;
+            // First move: jump after 6-14s
+            const initialDelay = 6000 + Math.random() * 8000;
             setTimeout(() => {
                 if (!isSleeping && !isTransforming) {
-                    moveToRandomTarget();
+                    spiderJumpToRandomTarget();
                 }
             }, initialDelay);
         }
 
-        console.log('[Roaming Pet] v4 initialized');
+        console.log('[Roaming Pet] v5 initialized');
     }
 
     init();
