@@ -586,6 +586,12 @@
     
     /* Мобильная адаптация */
     @media (max-width: 768px) {
+        /* Fix header bar height — ASCII ghost fixed size */
+        #asciiGhost {
+            width: 6em !important;
+            font-size: 9px !important;
+        }
+
         .pixel-text-title {
             font-size: 28px;
             letter-spacing: 2px;
@@ -672,6 +678,11 @@
     }
     
     @media (max-width: 480px) {
+        /* Hide ASCII ghost on small phones — no layout shift */
+        #asciiGhost {
+            display: none !important;
+        }
+
         .pixel-text-title {
             font-size: 24px;
             letter-spacing: 1px;
