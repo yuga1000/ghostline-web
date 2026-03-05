@@ -544,15 +544,17 @@
     function scheduleNextMove() {
         if (isMoving || isSleeping || spiderModeActive || isTransforming) return;
 
-        // 8-30 seconds between moves (more active than v4)
-        const delay = 8000 + Math.random() * 22000;
+        // 6-20 seconds between moves
+        const delay = 6000 + Math.random() * 14000;
         console.log('[Roaming Pet] Next move in', Math.floor(delay / 1000), 's');
 
         setTimeout(() => {
             if (isSleeping || isTransforming) return;
 
-            // 15% chance for in-place action
-            if (Math.random() < 0.15) {
+            const roll = Math.random();
+
+            // 10% — in-place action (idle/transform)
+            if (roll < 0.10) {
                 const anims = ['idle', 'growing'];
                 const anim = anims[Math.floor(Math.random() * anims.length)];
                 setAnimation(anim);
@@ -562,7 +564,29 @@
                 return;
             }
 
-            // Jump to a new target (spider jump is the primary movement!)
+            // 77% — walk around current or nearby element (much more common)
+            if (roll < 0.87) {
+                const walkTargets = targets.filter(t => document.getElementById(t.id));
+                if (walkTargets.length > 0 && currentAnchorEl) {
+                    // 60% walk around current element, 40% walk to a random one nearby
+                    if (Math.random() < 0.6) {
+                        const curTarget = targets.find(t => document.getElementById(t.id) === currentAnchorEl);
+                        if (curTarget) {
+                            walkAroundElement(curTarget);
+                            return;
+                        }
+                    }
+                    // Walk to a random element (reuse walkAroundElement on arrival)
+                    const target = walkTargets[Math.floor(Math.random() * walkTargets.length)];
+                    walkAroundElement(target);
+                    return;
+                }
+                // fallback: jump if can't walk
+                spiderJumpToRandomTarget();
+                return;
+            }
+
+            // 13% — spider jump (rare, dramatic ~1:7 ratio)
             spiderJumpToRandomTarget();
         }, delay);
     }
