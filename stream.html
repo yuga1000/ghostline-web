@@ -3951,7 +3951,7 @@ const SCENES = [
         }
         lines.push(`  RADAR  ${String(angle).padStart(3,'0')}°  SCANNING`);
         return lines;
-    }, color: (i, t) => i === 8 ? '#00ff00' : `hsl(120,100%,${15 + ((((t*18)%360)/360)*25)}%)` },
+    }, color: (i, t) => i === 8 ? '#00ff00' : `hsl(130,100%,${15 + ((((t*18)%360)/360)*25)}%)` },
 
     // ── SCENE 2: Matrix rain ──
     { speed: 80, frames: (t) => {
@@ -4001,7 +4001,7 @@ const SCENES = [
              '     ◈  GHOST  ◈       '],
         ];
         return webs[phase % webs.length];
-    }, color: (i, t) => i === 7 ? '#00ff00' : ['#00ff00','#00dd00','#00bb00','#009900','#00bb00','#00dd00','#00ff00','#00ff00'][i] },
+    }, color: (i, t) => i === 7 ? '#00ffcc' : ['#00ffdd','#00ddcc','#00bbaa','#009988','#00bbaa','#00ddcc','#00ffdd','#00ffcc'][i] },
 
     // ── SCENE 4: Glitch corruption ──
     { speed: 60, frames: (t) => {
@@ -4046,7 +4046,7 @@ const SCENES = [
         ];
     }, color: (i, t) => {
         const bright = [40,30,25,50,25,30,40,60][i];
-        return `hsl(120,100%,${bright}%)`;
+        return `hsl(210,100%,${bright}%)`;
     }},
 
     // ── SCENE 6: Sine wave ocean (slow, meditative ~45s) ──
@@ -4067,9 +4067,9 @@ const SCENES = [
         }
         return lines;
     }, color: (i, t) => {
-        const hue = 120 + Math.sin(t * 0.03 + i * 0.4) * 20;
+        const hue = 200 + Math.sin(t * 0.03 + i * 0.4) * 25;
         const light = 25 + Math.sin(t * 0.05 + i * 0.7) * 20;
-        return `hsl(${hue},100%,${light}%)`;
+        return `hsl(${hue},90%,${light}%)`;
     }},
 
     // ── SCENE 7: DNA helix (medium pace) ──
@@ -4094,10 +4094,10 @@ const SCENES = [
         lines.push(`  SEQUENCE ${String(t%9999).padStart(4,'0')}  `);
         return lines;
     }, color: (i, t) => {
-        if (i === 8) return '#00ff00';
+        if (i === 8) return '#cc88ff';
         const phase = (t * 0.05 + i * 0.25) % 1;
         const light = 25 + Math.sin(phase * Math.PI * 2) * 20;
-        return `hsl(120,100%,${light}%)`;
+        return `hsl(270,80%,${light}%)`;
     }},
 
     // ── SCENE 8: Falling kanji / symbols waterfall (medium pace) ──
@@ -4125,7 +4125,7 @@ const SCENES = [
         return grid;
     }, color: (i, t) => {
         const bright = 20 + ((8 - i) / 8) * 45;
-        return `hsl(120,100%,${Math.min(65, bright)}%)`;
+        return `hsl(320,80%,${Math.min(65, bright)}%)`;
     }},
 
     // ── SCENE 9: Breathing eye (long, hypnotic ~60s) ──
@@ -4176,10 +4176,10 @@ const SCENES = [
         const phase = Math.floor(pulse * (eyes.length - 0.01));
         return eyes[phase];
     }, color: (i, t) => {
-        if (i === 7) return '#005500';
+        if (i === 7) return '#553388';
         const pulse = (Math.sin(t * 0.06) + 1) / 2;
         const bright = 15 + pulse * 40;
-        return `hsl(120,100%,${bright}%)`;
+        return `hsl(265,70%,${bright}%)`;
     }},
 
     // ── SCENE 10: Binary clock / data stream ──
@@ -4231,7 +4231,7 @@ const SCENES = [
         SCENES[10]._grid = ng;
         const cellChars = [' ', '▓'];
         return ng.map(row => row.map(c => cellChars[c]).join(''));
-    }, color: (i, t) => `hsl(120,100%,${25+i*4}%)`},
+    }, color: (i, t) => `hsl(185,90%,${25+i*4}%)`},
 
     // ── SCENE 12: Ghost typing a message (theatrical, slow) ──
     { speed: 80, duration: 25000, frames: (t) => {
@@ -4259,7 +4259,7 @@ const SCENES = [
         }
         lines[7] = revealed > totalChars ? '> _ ' : '';
         return lines;
-    }, color: (i, t) => i === 7 ? '#004400' : '#00ff00' },
+    }, color: (i, t) => i === 7 ? '#555555' : '#cccccc' },
 
     // ── SCENE 13: Breathing skull / face (slow inhale-exhale, 90s) ──
     { speed: 180, duration: 90000, frames: (t) => {
@@ -4286,10 +4286,10 @@ const SCENES = [
         ];
     }, color: (i, t) => {
         const breath = (Math.sin(t * 0.035) + 1) / 2;
-        const lo = 12, hi = 45;
+        const lo = 25, hi = 75;
         const b = lo + Math.floor(breath * (hi - lo));
-        if (i === 7) return `hsl(120,60%,${b * 0.5}%)`;
-        return `hsl(120,100%,${b}%)`;
+        if (i === 7) return `hsl(0,0%,${b * 0.5}%)`;
+        return `hsl(0,0%,${b}%)`;
     }},
 
     // ── SCENE 14: Floating jellyfish / creature (60s) ──
@@ -4319,10 +4319,10 @@ const SCENES = [
         ];
     }, color: (i, t) => {
         const pulse = (Math.sin(t * 0.09) + 1) / 2;
-        if (i === 7) return '#003300';
-        const hue = 120 + Math.sin(t * 0.02) * 20;
+        if (i === 7) return '#334488';
+        const hue = 230 + Math.sin(t * 0.02) * 30;
         const b = 18 + pulse * 32;
-        return `hsl(${hue},100%,${b}%)`;
+        return `hsl(${hue},80%,${b}%)`;
     }},
 
     // ── SCENE 15: Slow heartbeat / pulse line (75s) ──
@@ -4357,9 +4357,9 @@ const SCENES = [
         ];
     }, color: (i, t) => {
         const spike = (Math.sin(t * 0.21) + 1) / 2 > 0.95;
-        if (i === 3) return spike ? '#00ff88' : '#00cc44';
-        if (i === 7) return '#005500';
-        return '#00aa33';
+        if (i === 3) return spike ? '#ff4466' : '#cc2244';
+        if (i === 7) return '#883344';
+        return '#dd3355';
     }},
 
     // ── SCENE 16: Cocoon / pod metamorphosis (120s ultra-slow) ──
@@ -4425,8 +4425,8 @@ const SCENES = [
     }, color: (i, t) => {
         const phase = Math.floor((t * 0.008) % 6);
         const bright = [14, 18, 22, 35, 42, 14][phase];
-        if (i === 7) return `hsl(120,80%,${bright * 0.6}%)`;
-        return `hsl(120,100%,${bright}%)`;
+        if (i === 7) return `hsl(40,80%,${bright * 0.6}%)`;
+        return `hsl(40,90%,${bright}%)`;
     }},
 
     // ── SCENE 17: Deep breath / rings expanding from center (80s) ──
@@ -4459,11 +4459,11 @@ const SCENES = [
         const breathPhase = (t % 80) / 80;
         const expand = breathPhase < 0.45;
         const p = expand ? breathPhase / 0.45 : (1 - breathPhase) / 0.55;
-        const b = 10 + p * 40;
-        if (i === 7) return `hsl(120,60%,${b * 0.4}%)`;
+        const b = 15 + p * 50;
+        if (i === 7) return `hsl(200,40%,${b * 0.4}%)`;
         // fade by row distance from center
         const dist = Math.abs(i - 3);
-        return `hsl(120,100%,${Math.max(8, b - dist * 6)}%)`;
+        return `hsl(200,60%,${Math.max(10, b - dist * 6)}%)`;
     }},
 ];
 
@@ -4979,18 +4979,37 @@ window.addEventListener('DOMContentLoaded', () => {
         draw();
     }
 
-    // main loop
+    // main loop — throttled to ~5 fps for visible evolution
     let lastSeed = 0;
-    function tick() {
+    let lastStepTime = 0;
+    const STEP_INTERVAL = 200; // ms between steps (~5 fps)
+    let staleCounter = 0;
+    let prevAlive = 0;
+
+    function tick(ts) {
         try {
             const currentSeed = Math.floor(Date.now() / CYCLE_MS);
             if (currentSeed !== lastSeed) {
                 lastSeed = currentSeed;
+                staleCounter = 0;
                 syncStart();
-            } else {
-                const speed = GRID > 80 ? 2 : 3;
-                for (let i = 0; i < speed; i++) step();
+            } else if (ts - lastStepTime >= STEP_INTERVAL) {
+                lastStepTime = ts;
+                step();
                 draw();
+
+                // Count alive cells — if pattern is dead/stuck, restart sooner
+                let alive = 0;
+                for (let i = 0; i < GRID * GRID; i++) if (grid[i]) alive++;
+                if (alive === prevAlive) staleCounter++;
+                else staleCounter = 0;
+                prevAlive = alive;
+
+                // Restart if dead (<5 cells) or stuck for 50 frames (~10s)
+                if (alive < 5 || staleCounter > 50) {
+                    staleCounter = 0;
+                    syncStart();
+                }
             }
         } catch(e) {}
         requestAnimationFrame(tick);
