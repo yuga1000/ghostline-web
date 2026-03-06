@@ -326,12 +326,28 @@ app.get('/api/visitors', (req, res) => {
 });
 
 // Dynamic spider-log.json — transforms /api/logs into spider feed format
-// This overrides the static api/spider-log.json file
+// Falls back to static api/spider-log.json when no in-memory logs (e.g. after deploy restart)
 app.get('/api/spider-log.json', (req, res) => {
   // Filter spider logs only (from our stream handler)
   const spiderLogs = recentLogs.filter(l =>
     (l.metadata && l.metadata.source === 'spider') || l.level === 'ACTION' || l.level === 'THINKING' || l.level === 'ERROR'
   );
+
+  // If no in-memory logs, try the static file (written directly by spider)
+  if (spiderLogs.length === 0) {
+    const staticPath = path.join(__dirname, 'api', 'spider-log.json');
+    try {
+      if (fs.existsSync(staticPath)) {
+        const staticData = JSON.parse(fs.readFileSync(staticPath, 'utf8'));
+        if (staticData && staticData.events && staticData.events.length > 0) {
+          console.log('[spider-log] Serving from static file:', staticData.event_count, 'events');
+          return res.json(staticData);
+        }
+      }
+    } catch (e) {
+      console.warn('[spider-log] Static file read failed:', e.message);
+    }
+  }
 
   // Convert to spider feed event format
   const events = spiderLogs.slice(-50).reverse().map(l => {
