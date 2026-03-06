@@ -4616,34 +4616,51 @@ document.addEventListener('visibilitychange', () => {
 
 let spiderPollInterval = null;
 let spiderIsLive = false;
+let spiderFetchFails = 0;
 
 async function fetchSpiderFeed() {
     try {
-        const resp = await fetch('/api/spider-log.json?' + Date.now());
+        const resp = await fetch('/api/spider-log.json?t=' + Date.now(), {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const data = await resp.json();
+        spiderFetchFails = 0; // reset on success
         console.log('[SpiderFeed]', data.event_count, 'events, generated_at:', data.generated_at);
         feedUpdateDisplay(data);
 
-        // Adaptive polling: 30s when live, 60s when sleeping
+        // Adaptive polling: 20s when live, 45s when sleeping
         const wasLive = spiderIsLive;
         spiderIsLive = !!(data.generated_at && data.events && data.events.length >= 1 &&
             (Date.now() - new Date(data.generated_at).getTime()) / 60000 < 180);
         if (wasLive !== spiderIsLive) {
             clearInterval(spiderPollInterval);
-            spiderPollInterval = setInterval(fetchSpiderFeed, spiderIsLive ? 30000 : 60000);
-            console.log('[SpiderFeed] poll rate:', spiderIsLive ? '30s (live)' : '60s (sleeping)');
+            spiderPollInterval = setInterval(fetchSpiderFeed, spiderIsLive ? 20000 : 45000);
+            console.log('[SpiderFeed] poll rate:', spiderIsLive ? '20s (live)' : '45s (sleeping)');
         }
     } catch (e) {
-        console.warn('[SpiderFeed] fetch failed:', e.message);
+        spiderFetchFails++;
+        console.warn('[SpiderFeed] fetch failed (#' + spiderFetchFails + '):', e.message);
         if (!spiderFeedData) feedShowSignalLost();
+        // Retry faster on first few failures (server might be restarting)
+        if (spiderFetchFails <= 3) {
+            setTimeout(fetchSpiderFeed, 5000);
+        }
     }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(fetchSpiderFeed, 1200);
-    spiderPollInterval = setInterval(fetchSpiderFeed, 60000); // initial 60s, adapts after first fetch
-});
+// Start fetching immediately — no delay
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSpiderFeed();
+        spiderPollInterval = setInterval(fetchSpiderFeed, 45000);
+    });
+} else {
+    // DOM already loaded (script at bottom of body)
+    fetchSpiderFeed();
+    spiderPollInterval = setInterval(fetchSpiderFeed, 45000);
+}
 
 // ==================== SPRITE PET (v4 — edge-walking, correct orientation) ====================
 // Independent from index.html pet — do NOT sync or share code with agent-pet-roaming.js

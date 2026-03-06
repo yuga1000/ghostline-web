@@ -325,16 +325,46 @@ app.get('/api/visitors', (req, res) => {
   });
 });
 
+// Persistent spider log cache — survives in-memory loss, written to /tmp
+const SPIDER_LOG_CACHE_PATH = '/tmp/ghostline-spider-log-cache.json';
+
+function saveSpiderLogCache(data) {
+  try { fs.writeFileSync(SPIDER_LOG_CACHE_PATH, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadSpiderLogCache() {
+  try {
+    if (fs.existsSync(SPIDER_LOG_CACHE_PATH)) {
+      return JSON.parse(fs.readFileSync(SPIDER_LOG_CACHE_PATH, 'utf8'));
+    }
+  } catch(e) {}
+  return null;
+}
+
 // Dynamic spider-log.json — transforms /api/logs into spider feed format
-// Falls back to static api/spider-log.json when no in-memory logs (e.g. after deploy restart)
+// Falls back to: 1) /tmp cache  2) static api/spider-log.json
 app.get('/api/spider-log.json', (req, res) => {
+  // Prevent CDN/browser caching — always fresh
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+
   // Filter spider logs only (from our stream handler)
   const spiderLogs = recentLogs.filter(l =>
     (l.metadata && l.metadata.source === 'spider') || l.level === 'ACTION' || l.level === 'THINKING' || l.level === 'ERROR'
   );
 
-  // If no in-memory logs, try the static file (written directly by spider)
+  // If no in-memory logs, try fallbacks
   if (spiderLogs.length === 0) {
+    // Fallback 1: /tmp cache (persists across code but not container restarts)
+    const cached = loadSpiderLogCache();
+    if (cached && cached.events && cached.events.length > 0) {
+      console.log('[spider-log] Serving from /tmp cache:', cached.event_count, 'events');
+      return res.json(cached);
+    }
+
+    // Fallback 2: static file (committed to git, may be old)
     const staticPath = path.join(__dirname, 'api', 'spider-log.json');
     try {
       if (fs.existsSync(staticPath)) {
@@ -364,12 +394,19 @@ app.get('/api/spider-log.json', (req, res) => {
     ? new Date(spiderLogs[spiderLogs.length - 1].timestamp * 1000).toISOString()
     : null;
 
-  res.json({
+  const payload = {
     generated_at: lastTs, // null when no logs — frontend treats as sleeping
     log_source: 'live_stream',
     event_count: spiderLogs.length,
     events
-  });
+  };
+
+  // Persist to /tmp so next restart can use it as fallback
+  if (spiderLogs.length > 0) {
+    saveSpiderLogCache(payload);
+  }
+
+  res.json(payload);
 });
 
 // Health check endpoint for StreamLogger
