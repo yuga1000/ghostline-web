@@ -325,11 +325,20 @@ app.get('/api/visitors', (req, res) => {
   });
 });
 
-// Persistent spider log cache — survives in-memory loss, written to /tmp
+// Persistent spider log cache — dual write to /tmp AND api/spider-log.json
+// /tmp survives process restarts, api/ survives within the same deploy container
 const SPIDER_LOG_CACHE_PATH = '/tmp/ghostline-spider-log-cache.json';
+const SPIDER_LOG_STATIC_PATH = path.join(__dirname, 'api', 'spider-log.json');
+let lastSpiderLogSave = 0;
 
 function saveSpiderLogCache(data) {
+  const now = Date.now();
   try { fs.writeFileSync(SPIDER_LOG_CACHE_PATH, JSON.stringify(data)); } catch(e) {}
+  // Also update static file, but throttle to every 60s to reduce disk writes
+  if (now - lastSpiderLogSave > 60000) {
+    lastSpiderLogSave = now;
+    try { fs.writeFileSync(SPIDER_LOG_STATIC_PATH, JSON.stringify(data)); } catch(e) {}
+  }
 }
 
 function loadSpiderLogCache() {
