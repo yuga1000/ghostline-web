@@ -4614,12 +4614,26 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+let spiderPollInterval = null;
+let spiderIsLive = false;
+
 async function fetchSpiderFeed() {
     try {
         const resp = await fetch('/api/spider-log.json?' + Date.now());
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const data = await resp.json();
+        console.log('[SpiderFeed]', data.event_count, 'events, generated_at:', data.generated_at);
         feedUpdateDisplay(data);
+
+        // Adaptive polling: 30s when live, 60s when sleeping
+        const wasLive = spiderIsLive;
+        spiderIsLive = !!(data.generated_at && data.events && data.events.length >= 3 &&
+            (Date.now() - new Date(data.generated_at).getTime()) / 60000 < 180);
+        if (wasLive !== spiderIsLive) {
+            clearInterval(spiderPollInterval);
+            spiderPollInterval = setInterval(fetchSpiderFeed, spiderIsLive ? 30000 : 60000);
+            console.log('[SpiderFeed] poll rate:', spiderIsLive ? '30s (live)' : '60s (sleeping)');
+        }
     } catch (e) {
         console.warn('[SpiderFeed] fetch failed:', e.message);
         if (!spiderFeedData) feedShowSignalLost();
@@ -4628,7 +4642,7 @@ async function fetchSpiderFeed() {
 
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(fetchSpiderFeed, 1200);
-    setInterval(fetchSpiderFeed, 2 * 60 * 1000); // re-fetch every 2 min
+    spiderPollInterval = setInterval(fetchSpiderFeed, 60000); // initial 60s, adapts after first fetch
 });
 
 // ==================== SPRITE PET (v4 — edge-walking, correct orientation) ====================
