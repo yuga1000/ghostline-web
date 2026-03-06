@@ -3864,7 +3864,7 @@ function feedUpdateDisplay(data) {
 
     // Status — figure out if spider is currently active or sleeping
     const hasEvents = data.events && data.events.length > 0;
-    const hasEnoughEvents = data.events && data.events.length >= 3; // need several events to consider "active"
+    const hasEnoughEvents = data.events && data.events.length >= 1; // at least 1 event = spider is active
     let spiderSleeping = true;
     let lastActiveAgo  = '';
 
@@ -4627,7 +4627,7 @@ async function fetchSpiderFeed() {
 
         // Adaptive polling: 30s when live, 60s when sleeping
         const wasLive = spiderIsLive;
-        spiderIsLive = !!(data.generated_at && data.events && data.events.length >= 3 &&
+        spiderIsLive = !!(data.generated_at && data.events && data.events.length >= 1 &&
             (Date.now() - new Date(data.generated_at).getTime()) / 60000 < 180);
         if (wasLive !== spiderIsLive) {
             clearInterval(spiderPollInterval);
