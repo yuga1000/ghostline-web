@@ -4631,7 +4631,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchSpiderFeed, 2 * 60 * 1000); // re-fetch every 2 min
 });
 
-// ==================== SPRITE PET (v3 — roaming physics) ====================
+// ==================== SPRITE PET (v4 — edge-walking, correct orientation) ====================
+// Independent from index.html pet — do NOT sync or share code with agent-pet-roaming.js
 (function() {
     const FRAMES = {
         stay: [
@@ -4669,7 +4670,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const moodEl  = document.getElementById('pet-mood');
     const stateEl = document.getElementById('pet-state-label');
     const eventEl = document.getElementById('pet-event-label');
-    const zzzEl   = document.getElementById('pet-zzz');
     const feedEl  = document.getElementById('pet-feed');
     if (!petImg || !feedEl) return;
 
@@ -4691,247 +4691,203 @@ window.addEventListener('DOMContentLoaded', () => {
     function setState(t) { if (stateEl) stateEl.textContent = '// ' + t; }
     function setEvent(t) { if (!eventEl) return; eventEl.textContent = t; if (t) setTimeout(()=>{ eventEl.textContent=''; },4000); }
 
-    // ── Physics state ──
-    const PET_W = 48, PET_H = 48;
-    let px = 0, py = 0;        // position (px from top-left of container)
-    let vx = 0, vy = 0;        // velocity
-    let rotation = 0;           // degrees
-    let surface = 'floor';      // floor / left-wall / right-wall / ceiling
+    // ── Edge-walking model ──
+    // Pet walks along the border (perimeter) of the box.
+    // Edge = 'bottom' | 'right' | 'top' | 'left'
+    // t = position along that edge (0..1, where 0=start, 1=end)
+    //   bottom: left→right, right: bottom→top, top: right→left, left: top→bottom
+    const PET_S = 40; // sprite display size (px)
+    const MARGIN = 2; // px from edge of container
+    let edge = 'bottom'; // current edge
+    let edgeT = 0.5;     // 0..1 position along edge
+    let edgeDir = 1;     // +1 = forward along edge, -1 = backward
     let petSleeping = false;
     let behaviorTimer = null;
-    let physicsRAF = null;
-    let lastPhysicsTime = 0;
+    let moveRAF = null;
+    let lastMoveTime = 0;
+    let moveSpeed = 0; // px/s (0 = stopped)
+    let facingDir = 1; // 1 = forward, -1 = backward (for scaleX flip)
 
     // Container dimensions
     function boxW() { return feedEl.clientWidth; }
     function boxH() { return feedEl.clientHeight; }
 
-    // Init position: center floor
-    function initPos() {
-        px = (boxW() - PET_W) / 2;
-        py = boxH() - PET_H - 2;
-        rotation = 0;
-        surface = 'floor';
-        applyTransform();
+    // Edge lengths in px
+    function edgeLen(e) {
+        if (e === 'bottom' || e === 'top') return boxW() - PET_S - MARGIN * 2;
+        return boxH() - PET_S - MARGIN * 2;
+    }
+
+    // Convert edge+t to pixel position and CSS transform
+    function edgeToPos(e, t) {
+        const W = boxW(), H = boxH();
+        const clamped = Math.max(0, Math.min(1, t));
+        let x, y, rot;
+        // Paws always point TOWARD the wall the pet is walking on.
+        // Sprite default: paws on bottom, head on top. So:
+        //   bottom edge: rotation=0 (paws down, touching bottom wall)
+        //   right edge:  rotation=90 + scaleX(-1) OR rotation=-90 (paws right, touching right wall)
+        //   top edge:    rotation=180 (paws up, touching top wall / ceiling)
+        //   left edge:   rotation=90 (paws left, touching left wall)
+        if (e === 'bottom') {
+            x = MARGIN + clamped * (W - PET_S - MARGIN * 2);
+            y = H - PET_S - MARGIN;
+            rot = 0;
+        } else if (e === 'right') {
+            x = W - PET_S - MARGIN;
+            y = H - PET_S - MARGIN - clamped * (H - PET_S - MARGIN * 2);
+            rot = 90; // rotate 90deg CW → paws face right wall
+        } else if (e === 'top') {
+            x = W - PET_S - MARGIN - clamped * (W - PET_S - MARGIN * 2);
+            y = MARGIN;
+            rot = 180; // upside down → paws face ceiling
+        } else { // left
+            x = MARGIN;
+            y = MARGIN + clamped * (H - PET_S - MARGIN * 2);
+            rot = -90; // rotate 90deg CCW → paws face left wall
+        }
+        return { x, y, rot };
     }
 
     function applyTransform() {
-        petImg.style.left = px + 'px';
-        petImg.style.top = py + 'px';
+        const pos = edgeToPos(edge, edgeT);
+        petImg.style.left = pos.x + 'px';
+        petImg.style.top = pos.y + 'px';
         petImg.style.bottom = 'auto';
-        petImg.style.transform = 'rotate(' + rotation + 'deg)' + (vx < -0.3 ? ' scaleX(-1)' : '');
+        // facingDir: flip sprite if walking backward on this edge
+        const flip = facingDir < 0 ? ' scaleX(-1)' : '';
+        petImg.style.transform = 'rotate(' + pos.rot + 'deg)' + flip;
+        petImg.style.transformOrigin = 'center center';
+    }
+
+    // Advance along edge, wrap to next edge when reaching end
+    function nextEdge(e) {
+        const order = ['bottom','right','top','left'];
+        return order[(order.indexOf(e) + 1) % 4];
+    }
+    function prevEdge(e) {
+        const order = ['bottom','right','top','left'];
+        return order[(order.indexOf(e) + 3) % 4];
+    }
+
+    // ── Movement loop (60fps) ──
+    function moveStep(ts) {
+        if (petSleeping) { moveRAF = requestAnimationFrame(moveStep); return; }
+        const dt = lastMoveTime ? (ts - lastMoveTime) / 1000 : 0.016;
+        lastMoveTime = ts;
+        if (dt > 0.1 || moveSpeed === 0) { moveRAF = requestAnimationFrame(moveStep); return; }
+
+        const len = edgeLen(edge);
+        if (len <= 0) { moveRAF = requestAnimationFrame(moveStep); return; }
+        const dtNorm = (moveSpeed * dt) / len; // how much of edge to traverse this frame
+
+        edgeT += edgeDir * dtNorm;
+
+        // Wrap to next/prev edge
+        if (edgeT > 1) {
+            edgeT = 0;
+            edge = nextEdge(edge);
+        } else if (edgeT < 0) {
+            edgeT = 1;
+            edge = prevEdge(edge);
+        }
+
+        applyTransform();
+        moveRAF = requestAnimationFrame(moveStep);
     }
 
     // ── BEHAVIORS ──
 
-    // Walk along floor
-    function walkFloor(dir, duration) {
-        const speed = 40 + Math.random() * 30; // px/s
-        vx = dir * speed;
-        vy = 0;
-        surface = 'floor';
-        rotation = 0;
+    // Walk along current edge in given direction
+    function walkEdge(dir, duration) {
+        moveSpeed = 35 + Math.random() * 30; // px/s
+        edgeDir = dir;
+        facingDir = dir;
         startAnim('go');
         setState('roaming...');
         return new Promise(r => behaviorTimer = setTimeout(r, duration));
     }
 
-    // Climb wall (left=-1, right=1)
-    function climbWall(side) {
-        surface = side < 0 ? 'left-wall' : 'right-wall';
-        const speed = 25 + Math.random() * 20;
-        vx = 0;
-        vy = -speed; // climb up
-        rotation = side < 0 ? -90 : 90;
-        if (side < 0) { px = 2; }
-        else { px = boxW() - PET_W - 2; }
-        startAnim('go');
-        setState('climbing!');
-        const dur = 1500 + Math.random() * 2500;
-        return new Promise(r => behaviorTimer = setTimeout(r, dur));
-    }
-
-    // Walk on ceiling
-    function walkCeiling(dir, duration) {
-        surface = 'ceiling';
-        py = 2;
-        rotation = 180;
-        vx = dir * (30 + Math.random() * 25);
-        vy = 0;
-        startAnim('go');
-        setState('ceiling walk!');
-        return new Promise(r => behaviorTimer = setTimeout(r, duration));
-    }
-
-    // Jump
-    function jump() {
+    // Jump in place (little hop animation)
+    function jumpInPlace() {
         startAnim('transformation');
         setState('JUMP!');
         setMood('!!');
-        const jumpVy = -(120 + Math.random() * 60);
-        const jumpVx = (Math.random() - 0.5) * 80;
-        vx = jumpVx;
-        vy = jumpVy;
-        surface = 'air';
-        rotation = 0;
+        moveSpeed = 0;
+        // Quick vertical hop effect using translate
+        const pos = edgeToPos(edge, edgeT);
+        const origY = pos.y;
+        let t = 0;
         return new Promise(resolve => {
-            const checkLand = setInterval(() => {
-                if (surface === 'floor') {
-                    clearInterval(checkLand);
+            const hopInterval = setInterval(() => {
+                t += 30;
+                const hopH = Math.sin(t / 300 * Math.PI) * 18;
+                if (edge === 'bottom') petImg.style.top = (origY - hopH) + 'px';
+                else if (edge === 'top') petImg.style.top = (origY + hopH) + 'px';
+                else if (edge === 'right') petImg.style.left = (pos.x - hopH) + 'px';
+                else petImg.style.left = (pos.x + hopH) + 'px';
+                if (t >= 300) {
+                    clearInterval(hopInterval);
+                    applyTransform();
                     setMood('IDLE');
                     resolve();
                 }
-            }, 50);
-            // Safety timeout
-            behaviorTimer = setTimeout(() => { clearInterval(checkLand); surface='floor'; py=boxH()-PET_H-2; vy=0; rotation=0; resolve(); }, 3000);
+            }, 30);
+            behaviorTimer = setTimeout(() => { clearInterval(hopInterval); applyTransform(); resolve(); }, 2000);
         });
     }
 
-    // Run in rectangles (hamster wheel style — laps around the box perimeter)
+    // Run laps around the entire perimeter (rectangular zoomies)
     function runLaps(numLaps) {
         setState('ZOOMIES!');
         setMood('!!!');
         startAnim('go');
-        const speed = 100; // px/s fast!
-        let lap = 0;
+        moveSpeed = 120 + Math.random() * 40; // fast!
+        edgeDir = 1;
+        facingDir = 1;
 
-        return new Promise(resolve => {
-            async function doLap() {
-                if (lap >= numLaps) { resolve(); return; }
-                const W = boxW(), H = boxH();
+        // Calculate total perimeter distance to travel
+        const perim = edgeLen('bottom') + edgeLen('right') + edgeLen('top') + edgeLen('left');
+        const totalDist = perim * numLaps;
+        const totalTime = (totalDist / moveSpeed) * 1000;
 
-                // floor → right
-                vx = speed; vy = 0; rotation = 0; surface = 'floor'; py = H - PET_H - 2;
-                await waitUntil(() => px >= W - PET_W - 4, 40);
-
-                // right wall → up
-                px = W - PET_W - 2; vx = 0; vy = -speed; rotation = 90; surface = 'right-wall';
-                await waitUntil(() => py <= 4, 40);
-
-                // ceiling → left
-                py = 2; vx = -speed; vy = 0; rotation = 180; surface = 'ceiling';
-                await waitUntil(() => px <= 4, 40);
-
-                // left wall → down
-                px = 2; vx = 0; vy = speed; rotation = -90; surface = 'left-wall';
-                await waitUntil(() => py >= H - PET_H - 4, 40);
-
-                py = H - PET_H - 2; rotation = 0; surface = 'floor';
-                lap++;
-                doLap();
-            }
-            doLap();
-            // Safety
-            behaviorTimer = setTimeout(resolve, numLaps * 6000);
-        });
-    }
-
-    function waitUntil(condFn, interval) {
-        return new Promise(r => {
-            const check = setInterval(() => {
-                if (condFn()) { clearInterval(check); r(); }
-            }, interval);
-            setTimeout(() => { clearInterval(check); r(); }, 5000);
-        });
+        return new Promise(r => behaviorTimer = setTimeout(r, totalTime));
     }
 
     // Idle: stay in place
     function idle(duration) {
-        vx = 0; vy = 0;
+        moveSpeed = 0;
         startAnim('stay');
         setState('idle');
         setMood('IDLE');
         return new Promise(r => behaviorTimer = setTimeout(r, duration));
     }
 
-    // ── PHYSICS LOOP (60fps) ──
-    const GRAVITY = 200; // px/s²
-
-    function physicsStep(dt) {
-        if (petSleeping) return;
-        if (dt > 0.1) dt = 0.1; // clamp
-
-        // Gravity in air
-        if (surface === 'air') {
-            vy += GRAVITY * dt;
-        }
-
-        px += vx * dt;
-        py += vy * dt;
-
-        const W = boxW(), H = boxH();
-
-        // Floor collision
-        if (py > H - PET_H - 2) {
-            py = H - PET_H - 2;
-            if (surface === 'air') { vy = 0; vx *= 0.5; surface = 'floor'; rotation = 0; }
-        }
-        // Ceiling
-        if (py < 2) {
-            py = 2;
-            if (surface === 'air') { vy = 0; surface = 'floor'; py = H - PET_H - 2; rotation = 0; }
-        }
-        // Left wall
-        if (px < 2) {
-            px = 2;
-            if (surface === 'floor' && vx < 0) vx = 0;
-        }
-        // Right wall
-        if (px > W - PET_W - 2) {
-            px = W - PET_W - 2;
-            if (surface === 'floor' && vx > 0) vx = 0;
-        }
-
-        applyTransform();
-    }
-
-    function physicsLoop(ts) {
-        const dt = lastPhysicsTime ? (ts - lastPhysicsTime) / 1000 : 0.016;
-        lastPhysicsTime = ts;
-        physicsStep(dt);
-        physicsRAF = requestAnimationFrame(physicsLoop);
-    }
-
     // ── BEHAVIOR SEQUENCE ──
     async function behaviorLoop() {
         while (!petSleeping) {
-            // Pick a random behavior
             const roll = Math.random();
-            if (roll < 0.30) {
-                // Walk left or right
-                const dir = Math.random() < 0.5 ? -1 : 1;
-                await walkFloor(dir, 2000 + Math.random() * 3000);
-                vx = 0;
-            } else if (roll < 0.45) {
-                // Jump!
-                await jump();
-            } else if (roll < 0.58) {
-                // Climb left wall
-                await climbWall(-1);
-                // Walk ceiling
-                await walkCeiling(1, 1500 + Math.random() * 2000);
-                // Drop down
-                surface = 'air'; vy = 0; rotation = 0;
-                await new Promise(r => behaviorTimer = setTimeout(r, 800));
-            } else if (roll < 0.71) {
-                // Climb right wall
-                await climbWall(1);
-                await walkCeiling(-1, 1500 + Math.random() * 2000);
-                surface = 'air'; vy = 0; rotation = 0;
-                await new Promise(r => behaviorTimer = setTimeout(r, 800));
-            } else if (roll < 0.82) {
+            if (roll < 0.35) {
+                // Walk forward or backward along edges
+                const dir = Math.random() < 0.5 ? 1 : -1;
+                await walkEdge(dir, 2500 + Math.random() * 4000);
+                moveSpeed = 0;
+            } else if (roll < 0.50) {
+                // Jump in place
+                await jumpInPlace();
+            } else if (roll < 0.70) {
                 // ZOOMIES — run laps!
                 await runLaps(1 + Math.floor(Math.random() * 3));
-                vx = 0; vy = 0;
+                moveSpeed = 0;
             } else {
                 // Idle
-                await idle(3000 + Math.random() * 4000);
+                await idle(2000 + Math.random() * 3000);
             }
             // Brief pause between behaviors
             if (!petSleeping) {
-                vx = 0; vy = 0;
+                moveSpeed = 0;
                 startAnim('stay');
-                await new Promise(r => behaviorTimer = setTimeout(r, 800 + Math.random() * 1500));
+                await new Promise(r => behaviorTimer = setTimeout(r, 600 + Math.random() * 1200));
             }
         }
     }
@@ -4946,12 +4902,11 @@ window.addEventListener('DOMContentLoaded', () => {
         if (petSleeping) return;
         petSleeping = true;
         clearTimers();
-        vx = 0; vy = 0;
-        // Move to floor center for sleep
-        surface = 'floor';
-        rotation = 0;
-        px = (boxW() - PET_W) / 2;
-        py = boxH() - PET_H - 2;
+        moveSpeed = 0;
+        // Move to bottom center for sleep
+        edge = 'bottom';
+        edgeT = 0.5;
+        facingDir = 1;
         applyTransform();
 
         startAnim('sleep');
@@ -4981,22 +4936,26 @@ window.addEventListener('DOMContentLoaded', () => {
         if (petSleeping) return;
         clearTimers();
         if (type === 'waving' || type === 'excited-bounce') {
-            jump().then(() => { if (!petSleeping) behaviorLoop(); });
+            jumpInPlace().then(() => { if (!petSleeping) behaviorLoop(); });
             setEvent(type === 'waving' ? '* HOT LEAD' : '> scan done');
             setMood('HOT!');
         } else if (type === 'nervous') {
             startAnim('sleep'); setState('nervous'); setEvent('signal lost'); setMood('???');
+            moveSpeed = 0;
             behaviorTimer = setTimeout(() => { setMood('IDLE'); if(!petSleeping) behaviorLoop(); }, dur||3000);
         }
     };
     window.petIsAwake = true;
 
     // ── INIT ──
-    initPos();
     petImg.style.position = 'absolute';
-    physicsRAF = requestAnimationFrame(physicsLoop);
+    petImg.style.width = PET_S + 'px';
+    petImg.style.height = PET_S + 'px';
+    edge = 'bottom'; edgeT = 0.5; facingDir = 1;
+    applyTransform();
+    moveRAF = requestAnimationFrame(moveStep);
     petGoToSleep();
-    console.log('[Pet] v3 initialized (roaming physics)');
+    console.log('[Pet] v4 initialized (edge-walking)');
 })();
 
 </script>
@@ -5009,25 +4968,48 @@ window.addEventListener('DOMContentLoaded', () => {
 <!-- Pixel Pet Module - DISABLED, using integrated pet instead -->
 <!-- <script src="pet.js?v=1762247417"></script> -->
 
-<!-- GoL Mandala v0.2 — Symmetric seed patterns with age coloring -->
+<!-- GoL Mandala v1.0 — Multi-rule engine with maximum diversity -->
 <script>
 (function() {
-    const CYCLE_MS = 90 * 1000; // new seed every 90 seconds for more variety
-    const SESSION_SALT = Math.floor(Math.random() * 999999); // unique per page load
+    const CYCLE_MS = 75 * 1000; // new pattern every 75 seconds
+    let SESSION_SALT = Math.floor(Math.random() * 999999);
 
-    // === GoL MANDALA v0.3 — diverse seeds, more colors ===
+    // === GoL MANDALA v1.0 — multi-rule, diverse seeds, mathematical patterns ===
 
+    // 14 color palettes for maximum variety
     const COLORS = [
-        { name: 'GREEN',   ages: ['#001a00','#003300','#005500','#008800','#00aa00','#00cc00','#00ff00','#33ff33','#66ff66','#99ff99'] },
-        { name: 'RED',     ages: ['#1a0000','#330000','#550000','#880000','#aa0000','#cc0000','#ff0000','#ff3333','#ff6666','#ff9999'] },
-        { name: 'BLUE',    ages: ['#00001a','#000033','#000055','#000088','#0000aa','#0033cc','#0055ff','#3388ff','#66aaff','#99ccff'] },
-        { name: 'CYAN',    ages: ['#001a1a','#003333','#005555','#008888','#00aaaa','#00cccc','#00ffff','#33ffff','#66ffff','#99ffff'] },
-        { name: 'GOLD',    ages: ['#1a1a00','#333300','#555500','#888800','#aaaa00','#cccc00','#ffff00','#ffff33','#ffff66','#ffff99'] },
-        { name: 'PINK',    ages: ['#1a0010','#330020','#550033','#882255','#aa3366','#cc4488','#ff66aa','#ff88bb','#ffaacc','#ffccdd'] },
-        { name: 'MAGENTA', ages: ['#1a001a','#330033','#550055','#880088','#aa00aa','#cc00cc','#ff00ff','#ff33ff','#ff66ff','#ff99ff'] },
-        { name: 'ORANGE',  ages: ['#1a0a00','#331500','#552200','#884400','#aa5500','#cc7700','#ff9900','#ffaa33','#ffbb66','#ffcc99'] },
-        { name: 'LIME',    ages: ['#0a1a00','#153300','#225500','#448800','#55aa00','#77cc00','#99ff00','#aaff33','#bbff66','#ccff99'] },
-        { name: 'CORAL',   ages: ['#1a0808','#331010','#552020','#884040','#aa5050','#cc6666','#ff8888','#ff9999','#ffaaaa','#ffbbbb'] },
+        { name: 'GREEN',     ages: ['#001a00','#003300','#005500','#008800','#00aa00','#00cc00','#00ff00','#33ff33','#66ff66','#aaffaa'] },
+        { name: 'RED',       ages: ['#1a0000','#330000','#550000','#880000','#aa0000','#cc0000','#ff0000','#ff3333','#ff6666','#ff9999'] },
+        { name: 'BLUE',      ages: ['#00001a','#000033','#000066','#000099','#0033cc','#0066ff','#0088ff','#33aaff','#66ccff','#aaddff'] },
+        { name: 'CYAN',      ages: ['#001a1a','#003333','#005555','#008888','#00aaaa','#00cccc','#00ffff','#33ffff','#77ffff','#bbffff'] },
+        { name: 'GOLD',      ages: ['#1a1200','#332400','#554400','#886600','#aa8800','#ccaa00','#ffcc00','#ffdd33','#ffee66','#fff499'] },
+        { name: 'PINK',      ages: ['#1a0010','#330020','#550033','#882255','#aa3366','#cc4488','#ff66aa','#ff88cc','#ffaadd','#ffccee'] },
+        { name: 'MAGENTA',   ages: ['#1a001a','#330033','#550055','#880088','#aa00aa','#cc00cc','#ff00ff','#ff44ff','#ff77ff','#ffaaff'] },
+        { name: 'ORANGE',    ages: ['#1a0a00','#331500','#552200','#884400','#aa5500','#cc7700','#ff9900','#ffaa33','#ffbb66','#ffdd99'] },
+        { name: 'LIME',      ages: ['#0a1a00','#153300','#225500','#448800','#55aa00','#77cc00','#99ff00','#aaff33','#bbff66','#ddff99'] },
+        { name: 'CORAL',     ages: ['#1a0808','#331010','#552020','#884040','#aa5050','#cc6666','#ff7777','#ff9999','#ffbbbb','#ffdddd'] },
+        { name: 'ELECTRIC',  ages: ['#000a1a','#001133','#002255','#003388','#0044aa','#0055dd','#2277ff','#4499ff','#66bbff','#99ddff'] },
+        { name: 'VIOLET',    ages: ['#0d001a','#1a0033','#2d0055','#440088','#5500aa','#7722cc','#9944ff','#aa66ff','#bb88ff','#ddaaff'] },
+        { name: 'EMERALD',   ages: ['#001a0d','#00331a','#005533','#008855','#00aa66','#00cc88','#00ffaa','#33ffbb','#66ffcc','#99ffdd'] },
+        { name: 'FIRE',      ages: ['#1a0000','#330500','#550a00','#881100','#aa2200','#cc4400','#ff6600','#ff8800','#ffaa00','#ffcc33'] },
+    ];
+
+    // === RULE SYSTEMS ===
+    // Each rule: { name, birth: Set, survive: Set, states: number }
+    // states=2 = standard 2-state, states>2 = "Generations" (cells age through states before dying)
+    const RULES = [
+        { name: 'Life',      birth: [3],       survive: [2,3],       states: 2 },
+        { name: 'HighLife',   birth: [3,6],     survive: [2,3],       states: 2 },
+        { name: 'DayNight',   birth: [3,6,7,8], survive: [3,4,6,7,8], states: 2 },
+        { name: 'Seeds',      birth: [2],       survive: [],          states: 2 },
+        { name: 'Coral',      birth: [3],       survive: [4,5,6,7,8], states: 2 },
+        { name: 'Maze',       birth: [3],       survive: [1,2,3,4,5], states: 2 },
+        { name: 'Anneal',     birth: [4,6,7,8], survive: [3,5,6,7,8], states: 2 },
+        { name: 'Diamoeba',   birth: [3,5,6,7,8], survive: [5,6,7,8], states: 2 },
+        { name: 'Morley',     birth: [3,6,8],   survive: [2,4,5],     states: 2 },
+        { name: 'BrianBrain', birth: [2],       survive: [],          states: 3 },
+        { name: 'StarWars',   birth: [2],       survive: [3,4,5],     states: 4 },
+        { name: 'Caterpillar',birth: [3,7,8],   survive: [2,3,4,5],   states: 4 },
     ];
 
     const canvas = document.getElementById('gol-canvas');
@@ -5038,13 +5020,15 @@ window.addEventListener('DOMContentLoaded', () => {
     let grid, nextGrid, ageGrid;
     let generation = 0;
     let palette = COLORS[0];
+    let currentRule = RULES[0];
     let seed = 0;
     let rng;
     let currentSymType = '';
     let currentSeedName = '';
 
     function createRNG(hash) {
-        let s = hash;
+        let s = hash | 0;
+        if (s === 0) s = 1;
         return function() {
             s ^= s << 13; s ^= s >> 17; s ^= s << 5;
             return ((s < 0 ? ~s + 1 : s) % 10000) / 10000;
@@ -5067,6 +5051,16 @@ window.addEventListener('DOMContentLoaded', () => {
                 const a = (Math.PI*2/6)*i, cos=Math.cos(a), sin=Math.sin(a);
                 pts.push([Math.round(cx+dx*cos-dy*sin), Math.round(cy+dx*sin+dy*cos)]);
             }
+        } else if (type === 'radial8') {
+            for (let i = 1; i < 8; i++) {
+                const a = (Math.PI*2/8)*i, cos=Math.cos(a), sin=Math.sin(a);
+                pts.push([Math.round(cx+dx*cos-dy*sin), Math.round(cy+dx*sin+dy*cos)]);
+            }
+        } else if (type === 'radial12') {
+            for (let i = 1; i < 12; i++) {
+                const a = (Math.PI*2/12)*i, cos=Math.cos(a), sin=Math.sin(a);
+                pts.push([Math.round(cx+dx*cos-dy*sin), Math.round(cy+dx*sin+dy*cos)]);
+            }
         }
         return pts;
     }
@@ -5079,61 +5073,142 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // === SEED GENERATORS ===
-    function seedLines(cx, cy, sym) {
-        const n = 1 + Math.floor(rng() * 8);
-        const thick = rng() < 0.4;
-        for (let l = 0; l < n; l++) {
-            const angle = rng() * Math.PI * 2;
-            const len = GRID * (0.1 + rng() * 0.4);
-            const w = thick ? (1 + Math.floor(rng() * 3)) : 1;
-            for (let t = 0; t < len; t += 0.5) {
-                const bx = Math.floor(cx + Math.cos(angle) * t);
-                const by = Math.floor(cy + Math.sin(angle) * t);
-                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym))
-                    for (let ww=0;ww<w;ww++) { setPixel(px+ww,py); if(w>1) setPixel(px,py+ww); }
+
+    // 1. Full-span straight lines (the user's key insight — simple lines across entire grid)
+    function seedFullLines(cx, cy, sym) {
+        const numLines = 1 + Math.floor(rng() * 3);
+        for (let l = 0; l < numLines; l++) {
+            const thick = 1 + Math.floor(rng() * 3);
+            const isHoriz = rng() < 0.5;
+            const offset = Math.floor((rng() - 0.5) * GRID * 0.3);
+            for (let t = 0; t < GRID; t++) {
+                for (let w = 0; w < thick; w++) {
+                    if (isHoriz) {
+                        for (const [px,py] of mirrorPoints(t, cy + offset + w, cx, cy, sym)) setPixel(px,py);
+                    } else {
+                        for (const [px,py] of mirrorPoints(cx + offset + w, t, cx, cy, sym)) setPixel(px,py);
+                    }
+                }
             }
         }
     }
 
-    function seedCross(cx, cy, sym) {
-        const armLen = Math.floor(GRID * (0.1 + rng() * 0.35));
-        const armW = 1 + Math.floor(rng() * 3);
-        const numArms = 2 + Math.floor(rng() * 4);
+    // 2. Diagonal full-span lines
+    function seedDiagLines(cx, cy, sym) {
+        const numLines = 1 + Math.floor(rng() * 3);
+        for (let l = 0; l < numLines; l++) {
+            const thick = 1 + Math.floor(rng() * 2);
+            const offset = Math.floor((rng() - 0.5) * GRID * 0.4);
+            const dir = rng() < 0.5 ? 1 : -1;
+            for (let t = 0; t < GRID; t++) {
+                for (let w = 0; w < thick; w++) {
+                    const x = t;
+                    const y = Math.floor(cy + (t - cx) * dir + offset + w);
+                    for (const [px,py] of mirrorPoints(x, y, cx, cy, sym)) setPixel(px,py);
+                }
+            }
+        }
+    }
+
+    // 3. Cross / plus sign spanning full grid
+    function seedFullCross(cx, cy, sym) {
+        const thick = 1 + Math.floor(rng() * 3);
+        const numArms = 2 + Math.floor(rng() * 2);
         for (let a = 0; a < numArms; a++) {
-            const angle = (a / numArms) * Math.PI + rng() * 0.2;
-            for (let t = 0; t < armLen; t++) {
+            const angle = (a / numArms) * Math.PI;
+            for (let t = -GRID/2; t < GRID/2; t++) {
                 const bx = Math.floor(cx + Math.cos(angle) * t);
                 const by = Math.floor(cy + Math.sin(angle) * t);
-                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym))
-                    for (let w = -Math.floor(armW/2); w <= Math.floor(armW/2); w++) { setPixel(px+w,py); setPixel(px,py+w); }
+                for (let w = -Math.floor(thick/2); w <= Math.floor(thick/2); w++) {
+                    for (const [px,py] of mirrorPoints(bx+w, by, cx, cy, sym)) setPixel(px,py);
+                    for (const [px,py] of mirrorPoints(bx, by+w, cx, cy, sym)) setPixel(px,py);
+                }
             }
         }
     }
 
-    function seedRings(cx, cy, sym) {
-        const n = 2 + Math.floor(rng() * 6);
-        for (let r = 0; r < n; r++) {
-            const radius = 3 + r * (GRID * 0.4 / n) * (0.6 + rng() * 0.8);
-            const arcStart = rng() * Math.PI * 2;
-            const arcLen = Math.PI * (0.3 + rng() * 1.7);
-            const steps = Math.floor(radius * 3);
+    // 4. Sine waves spanning grid
+    function seedSineWave(cx, cy, sym) {
+        const freq = 1 + Math.floor(rng() * 5); // number of waves
+        const amp = 3 + Math.floor(rng() * (GRID * 0.15));
+        const thick = 1 + Math.floor(rng() * 2);
+        const vertical = rng() < 0.5;
+        for (let t = 0; t < GRID; t++) {
+            const wave = Math.sin(t / GRID * Math.PI * 2 * freq) * amp;
+            for (let w = 0; w < thick; w++) {
+                if (vertical) {
+                    for (const [px,py] of mirrorPoints(Math.floor(cx + wave + w), t, cx, cy, sym)) setPixel(px,py);
+                } else {
+                    for (const [px,py] of mirrorPoints(t, Math.floor(cy + wave + w), cx, cy, sym)) setPixel(px,py);
+                }
+            }
+        }
+    }
+
+    // 5. Concentric circles
+    function seedCircles(cx, cy, sym) {
+        const numCircles = 2 + Math.floor(rng() * 5);
+        const maxR = GRID * (0.15 + rng() * 0.3);
+        for (let c = 0; c < numCircles; c++) {
+            const r = maxR * (c + 1) / numCircles;
+            const steps = Math.max(20, Math.floor(r * 6.28));
+            const thick = rng() < 0.3 ? 2 : 1;
             for (let s = 0; s < steps; s++) {
-                const a = arcStart + (s / steps) * arcLen;
-                const bx = Math.floor(cx + Math.cos(a) * radius);
-                const by = Math.floor(cy + Math.sin(a) * radius);
-                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym)) setPixel(px,py);
+                const a = (s / steps) * Math.PI * 2;
+                for (let w = 0; w < thick; w++) {
+                    const bx = Math.floor(cx + Math.cos(a) * (r + w));
+                    const by = Math.floor(cy + Math.sin(a) * (r + w));
+                    for (const [px,py] of mirrorPoints(bx, by, cx, cy, sym)) setPixel(px,py);
+                }
             }
         }
     }
 
+    // 6. Square / rectangle outlines
+    function seedSquares(cx, cy, sym) {
+        const numSquares = 2 + Math.floor(rng() * 4);
+        const maxSize = Math.floor(GRID * (0.15 + rng() * 0.25));
+        for (let s = 0; s < numSquares; s++) {
+            const halfSz = Math.floor(maxSize * (s + 1) / numSquares);
+            for (let t = -halfSz; t <= halfSz; t++) {
+                for (const [px,py] of mirrorPoints(cx+t, cy-halfSz, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx+t, cy+halfSz, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx-halfSz, cy+t, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx+halfSz, cy+t, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // 7. Triangle shapes
+    function seedTriangles(cx, cy, sym) {
+        const numTris = 1 + Math.floor(rng() * 3);
+        const size = Math.floor(GRID * (0.15 + rng() * 0.25));
+        for (let tri = 0; tri < numTris; tri++) {
+            const scale = (tri + 1) / numTris;
+            const h = Math.floor(size * scale);
+            for (let row = 0; row < h; row++) {
+                const w = Math.floor((row / h) * h);
+                for (const [px,py] of mirrorPoints(cx - w, cy + row - h/2, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx + w, cy + row - h/2, cx, cy, sym)) setPixel(px,py);
+            }
+            // base
+            const baseW = Math.floor(size * scale);
+            for (let t = -baseW; t <= baseW; t++) {
+                for (const [px,py] of mirrorPoints(cx + t, cy + h - h/2, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // 8. Spiral arms
     function seedSpiral(cx, cy, sym) {
-        const numArms = 1 + Math.floor(rng() * 4);
-        const tightness = 0.02 + rng() * 0.08;
-        const turns = 1 + rng() * 4;
+        const numArms = 1 + Math.floor(rng() * 5);
+        const tightness = 0.03 + rng() * 0.1;
+        const turns = 1.5 + rng() * 3;
         for (let arm = 0; arm < numArms; arm++) {
             const offset = (arm / numArms) * Math.PI * 2;
-            for (let t = 0; t < turns * Math.PI * 2; t += 0.05) {
-                const r = t / tightness * 0.3;
+            for (let t = 0; t < turns * Math.PI * 2; t += 0.04) {
+                const r = t / tightness * 0.25;
+                if (r > GRID * 0.45) break;
                 const bx = Math.floor(cx + Math.cos(t+offset) * r);
                 const by = Math.floor(cy + Math.sin(t+offset) * r);
                 for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym)) setPixel(px,py);
@@ -5141,38 +5216,28 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function seedWeave(cx, cy, sym) {
-        const spacing = 2 + Math.floor(rng() * 6);
-        const extent = Math.floor(GRID * (0.15 + rng() * 0.3));
-        for (let i = -extent; i < extent; i += spacing) {
-            for (let t = 0; t < extent; t++) {
-                for (const [px,py] of mirrorPoints(cx+i+t, cy+t, cx, cy, sym)) setPixel(px,py);
-                if (rng() < 0.5)
-                    for (const [px,py] of mirrorPoints(cx+i+t, cy-t, cx, cy, sym)) setPixel(px,py);
+    // 9. Starburst — explosive rays from center
+    function seedStarburst(cx, cy, sym) {
+        const numRays = 5 + Math.floor(rng() * 16);
+        const length = GRID * (0.25 + rng() * 0.2);
+        const dotted = rng() < 0.3;
+        const thick = rng() < 0.3 ? 2 : 1;
+        for (let r = 0; r < numRays; r++) {
+            const angle = (r / numRays) * Math.PI * 2;
+            for (let t = 2; t < length; t += (dotted ? 2+Math.floor(rng()*3) : 0.5)) {
+                const bx = Math.floor(cx + Math.cos(angle) * t);
+                const by = Math.floor(cy + Math.sin(angle) * t);
+                for (let w = 0; w < thick; w++) {
+                    for (const [px,py] of mirrorPoints(bx+w, by, cx, cy, sym)) setPixel(px,py);
+                }
             }
         }
     }
 
-    // Scattered dots — creates chaotic but symmetric noise
-    function seedDots(cx, cy, sym) {
-        const count = 20 + Math.floor(rng() * 80);
-        const spread = GRID * (0.15 + rng() * 0.35);
-        for (let i = 0; i < count; i++) {
-            const dx = Math.floor((rng() - 0.5) * spread * 2);
-            const dy = Math.floor((rng() - 0.5) * spread * 2);
-            for (const [px,py] of mirrorPoints(cx+dx, cy+dy, cx, cy, sym)) setPixel(px,py);
-            // Sometimes place a small cluster
-            if (rng() < 0.3) {
-                for (const [px,py] of mirrorPoints(cx+dx+1, cy+dy, cx, cy, sym)) setPixel(px,py);
-                for (const [px,py] of mirrorPoints(cx+dx, cy+dy+1, cx, cy, sym)) setPixel(px,py);
-            }
-        }
-    }
-
-    // Grid/mesh — creates structured patterns with lattice feel
+    // 10. Grid/mesh lattice
     function seedMesh(cx, cy, sym) {
-        const spacing = 3 + Math.floor(rng() * 5);
-        const extent = Math.floor(GRID * (0.1 + rng() * 0.3));
+        const spacing = 3 + Math.floor(rng() * 6);
+        const extent = Math.floor(GRID * (0.2 + rng() * 0.25));
         const horiz = rng() < 0.7;
         const vert = rng() < 0.7;
         for (let i = -extent; i <= extent; i += spacing) {
@@ -5185,19 +5250,97 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Starburst — explosive lines from center
-    function seedStarburst(cx, cy, sym) {
-        const numRays = 5 + Math.floor(rng() * 12);
-        const length = GRID * (0.2 + rng() * 0.3);
-        const dotted = rng() < 0.4;
-        for (let r = 0; r < numRays; r++) {
-            const angle = (r / numRays) * Math.PI * 2 + rng() * 0.1;
-            for (let t = 0; t < length; t += (dotted ? 2 + Math.floor(rng()*3) : 0.5)) {
-                const bx = Math.floor(cx + Math.cos(angle) * t);
-                const by = Math.floor(cy + Math.sin(angle) * t);
-                for (const [px,py] of mirrorPoints(bx, by, cx, cy, sym)) setPixel(px,py);
+    // 11. Scattered symmetric dots
+    function seedDots(cx, cy, sym) {
+        const count = 30 + Math.floor(rng() * 100);
+        const spread = GRID * (0.2 + rng() * 0.25);
+        for (let i = 0; i < count; i++) {
+            const dx = Math.floor((rng() - 0.5) * spread * 2);
+            const dy = Math.floor((rng() - 0.5) * spread * 2);
+            for (const [px,py] of mirrorPoints(cx+dx, cy+dy, cx, cy, sym)) setPixel(px,py);
+            if (rng() < 0.4) {
+                for (const [px,py] of mirrorPoints(cx+dx+1, cy+dy, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx+dx, cy+dy+1, cx, cy, sym)) setPixel(px,py);
             }
         }
+    }
+
+    // 12. Parabola / quadratic curves
+    function seedParabola(cx, cy, sym) {
+        const numCurves = 1 + Math.floor(rng() * 3);
+        const spread = 0.02 + rng() * 0.06;
+        for (let c = 0; c < numCurves; c++) {
+            const k = spread * (1 + c * 0.5);
+            const offset = Math.floor((rng() - 0.5) * GRID * 0.15);
+            for (let t = -GRID/2; t < GRID/2; t++) {
+                const x = t;
+                const y = Math.floor(k * t * t) + offset;
+                if (Math.abs(y) > GRID/2) continue;
+                for (const [px,py] of mirrorPoints(cx+x, cy+y, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // 13. Diamond / rhombus outlines
+    function seedDiamonds(cx, cy, sym) {
+        const num = 2 + Math.floor(rng() * 4);
+        const maxR = Math.floor(GRID * (0.15 + rng() * 0.2));
+        for (let d = 0; d < num; d++) {
+            const r = Math.floor(maxR * (d + 1) / num);
+            for (let t = 0; t < r; t++) {
+                for (const [px,py] of mirrorPoints(cx+t, cy+r-t, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx-t, cy+r-t, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx+t, cy-r+t, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx-t, cy-r+t, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // 14. Weave / diagonal hatching
+    function seedWeave(cx, cy, sym) {
+        const spacing = 3 + Math.floor(rng() * 5);
+        const extent = Math.floor(GRID * (0.2 + rng() * 0.25));
+        for (let i = -extent; i < extent; i += spacing) {
+            for (let t = -extent; t < extent; t++) {
+                for (const [px,py] of mirrorPoints(cx+i+t, cy+t, cx, cy, sym)) setPixel(px,py);
+                if (rng() < 0.5)
+                    for (const [px,py] of mirrorPoints(cx+i+t, cy-t, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // 15. Ring arcs (partial circles)
+    function seedArcs(cx, cy, sym) {
+        const n = 3 + Math.floor(rng() * 6);
+        for (let r = 0; r < n; r++) {
+            const radius = 4 + r * (GRID * 0.35 / n) * (0.7 + rng() * 0.6);
+            const arcStart = rng() * Math.PI * 2;
+            const arcLen = Math.PI * (0.4 + rng() * 1.5);
+            const steps = Math.max(10, Math.floor(radius * 4));
+            for (let s = 0; s < steps; s++) {
+                const a = arcStart + (s / steps) * arcLen;
+                const bx = Math.floor(cx + Math.cos(a) * radius);
+                const by = Math.floor(cy + Math.sin(a) * radius);
+                for (const [px,py] of mirrorPoints(bx,by,cx,cy,sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // 16. Fractal-like nested pattern (Sierpinski-ish)
+    function seedFractal(cx, cy, sym) {
+        const depth = 3 + Math.floor(rng() * 3);
+        const baseSize = Math.floor(GRID * 0.35);
+        function place(x, y, sz, d) {
+            if (d <= 0 || sz < 2) {
+                for (const [px,py] of mirrorPoints(x, y, cx, cy, sym)) setPixel(px,py);
+                return;
+            }
+            const half = Math.floor(sz / 2);
+            place(x - half, y - half, half, d-1);
+            place(x + half, y - half, half, d-1);
+            place(x, y + half, half, d-1);
+        }
+        place(cx, cy - Math.floor(baseSize * 0.3), baseSize, depth);
     }
 
     // === INIT GRID ===
@@ -5208,9 +5351,10 @@ window.addEventListener('DOMContentLoaded', () => {
         generation = 0;
 
         const cx = Math.floor(GRID / 2), cy = Math.floor(GRID / 2);
-        const symTypes = ['vertical','horizontal','quad','diagonal','octal','radial6','none'];
-        // Bias toward high-symmetry for more mandala-like results
-        const symWeights = [1, 1, 3, 1, 4, 3, 0.5];
+
+        // Symmetry types with weights — bias toward visually rich symmetries
+        const symTypes = ['vertical','horizontal','quad','diagonal','octal','radial6','radial8','radial12','none'];
+        const symWeights = [1, 1, 3, 1, 5, 3, 4, 2, 0.3];
         let total = symWeights.reduce((a,b) => a+b, 0);
         let roll = rng() * total;
         let symIdx = 0;
@@ -5220,20 +5364,28 @@ window.addEventListener('DOMContentLoaded', () => {
         const symType = symTypes[symIdx];
         currentSymType = symType;
 
-        const seedGens = [seedLines, seedCross, seedRings, seedSpiral, seedWeave, seedDots, seedMesh, seedStarburst];
-        const idx1 = Math.floor(rng() * seedGens.length);
-        const combo = rng() < 0.55; // higher combo rate for more complex seeds
-        const idx2 = Math.floor(rng() * seedGens.length);
+        // All seed generators
+        const seedGens = [
+            seedFullLines, seedDiagLines, seedFullCross, seedSineWave,
+            seedCircles, seedSquares, seedTriangles, seedSpiral,
+            seedStarburst, seedMesh, seedDots, seedParabola,
+            seedDiamonds, seedWeave, seedArcs, seedFractal,
+        ];
 
+        // Pick 1-2 seed generators
+        const idx1 = Math.floor(rng() * seedGens.length);
         seedGens[idx1](cx, cy, symType);
         currentSeedName = seedGens[idx1].name;
-        if (combo) {
+
+        // 60% chance of combining with a second seed
+        if (rng() < 0.60) {
+            const idx2 = Math.floor(rng() * seedGens.length);
             seedGens[idx2](cx, cy, symType);
             currentSeedName += '+' + seedGens[idx2].name;
         }
     }
 
-    // === GAME OF LIFE ===
+    // === RULE ENGINE ===
     function getCell(x, y) {
         x = ((x % GRID) + GRID) % GRID;
         y = ((y % GRID) + GRID) % GRID;
@@ -5241,23 +5393,54 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function step() {
+        const birthSet = currentRule.birth;
+        const surviveSet = currentRule.survive;
+        const maxState = currentRule.states;
+
         for (let y = 0; y < GRID; y++) {
             for (let x = 0; x < GRID; x++) {
                 let n = 0;
+                // Count only fully-alive neighbors (state === 1)
                 for (let dy = -1; dy <= 1; dy++)
                     for (let dx = -1; dx <= 1; dx++) {
                         if (dx === 0 && dy === 0) continue;
-                        if (getCell(x+dx, y+dy) > 0) n++;
+                        if (getCell(x+dx, y+dy) === 1) n++;
                     }
                 const idx = y * GRID + x;
-                if (grid[idx] > 0) {
-                    nextGrid[idx] = (n === 2 || n === 3) ? 1 : 0;
-                    if (nextGrid[idx]) ageGrid[idx] = Math.min(ageGrid[idx]+1, 500);
-                    else ageGrid[idx] = ageGrid[idx] > 0 ? -1 : 0;
+                const cell = grid[idx];
+
+                if (maxState === 2) {
+                    // Standard 2-state Life-like rule
+                    if (cell === 1) {
+                        nextGrid[idx] = surviveSet.includes(n) ? 1 : 0;
+                        if (nextGrid[idx]) ageGrid[idx] = Math.min(ageGrid[idx]+1, 500);
+                        else ageGrid[idx] = ageGrid[idx] > 0 ? -1 : 0;
+                    } else {
+                        nextGrid[idx] = birthSet.includes(n) ? 1 : 0;
+                        if (nextGrid[idx]) ageGrid[idx] = 1;
+                        else if (ageGrid[idx] < 0) ageGrid[idx] = Math.min(ageGrid[idx]+0.05, 0);
+                    }
                 } else {
-                    nextGrid[idx] = (n === 3) ? 1 : 0;
-                    if (nextGrid[idx]) ageGrid[idx] = 1;
-                    else if (ageGrid[idx] < 0) ageGrid[idx] = Math.min(ageGrid[idx]+0.05, 0);
+                    // Generations rule: 0=dead, 1=alive, 2..maxState-1=dying states
+                    if (cell === 0) {
+                        // Dead cell — can be born
+                        nextGrid[idx] = birthSet.includes(n) ? 1 : 0;
+                        if (nextGrid[idx]) ageGrid[idx] = 1;
+                        else if (ageGrid[idx] < 0) ageGrid[idx] = Math.min(ageGrid[idx]+0.03, 0);
+                    } else if (cell === 1) {
+                        // Alive — survive or start dying
+                        if (surviveSet.includes(n)) {
+                            nextGrid[idx] = 1;
+                            ageGrid[idx] = Math.min(ageGrid[idx]+1, 500);
+                        } else {
+                            nextGrid[idx] = maxState > 2 ? 2 : 0; // enter dying state
+                            ageGrid[idx] = ageGrid[idx] > 0 ? -0.5 : 0;
+                        }
+                    } else {
+                        // Dying state — advance toward death
+                        nextGrid[idx] = cell + 1 < maxState ? cell + 1 : 0;
+                        ageGrid[idx] = -(cell / maxState); // fade based on dying phase
+                    }
                 }
             }
         }
@@ -5274,18 +5457,32 @@ window.addEventListener('DOMContentLoaded', () => {
 
         for (let y = 0; y < GRID; y++) {
             for (let x = 0; x < GRID; x++) {
-                const age = ageGrid[y * GRID + x];
-                if (age > 0) {
+                const idx = y * GRID + x;
+                const age = ageGrid[idx];
+                const cell = grid[idx];
+
+                if (cell === 1) {
                     alive++;
-                    const ci = Math.min(Math.floor(age / 5), colors.length - 1);
+                    const ci = Math.min(Math.floor(age / 4), colors.length - 1);
                     ctx.fillStyle = colors[ci];
                     ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-                } else if (age < 0) {
-                    const alpha = Math.max(0, -age * 0.3);
-                    ctx.fillStyle = colors[0];
-                    ctx.globalAlpha = alpha;
+                } else if (cell > 1 && currentRule.states > 2) {
+                    // Dying cells in Generations rules — show in dimmer color
+                    const phase = cell / currentRule.states;
+                    const ci = Math.min(Math.floor(phase * 4), colors.length - 1);
+                    ctx.globalAlpha = 0.7 - phase * 0.5;
+                    ctx.fillStyle = colors[ci];
                     ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                     ctx.globalAlpha = 1;
+                } else if (age < 0) {
+                    // Recently dead cells — ghost trail
+                    const alpha = Math.max(0, -age * 0.25);
+                    if (alpha > 0.01) {
+                        ctx.fillStyle = colors[0];
+                        ctx.globalAlpha = alpha;
+                        ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        ctx.globalAlpha = 1;
+                    }
                 }
             }
         }
@@ -5298,7 +5495,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (genEl) genEl.textContent = generation;
         if (cellsEl) cellsEl.textContent = alive;
         if (seedEl) seedEl.textContent = seed.toString(16).toUpperCase();
-        if (modeEl) modeEl.textContent = currentSymType + '/' + palette.name;
+        if (modeEl) modeEl.textContent = currentRule.name + '/' + currentSymType + '/' + palette.name;
     }
 
     // === RESIZE / SYNC ===
@@ -5308,8 +5505,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const w = container.clientWidth;
         const h = container.clientHeight;
         const dim = Math.min(w, h);
-        // Wider range of grid sizes for more variety
-        const gridOptions = [48, 64, 80, 96, 112, 128];
+        // Bigger grids for more complex patterns
+        const gridOptions = [64, 80, 96, 112, 128, 144, 160];
         GRID = gridOptions[Math.floor(rng() * gridOptions.length)];
         CELL_SIZE = Math.max(1, Math.floor(dim / GRID));
         canvas.width = GRID * CELL_SIZE;
@@ -5319,9 +5516,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function syncStart() {
         const now = Date.now();
-        seed = Math.floor(now / CYCLE_MS) + SESSION_SALT; // unique per page load
+        seed = Math.floor(now / CYCLE_MS) + SESSION_SALT;
         rng = createRNG(seed * 2654435761);
         palette = COLORS[Math.abs(seed) % COLORS.length];
+
+        // Pick a rule — weighted: Life/HighLife most common, others for variety
+        const ruleWeights = [4, 3, 2, 2, 2, 2, 1.5, 1.5, 1.5, 2, 1, 1];
+        let rTotal = ruleWeights.reduce((a,b)=>a+b, 0);
+        let rRoll = rng() * rTotal;
+        let rIdx = 0;
+        for (let i = 0; i < ruleWeights.length; i++) {
+            rRoll -= ruleWeights[i]; if (rRoll <= 0) { rIdx = i; break; }
+        }
+        currentRule = RULES[rIdx];
 
         resize();
         if (!GRID) { setTimeout(syncStart, 100); return; }
@@ -5329,10 +5536,10 @@ window.addEventListener('DOMContentLoaded', () => {
         draw();
     }
 
-    // main loop — throttled for visible evolution, faster on bigger grids
+    // main loop
     let lastSeed = 0;
     let lastStepTime = 0;
-    const STEP_INTERVAL = 150; // ms between steps (~6.6 fps)
+    const STEP_INTERVAL = 120; // ms between steps (~8 fps)
     let staleCounter = 0;
     let prevAlive = 0;
 
@@ -5345,21 +5552,22 @@ window.addEventListener('DOMContentLoaded', () => {
                 syncStart();
             } else if (ts - lastStepTime >= STEP_INTERVAL) {
                 lastStepTime = ts;
-                // More steps per tick on bigger grids
-                const stepsPerTick = GRID > 96 ? 3 : GRID > 64 ? 2 : 1;
+                const stepsPerTick = GRID > 120 ? 3 : GRID > 80 ? 2 : 1;
                 for (let s = 0; s < stepsPerTick; s++) step();
                 draw();
 
-                // Count alive cells — if pattern is dead/stuck, restart sooner
+                // Count alive cells — restart if dead or stuck
                 let alive = 0;
-                for (let i = 0; i < GRID * GRID; i++) if (grid[i]) alive++;
+                for (let i = 0; i < GRID * GRID; i++) if (grid[i] === 1) alive++;
                 if (alive === prevAlive) staleCounter++;
                 else staleCounter = 0;
                 prevAlive = alive;
 
-                // Restart if dead (<5 cells) or stuck for 50 frames (~10s)
-                if (alive < 5 || staleCounter > 50) {
+                // Dead (<3 cells) or stuck for 40 frames — restart with fresh seed
+                if (alive < 3 || staleCounter > 40) {
                     staleCounter = 0;
+                    // Bump seed to get a different pattern
+                    SESSION_SALT++;
                     syncStart();
                 }
             }
