@@ -771,12 +771,11 @@
                         <span>[AGENT_PET]</span>
                         <span><span class="status-online active" id="pet-status"></span><span id="pet-mood">IDLE</span></span>
                     </div>
-                    <div class="h-40 terminal-border relative" id="pet-feed" style="background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                        <!-- ZZZ sleep bubbles -->
-                        <div id="pet-zzz" style="display:none;position:absolute;top:10px;right:20px;font-family:'Share Tech Mono',monospace;font-size:14px;color:#00ff00;opacity:0.7;animation:petZzz 2s ease-in-out infinite;">z z z</div>
-                        <!-- Pet sprite (real frames) -->
+                    <div class="h-40 terminal-border relative" id="pet-feed" style="background:#000;position:relative;overflow:hidden;">
+                        <!-- (zzz removed) -->
+                        <!-- Pet sprite (roaming) -->
                         <img id="pet-sprite-img" src="pet/newpetseq/stay/IMG_6072.PNG" alt="agent pet"
-                            style="image-rendering:pixelated;image-rendering:crisp-edges;width:100px;height:100px;">
+                            style="image-rendering:pixelated;image-rendering:crisp-edges;width:48px;height:48px;position:absolute;bottom:4px;left:50%;transform:translateX(-50%);z-index:2;">
                     </div>
                     <div class="pixel-font text-xs mt-2" style="color:#003300;">
                         <span id="pet-state-label">// idle</span>
@@ -3655,15 +3654,37 @@ function divCountUp(el, target, duration) {
     }, step);
 }
 
+// ── Shared log color palette: saturated rotating colors ──
+const FEED_LOG_COLORS = [
+    '#00ff00', // green
+    '#00ccff', // blue / cyan
+    '#aa66ff', // purple
+    '#ff66aa', // pink
+    '#ffaa77', // peach
+    '#00ffcc', // turquoise
+    '#888888', // gray
+    '#66ff66', // light green
+    '#6699ff', // medium blue
+    '#cc66ff', // violet
+    '#ff88cc', // rose
+    '#ffcc88', // light peach
+    '#44ffdd', // aqua
+    '#aaaaaa', // light gray
+];
+
+let divLogColorIdx = 0;
 function divAddLog(text, cls) {
     const log = document.getElementById('div-log-content');
     if (!log) return;
     const line = document.createElement('div');
-    line.className = 'log-line ' + (cls || 'log-dim');
+    line.className = 'log-line';
+    const color = FEED_LOG_COLORS[divLogColorIdx % FEED_LOG_COLORS.length];
+    divLogColorIdx++;
+    line.style.color = color;
+    line.style.textShadow = '0 0 6px ' + color + '66';
     line.textContent = text;
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
-    // keep max 60 lines
     while (log.children.length > 60) log.removeChild(log.firstChild);
 }
 
@@ -3801,11 +3822,18 @@ window.addEventListener('DOMContentLoaded', () => {
 let spiderFeedData = null;
 let spiderFeedShownEvents = new Set();
 
+let feedLogColorIdx = 0;
+
 function feedAddLog(text, cls) {
     const log = document.getElementById('feed-log-content');
     if (!log) return;
     const line = document.createElement('div');
-    line.className = 'log-line ' + (cls || 'log-dim');
+    line.className = 'log-line';
+    // Assign rotating color instead of class-based coloring
+    const color = FEED_LOG_COLORS[feedLogColorIdx % FEED_LOG_COLORS.length];
+    feedLogColorIdx++;
+    line.style.color = color;
+    line.style.textShadow = '0 0 6px ' + color + '66';
     line.textContent = text;
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
@@ -3904,12 +3932,22 @@ function feedUpdateDisplay(data) {
 
         // Add oldest-first so log reads top→bottom chronologically
         toAdd.reverse().forEach(ev => {
-            const isHot  = (ev.event || '').toLowerCase().includes('hot');
-            const isErr  = (ev.event || '').startsWith('[ERR]') || (ev.event || '').startsWith('[!]');
-            const isScan = (ev.event || '').toLowerCase().includes('scan') ||
-                           (ev.event || '').toLowerCase().includes('sector');
-            const cls = isHot ? 'log-success' : isErr ? 'log-warning' : isScan ? 'log-action' : 'log-dim';
-            feedAddLog(`> [${ev.time}] ${ev.event}`, cls);
+            // Sanitize: redact brand names, emails, URLs from brand_finder events
+            let text = ev.event || '';
+            if (text.includes('[brand_finder]') || text.includes('Found email')) {
+                // Replace real names/emails/URLs with cryptic spider-speak
+                text = text
+                    .replace(/Found email for \w[\w\s-]*:/g, 'Signal lock on target:')
+                    .replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, '[REDACTED]')
+                    .replace(/via [\w\s]+:\s*"[^"]*"/g, 'via deep scan')
+                    .replace(/via [\w\s/]+\)/g, 'via web trace)')
+                    .replace(/\[brand_finder\]\s*/g, '')
+                    .replace(/Niche '[\w\s]+'/g, 'Sector sweep')
+                    .replace(/\d+ leads/g, (m) => m) // keep lead count
+                    .replace(/returned \d+/g, 'signal blocked')
+                    .replace(/https?:\/\/[^\s)]+/g, '[...]');
+            }
+            feedAddLog(`> [${ev.time}] ${text}`);
         });
 
         // Pet reacts to new spider events
@@ -4593,9 +4631,8 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchSpiderFeed, 2 * 60 * 1000); // re-fetch every 2 min
 });
 
-// ==================== SPRITE PET (v2 — real pet frames) ====================
+// ==================== SPRITE PET (v3 — roaming physics) ====================
 (function() {
-    // Frame definitions — real pet sprites from newpetseq
     const FRAMES = {
         stay: [
             'pet/newpetseq/stay/IMG_6072.PNG',
@@ -4621,158 +4658,345 @@ window.addEventListener('DOMContentLoaded', () => {
             'pet/newpetseq/transformation/IMG_6086.PNG',
         ],
     };
-
-    // Timing (ms per frame)
     const TIMING = { stay: 300, go: 100, sleep: 600, transformation: 400 };
 
-    // Preload all frames
-    const preloadCache = {};
-    for (const key of Object.keys(FRAMES)) {
-        for (const src of FRAMES[key]) {
-            const img = new Image(); img.src = src;
-            preloadCache[src] = img;
-        }
-    }
+    // Preload
+    for (const key of Object.keys(FRAMES))
+        for (const src of FRAMES[key]) { const i = new Image(); i.src = src; }
 
-    // State
-    let currentAnim = 'stay';
-    let frameIdx = 0;
-    let animTimer = null;
-    let petTimer = null;
-    let petSleeping = false;
+    // DOM
+    const petImg  = document.getElementById('pet-sprite-img');
+    const moodEl  = document.getElementById('pet-mood');
+    const stateEl = document.getElementById('pet-state-label');
+    const eventEl = document.getElementById('pet-event-label');
+    const zzzEl   = document.getElementById('pet-zzz');
+    const feedEl  = document.getElementById('pet-feed');
+    if (!petImg || !feedEl) return;
 
-    const petImg   = document.getElementById('pet-sprite-img');
-    const moodEl   = document.getElementById('pet-mood');
-    const stateEl  = document.getElementById('pet-state-label');
-    const eventEl  = document.getElementById('pet-event-label');
-    const zzzEl    = document.getElementById('pet-zzz');
-    const feedEl   = document.getElementById('pet-feed');
-
-    if (!petImg) return;
-
-    function setMood(text)  { if (moodEl) moodEl.textContent = text; }
-    function setState(text) { if (stateEl) stateEl.textContent = '// ' + text; }
-    function setEvent(text) {
-        if (!eventEl) return;
-        eventEl.textContent = text;
-        if (text) setTimeout(() => { eventEl.textContent = ''; }, 4000);
-    }
+    // ── Sprite animation ──
+    let currentAnim = 'stay', frameIdx = 0, animTimer = null;
 
     function startAnim(name) {
-        if (animTimer) { clearInterval(animTimer); animTimer = null; }
-        currentAnim = name;
-        frameIdx = 0;
-        const frames = FRAMES[name];
-        if (!frames || !frames.length) return;
-        petImg.src = frames[0];
-        if (frames.length > 1) {
-            animTimer = setInterval(() => {
-                frameIdx = (frameIdx + 1) % frames.length;
-                petImg.src = frames[frameIdx];
-            }, TIMING[name] || 300);
-        }
+        if (animTimer) clearInterval(animTimer);
+        currentAnim = name; frameIdx = 0;
+        const f = FRAMES[name]; if (!f || !f.length) return;
+        petImg.src = f[0];
+        if (f.length > 1)
+            animTimer = setInterval(() => { frameIdx = (frameIdx+1)%f.length; petImg.src = f[frameIdx]; }, TIMING[name]||300);
+    }
+    function stopAnim() { if (animTimer) { clearInterval(animTimer); animTimer = null; } }
+
+    // ── Helpers ──
+    function setMood(t)  { if (moodEl) moodEl.textContent = t; }
+    function setState(t) { if (stateEl) stateEl.textContent = '// ' + t; }
+    function setEvent(t) { if (!eventEl) return; eventEl.textContent = t; if (t) setTimeout(()=>{ eventEl.textContent=''; },4000); }
+
+    // ── Physics state ──
+    const PET_W = 48, PET_H = 48;
+    let px = 0, py = 0;        // position (px from top-left of container)
+    let vx = 0, vy = 0;        // velocity
+    let rotation = 0;           // degrees
+    let surface = 'floor';      // floor / left-wall / right-wall / ceiling
+    let petSleeping = false;
+    let behaviorTimer = null;
+    let physicsRAF = null;
+    let lastPhysicsTime = 0;
+
+    // Container dimensions
+    function boxW() { return feedEl.clientWidth; }
+    function boxH() { return feedEl.clientHeight; }
+
+    // Init position: center floor
+    function initPos() {
+        px = (boxW() - PET_W) / 2;
+        py = boxH() - PET_H - 2;
+        rotation = 0;
+        surface = 'floor';
+        applyTransform();
     }
 
-    function stopAnim() {
-        if (animTimer) { clearInterval(animTimer); animTimer = null; }
+    function applyTransform() {
+        petImg.style.left = px + 'px';
+        petImg.style.top = py + 'px';
+        petImg.style.bottom = 'auto';
+        petImg.style.transform = 'rotate(' + rotation + 'deg)' + (vx < -0.3 ? ' scaleX(-1)' : '');
     }
 
-    // ── Idle loop: stay 4s → go 3s → stay 5s → repeat ──
-    function runIdleLoop() {
+    // ── BEHAVIORS ──
+
+    // Walk along floor
+    function walkFloor(dir, duration) {
+        const speed = 40 + Math.random() * 30; // px/s
+        vx = dir * speed;
+        vy = 0;
+        surface = 'floor';
+        rotation = 0;
+        startAnim('go');
+        setState('roaming...');
+        return new Promise(r => behaviorTimer = setTimeout(r, duration));
+    }
+
+    // Climb wall (left=-1, right=1)
+    function climbWall(side) {
+        surface = side < 0 ? 'left-wall' : 'right-wall';
+        const speed = 25 + Math.random() * 20;
+        vx = 0;
+        vy = -speed; // climb up
+        rotation = side < 0 ? -90 : 90;
+        if (side < 0) { px = 2; }
+        else { px = boxW() - PET_W - 2; }
+        startAnim('go');
+        setState('climbing!');
+        const dur = 1500 + Math.random() * 2500;
+        return new Promise(r => behaviorTimer = setTimeout(r, dur));
+    }
+
+    // Walk on ceiling
+    function walkCeiling(dir, duration) {
+        surface = 'ceiling';
+        py = 2;
+        rotation = 180;
+        vx = dir * (30 + Math.random() * 25);
+        vy = 0;
+        startAnim('go');
+        setState('ceiling walk!');
+        return new Promise(r => behaviorTimer = setTimeout(r, duration));
+    }
+
+    // Jump
+    function jump() {
+        startAnim('transformation');
+        setState('JUMP!');
+        setMood('!!');
+        const jumpVy = -(120 + Math.random() * 60);
+        const jumpVx = (Math.random() - 0.5) * 80;
+        vx = jumpVx;
+        vy = jumpVy;
+        surface = 'air';
+        rotation = 0;
+        return new Promise(resolve => {
+            const checkLand = setInterval(() => {
+                if (surface === 'floor') {
+                    clearInterval(checkLand);
+                    setMood('IDLE');
+                    resolve();
+                }
+            }, 50);
+            // Safety timeout
+            behaviorTimer = setTimeout(() => { clearInterval(checkLand); surface='floor'; py=boxH()-PET_H-2; vy=0; rotation=0; resolve(); }, 3000);
+        });
+    }
+
+    // Run in rectangles (hamster wheel style — laps around the box perimeter)
+    function runLaps(numLaps) {
+        setState('ZOOMIES!');
+        setMood('!!!');
+        startAnim('go');
+        const speed = 100; // px/s fast!
+        let lap = 0;
+
+        return new Promise(resolve => {
+            async function doLap() {
+                if (lap >= numLaps) { resolve(); return; }
+                const W = boxW(), H = boxH();
+
+                // floor → right
+                vx = speed; vy = 0; rotation = 0; surface = 'floor'; py = H - PET_H - 2;
+                await waitUntil(() => px >= W - PET_W - 4, 40);
+
+                // right wall → up
+                px = W - PET_W - 2; vx = 0; vy = -speed; rotation = 90; surface = 'right-wall';
+                await waitUntil(() => py <= 4, 40);
+
+                // ceiling → left
+                py = 2; vx = -speed; vy = 0; rotation = 180; surface = 'ceiling';
+                await waitUntil(() => px <= 4, 40);
+
+                // left wall → down
+                px = 2; vx = 0; vy = speed; rotation = -90; surface = 'left-wall';
+                await waitUntil(() => py >= H - PET_H - 4, 40);
+
+                py = H - PET_H - 2; rotation = 0; surface = 'floor';
+                lap++;
+                doLap();
+            }
+            doLap();
+            // Safety
+            behaviorTimer = setTimeout(resolve, numLaps * 6000);
+        });
+    }
+
+    function waitUntil(condFn, interval) {
+        return new Promise(r => {
+            const check = setInterval(() => {
+                if (condFn()) { clearInterval(check); r(); }
+            }, interval);
+            setTimeout(() => { clearInterval(check); r(); }, 5000);
+        });
+    }
+
+    // Idle: stay in place
+    function idle(duration) {
+        vx = 0; vy = 0;
         startAnim('stay');
         setState('idle');
         setMood('IDLE');
-
-        petTimer = setTimeout(() => {
-            // Walk for a bit
-            startAnim('go');
-            setState('roaming...');
-
-            petTimer = setTimeout(() => {
-                // Back to stay
-                startAnim('stay');
-                setState('idle');
-
-                petTimer = setTimeout(runIdleLoop, 4000 + Math.random() * 3000);
-            }, 2000 + Math.random() * 2000);
-        }, 3000 + Math.random() * 4000);
+        return new Promise(r => behaviorTimer = setTimeout(r, duration));
     }
 
+    // ── PHYSICS LOOP (60fps) ──
+    const GRAVITY = 200; // px/s²
+
+    function physicsStep(dt) {
+        if (petSleeping) return;
+        if (dt > 0.1) dt = 0.1; // clamp
+
+        // Gravity in air
+        if (surface === 'air') {
+            vy += GRAVITY * dt;
+        }
+
+        px += vx * dt;
+        py += vy * dt;
+
+        const W = boxW(), H = boxH();
+
+        // Floor collision
+        if (py > H - PET_H - 2) {
+            py = H - PET_H - 2;
+            if (surface === 'air') { vy = 0; vx *= 0.5; surface = 'floor'; rotation = 0; }
+        }
+        // Ceiling
+        if (py < 2) {
+            py = 2;
+            if (surface === 'air') { vy = 0; surface = 'floor'; py = H - PET_H - 2; rotation = 0; }
+        }
+        // Left wall
+        if (px < 2) {
+            px = 2;
+            if (surface === 'floor' && vx < 0) vx = 0;
+        }
+        // Right wall
+        if (px > W - PET_W - 2) {
+            px = W - PET_W - 2;
+            if (surface === 'floor' && vx > 0) vx = 0;
+        }
+
+        applyTransform();
+    }
+
+    function physicsLoop(ts) {
+        const dt = lastPhysicsTime ? (ts - lastPhysicsTime) / 1000 : 0.016;
+        lastPhysicsTime = ts;
+        physicsStep(dt);
+        physicsRAF = requestAnimationFrame(physicsLoop);
+    }
+
+    // ── BEHAVIOR SEQUENCE ──
+    async function behaviorLoop() {
+        while (!petSleeping) {
+            // Pick a random behavior
+            const roll = Math.random();
+            if (roll < 0.30) {
+                // Walk left or right
+                const dir = Math.random() < 0.5 ? -1 : 1;
+                await walkFloor(dir, 2000 + Math.random() * 3000);
+                vx = 0;
+            } else if (roll < 0.45) {
+                // Jump!
+                await jump();
+            } else if (roll < 0.58) {
+                // Climb left wall
+                await climbWall(-1);
+                // Walk ceiling
+                await walkCeiling(1, 1500 + Math.random() * 2000);
+                // Drop down
+                surface = 'air'; vy = 0; rotation = 0;
+                await new Promise(r => behaviorTimer = setTimeout(r, 800));
+            } else if (roll < 0.71) {
+                // Climb right wall
+                await climbWall(1);
+                await walkCeiling(-1, 1500 + Math.random() * 2000);
+                surface = 'air'; vy = 0; rotation = 0;
+                await new Promise(r => behaviorTimer = setTimeout(r, 800));
+            } else if (roll < 0.82) {
+                // ZOOMIES — run laps!
+                await runLaps(1 + Math.floor(Math.random() * 3));
+                vx = 0; vy = 0;
+            } else {
+                // Idle
+                await idle(3000 + Math.random() * 4000);
+            }
+            // Brief pause between behaviors
+            if (!petSleeping) {
+                vx = 0; vy = 0;
+                startAnim('stay');
+                await new Promise(r => behaviorTimer = setTimeout(r, 800 + Math.random() * 1500));
+            }
+        }
+    }
+
+    // ── SLEEP / WAKE ──
     function clearTimers() {
         stopAnim();
-        if (petTimer) { clearTimeout(petTimer); petTimer = null; }
+        if (behaviorTimer) { clearTimeout(behaviorTimer); behaviorTimer = null; }
     }
 
-    // ── Pet sleep/wake (synced with spider) ──
     function petGoToSleep() {
         if (petSleeping) return;
         petSleeping = true;
         clearTimers();
+        vx = 0; vy = 0;
+        // Move to floor center for sleep
+        surface = 'floor';
+        rotation = 0;
+        px = (boxW() - PET_W) / 2;
+        py = boxH() - PET_H - 2;
+        applyTransform();
 
         startAnim('sleep');
         setMood('SLEEPING');
         setState('sleeping~');
-        if (zzzEl) zzzEl.style.display = 'block';
-        petImg.style.opacity = '0.6';
-
-        console.log('[Pet] Going to sleep (spider is sleeping)');
+        console.log('[Pet] Going to sleep');
     }
 
     function petWakeUp() {
         if (!petSleeping) return;
         petSleeping = false;
-
-        if (zzzEl) zzzEl.style.display = 'none';
-        petImg.style.opacity = '1';
-
         setMood('IDLE');
         setState('waking up!');
         setEvent('spider is active');
 
-        // Play transformation as wake-up effect, then resume idle loop
         startAnim('transformation');
-        petTimer = setTimeout(() => {
-            runIdleLoop();
+        setTimeout(() => {
+            if (!petSleeping) behaviorLoop();
         }, TIMING.transformation * FRAMES.transformation.length);
-
-        console.log('[Pet] Waking up (spider is active)');
+        console.log('[Pet] Waking up');
     }
 
-    // Expose globally
+    // ── GLOBALS ──
     window.petGoToSleep = petGoToSleep;
     window.petWakeUp = petWakeUp;
-
-    // ── Public trigger (called from feed monitors) ──
-    window.triggerPetAnimation = function(type, duration) {
+    window.triggerPetAnimation = function(type, dur) {
         if (petSleeping) return;
         clearTimers();
-
         if (type === 'waving' || type === 'excited-bounce') {
-            startAnim('go');
-            setState('excited!');
+            jump().then(() => { if (!petSleeping) behaviorLoop(); });
             setEvent(type === 'waving' ? '* HOT LEAD' : '> scan done');
             setMood('HOT!');
-            petTimer = setTimeout(() => {
-                setMood('IDLE');
-                runIdleLoop();
-            }, duration || 2500);
         } else if (type === 'nervous') {
-            startAnim('sleep');
-            setState('nervous');
-            setEvent('signal lost');
-            setMood('???');
-            petTimer = setTimeout(() => {
-                setMood('IDLE');
-                runIdleLoop();
-            }, duration || 3000);
+            startAnim('sleep'); setState('nervous'); setEvent('signal lost'); setMood('???');
+            behaviorTimer = setTimeout(() => { setMood('IDLE'); if(!petSleeping) behaviorLoop(); }, dur||3000);
         }
     };
-
     window.petIsAwake = true;
 
-    // Start — begin in sleep mode (spider status will wake us up if needed)
+    // ── INIT ──
+    initPos();
+    petImg.style.position = 'absolute';
+    physicsRAF = requestAnimationFrame(physicsLoop);
     petGoToSleep();
-    console.log('[Pet] v2 initialized (real sprites)');
+    console.log('[Pet] v3 initialized (roaming physics)');
 })();
 
 </script>
@@ -4788,17 +5012,22 @@ window.addEventListener('DOMContentLoaded', () => {
 <!-- GoL Mandala v0.2 — Symmetric seed patterns with age coloring -->
 <script>
 (function() {
-    const CYCLE_MS = 3 * 60 * 1000; // new seed every 3 minutes
+    const CYCLE_MS = 90 * 1000; // new seed every 90 seconds for more variety
+    const SESSION_SALT = Math.floor(Math.random() * 999999); // unique per page load
 
-    // === GoL MANDALA v0.2 — adapted for stream panel ===
-    // Symmetric seed patterns, age-based coloring, trail effects
+    // === GoL MANDALA v0.3 — diverse seeds, more colors ===
 
     const COLORS = [
-        { name: 'GREEN', ages: ['#001a00','#003300','#005500','#008800','#00aa00','#00cc00','#00ff00','#33ff33','#66ff66','#99ff99'] },
-        { name: 'RED',   ages: ['#1a0000','#330000','#550000','#880000','#aa0000','#cc0000','#ff0000','#ff3333','#ff6666','#ff9999'] },
-        { name: 'BLUE',  ages: ['#00001a','#000033','#000055','#000088','#0000aa','#0033cc','#0055ff','#3388ff','#66aaff','#99ccff'] },
-        { name: 'CYAN',  ages: ['#001a1a','#003333','#005555','#008888','#00aaaa','#00cccc','#00ffff','#33ffff','#66ffff','#99ffff'] },
-        { name: 'GOLD',  ages: ['#1a1a00','#333300','#555500','#888800','#aaaa00','#cccc00','#ffff00','#ffff33','#ffff66','#ffff99'] },
+        { name: 'GREEN',   ages: ['#001a00','#003300','#005500','#008800','#00aa00','#00cc00','#00ff00','#33ff33','#66ff66','#99ff99'] },
+        { name: 'RED',     ages: ['#1a0000','#330000','#550000','#880000','#aa0000','#cc0000','#ff0000','#ff3333','#ff6666','#ff9999'] },
+        { name: 'BLUE',    ages: ['#00001a','#000033','#000055','#000088','#0000aa','#0033cc','#0055ff','#3388ff','#66aaff','#99ccff'] },
+        { name: 'CYAN',    ages: ['#001a1a','#003333','#005555','#008888','#00aaaa','#00cccc','#00ffff','#33ffff','#66ffff','#99ffff'] },
+        { name: 'GOLD',    ages: ['#1a1a00','#333300','#555500','#888800','#aaaa00','#cccc00','#ffff00','#ffff33','#ffff66','#ffff99'] },
+        { name: 'PINK',    ages: ['#1a0010','#330020','#550033','#882255','#aa3366','#cc4488','#ff66aa','#ff88bb','#ffaacc','#ffccdd'] },
+        { name: 'MAGENTA', ages: ['#1a001a','#330033','#550055','#880088','#aa00aa','#cc00cc','#ff00ff','#ff33ff','#ff66ff','#ff99ff'] },
+        { name: 'ORANGE',  ages: ['#1a0a00','#331500','#552200','#884400','#aa5500','#cc7700','#ff9900','#ffaa33','#ffbb66','#ffcc99'] },
+        { name: 'LIME',    ages: ['#0a1a00','#153300','#225500','#448800','#55aa00','#77cc00','#99ff00','#aaff33','#bbff66','#ccff99'] },
+        { name: 'CORAL',   ages: ['#1a0808','#331010','#552020','#884040','#aa5050','#cc6666','#ff8888','#ff9999','#ffaaaa','#ffbbbb'] },
     ];
 
     const canvas = document.getElementById('gol-canvas');
@@ -4924,6 +5153,53 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Scattered dots — creates chaotic but symmetric noise
+    function seedDots(cx, cy, sym) {
+        const count = 20 + Math.floor(rng() * 80);
+        const spread = GRID * (0.15 + rng() * 0.35);
+        for (let i = 0; i < count; i++) {
+            const dx = Math.floor((rng() - 0.5) * spread * 2);
+            const dy = Math.floor((rng() - 0.5) * spread * 2);
+            for (const [px,py] of mirrorPoints(cx+dx, cy+dy, cx, cy, sym)) setPixel(px,py);
+            // Sometimes place a small cluster
+            if (rng() < 0.3) {
+                for (const [px,py] of mirrorPoints(cx+dx+1, cy+dy, cx, cy, sym)) setPixel(px,py);
+                for (const [px,py] of mirrorPoints(cx+dx, cy+dy+1, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // Grid/mesh — creates structured patterns with lattice feel
+    function seedMesh(cx, cy, sym) {
+        const spacing = 3 + Math.floor(rng() * 5);
+        const extent = Math.floor(GRID * (0.1 + rng() * 0.3));
+        const horiz = rng() < 0.7;
+        const vert = rng() < 0.7;
+        for (let i = -extent; i <= extent; i += spacing) {
+            if (horiz) for (let t = -extent; t <= extent; t++) {
+                for (const [px,py] of mirrorPoints(cx+t, cy+i, cx, cy, sym)) setPixel(px,py);
+            }
+            if (vert) for (let t = -extent; t <= extent; t++) {
+                for (const [px,py] of mirrorPoints(cx+i, cy+t, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
+    // Starburst — explosive lines from center
+    function seedStarburst(cx, cy, sym) {
+        const numRays = 5 + Math.floor(rng() * 12);
+        const length = GRID * (0.2 + rng() * 0.3);
+        const dotted = rng() < 0.4;
+        for (let r = 0; r < numRays; r++) {
+            const angle = (r / numRays) * Math.PI * 2 + rng() * 0.1;
+            for (let t = 0; t < length; t += (dotted ? 2 + Math.floor(rng()*3) : 0.5)) {
+                const bx = Math.floor(cx + Math.cos(angle) * t);
+                const by = Math.floor(cy + Math.sin(angle) * t);
+                for (const [px,py] of mirrorPoints(bx, by, cx, cy, sym)) setPixel(px,py);
+            }
+        }
+    }
+
     // === INIT GRID ===
     function initGrid() {
         grid = new Uint8Array(GRID * GRID);
@@ -4933,12 +5209,20 @@ window.addEventListener('DOMContentLoaded', () => {
 
         const cx = Math.floor(GRID / 2), cy = Math.floor(GRID / 2);
         const symTypes = ['vertical','horizontal','quad','diagonal','octal','radial6','none'];
-        const symType = symTypes[Math.floor(rng() * symTypes.length)];
+        // Bias toward high-symmetry for more mandala-like results
+        const symWeights = [1, 1, 3, 1, 4, 3, 0.5];
+        let total = symWeights.reduce((a,b) => a+b, 0);
+        let roll = rng() * total;
+        let symIdx = 0;
+        for (let i = 0; i < symWeights.length; i++) {
+            roll -= symWeights[i]; if (roll <= 0) { symIdx = i; break; }
+        }
+        const symType = symTypes[symIdx];
         currentSymType = symType;
 
-        const seedGens = [seedLines, seedCross, seedRings, seedSpiral, seedWeave];
+        const seedGens = [seedLines, seedCross, seedRings, seedSpiral, seedWeave, seedDots, seedMesh, seedStarburst];
         const idx1 = Math.floor(rng() * seedGens.length);
-        const combo = rng() < 0.35;
+        const combo = rng() < 0.55; // higher combo rate for more complex seeds
         const idx2 = Math.floor(rng() * seedGens.length);
 
         seedGens[idx1](cx, cy, symType);
@@ -5024,21 +5308,20 @@ window.addEventListener('DOMContentLoaded', () => {
         const w = container.clientWidth;
         const h = container.clientHeight;
         const dim = Math.min(w, h);
-        // Pick grid size to fill panel nicely
-        const gridOptions = [48, 64, 80, 96];
+        // Wider range of grid sizes for more variety
+        const gridOptions = [48, 64, 80, 96, 112, 128];
         GRID = gridOptions[Math.floor(rng() * gridOptions.length)];
         CELL_SIZE = Math.max(1, Math.floor(dim / GRID));
         canvas.width = GRID * CELL_SIZE;
         canvas.height = GRID * CELL_SIZE;
-        // Center canvas in container
         canvas.style.margin = 'auto';
     }
 
     function syncStart() {
         const now = Date.now();
-        seed = Math.floor(now / CYCLE_MS);
-        rng = createRNG(seed * 2654435761); // hash the seed
-        palette = COLORS[seed % COLORS.length];
+        seed = Math.floor(now / CYCLE_MS) + SESSION_SALT; // unique per page load
+        rng = createRNG(seed * 2654435761);
+        palette = COLORS[Math.abs(seed) % COLORS.length];
 
         resize();
         if (!GRID) { setTimeout(syncStart, 100); return; }
@@ -5046,10 +5329,10 @@ window.addEventListener('DOMContentLoaded', () => {
         draw();
     }
 
-    // main loop — throttled to ~5 fps for visible evolution
+    // main loop — throttled for visible evolution, faster on bigger grids
     let lastSeed = 0;
     let lastStepTime = 0;
-    const STEP_INTERVAL = 200; // ms between steps (~5 fps)
+    const STEP_INTERVAL = 150; // ms between steps (~6.6 fps)
     let staleCounter = 0;
     let prevAlive = 0;
 
@@ -5062,7 +5345,9 @@ window.addEventListener('DOMContentLoaded', () => {
                 syncStart();
             } else if (ts - lastStepTime >= STEP_INTERVAL) {
                 lastStepTime = ts;
-                step();
+                // More steps per tick on bigger grids
+                const stepsPerTick = GRID > 96 ? 3 : GRID > 64 ? 2 : 1;
+                for (let s = 0; s < stepsPerTick; s++) step();
                 draw();
 
                 // Count alive cells — if pattern is dead/stuck, restart sooner
