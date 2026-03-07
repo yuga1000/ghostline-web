@@ -582,6 +582,18 @@ app.use((req, res, next) => {
   return next();
 });
 
+// --- Admin: debug env vars ---
+app.get('/api/admin/env-debug', (req, res) => {
+  const adminPw = req.headers['x-admin-password'] || req.query.password;
+  if (!ADMIN_PASSWORD || adminPw !== ADMIN_PASSWORD) {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+  const keys = Object.keys(process.env).filter(k => k.startsWith('SUPA') || k.startsWith('ADMIN') || k === 'PORT');
+  const masked = {};
+  keys.forEach(k => { const v = process.env[k] || ''; masked[k] = v ? v.slice(0,8) + '...' + v.slice(-4) : '(empty)'; });
+  res.json({ envKeys: keys, masked });
+});
+
 // --- Admin: sync portfolio PDF to Supabase Storage ---
 app.post('/api/admin/sync-portfolio', (req, res) => {
   const adminPw = req.headers['x-admin-password'] || req.query.password;
