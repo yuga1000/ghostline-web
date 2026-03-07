@@ -433,6 +433,26 @@ app.get('/api/test-deployment', (req, res) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════
+// Portfolio PDF upload (admin only, generated client-side in Ghostline OS style)
+// ═══════════════════════════════════════════════════════════════
+const PORTFOLIO_PATH = path.join(__dirname, 'YUGA_cv_portfolio.pdf');
+
+app.post('/api/upload-portfolio', requireAdmin, express.raw({ type: 'application/pdf', limit: '15mb' }), (req, res) => {
+  try {
+    if (!req.body || req.body.length === 0) {
+      return res.status(400).json({ error: 'No PDF data received' });
+    }
+    const sizeMB = (req.body.length / (1024 * 1024)).toFixed(1);
+    fs.writeFileSync(PORTFOLIO_PATH, req.body);
+    console.log(`[Portfolio] PDF updated: ${sizeMB} MB`);
+    res.json({ ok: true, size: sizeMB + ' MB' });
+  } catch (e) {
+    console.error('[Portfolio] Upload error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Hide admin entry under secret slug - show login form if not authenticated
 app.get(`/${ADMIN_SLUG}`, (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');

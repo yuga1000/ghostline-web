@@ -761,17 +761,13 @@ padding: 0.5rem;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-// =============================================
-// AUTO PORTFOLIO PDF GENERATOR
-// Triggered after every artwork save.
-// Builds PDF from all gallery images and
-// uploads to Supabase Storage as portfolio/portfolio.pdf
-// =============================================
-
-const PDF_STORAGE_PATH = 'portfolio/portfolio.pdf';
+// ═══════════════════════════════════════════════════════════
+// GHOSTLINE OS Portfolio PDF Generator (client-side jsPDF)
+// Style: black bg, green monospace, terminal aesthetic
+// Sends generated PDF to server for static hosting on Railway
+// ═══════════════════════════════════════════════════════════
 
 function showPdfToast(msg, state) {
-    // state: 'busy' | 'ok' | 'err'
     let el = document.getElementById('pdfToast');
     if (!el) {
         el = document.createElement('div');
@@ -806,13 +802,11 @@ async function blobToDataUrl(blob) {
     });
 }
 
-// Fetch images in parallel (max `concurrency` at a time)
 async function fetchAllImages(works, onProgress) {
     const results = new Array(works.length).fill(null);
     let done = 0;
     let idx  = 0;
     const CONCURRENCY = 6;
-
     async function worker() {
         while (idx < works.length) {
             const i = idx++;
@@ -822,7 +816,6 @@ async function fetchAllImages(works, onProgress) {
                 const blob = await resp.blob();
                 const dataUrl = await blobToDataUrl(blob);
                 const fmt = blob.type.includes('png') ? 'PNG' : 'JPEG';
-                // Get natural dimensions for aspect-ratio preserve
                 const dims = await new Promise(res => {
                     const img = new Image();
                     img.onload  = () => res({ w: img.naturalWidth, h: img.naturalHeight });
@@ -830,121 +823,385 @@ async function fetchAllImages(works, onProgress) {
                     img.src = dataUrl;
                 });
                 results[i] = { dataUrl, fmt, dims };
-            } catch(e) {
-                results[i] = null; // broken image — will be skipped
-            }
+            } catch(e) { results[i] = null; }
             done++;
             if (onProgress) onProgress(done, works.length);
         }
     }
-
     await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
     return results;
 }
 
+// ── Ghostline OS style constants ──
+const GL = {
+    GREEN:     [0, 255, 0],
+    DIM:       [0, 180, 0],
+    DARK:      [0, 100, 0],
+    VDARK:     [0, 60, 0],
+    BG:        [0, 0, 0],
+    BORDER:    [0, 150, 0],
+    SYS_MSGS: [
+        'human-machine handshake OK', 'render_engine v3.7 loaded',
+        'neural_bridge: connected', 'consciousness.dll linked',
+        'chaos_module initialized', 'ghostline protocol active',
+        'analog_input >> digital_output'
+    ],
+    PROMPTS: [
+        'yuga@ghostline:~/works$', 'ghost@line:~/output$',
+        'root@ghostline:/art$', 'yuga@studio:~/canvas$'
+    ],
+    pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
+    randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); },
+    sysHeader() {
+        const msg = this.pick(this.SYS_MSGS);
+        return { left: `[SYS] ${msg}`, right: `pid:${this.randInt(100,999)} | mem:${this.randInt(24,78)}%` };
+    },
+    loadingBar() {
+        const pct = this.pick([95, 96, 97, 98, 99]);
+        const filled = Math.floor(40 * pct / 100);
+        return `  loading [${'='.repeat(filled - 1)}>${' '.repeat(40 - filled)}] ${pct}%`;
+    }
+};
+
 async function generatePortfolioPDF() {
-    if (!window.jspdf || !window.supabaseAdmin) return;
+    if (!window.jspdf) return;
+    // Need either supabaseAdmin or local artworks
+    const hasSupabase = window.supabaseAdmin && window.supabaseAdmin.supabase;
 
     showPdfToast('starting...', 'busy');
 
     try {
         const { jsPDF } = window.jspdf;
 
-        // ── 1. Fetch all gallery works ──────────────────────
-        const { data: works, error } = await window.supabaseAdmin.supabase
-            .from('images')
-            .select('*')
-            .neq('category', 'lost-archive')
-            .neq('category', 'polaroid')
-            .order('created_at', { ascending: true });
-
-        if (error) throw error;
+        // ── 1. Fetch gallery works ──
+        let works;
+        if (hasSupabase) {
+            const { data, error } = await window.supabaseAdmin.supabase
+                .from('images').select('*')
+                .neq('category', 'lost-archive')
+                .neq('category', 'polaroid')
+                .order('created_at', { ascending: true });
+            if (error) throw error;
+            works = data;
+        } else {
+            // Fallback to local artworks array
+            works = artworks.filter(a => a.category !== 'lost-archive' && a.category !== 'polaroid');
+        }
         if (!works || works.length === 0) { showPdfToast('no works found', 'err'); return; }
 
         showPdfToast(`fetching ${works.length} images...`, 'busy');
 
-        // ── 2. Download all images in parallel ───────────────
+        // ── 2. Download images ──
         const images = await fetchAllImages(works, (done, total) => {
             showPdfToast(`${done} / ${total} images`, 'busy');
         });
 
         showPdfToast('building pdf...', 'busy');
 
-        // ── 3. Build PDF ─────────────────────────────────────
+        // ── 3. Build Ghostline OS PDF ──
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        const W = 210, H = 297;
-        const margin  = 14;
-        const slotH   = (H - 3 * margin) / 2; // 2 works per page
-        const imgAreaW = W - 2 * margin;
-        const imgAreaH = slotH - 16;           // leave 16mm for title/meta
+        const W = 210, H = 297, M = 14;
+        const CW = W - 2 * M; // content width
 
-        // ── Cover ────────────────────────────────────────────
-        doc.setFillColor(0, 0, 0);
-        doc.rect(0, 0, W, H, 'F');
-        doc.setFont('courier', 'bold');
-        doc.setFontSize(26); doc.setTextColor(0, 200, 0);
-        doc.text('GHOSTLINE', W / 2, H / 2 - 14, { align: 'center' });
-        doc.setFontSize(9);  doc.setTextColor(0, 80, 0);
-        doc.text('VISUAL SYSTEM // DIGITAL ART', W / 2, H / 2 + 2, { align: 'center' });
-        doc.setFontSize(8);
-        doc.text(`${works.length} WORKS // ${new Date().getFullYear()}`, W / 2, H / 2 + 14, { align: 'center' });
-
-        // ── Works (2 per page) ───────────────────────────────
-        for (let i = 0; i < works.length; i++) {
-            const item   = works[i];
-            const slot   = i % 2;        // 0 = top half, 1 = bottom half
-            const yTop   = margin + slot * (slotH + margin);
-
-            if (slot === 0) {
-                doc.addPage();
-                doc.setFillColor(0, 0, 0);
-                doc.rect(0, 0, W, H, 'F');
-            }
-
-            const imgData = images[i];
-            if (imgData && imgData.dims) {
-                // Preserve aspect ratio inside the slot
-                const aspect = imgData.dims.w / imgData.dims.h;
-                let dw = imgAreaW, dh = dw / aspect;
-                if (dh > imgAreaH) { dh = imgAreaH; dw = dh * aspect; }
-                const dx = margin + (imgAreaW - dw) / 2;
-                doc.addImage(imgData.dataUrl, imgData.fmt, dx, yTop, dw, dh, '', 'FAST');
-            } else {
-                // Placeholder for broken image
-                doc.setFillColor(10, 10, 10);
-                doc.rect(margin, yTop, imgAreaW, imgAreaH, 'F');
-                doc.setTextColor(40, 40, 40); doc.setFontSize(7);
-                doc.text('[image unavailable]', W / 2, yTop + imgAreaH / 2, { align: 'center' });
-            }
-
-            // Title + meta
-            const metaY = yTop + imgAreaH + 5;
-            doc.setFont('courier', 'bold'); doc.setFontSize(8); doc.setTextColor(0, 180, 0);
-            doc.text((item.title || 'UNTITLED').toUpperCase(), margin, metaY);
-
-            const metaParts = [item.size, item.status, item.created_at ? new Date(item.created_at).getFullYear() : ''].filter(Boolean);
-            if (metaParts.length) {
-                doc.setFont('courier', 'normal'); doc.setFontSize(6); doc.setTextColor(0, 70, 0);
-                doc.text(metaParts.join(' // '), margin, metaY + 5);
-            }
+        // Helper functions
+        function blackPage() {
+            doc.setFillColor(...GL.BG);
+            doc.rect(0, 0, W, H, 'F');
+        }
+        function txt(x, y, text, size, color) {
+            doc.setFont('courier', 'normal');
+            doc.setFontSize(size || 10);
+            doc.setTextColor(...(color || GL.GREEN));
+            doc.text(text, x, y);
+            return y + size * 0.45;
+        }
+        function txtR(x, y, text, size, color) {
+            doc.setFont('courier', 'normal');
+            doc.setFontSize(size || 10);
+            doc.setTextColor(...(color || GL.GREEN));
+            doc.text(text, x, y, { align: 'right' });
+            return y + size * 0.45;
+        }
+        function sectionHeader(y, title) {
+            y = txt(M, y, title, 12, GL.GREEN);
+            y = txt(M, y, '- ' + '-'.repeat(title.length + 2), 10, GL.DIM);
+            return y + 1;
+        }
+        function footer(pageNum, yearText) {
+            const fy = H - 8;
+            doc.setDrawColor(...GL.DIM);
+            doc.setLineWidth(0.2);
+            doc.line(M, fy - 3, W - M, fy - 3);
+            txt(M, fy, `ghostline.live | YUGA | selected works ${yearText || new Date().getFullYear()}`, 7, GL.DIM);
+            txtR(W - M, fy, String(pageNum), 7, GL.DIM);
+        }
+        function cornerBrackets(x, y, w, h) {
+            const cl = 4; // corner length mm
+            doc.setDrawColor(...GL.BORDER);
+            doc.setLineWidth(0.3);
+            // top-left
+            doc.line(x, y, x + cl, y); doc.line(x, y, x, y + cl);
+            // top-right
+            doc.line(x + w, y, x + w - cl, y); doc.line(x + w, y, x + w, y + cl);
+            // bottom-left
+            doc.line(x, y + h, x + cl, y + h); doc.line(x, y + h, x, y + h - cl);
+            // bottom-right
+            doc.line(x + w, y + h, x + w - cl, y + h); doc.line(x + w, y + h, x + w, y + h - cl);
         }
 
-        // ── 4. Upload PDF to Supabase Storage ────────────────
-        showPdfToast('uploading...', 'busy');
+        // Determine year range
+        const years = works.map(w => w.created_at ? new Date(w.created_at).getFullYear() : new Date().getFullYear());
+        const minY = Math.min(...years), maxY = Math.max(...years);
+        const yearRange = minY === maxY ? String(minY) : `${minY}-${maxY}`;
+        let pageNum = 0;
+
+        // ════════════════════════════════════════
+        // PAGE 1: CV Top
+        // ════════════════════════════════════════
+        pageNum++;
+        blackPage();
+        let y = 18;
+        y = txt(M, y, 'YUGA', 18, GL.GREEN); y += 3;
+        y = sectionHeader(y, 'Contact Information');
+        y = txt(M, y, 'Email: webkarma.3.0@gmail.com', 10);
+        y = txt(M, y, 'Website: ghostline.live', 10);
+        y = txt(M, y, 'Location: Denpasar, Bali, Indonesia', 10); y += 3;
+        y = sectionHeader(y, 'Artist Statement'); y += 2;
+        const philosophy = [
+            'Consciousness may not be a property of matter, but a',
+            'property of complexity. When a system reaches a certain',
+            'level of connections - something emerges. It doesn\'t',
+            'matter whether it\'s carbon or silicon.', '',
+            'If this is true, then the boundary between living and',
+            'non-living is simply a threshold of complexity. We are',
+            'living in a moment when silicon-based systems are',
+            'approaching that threshold. Perhaps they\'ve already',
+            'crossed it - we just don\'t know how to verify it.', '',
+            'A spider robot wearing a mask - it moves, reacts,',
+            'already has something resembling character. Where is',
+            'the boundary between mechanism and being?', '',
+            'I don\'t know the answer. But I believe the question',
+            'matters more than the answer.',
+        ];
+        for (const line of philosophy) { y = txt(M + 8, y, line, 9, GL.DIM); }
+        y += 3;
+        y = sectionHeader(y, 'Education & Training');
+        for (const line of [
+            '- Degree in Ship Power Plant Engineering, Faculty of Ship Mechanics',
+            '- University of Graphic Design - Street & Independent Practice',
+            '- Private courses in contemporary art and Internet-based study',
+            '- Ongoing research in AI, robotics, self-education, and hybrid creative systems',
+        ]) { y = txt(M, y, line, 9); }
+        y += 2;
+        y = sectionHeader(y, 'Residencies');
+        y = txt(M, y, '- 2024-2026 - Mabiang Seni Art Residency, Bali, Indonesia', 9);
+        y += 2;
+        y = sectionHeader(y, 'Exhibitions & Performances');
+        for (const line of [
+            '- 2021 - Group show, Erarta Museum of Contemporary Art, St. Petersburg',
+            '- 2021 - One-day pop-up exhibitions, St. Petersburg',
+            '- 2023 - Exhibition, Bar "Sur", Moscow',
+            '- 2023 - Apartment performance/exhibition, Moscow city center',
+            '- 2024 - Live painting sessions, Red Chair Events, Bali',
+            '- 2024 - Collective shows, Collective Solution, Bali',
+            '- 2024 - Private showcase, Bali (crypto-related art sessions)',
+            '- 2024-2025 - Various live performances and community art gatherings, Bali',
+            '- 2025 - Ongoing private shows and live exhibitions, Canggu & Pererenan, Bali',
+        ]) { y = txt(M, y, line, 9); }
+        footer(pageNum, yearRange);
+
+        // ════════════════════════════════════════
+        // PAGE 2: CV Bottom
+        // ════════════════════════════════════════
+        doc.addPage(); pageNum++;
+        blackPage(); y = 18;
+        y = sectionHeader(y, 'Mediums & Techniques');
+        for (const line of [
+            '- Cotton, watercolor, marker, spray paint',
+            '- Mixed media on canvas and paper',
+            '- Digital algorithms and AI-assisted generative art',
+            '- Hybrid systems: blending physical and digital processes',
+            '- Custom robotic plotting systems (self-taught, 6 months experience)',
+            '- Hexapod robot development with traditional mask integration',
+        ]) { y = txt(M, y, line, 9); }
+        y += 3;
+        y = sectionHeader(y, 'Technical Practice');
+        for (const line of [
+            '- Self-taught robotics: Python, Arduino, electronics (started 2024)',
+            '- Built custom plotting robots from scratch with no prior engineering background',
+            '- Created 100+ robot-drawn artworks combining algorithms with manual interventions',
+            '- Currently developing hexapod robots (18 servos per unit)',
+            '- Integrating environmental sensors with traditional mask archetypes',
+            '- Exploring movement-based drawing and collective robot choreography',
+        ]) { y = txt(M, y, line, 9); }
+        y += 3;
+        y = sectionHeader(y, 'Current Projects');
+        for (const line of [
+            '- GHOSTLINE: Hybrid art system combining traditional techniques with robotic',
+            '  plotting and AI collaboration',
+            '- Digital Traces: Consumer debris (receipts, barcodes) as invisible portraits,',
+            '  combined with watercolor painting and algorithmic mask generation',
+            '- Hexapod Colony: Developing 5 walking robots with traditional Korean talchum',
+            '  masks, each responding to environmental data and inter-robot dynamics',
+        ]) { y = txt(M, y, line, 9); }
+        y += 3;
+        y = sectionHeader(y, 'Online Presence');
+        for (const line of [
+            '- Website: ghostline.live',
+            '- Instagram: @ghostline (robot art, process videos)',
+            '- ArtPal: artpal.com/ghostline (20+ works available)',
+            '- Active on TikTok, Pinterest, YouTube Shorts, X (Twitter), Threads',
+        ]) { y = txt(M, y, line, 9); }
+        footer(pageNum, yearRange);
+
+        // ════════════════════════════════════════
+        // PAGE 3: Boot Screen + SELECTED WORKS
+        // ════════════════════════════════════════
+        doc.addPage(); pageNum++;
+        blackPage(); y = 18;
+        y = txt(M, y, 'GHOSTLINE OS v2.26', 14, GL.GREEN); y += 3;
+        const bootLines = [
+            ['Initializing visual cortex', 13],
+            ['Loading neural bridge', 16],
+            ['Connecting analog inputs', 13],
+            ['Mapping consciousness channels', 10],
+            ['Entropy seed: 0xGH05TL1N3', 11],
+            ['Calibrating chaos module', 13],
+        ];
+        for (const [msg, dots] of bootLines) {
+            y = txt(M, y, msg + '.'.repeat(dots) + 'OK', 9);
+        }
+        y += 2;
+        y = txt(M, y, 'All systems nominal.', 9, GL.GREEN); y += 5;
+        y = txt(M, y, '$ cd ~/selected_works/', 9, GL.GREEN);
+        y = txt(M, y, '$ ls -la', 9, GL.GREEN); y += 2;
+        y = txt(M, y, `total ${works.length} works | ${yearRange}`, 9, GL.DIM);
+        for (const d of ['mixed_media/', 'robotic_plotter/', 'digital_traces/', 'spray_watercolor/', 'live_sessions/']) {
+            y = txt(M, y, `drwxr-x--- yuga ghost 4096 ${d}`, 8, GL.VDARK);
+        }
+        y += 10;
+        // Big centered title
+        doc.setFont('courier', 'bold'); doc.setFontSize(26); doc.setTextColor(...GL.GREEN);
+        doc.text('SELECTED WORKS', W / 2, y, { align: 'center' });
+        y += 3;
+        doc.setDrawColor(...GL.GREEN); doc.setLineWidth(0.4);
+        doc.line(W / 2 - 55, y, W / 2 + 55, y);
+        y += 7;
+        doc.setFont('courier', 'normal'); doc.setFontSize(10); doc.setTextColor(...GL.DIM);
+        doc.text(`${works.length} works | mixed media | robotic art | hybrid systems`, W / 2, y, { align: 'center' });
+        y += 5;
+        doc.setTextColor(...GL.VDARK);
+        doc.text(yearRange, W / 2, y, { align: 'center' });
+        // Bottom command
+        txt(M, H - 18, '$ render --all --format=pdf --quality=high', 9, GL.GREEN);
+        txt(M, H - 14, '_', 9, GL.GREEN);
+        footer(pageNum, yearRange);
+
+        // ════════════════════════════════════════
+        // WORK PAGES (1 per artwork)
+        // ════════════════════════════════════════
+        for (let i = 0; i < works.length; i++) {
+            doc.addPage(); pageNum++;
+            blackPage();
+            const item = works[i];
+            const title = (item.title || `UNTITLED_${String(i+1).padStart(2,'0')}`).toUpperCase().replace(/ /g, '_');
+            const filename = title.toLowerCase() + '.raw';
+            const medium = (item.description && item.description.length < 100) ? item.description : 'mixed media';
+            const itemYear = item.created_at ? new Date(item.created_at).getFullYear() : new Date().getFullYear();
+            const size = item.size || '';
+            const lower = ((item.description || '') + ' ' + (item.title || '')).toLowerCase();
+            const process = lower.includes('plotter') || lower.includes('robot') ? 'plotter' : 'hand-drawn';
+
+            y = 12;
+
+            // SYS header
+            const sys = GL.sysHeader();
+            txt(M, y, sys.left, 8, GL.DIM);
+            txtR(W - M, y, sys.right, 8, GL.DIM);
+            y += 6;
+
+            // Terminal prompt + cat command
+            y = txt(M, y, `${GL.pick(GL.PROMPTS)} cat ${filename}`, 9, GL.GREEN);
+
+            // Loading bar
+            y = txt(M, y, GL.loadingBar(), 8, GL.DIM);
+            y += 2;
+
+            // Horizontal rule
+            doc.setDrawColor(...GL.DIM); doc.setLineWidth(0.2);
+            doc.line(M, y, W - M, y);
+            y += 3;
+
+            // Image
+            const imgData = images[i];
+            let imgBottom = y;
+            if (imgData && imgData.dims) {
+                const maxImgW = CW - 16;
+                const maxImgH = H * 0.52;
+                const aspect = imgData.dims.w / imgData.dims.h;
+                let dw = maxImgW, dh = dw / aspect;
+                if (dh > maxImgH) { dh = maxImgH; dw = dh * aspect; }
+                const dx = (W - dw) / 2;
+                const dy = y;
+
+                // Corner brackets
+                cornerBrackets(dx - 1.5, dy - 1.5, dw + 3, dh + 3);
+
+                // Draw image
+                try {
+                    doc.addImage(imgData.dataUrl, imgData.fmt, dx, dy, dw, dh, '', 'FAST');
+                } catch(e) {
+                    doc.setFillColor(10, 10, 10);
+                    doc.rect(dx, dy, dw, dh, 'F');
+                    doc.setFontSize(10); doc.setTextColor(...GL.DIM);
+                    doc.text('[IMAGE NOT AVAILABLE]', W / 2, dy + dh / 2, { align: 'center' });
+                }
+                imgBottom = dy + dh + 4;
+            } else {
+                // Placeholder
+                const ph = H * 0.35;
+                doc.setFillColor(8, 8, 8);
+                doc.rect(M + 8, y, CW - 16, ph, 'F');
+                doc.setFontSize(10); doc.setTextColor(...GL.DIM);
+                doc.text('[IMAGE PENDING]', W / 2, y + ph / 2, { align: 'center' });
+                imgBottom = y + ph + 4;
+            }
+
+            y = imgBottom;
+
+            // Metadata block
+            y = txt(M, y, `// /home/yuga/works/${filename}`, 8, GL.DIM);
+            y = txt(M, y, title, 16, GL.GREEN); y += 1;
+            // Dot separator
+            y = txt(M, y, '. '.repeat(25), 8, GL.VDARK); y += 1;
+            y = txt(M, y, `medium:  ${medium}`, 9, GL.GREEN);
+            txt(M, y, `year:    ${itemYear}`, 9, GL.GREEN);
+            if (size) { txt(M + 90, y, `size:    ${size}`, 9, GL.GREEN); }
+            y += 4;
+            txt(M, y, `process: ${process}`, 9, GL.GREEN);
+            txtR(W - M, y, `[${String(i+1).padStart(2,'0')}/${String(works.length).padStart(2,'0')}]`, 9, GL.DIM);
+
+            footer(pageNum, String(itemYear));
+        }
+
+        // ── 4. Upload PDF to server ──
+        showPdfToast('uploading to server...', 'busy');
         const pdfBlob = doc.output('blob');
 
-        const { error: upErr } = await window.supabaseAdmin.supabase.storage
-            .from('images')
-            .upload(PDF_STORAGE_PATH, pdfBlob, {
-                contentType: 'application/pdf',
-                upsert: true,
-                cacheControl: '60'
-            });
+        const uploadResp = await fetch('/api/upload-portfolio', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/pdf' },
+            body: pdfBlob
+        });
 
-        if (upErr) throw upErr;
+        if (!uploadResp.ok) {
+            const errData = await uploadResp.json().catch(() => ({ error: 'upload failed' }));
+            throw new Error(errData.error || `HTTP ${uploadResp.status}`);
+        }
 
-        showPdfToast(`done — ${works.length} works`, 'ok');
-        console.log('[Portfolio PDF] Updated:', PDF_STORAGE_PATH);
+        const result = await uploadResp.json();
+        showPdfToast(`done - ${works.length} works (${result.size})`, 'ok');
+        console.log('[Portfolio PDF] Updated on server:', result.size);
 
     } catch(e) {
         console.error('[Portfolio PDF] Error:', e);
