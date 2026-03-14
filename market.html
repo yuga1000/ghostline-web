@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTLINE MARKET - App Showcase</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/market.css">
+
+    <style>
+        body {
+            background: #0a0a0a;
+            font-family: 'IBM Plex Mono', monospace;
+            overflow-x: hidden;
+            color: #aaa;
+        }
+
+        .desktop-pattern {
+            background:
+                linear-gradient(transparent 50%, rgba(0, 255, 0, 0.015) 50%),
+                radial-gradient(ellipse at center, #111 0%, #000 80%);
+            background-size: 100% 4px, 100% 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .desktop-pattern::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="desktop-pattern">
+    <!-- Top Terminal Bar -->
+    <div class="win95-titlebar">
+        <div class="titlebar-text">
+            <span class="blink-cursor">█</span> GHOSTLINE MARKET v1.0 - [SHOWCASE MODE]
+        </div>
+        <div class="titlebar-buttons">
+            <a href="index.html" class="win95-btn-close">✕</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- Filter Bar -->
+        <div class="filter-bar mb-6">
+            <button class="filter-btn active">ALL</button>
+            <button class="filter-btn">TOOLS</button>
+            <button class="filter-btn">CREATIVE</button>
+            <button class="filter-btn">AI/BOTS</button>
+            <button class="filter-btn">SYSTEM</button>
+            <span class="filter-count">6 APPS FOUND</span>
+        </div>
+
+        <!-- App Grid -->
+        <div class="app-grid">
+
+            <!-- App Card 1 - Pixel Paint (FEATURED) -->
+            <div class="win95-app-card featured">
+                <div class="win95-card-header">
+                    <div class="win95-icon">▦</div>
+                    <div class="card-title">PIXPAINT.EXE</div>
+                    <span class="status-badge badge-beta">BETA</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <div class="terminal-preview">
+                            <div style="font-size: 20px; line-height: 1; text-align: center;">
+                                ██░░██░░██░░██<br>
+                                ░░██░░██░░██░░<br>
+                                ██░░<span style="color: #ff00ff;">██</span><span style="color: #00ffff;">██</span>░░██<br>
+                                ░░██<span style="color: #ffaa00;">██</span><span style="color: #ff4444;">██</span>██░░<br>
+                                ██░░██░░██░░██
+                            </div>
+                            <div style="margin-top: 12px; font-size: 12px; color: #00ff00; text-align: center;">
+                                > PIXEL ART STUDIO v2.0<br>
+                                > CANVAS: 64x64 | LAYERS: 8 | PALETTE: 256
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-description">
+                        <strong>Pixel Art Studio</strong><br>
+                        Draw pixel art in your browser. Layers, palette, export to PNG.<br>
+                        Status: Beta Testing | Size: 3.14MB
+                    </div>
+                </div>
+                <div class="win95-card-footer">
+                    <button class="win95-button primary">INSTALL</button>
+                    <button class="win95-button">INFO</button>
+                </div>
+            </div>
+
+            <!-- App Card 2 - Neural Bot -->
+            <div class="win95-app-card">
+                <div class="win95-card-header">
+                    <div class="win95-icon">☻</div>
+                    <div class="card-title">NUROBOT.EXE</div>
+                    <span class="status-badge badge-beta">BETA</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <div class="terminal-preview pixel-art-bg">
+                            <div class="ascii-robot">
+                                ┌─────┐<br>
+                                │●̑ ◡ ●̑│<br>
+                                └─────┘
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-description">
+                        <strong>Neural Bot Helper</strong><br>
+                        Status: Beta Testing<br>
+                        Size: 2.88MB
+                    </div>
+                </div>
+                <div class="win95-card-footer">
+                    <button class="win95-button primary">INSTALL</button>
+                    <button class="win95-button">INFO</button>
+                </div>
+            </div>
+
+            <!-- App Card 3 - Example App -->
+            <div class="win95-app-card">
+                <div class="win95-card-header">
+                    <div class="win95-icon">▣</div>
+                    <div class="card-title">APP.EXE</div>
+                    <span class="status-badge badge-alpha">DEV</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <div class="terminal-preview">
+                            <div class="terminal-line">C:\> run_app.exe</div>
+                            <div class="terminal-line">[OK] Starting...</div>
+                            <div class="terminal-line blink-cursor">█</div>
+                        </div>
+                    </div>
+                    <div class="app-description">
+                        <strong>Test Application v1.0</strong><br>
+                        Status: Development<br>
+                        Size: 1.44MB
+                    </div>
+                </div>
+                <div class="win95-card-footer">
+                    <button class="win95-button primary">INSTALL</button>
+                    <button class="win95-button">INFO</button>
+                </div>
+            </div>
+
+            <!-- App Card 4 - Data Viewer -->
+            <div class="win95-app-card">
+                <div class="win95-card-header">
+                    <div class="win95-icon">▪</div>
+                    <div class="card-title">DATAVIEW.EXE</div>
+                    <span class="status-badge badge-alpha">ALPHA</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <div class="terminal-preview">
+                            <div class="terminal-line">LOADING DATA...</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="terminal-line">[████░░░░] 50%</div>
+                        </div>
+                    </div>
+                    <div class="app-description">
+                        <strong>Data Visualization</strong><br>
+                        Status: Alpha<br>
+                        Size: 1.92MB
+                    </div>
+                </div>
+                <div class="win95-card-footer">
+                    <button class="win95-button primary">INSTALL</button>
+                    <button class="win95-button">INFO</button>
+                </div>
+            </div>
+
+            <!-- App Card 5 - Terminal Pro -->
+            <div class="win95-app-card">
+                <div class="win95-card-header">
+                    <div class="win95-icon">■</div>
+                    <div class="card-title">TERMPRO.EXE</div>
+                    <span class="status-badge badge-stable">STABLE</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <div class="terminal-preview terminal-black">
+                            <div class="terminal-line-green">root@ghost:~$</div>
+                            <div class="terminal-line-green">> system_online</div>
+                            <div class="terminal-line-green blink-cursor">█</div>
+                        </div>
+                    </div>
+                    <div class="app-description">
+                        <strong>Terminal Pro+</strong><br>
+                        Status: Stable<br>
+                        Size: 0.88MB
+                    </div>
+                </div>
+                <div class="win95-card-footer">
+                    <button class="win95-button primary">INSTALL</button>
+                    <button class="win95-button">INFO</button>
+                </div>
+            </div>
+
+            <!-- App Card 6 - Mystery -->
+            <div class="win95-app-card mystery-card">
+                <div class="win95-card-header">
+                    <div class="win95-icon">?</div>
+                    <div class="card-title">???????.EXE</div>
+                    <span class="status-badge badge-locked">LOCKED</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <div class="terminal-preview glitch-effect">
+                            <div class="glitch-text">
+                                █▓▒░<br>
+                                ░▒▓█<br>
+                                █▓▒░
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-description">
+                        <strong>??? Mystery App ???</strong><br>
+                        Status: Locked<br>
+                        Size: UNKNOWN
+                    </div>
+                </div>
+                <div class="win95-card-footer">
+                    <button class="win95-button disabled">LOCKED</button>
+                    <button class="win95-button disabled">???</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Status Bar -->
+        <div class="win95-statusbar mt-8">
+            <div class="status-section">
+                <span class="status-icon">▪</span> 6 APPS AVAILABLE
+            </div>
+            <div class="status-section">
+                <span class="status-icon">■</span> SYSTEM: ONLINE
+            </div>
+            <div class="status-section">
+                <span class="status-icon blink-green">●</span> <span id="clock">00:00:00</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Pixels Effect -->
+    <div id="pixel-rain"></div>
+</div>
+
+<script>
+    // Clock
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+        document.getElementById('clock').textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Pixel Rain Effect (multicolor)
+    function createPixelRain() {
+        const container = document.getElementById('pixel-rain');
+        if (!container) return;
+
+        const colorClasses = ['', 'fp-cyan', 'fp-magenta'];
+
+        setInterval(() => {
+            const pixel = document.createElement('div');
+            pixel.className = 'falling-pixel';
+
+            // Random color
+            const colorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            if (colorClass) pixel.classList.add(colorClass);
+
+            pixel.style.left = Math.random() * 100 + '%';
+            pixel.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            pixel.style.opacity = (Math.random() * 0.4 + 0.3).toFixed(2);
+
+            const chars = ['█', '▓', '▒', '░', '■', '□'];
+            pixel.textContent = chars[Math.floor(Math.random() * chars.length)];
+
+            container.appendChild(pixel);
+
+            setTimeout(() => {
+                if (pixel.parentNode) {
+                    pixel.parentNode.removeChild(pixel);
+                }
+            }, 5000);
+        }, 500);
+    }
+
+    // Filter bar interaction (visual only)
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Button hover effects
+    document.querySelectorAll('.win95-button').forEach(btn => {
+        if (!btn.classList.contains('disabled')) {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            });
+        }
+    });
+
+    // Start effects
+    document.addEventListener('DOMContentLoaded', function() {
+        createPixelRain();
+        console.log('🎮 GHOSTLINE MARKET INITIALIZED');
+    });
+</script>
+
+</body>
+</html>

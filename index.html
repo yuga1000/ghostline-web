@@ -170,10 +170,10 @@
             <!-- Navigation Buttons -->
             <div class="nav-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 3rem; width: 95%; max-width: 700px;">
                 <a href="gallery.html" class="console-button" id="galleryBtn">GALLERY</a>
-                <a href="lost-archive.html" class="console-button">LOST ARCHIVE</a>
                 <a href="polaroids.html" class="console-button">POLAROIDS</a>
                 <a href="stream.html" class="console-button" id="streamBtn">STREAM</a>
                 <a href="order.html" class="console-button" id="orderBtn">ORDER</a>
+                <a href="market.html" class="console-button" id="marketBtn">MARKET</a>
             </div>
 
             <!-- Separator Line -->
@@ -221,6 +221,8 @@
       <a href="https://www.tiktok.com/@ghostline207" target="_blank" rel="noopener noreferrer">TikTok</a>
       <a href="https://t.me/yuga_art" target="_blank" rel="noopener noreferrer">Join our Telegram</a>
       <a href="https://www.youtube.com/@Yugatime" target="_blank" rel="noopener noreferrer">YouTube</a>
+      <a href="https://id.pinterest.com/yugatxt/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+      <a href="https://zora.co/@yuga_1000" target="_blank" rel="noopener noreferrer">Zora</a>
     </div>
 </div>
 
@@ -1159,6 +1161,19 @@ let currentManifestoSlide = 0;
       <div style="font-size:9px; color:#00ff00; opacity:0.5; letter-spacing:2px; margin-bottom:8px;">[ CATALOG ]</div>
       <a id="portfolioLink" href="YUGA_cv_portfolio.pdf" target="_blank" style="display:block; padding:10px 20px; border:1px solid #00ff00; color:#00ff00; font-size:11px; text-decoration:none; letter-spacing:2px; transition:all 0.3s; background:rgba(0,0,0,0.6);" onmouseover="this.style.background='#00ff00';this.style.color='#000'" onmouseout="this.style.background='rgba(0,0,0,0.6)';this.style.color='#00ff00'">&#9608; VIEW PORTFOLIO</a>
     </div>
+    <!-- HoMM3 Crystal — Lost Archive -->
+    <div style="text-align:center;">
+      <a href="lost-archive.html" class="crystal-item" style="background:#000080; border:1px solid; border-color:#444 #111 #111 #444; padding:4px 12px; display:inline-flex; align-items:center; gap:6px; font-family:'Press Start 2P',cursive; font-size:7px; cursor:pointer; text-decoration:none; transition:all 0.3s;">
+          <svg width="10" height="13" viewBox="0 0 16 20" style="display:block; filter:drop-shadow(0 0 3px rgba(255,50,80,0.5)); animation:crystalPulse 2s ease-in-out infinite;">
+              <polygon points="8,0 14,6 12,20 4,20 2,6" fill="#cc2244" stroke="#ff4466" stroke-width="0.5"/>
+              <polygon points="8,0 14,6 8,5" fill="#ff6688" stroke="none"/>
+              <polygon points="8,5 14,6 12,20 8,18" fill="#aa1133" stroke="none"/>
+              <polygon points="8,0 2,6 8,5" fill="#ee3355" stroke="none"/>
+              <polygon points="8,5 2,6 4,20 8,18" fill="#cc2244" stroke="none"/>
+          </svg>
+          <span style="color:#00ff00; text-shadow:0 0 3px rgba(0,255,0,0.3);">LOST ARCHIVE</span>
+      </a>
+    </div>
   </div>
 </div>
 <script>
@@ -1396,6 +1411,27 @@ initATASquare();
   <script src="js/manual-modal.js"></script>
   <script src="js/agent-pet-roaming.js?v=5.2"></script>
   <script src="js/spider-web-system.js?v=1"></script>
+
+<!-- Lost Archive Easter Egg -->
+<a href="lost-archive.html" id="lostEgg"
+   style="position:fixed; bottom:8px; left:8px; color:#111; font-size:9px;
+          font-family:'Share Tech Mono',monospace; text-decoration:none; z-index:5;
+          opacity:0.12; transition:all 0.3s; letter-spacing:1px;"
+   onmouseenter="this.style.opacity='0.8';this.style.color='#ff00ff';this.style.textShadow='0 0 8px #ff00ff'"
+   onmouseleave="this.style.opacity='0.12';this.style.color='#111';this.style.textShadow='none'">[LOST]</a>
+
+<script>
+// Konami-style LOST code
+(function(){
+  var seq = ['l','o','s','t'], pos = 0;
+  document.addEventListener('keydown', function(e){
+    if(e.key.toLowerCase() === seq[pos]) {
+      pos++;
+      if(pos === seq.length) { window.location.href = 'lost-archive.html'; pos = 0; }
+    } else { pos = 0; }
+  });
+})();
+</script>
 
   </body>
   </html>

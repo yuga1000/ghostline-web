@@ -1,0 +1,668 @@
+/* GHOSTLINE MARKET - Web3 Dark Terminal + Win95 Chrome */
+
+/* Title Bar (Top of page) */
+.win95-titlebar {
+    background: linear-gradient(90deg, #000080, #000050);
+    color: #00ff00;
+    padding: 8px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #00ff00;
+    box-shadow: 0 2px 8px rgba(0, 255, 0, 0.3);
+}
+
+.titlebar-text {
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 6px rgba(0, 255, 0, 0.5);
+}
+
+.titlebar-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.win95-btn-close {
+    background: #1a1a1a;
+    border: 2px solid;
+    border-color: #444 #111 #111 #444;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    color: #888;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.win95-btn-close:hover {
+    color: #ff4444;
+    border-color: #ff4444 #660000 #660000 #ff4444;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.4);
+}
+
+.win95-btn-close:active {
+    border-color: #111 #444 #444 #111;
+}
+
+/* Windows 95 Window Style (Dark) */
+.win95-window {
+    background: #1a1a1a;
+    border: 3px solid;
+    border-color: #444 #111 #111 #444;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.win95-window-title {
+    background: #000080;
+    color: white;
+    padding: 4px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: inset 0 0 20px rgba(0, 128, 255, 0.1);
+}
+
+.win95-window-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.win95-window-controls button {
+    background: #1a1a1a;
+    border: 2px solid;
+    border-color: #444 #111 #111 #444;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 10px;
+    padding: 0;
+    color: #888;
+}
+
+.win95-window-content {
+    background: #0d0d0d;
+    padding: 20px 16px;
+    border: 2px solid;
+    border-color: #222 #111 #111 #222;
+}
+
+/* Pixel Title */
+.pixel-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 24px;
+    color: #00ff00;
+    text-shadow:
+        0 0 4px rgba(0, 255, 0, 0.8),
+        0 0 8px rgba(0, 255, 0, 0.6),
+        0 0 16px rgba(0, 255, 0, 0.4);
+    letter-spacing: 1px;
+    animation: pixelPulse 2s ease-in-out infinite;
+}
+
+@keyframes pixelPulse {
+    0%, 100% {
+        text-shadow:
+            0 0 4px rgba(0, 255, 0, 0.8),
+            0 0 8px rgba(0, 255, 0, 0.6),
+            0 0 16px rgba(0, 255, 0, 0.4);
+    }
+    50% {
+        text-shadow:
+            0 0 6px rgba(0, 255, 0, 1),
+            0 0 12px rgba(0, 255, 0, 0.8),
+            0 0 24px rgba(0, 255, 0, 0.5),
+            0 0 40px rgba(0, 255, 0, 0.2);
+    }
+}
+
+/* Terminal Text */
+.terminal-text {
+    font-family: 'VT323', monospace;
+    font-size: 16px;
+    color: #00ff00;
+    line-height: 1.3;
+    text-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
+}
+
+.blink-cursor {
+    animation: blink 1s infinite;
+}
+
+.blink-green {
+    color: #00ff00;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.filter-btn {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #888;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 6px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+}
+
+.filter-btn:hover {
+    border-color: #00ff00;
+    color: #00ff00;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
+
+.filter-btn.active {
+    border-color: #00ff00;
+    color: #00ff00;
+    background: rgba(0, 255, 0, 0.08);
+    box-shadow: 0 0 12px rgba(0, 255, 0, 0.3);
+}
+
+.filter-count {
+    color: #555;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    margin-left: auto;
+    letter-spacing: 0.5px;
+}
+
+/* App Grid */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* App Card - Dark Win95 Style */
+.win95-app-card {
+    background: #1a1a1a;
+    border: 3px solid;
+    border-color: #444 #111 #111 #444;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+    transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    overflow: hidden;
+}
+
+.win95-app-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.5), 0 0 20px rgba(0, 255, 0, 0.15);
+    border-color: #00ff00 #005500 #005500 #00ff00;
+}
+
+.win95-app-card.featured {
+    grid-column: span 2;
+}
+
+.mystery-card {
+    border-color: #ff00ff #8800ff #8800ff #ff00ff;
+    animation: mysteryGlow 3s ease-in-out infinite;
+}
+
+.mystery-card:hover {
+    border-color: #ff00ff #aa00ff #aa00ff #ff00ff;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.5), 0 0 30px rgba(255, 0, 255, 0.4);
+}
+
+@keyframes mysteryGlow {
+    0%, 100% {
+        box-shadow: 3px 3px 0 rgba(0,0,0,0.5),
+                    0 0 15px rgba(255, 0, 255, 0.3),
+                    inset 0 0 30px rgba(255, 0, 255, 0.05);
+    }
+    50% {
+        box-shadow: 3px 3px 0 rgba(0,0,0,0.5),
+                    0 0 30px rgba(255, 0, 255, 0.5),
+                    0 0 60px rgba(136, 0, 255, 0.2),
+                    inset 0 0 40px rgba(255, 0, 255, 0.1);
+    }
+}
+
+.win95-card-header {
+    background: #000080;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #000;
+    border-left: 3px solid #00ff00;
+    min-height: 36px;
+}
+
+.win95-icon {
+    font-size: 22px;
+    line-height: 1;
+    width: 22px;
+    text-align: center;
+    color: #00ff00;
+    text-shadow: 0 0 6px rgba(0, 255, 0, 0.6);
+}
+
+.card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 4px rgba(0, 128, 255, 0.5);
+}
+
+/* Status Badges */
+.status-badge {
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 2px 8px;
+    letter-spacing: 1px;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.badge-stable {
+    color: #00ff00;
+    border-color: #00ff00;
+    background: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
+}
+
+.badge-beta {
+    color: #00ffff;
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+}
+
+.badge-alpha {
+    color: #ffaa00;
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.1);
+}
+
+.badge-soon {
+    color: #888;
+    border-color: #555;
+    background: rgba(128, 128, 128, 0.1);
+}
+
+.badge-locked {
+    color: #ff00ff;
+    border-color: #ff00ff;
+    background: rgba(255, 0, 255, 0.1);
+    box-shadow: 0 0 6px rgba(255, 0, 255, 0.3);
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(255, 0, 255, 0.3); }
+    50% { box-shadow: 0 0 12px rgba(255, 0, 255, 0.6); }
+}
+
+.win95-card-body {
+    background: #0d0d0d;
+    padding: 16px;
+    border: 2px solid;
+    border-color: #222 #0d0d0d #0d0d0d #222;
+}
+
+.app-screenshot {
+    background: #000;
+    border: 2px solid #333;
+    padding: 12px;
+    margin-bottom: 12px;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.app-screenshot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+}
+
+.featured .app-screenshot {
+    min-height: 220px;
+}
+
+.terminal-preview {
+    font-family: 'VT323', monospace;
+    color: #00ff00;
+    font-size: 14px;
+    line-height: 1.4;
+    width: 100%;
+}
+
+.terminal-preview.terminal-black {
+    background: #000;
+}
+
+.terminal-preview.pixel-art-bg {
+    background:
+        repeating-linear-gradient(0deg, #111 0px, #111 2px, transparent 2px, transparent 4px),
+        repeating-linear-gradient(90deg, #111 0px, #111 2px, transparent 2px, transparent 4px);
+}
+
+.terminal-line {
+    margin-bottom: 4px;
+}
+
+.terminal-line-green {
+    color: #00ff00;
+    margin-bottom: 4px;
+    text-shadow: 0 0 4px rgba(0, 255, 0, 0.4);
+}
+
+.ascii-robot {
+    font-family: monospace;
+    font-size: 18px;
+    color: #00ff00;
+    text-align: center;
+    line-height: 1.2;
+    animation: robotPulse 2s ease-in-out infinite;
+}
+
+@keyframes robotPulse {
+    0%, 100% {
+        transform: scale(1);
+        color: #00ff00;
+    }
+    50% {
+        transform: scale(1.05);
+        color: #00ffff;
+    }
+}
+
+.progress-bar {
+    background: #000080;
+    border: 2px solid #333;
+    height: 20px;
+    margin: 8px 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: #00ff00;
+    height: 100%;
+    width: 50%;
+    animation: progressMove 2s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+@keyframes progressMove {
+    0%, 100% { width: 50%; }
+    50% { width: 75%; }
+}
+
+.app-description {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.5;
+}
+
+.app-description strong {
+    color: #00ff00;
+    text-shadow: 0 0 3px rgba(0, 255, 0, 0.3);
+}
+
+.win95-card-footer {
+    background: #1a1a1a;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    border-top: 1px solid #333;
+}
+
+/* Win95 Buttons (Dark) */
+.win95-button {
+    background: #1a1a1a;
+    border: 2px solid;
+    border-color: #444 #111 #111 #444;
+    padding: 6px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #00ff00;
+    min-width: 70px;
+    text-align: center;
+    text-shadow: 0 0 4px rgba(0, 255, 0, 0.3);
+}
+
+.win95-button:hover:not(.disabled) {
+    background: #222;
+    border-color: #00ff00 #005500 #005500 #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+.win95-button:active:not(.disabled) {
+    border-color: #111 #444 #444 #111;
+    transform: translate(1px, 1px);
+    background: #111;
+}
+
+.win95-button.primary {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: #00ff00 #005500 #005500 #00ff00;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
+
+.win95-button.primary:hover {
+    background: rgba(0, 255, 0, 0.18);
+    box-shadow: 0 0 14px rgba(0, 255, 0, 0.35);
+}
+
+.win95-button.disabled {
+    color: #444;
+    cursor: not-allowed;
+    text-shadow: none;
+    border-color: #222 #222 #222 #222;
+}
+
+/* Glitch Effect for Mystery Card */
+.glitch-effect {
+    position: relative;
+}
+
+.glitch-text {
+    font-family: monospace;
+    font-size: 24px;
+    color: #ff00ff;
+    animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+    0%, 100% {
+        text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff;
+        transform: translate(0);
+    }
+    25% {
+        text-shadow: -2px 0 #00ffff, 2px 0 #ff00ff;
+        transform: translate(2px, -1px);
+    }
+    50% {
+        text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+        transform: translate(-2px, 1px);
+    }
+    75% {
+        text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff;
+        transform: translate(1px, 1px);
+    }
+}
+
+/* Status Bar (Dark) */
+.win95-statusbar {
+    background: #1a1a1a;
+    border: 3px solid;
+    border-color: #444 #111 #111 #444;
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: #00ff00;
+}
+
+.status-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: #0d0d0d;
+    border: 2px solid;
+    border-color: #222 #0d0d0d #0d0d0d #222;
+    color: #00ff00;
+    text-shadow: 0 0 3px rgba(0, 255, 0, 0.3);
+}
+
+.status-icon {
+    font-size: 16px;
+}
+
+/* Falling Pixels Effect */
+#pixel-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.falling-pixel {
+    position: absolute;
+    top: -20px;
+    font-family: monospace;
+    font-size: 16px;
+    color: #00ff00;
+    opacity: 0.6;
+    animation: fall linear forwards;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+.falling-pixel.fp-cyan {
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+}
+
+.falling-pixel.fp-magenta {
+    color: #ff00ff;
+    text-shadow: 0 0 5px #ff00ff;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Tablet Responsive */
+@media (max-width: 1024px) {
+    .win95-app-card.featured {
+        grid-column: span 1;
+    }
+
+    .app-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .app-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .pixel-title {
+        font-size: 14px;
+    }
+
+    .terminal-text {
+        font-size: 14px;
+    }
+
+    .win95-app-card {
+        border-width: 2px;
+    }
+
+    .app-screenshot {
+        min-height: 120px;
+    }
+
+    .win95-button {
+        font-size: 11px;
+        padding: 4px 12px;
+    }
+
+    .win95-statusbar {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .status-section {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .filter-bar {
+        justify-content: center;
+    }
+
+    .filter-count {
+        width: 100%;
+        text-align: center;
+        margin-left: 0;
+    }
+}
+
+/* Ensure content is above pixel rain */
+.container {
+    position: relative;
+    z-index: 1;
+}
