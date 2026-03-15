@@ -320,14 +320,16 @@
     }
 
     .lightbox-info {
-        margin-top: 12px;
-        color: #999;
-        padding: 0 4px;
+        margin-top: 10px;
+        background: rgba(10, 10, 10, 0.9);
+        border: 1px solid rgba(0, 255, 0, 0.15);
+        padding: 10px 14px;
         font-family: 'Share Tech Mono', monospace;
         text-align: left;
-        width: 100%;
+        max-width: 100%;
         line-height: 1.4;
-        font-size: 12px;
+        font-size: 11px;
+        color: #666;
         transform: translateY(10px);
         opacity: 0;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s, opacity 0.3s ease 0.35s;
@@ -338,43 +340,84 @@
         opacity: 1;
     }
 
+    .lb-title {
+        color: #eee;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    .lb-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+
+    .lb-meta-tag {
+        color: #555;
+        font-size: 10px;
+    }
+
+    .lb-desc {
+        color: #888;
+        font-size: 10px;
+        line-height: 1.4;
+        margin-bottom: 4px;
+    }
+
+    .lb-scan-line {
+        color: rgba(0, 255, 0, 0.35);
+        font-size: 9px;
+        margin-top: 8px;
+        border-top: 1px solid rgba(0, 255, 0, 0.08);
+        padding-top: 6px;
+        letter-spacing: 0.5px;
+    }
+
     .lightbox-contact-btn {
-        background: rgba(255, 255, 255, 0.08);
-        color: #ccc;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        padding: 6px 14px;
+        background: rgba(0, 255, 0, 0.06);
+        color: #00ff00;
+        border: 1px solid rgba(0, 255, 0, 0.2);
+        padding: 4px 12px;
         cursor: pointer;
         font-family: 'Share Tech Mono', monospace;
-        font-size: 11px;
+        font-size: 10px;
         transition: all 0.2s ease;
     }
 
     .lightbox-contact-btn:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
-        color: #fff;
+        background: rgba(0, 255, 0, 0.12);
+        border-color: rgba(0, 255, 0, 0.4);
     }
 
     @media (max-width: 640px) {
+        .lightbox {
+            padding: 8px;
+        }
+
         .lightbox-content {
             max-width: 95vw;
             max-height: 95vh;
+            overflow-y: auto;
         }
 
         .lightbox-frame img {
             max-width: 95vw;
-            max-height: 70vh;
+            max-height: calc(100vh - 180px);
         }
 
         .lightbox-info {
             margin-top: 8px;
-            padding: 0 2px;
-            font-size: 11px;
+            padding: 8px 10px;
+            font-size: 10px;
         }
 
         .lightbox-close {
             top: 8px;
             right: 8px;
+            position: fixed;
         }
 
         .mv-corner { width: 14px; height: 14px; }
@@ -862,16 +905,22 @@ function openLightbox(imageUrl, title, status, description) {
     const statusColor = status === 'sold' ? '#ff4444' : status === 'ghost' ? '#666' : '#00ff00';
     const isDonationArt = description && description.toLowerCase().includes('#donation');
 
+    const now = new Date();
+    const timestamp = now.toISOString().replace('T', ' ').slice(0, 19);
+    const scanId = 'GHL-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+
     lightboxInfo.innerHTML = `
-        <div style="font-size: 15px; margin-bottom: 6px; color: #fff; font-weight: bold;">${title.toUpperCase()}</div>
-        ${description ? `<div style="font-size: 11px; margin-bottom: 8px; color: #999; line-height: 1.4;">${description}</div>` : ''}
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="color: ${statusColor}; font-size: 11px;">${statusText}</span>
+        <div class="lb-title">${title.toUpperCase()}</div>
+        ${description ? `<div class="lb-desc">${description}</div>` : ''}
+        <div class="lb-meta">
+            <span style="color: ${statusColor};">${statusText}</span>
+            <span class="lb-meta-tag">ID:${scanId}</span>
             ${isDonationArt ?
                 `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openDonationEmail('${title}');">SUPPORT</button>` :
-                `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">CONTACT</button>`
+                `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">▸ INQUIRE</button>`
             }
         </div>
+        <div class="lb-scan-line">SCAN ${timestamp} · GHOSTLINE VISION v2.1 · OBJECT CLASSIFIED</div>
     `;
 }
 
