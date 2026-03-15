@@ -194,11 +194,11 @@
     letter-spacing: 0.5px;
 }
 
-/* App Grid */
+/* App Grid - compact cards, 4 per row desktop, 2 per row mobile */
 .app-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(4, 220px);
+    gap: 12px;
     margin-bottom: 20px;
     max-width: 1200px;
     margin-left: auto;
@@ -608,15 +608,15 @@
     }
 
     .app-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(3, 200px);
     }
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .app-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 
     .pixel-title {
