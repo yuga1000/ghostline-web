@@ -223,38 +223,48 @@
         }
     }
 
-    /* Lightbox styles */
+    /* Lightbox styles — cinematic reveal */
     .lightbox {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.95);
+        background: rgba(0, 0, 0, 0);
         z-index: 3000;
         justify-content: center;
         align-items: center;
         cursor: pointer;
         flex-direction: column;
-        opacity: 0;
-        transition: opacity 0.3s ease-in-out;
+        transition: background 0.4s ease;
+        backdrop-filter: blur(0px);
     }
-    
+
     .lightbox.show {
-        opacity: 1;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(8px);
     }
-    
+
     .lightbox-frame {
-        width: 70vw;
-        height: 80vh;
+        width: 80vw;
+        height: 85vh;
         max-width: 1200px;
         max-height: 90vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid #00ff00;
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        border: 1px solid rgba(0, 255, 0, 0.3);
+        box-shadow: 0 0 60px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(0, 0, 0, 0.5);
         margin: auto;
+        transform: scale(0.85);
+        opacity: 0;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        background: #050505;
     }
-    
+
+    .lightbox.show .lightbox-frame {
+        transform: scale(1);
+        opacity: 1;
+    }
+
     .lightbox-frame img {
         width: 100%;
         height: 100%;
@@ -262,129 +272,93 @@
         max-width: 100%;
         max-height: 100%;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.5s ease 0.2s;
         image-rendering: auto;
         -webkit-image-rendering: auto;
     }
-    
+
     .lightbox-frame img.loaded {
         opacity: 1;
     }
-    
+
     .lightbox-close {
         position: absolute;
-        top: 20px;
-        right: 20px;
-        color: #00ff00;
-        font-size: 30px;
+        top: 16px;
+        right: 16px;
+        color: #888;
+        font-size: 24px;
         cursor: pointer;
         font-family: 'Share Tech Mono', monospace;
-        background: rgba(0, 0, 0, 0.9);
-        padding: 10px 15px;
-        border: 1px solid #00ff00;
+        background: none;
+        border: none;
+        padding: 8px 12px;
         z-index: 3001;
-        transition: all 0.3s ease;
+        transition: color 0.2s ease;
     }
-    
+
     .lightbox-close:hover {
-        background: rgba(0, 255, 0, 0.2);
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        color: #fff;
     }
-    
+
     .lightbox-info {
         position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(0, 0, 0, 0.9);
-        color: #00ff00;
-        padding: 15px 20px;
-        border: 1px solid #00ff00;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+        color: #ccc;
+        padding: 24px 28px 20px;
         font-family: 'Share Tech Mono', monospace;
         text-align: left;
-        max-width: 280px;
-        backdrop-filter: blur(5px);
+        max-width: none;
         line-height: 1.4;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        border: none;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, opacity 0.4s ease 0.3s;
     }
-    
+
+    .lightbox.show .lightbox-info {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
     .lightbox-contact-btn {
-        background: #000BFF;
-        color: #ffffff;
-        border: 1px solid #000BFF;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         padding: 8px 16px;
         margin-top: 10px;
         cursor: pointer;
         font-family: 'Share Tech Mono', monospace;
         font-size: 12px;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
-    
+
     .lightbox-contact-btn:hover {
-        background: #0015FF;
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
     }
 
     @media (max-width: 640px) {
-        .lightbox {
-            flex-direction: column;
-            padding: 10px;
-            overflow-y: auto;
-            align-items: flex-start;
-        }
-
         .lightbox-frame {
-            width: 95vw;
-            height: 60vh;
+            width: 100vw;
+            height: 100vh;
             max-width: none;
             max-height: none;
-            flex-shrink: 0;
-        }
-
-        .lightbox-frame img {
-            max-height: 100%;
-            max-width: 100%;
+            border: none;
         }
 
         .lightbox-info {
-            position: static;
-            margin-top: 10px;
-            max-width: 95vw;
+            padding: 16px 16px 24px;
             font-size: 12px;
-            padding: 10px 15px;
-            flex-shrink: 0;
-            min-height: auto;
         }
-        
+
         .lightbox-close {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 3001;
-        }
-    }
-    
-    /* Дополнительные стили для очень маленьких экранов */
-    @media (max-width: 480px) {
-        .lightbox {
-            padding: 5px;
-        }
-        
-        .lightbox-frame {
-            width: 98vw;
-            height: 50vh;
-        }
-        
-        .lightbox-info {
-            font-size: 11px;
-            padding: 8px 12px;
-            line-height: 1.4;
-        }
-        
-        .lightbox-close {
-            top: 5px;
-            right: 5px;
-            font-size: 24px;
-            padding: 8px 12px;
+            top: 8px;
+            right: 8px;
         }
     }
     
@@ -728,30 +702,24 @@ async function loadGallery() {
 
 // Отображение галереи
 function renderGallery() {
-    console.log('renderGallery called with items:', galleryItems);
-    console.log('Current category:', currentCategory);
-    
     const grid = document.getElementById('galleryGrid');
     const emptyState = document.getElementById('emptyState');
-    
-    // Фильтрация по категории
+
     let filteredItems = galleryItems;
     if (currentCategory !== 'all') {
         filteredItems = galleryItems.filter(item => item.category === currentCategory);
     }
-    
-    console.log('Filtered items:', filteredItems);
-    
+
     if (filteredItems.length === 0) {
         grid.innerHTML = '';
         emptyState.classList.remove('hidden');
         return;
     }
-    
+
     emptyState.classList.add('hidden');
     grid.innerHTML = filteredItems.map((item, index) => `
         <div class="gallery-item">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'/%3E"
                  data-src="${item.url || ''}"
                  alt="${item.title || 'Artwork'}"
                  class="lazy-image gallery-image-clickable"
@@ -763,244 +731,58 @@ function renderGallery() {
             <div class="status-indicator status-${(item.status || 'available').toLowerCase()}" data-status="${item.status || 'available'}"></div>
         </div>
     `).join('');
-    
-    // Preload first 3 images for better UX
+
     preloadFirstImages();
-    
-    // Инициализируем lazy loading
     initLazyLoading();
-    
-    // Добавляем обработчики кликов для изображений
     addImageClickHandlers();
-    
-    // forceLoadAllImages removed - was debug code killing lazy loading
 }
 
-// Принудительная загрузка всех изображений для отладки
-function forceLoadAllImages() {
-    console.log('Force loading all images...');
-    const images = document.querySelectorAll('.lazy-image');
-    images.forEach((img, index) => {
-        const realSrc = img.getAttribute('data-src');
-        if (realSrc && img.src !== realSrc) {
-            console.log(`Force loading image ${index}:`, realSrc);
-            
-            // Проверяем доступность файла
-            checkImageAvailability(realSrc, index).then(isAvailable => {
-                if (isAvailable) {
-                    // Добавляем версию для принудительного обновления кэша
-                    const cacheBuster = realSrc.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
-                    const finalSrc = realSrc + cacheBuster;
-                    
-                    // Создаем новое изображение для предзагрузки
-                    const preloadImg = new Image();
-                    preloadImg.onload = function() {
-                        console.log(`Image ${index} preloaded successfully:`, finalSrc);
-                        img.src = finalSrc;
-                        img.classList.remove('loading');
-                        img.classList.add('loaded');
-                    };
-                    preloadImg.onerror = function() {
-                        console.error(`Image ${index} failed to preload:`, finalSrc);
-                        // Fallback на оригинальный src
-                        img.src = realSrc;
-                    };
-                    preloadImg.src = finalSrc;
-                } else {
-                    console.error(`Image ${index} is not available:`, realSrc);
-                    // Скрываем недоступные изображения
-                    const galleryItem = img.closest('.gallery-item');
-                    if (galleryItem) {
-                        galleryItem.style.display = 'none';
-                        console.log(`Hiding gallery item ${index} - image not available`);
-                    } else {
-                        img.style.opacity = '0.3';
-                        img.title = 'Image not available';
-                    }
-                }
-            });
-        }
-    });
-}
-
-// Функция для проверки доступности изображения
-async function checkImageAvailability(url, index) {
-    try {
-        console.log(`Checking availability for image ${index}:`, url);
-        
-        // Пробуем разные методы для разных браузеров
-        let response;
-        try {
-            // Сначала пробуем с CORS
-            response = await fetch(url, { 
-                method: 'HEAD',
-                mode: 'cors',
-                credentials: 'omit'
-            });
-        } catch (corsError) {
-            console.log(`CORS failed for ${index}, trying without CORS`);
-            // Если CORS не работает, пробуем без него
-            response = await fetch(url, { 
-                method: 'HEAD',
-                mode: 'no-cors'
-            });
-        }
-        
-        console.log(`Image ${index} availability check:`, response.status, response.statusText);
-        
-        // Для no-cors режима статус всегда 0, но это не означает ошибку
-        if (response.type === 'opaque') {
-            console.log(`Image ${index} is available (opaque response)`);
-            return true;
-        }
-        
-        if (!response.ok) {
-            console.error(`Image ${index} is not available. Status:`, response.status, response.statusText);
-            return false;
-        }
-        
-        console.log(`Image ${index} is available`);
-        return true;
-    } catch (error) {
-        console.error(`Image ${index} availability check failed:`, error);
-        // Если проверка не работает, считаем что файл доступен (как в Safari)
-        console.log(`Assuming image ${index} is available (fallback)`);
-        return true;
-    }
-}
-
-// Функция для очистки недоступных изображений
-async function cleanupUnavailableImages() {
-    console.log('Cleaning up unavailable images...');
-    const availableItems = [];
-    
-    for (let i = 0; i < galleryItems.length; i++) {
-        const item = galleryItems[i];
-        const isAvailable = await checkImageAvailability(item.url, i);
-        
-        if (isAvailable) {
-            availableItems.push(item);
-        } else {
-            console.log(`Removing unavailable image: ${item.title}`);
-        }
-    }
-    
-    if (availableItems.length !== galleryItems.length) {
-        console.log(`Cleaned up ${galleryItems.length - availableItems.length} unavailable images`);
-        galleryItems = availableItems;
-        localStorage.setItem('ghostline_images', JSON.stringify(galleryItems));
-        renderGallery();
-    }
-}
-
-// Добавляем обработчики кликов для изображений
+// Click handlers for gallery images
 function addImageClickHandlers() {
-    const images = document.querySelectorAll('.gallery-image-clickable');
-    console.log('Found', images.length, 'images to add click handlers');
-    
-    images.forEach((img, index) => {
-        console.log(`Image ${index}:`, {
-            src: img.src,
-            dataUrl: img.getAttribute('data-url'),
-            dataTitle: img.getAttribute('data-title'),
-            dataStatus: img.getAttribute('data-status'),
-            dataDescription: img.getAttribute('data-description')
-        });
-        
+    document.querySelectorAll('.gallery-image-clickable').forEach(img => {
         img.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
             const url = this.getAttribute('data-url');
-            const title = this.getAttribute('data-title');
-            const status = this.getAttribute('data-status');
-            const description = this.getAttribute('data-description');
-            
-            console.log('Image clicked:', { url, title, status, description });
-            
             if (url) {
-                // Сначала проверяем доступность файла
-                console.log('Checking file availability before opening lightbox...');
-                checkImageAvailability(url, 'lightbox').then(isAvailable => {
-                    if (isAvailable) {
-                        console.log('File is available, opening lightbox');
-                        openLightbox(url, title, status, description);
-                    } else {
-                        console.error('File is not available, cannot open lightbox');
-                        alert('This image is not available. Please contact support or try refreshing the page.');
-                    }
-                });
-            } else {
-                console.error('No URL found for clicked image');
+                openLightbox(url, this.getAttribute('data-title'), this.getAttribute('data-status'), this.getAttribute('data-description'));
             }
-        });
-        
-        // Также добавляем обработчик для отладки загрузки изображений
-        img.addEventListener('load', function() {
-            console.log(`Image ${index} loaded successfully:`, this.src);
-        });
-        
-        img.addEventListener('error', function() {
-            console.error(`Image ${index} failed to load:`, this.src);
         });
     });
 }
 
-// Preload first few images for better UX
+// Preload first few images immediately
 function preloadFirstImages() {
     const firstImages = document.querySelectorAll('.lazy-image');
-    const preloadCount = Math.min(6, firstImages.length);
-    
-    for (let i = 0; i < preloadCount; i++) {
+    const count = Math.min(6, firstImages.length);
+    for (let i = 0; i < count; i++) {
         const img = firstImages[i];
-        const realSrc = img.getAttribute('data-src');
-        
-        if (realSrc) {
-            img.src = realSrc;
-            img.classList.remove('loading');
-            img.classList.add('loaded');
+        const src = img.getAttribute('data-src');
+        if (src) {
+            img.src = src;
+            img.onload = () => img.classList.add('loaded');
         }
     }
 }
 
-// Optimized lazy loading for images
+// Lazy loading with IntersectionObserver
 function initLazyLoading() {
     const lazyImages = document.querySelectorAll('.lazy-image:not(.loaded)');
-    console.log('Found', lazyImages.length, 'lazy images to load');
-    
-    const imageObserver = new IntersectionObserver((entries, observer) => {
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
-                const realSrc = img.getAttribute('data-src');
-                
-                console.log('Loading image:', realSrc);
-                
-                if (realSrc) {
-                    // Direct loading without cache buster for better performance
-                    img.src = realSrc;
-                    
-                    img.onload = function() {
-                        console.log('Image loaded successfully:', realSrc);
-                        img.classList.remove('loading');
-                        img.classList.add('loaded');
-                    };
-                    
-                    img.onerror = function() {
-                        console.error('Image failed to load:', realSrc);
-                        img.classList.remove('loading');
-                        img.style.opacity = '0.3';
-                    };
+                const src = img.getAttribute('data-src');
+                if (src) {
+                    img.src = src;
+                    img.onload = () => img.classList.add('loaded');
+                    img.onerror = () => { img.style.opacity = '0.3'; };
                 }
-                
-                observer.unobserve(img);
+                obs.unobserve(img);
             }
         });
-    }, {
-        rootMargin: '400px' // Start loading 400px before image appears
-    });
-    
-    lazyImages.forEach(img => imageObserver.observe(img));
+    }, { rootMargin: '400px' });
+    lazyImages.forEach(img => observer.observe(img));
 }
 
 // Фильтр категорий
@@ -1018,201 +800,64 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadGallery();
 });
 
-// Анимация кнопки SUPPORT (из оригинала)
 // Lightbox functions
 function openLightbox(imageUrl, title, status, description) {
-    console.log('openLightbox called with:', { imageUrl, title, status, description });
-    
     const lightbox = document.getElementById('lightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxInfo = document.getElementById('lightboxInfo');
-    
-    if (!lightbox || !lightboxImage || !lightboxInfo) {
-        console.error('Lightbox elements not found');
-        return;
-    }
-    
-    // Проверяем формат изображения
-    const isHeic = imageUrl.toLowerCase().includes('.heic');
-    if (isHeic) {
-        console.warn('HEIC format detected - may not work in all browsers');
-        // Показываем предупреждение пользователю
-        const warningDiv = document.createElement('div');
-        warningDiv.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 165, 0, 0.9);
-            color: #000;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 10000;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
-        `;
-        warningDiv.textContent = 'HEIC format detected - image may not display in this browser';
-        document.body.appendChild(warningDiv);
-        setTimeout(() => warningDiv.remove(), 5000);
-    }
-    
-    // Добавляем версию для принудительного обновления кэша
-    const cacheBuster = imageUrl.includes('?') ? '&v=' + Date.now() : '?v=' + Date.now();
-    const finalImageUrl = imageUrl + cacheBuster;
-    
-    console.log('Loading image with cache buster:', finalImageUrl);
-    
-    // Показываем лайтбокс сразу
+
+    if (!lightbox || !lightboxImage || !lightboxInfo) return;
+
+    // Reset previous state
+    lightboxImage.classList.remove('loaded');
+    lightboxImage.src = '';
+    lightboxImage.style.display = '';
+    const oldError = lightbox.querySelector('.lightbox-error');
+    if (oldError) oldError.remove();
+
+    // Show lightbox
     lightbox.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
-    // Добавляем плавное появление
-    setTimeout(() => {
-        lightbox.classList.add('show');
-    }, 10);
-    
-    // Загружаем изображение с обработкой ошибок
-    const tempImg = new Image();
-    tempImg.crossOrigin = 'anonymous'; // Добавляем CORS
-    
-    tempImg.onload = function() {
-        console.log('Lightbox image loaded successfully:', finalImageUrl);
-        lightboxImage.src = finalImageUrl;
-        lightboxImage.alt = title;
-        lightboxImage.classList.add('loaded');
+    requestAnimationFrame(() => lightbox.classList.add('show'));
+
+    // Load image directly (no cache buster — let browser cache work)
+    lightboxImage.src = imageUrl;
+    lightboxImage.alt = title;
+    lightboxImage.onload = () => lightboxImage.classList.add('loaded');
+    lightboxImage.onerror = () => {
+        lightboxImage.style.display = 'none';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'lightbox-error';
+        errorDiv.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#666;font-family:"Share Tech Mono",monospace;font-size:13px;';
+        errorDiv.textContent = 'Image unavailable';
+        lightboxImage.parentNode.appendChild(errorDiv);
     };
-    tempImg.onerror = function(e) {
-        console.error('Lightbox image failed to load:', finalImageUrl);
-        console.error('Error details:', e);
-        
-        if (isHeic) {
-            // Для HEIC файлов показываем сообщение об ошибке
-            lightboxImage.style.display = 'none';
-            const errorDiv = document.createElement('div');
-            errorDiv.style.cssText = `
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                height: 100%;
-                color: #ff6b6b;
-                font-family: 'Share Tech Mono', monospace;
-                text-align: center;
-                padding: 20px;
-            `;
-            errorDiv.innerHTML = `
-                <div>
-                    <div style="font-size: 16px; margin-bottom: 10px;">⚠️ HEIC Format Not Supported</div>
-                    <div style="font-size: 12px; color: #ccc;">
-                        This image is in HEIC format which is only supported in Safari.<br>
-                        Please open this page in Safari to view the image.
-                    </div>
-                </div>
-            `;
-            lightboxImage.parentNode.appendChild(errorDiv);
-        } else {
-            // Попробуем разные варианты загрузки
-            console.log('Trying different loading methods...');
-            
-            // Метод 1: Без cache buster
-            const fallbackImg1 = new Image();
-            fallbackImg1.crossOrigin = 'anonymous';
-            
-            fallbackImg1.onload = function() {
-                console.log('Fallback 1 (no cache buster) loaded successfully:', imageUrl);
-                lightboxImage.src = imageUrl;
-                lightboxImage.alt = title;
-                lightboxImage.classList.add('loaded');
-            };
-            
-            fallbackImg1.onerror = function() {
-                console.log('Fallback 1 failed, trying method 2...');
-                
-                // Метод 2: Без CORS
-                const fallbackImg2 = new Image();
-                fallbackImg2.crossOrigin = '';
-                
-                fallbackImg2.onload = function() {
-                    console.log('Fallback 2 (no CORS) loaded successfully:', imageUrl);
-                    lightboxImage.src = imageUrl;
-                    lightboxImage.alt = title;
-                    lightboxImage.classList.add('loaded');
-                };
-                
-                fallbackImg2.onerror = function() {
-                    console.error('All loading methods failed:', imageUrl);
-                    // Показываем сообщение об ошибке
-                    lightboxImage.style.display = 'none';
-                    const errorDiv = document.createElement('div');
-                    errorDiv.style.cssText = `
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        width: 100%;
-                        height: 100%;
-                        color: #ff6b6b;
-                        font-family: 'Share Tech Mono', monospace;
-                        text-align: center;
-                        padding: 20px;
-                    `;
-                    errorDiv.innerHTML = `
-                        <div>
-                            <div style="font-size: 16px; margin-bottom: 10px;">⚠️ Browser Compatibility Issue</div>
-                            <div style="font-size: 12px; color: #ccc;">
-                                This image works in Safari but not in this browser.<br>
-                                Please try opening this page in Safari.
-                            </div>
-                        </div>
-                    `;
-                    lightboxImage.parentNode.appendChild(errorDiv);
-                };
-                
-                fallbackImg2.src = imageUrl;
-            };
-            
-            fallbackImg1.src = imageUrl;
-        }
-    };
-    tempImg.src = finalImageUrl;
-    
+
     const statusText = status === 'sold' ? 'SOLD' : status === 'ghost' ? 'GHOST' : 'AVAILABLE';
-    const statusColor = status === 'sold' ? '#ff0000' : status === 'ghost' ? '#888888' : '#00ff00';
-    
-    // Проверяем есть ли #donation в описании
+    const statusColor = status === 'sold' ? '#ff4444' : status === 'ghost' ? '#666' : '#00ff00';
     const isDonationArt = description && description.toLowerCase().includes('#donation');
-    
+
     lightboxInfo.innerHTML = `
-        <div style="font-size: 14px; margin-bottom: 8px; font-weight: bold;">${title.toUpperCase()}</div>
-        ${description ? `<div style="font-size: 11px; margin-bottom: 10px; color: #cccccc; line-height: 1.3;">${description}</div>` : ''}
-        <div style="margin-bottom: 12px;">
-            <span style="color: ${statusColor}; font-size: 12px;">${statusText}</span>
-        </div>
-        ${isDonationArt ? 
-            `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openDonationEmail('${title}');">
-                SUPPORT THIS ART
-            </button>` :
-            `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">
-                CONTACT ARTIST
-            </button>`
-        }
-        <div style="margin-top: 8px; font-size: 9px; color: #666;">
-            Click to close
+        <div style="font-size: 15px; margin-bottom: 6px; color: #fff; font-weight: bold;">${title.toUpperCase()}</div>
+        ${description ? `<div style="font-size: 11px; margin-bottom: 8px; color: #999; line-height: 1.4;">${description}</div>` : ''}
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="color: ${statusColor}; font-size: 11px;">${statusText}</span>
+            ${isDonationArt ?
+                `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openDonationEmail('${title}');">SUPPORT</button>` :
+                `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">CONTACT</button>`
+            }
         </div>
     `;
-    
-    console.log('Lightbox opened successfully');
 }
 
 function closeLightbox() {
-    console.log('closeLightbox called');
     const lightbox = document.getElementById('lightbox');
     if (lightbox) {
         lightbox.classList.remove('show');
         setTimeout(() => {
             lightbox.style.display = 'none';
             document.body.style.overflow = 'auto';
-        }, 300);
-        console.log('Lightbox closed successfully');
+        }, 400);
     }
 }
 
