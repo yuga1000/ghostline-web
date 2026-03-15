@@ -72,19 +72,6 @@
 
         </div>
 
-        <!-- Bottom Status Bar -->
-        <div class="win95-statusbar mt-8">
-            <div class="status-section">
-                <span class="status-icon">▪</span> 1 APP AVAILABLE
-            </div>
-            <div class="status-section">
-                <span class="status-icon">■</span> SYSTEM: ONLINE
-            </div>
-            <div class="status-section">
-                <span class="status-icon blink-green">●</span> <span id="clock">00:00:00</span>
-            </div>
-        </div>
-
     </div>
 
     <!-- Floating Pixels Effect -->
@@ -92,15 +79,6 @@
 </div>
 
 <script>
-    // Clock
-    function updateClock() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
-        document.getElementById('clock').textContent = timeStr;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
     // Pixel Rain Effect (multicolor)
     function createPixelRain() {
         const container = document.getElementById('pixel-rain');
