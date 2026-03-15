@@ -25,14 +25,7 @@
             position: relative;
         }
 
-        .desktop-pattern::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
-            pointer-events: none;
-            z-index: 2;
-        }
+        /* vignette removed */
     </style>
 </head>
 <body>
@@ -115,6 +108,31 @@
                 <div class="win95-card-footer">
                     <button class="win95-button primary">INSTALL</button>
                     <button class="win95-button">INFO</button>
+                </div>
+            </div>
+
+            <!-- App Card - PixelTap -->
+            <div class="win95-app-card">
+                <div class="win95-card-header">
+                    <div class="win95-icon">▦</div>
+                    <div class="card-title">PIXELTAP.EXE</div>
+                    <span class="status-badge badge-beta">BETA</span>
+                </div>
+                <div class="win95-card-body">
+                    <div class="app-screenshot">
+                        <img src="apps/pixeltap_cover.gif" alt="PixelTap" style="width: 100%; height: auto; image-rendering: pixelated; background: #000;">
+                    </div>
+                    <div class="app-description">
+                        <strong>PixelTap</strong> — pixel art drawing app<br>
+                        8 tools | layers | animation | GIF export<br>
+                        <span style="color: #888;">FREE: 1 layer, 64×64 canvas</span><br>
+                        <span style="color: #00ff00;">PRO $1: 20 layers, 256×256, animation</span>
+                    </div>
+                </div>
+                <div class="win95-card-footer" style="flex-wrap: wrap; gap: 6px;">
+                    <a href="https://yuga1000.github.io/pixeltap/" target="_blank" class="win95-button primary" style="text-decoration: none; text-align: center;">OPEN ONLINE</a>
+                    <a href="apps/PixelTap.apk" download class="win95-button" style="text-decoration: none; text-align: center;">APK ↓</a>
+                    <a href="https://t.me/Pixeltap_app_bot" target="_blank" class="win95-button" style="text-decoration: none; text-align: center;">UNLOCK PRO</a>
                 </div>
             </div>
 
