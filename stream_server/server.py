@@ -14,7 +14,7 @@ from collections import defaultdict
 from aiohttp import web
 
 # Auth password from environment
-AUTH_PASSWORD = os.environ.get('STREAM_PASSWORD', 'ghostline2025')
+AUTH_PASSWORD = os.environ.get('STREAM_PASSWORD', 'Gho$tline_2025!')
 
 # Store connected WebSocket clients
 clients: Set = set()

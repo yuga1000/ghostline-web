@@ -22,7 +22,7 @@ RAILWAY_URL = os.environ.get(
     'RAILWAY_URL',
     'https://ghostline-web-production-7bc6.up.railway.app'
 )
-AUTH_TOKEN = os.environ.get('STREAM_PASSWORD', 'ghostline2025')
+AUTH_TOKEN = os.environ.get('STREAM_PASSWORD', 'Gho$tline_2025!')
 SPIDER_LOG_DIR = os.environ.get(
     'SPIDER_LOG_DIR',
     str(Path.home() / 'Documents/spider_web/ghostline-spider/logs')
