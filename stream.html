@@ -3862,18 +3862,19 @@ function feedUpdateDisplay(data) {
     const cntEl = document.getElementById('feed-event-count');
     const updEl = document.getElementById('feed-last-update');
 
-    // Status — figure out if spider is currently active or sleeping
+    // Status — use spider_status from Railway directly
     const hasEvents = data.events && data.events.length > 0;
-    const hasEnoughEvents = data.events && data.events.length >= 1; // at least 1 event = spider is active
     let spiderSleeping = true;
     let lastActiveAgo  = '';
 
-    if (data.generated_at) {
+    // Railway spider has explicit status field
+    if (data.spider_status) {
+        spiderSleeping = !['scanning', 'running', 'active'].includes(data.spider_status);
+    } else if (data.generated_at) {
         try {
             const genDt    = new Date(data.generated_at);
             const ageMin   = (Date.now() - genDt.getTime()) / 60000;
-            // Spider is active only if recent logs AND enough events to prove activity
-            spiderSleeping = ageMin > 180 || !hasEnoughEvents;
+            spiderSleeping = ageMin > 180 || !hasEvents;
             if (ageMin < 60) {
                 lastActiveAgo = Math.round(ageMin) + 'm ago';
             } else {
@@ -3882,8 +3883,12 @@ function feedUpdateDisplay(data) {
         } catch(e) {}
     }
 
-    // No events at all → definitely sleeping
-    if (!hasEvents) spiderSleeping = true;
+    // Uptime display
+    if (data.uptime_seconds > 0) {
+        const mins = Math.floor(data.uptime_seconds / 60);
+        const hrs = Math.floor(mins / 60);
+        lastActiveAgo = hrs > 0 ? `uptime: ${hrs}h ${mins % 60}m` : `uptime: ${mins}m`;
+    }
 
     if (dot) {
         // Green = active recently, amber = sleeping/dreaming
@@ -3891,7 +3896,15 @@ function feedUpdateDisplay(data) {
         if (!spiderSleeping) dot.classList.add('active');
         else dot.classList.remove('active');
     }
-    if (txt) txt.textContent = spiderSleeping ? 'SLEEPING' : 'LIVE';
+    // Status text with phase info
+    if (spiderSleeping) {
+        if (txt) txt.textContent = 'SLEEPING';
+    } else {
+        let statusLabel = 'LIVE';
+        if (data.current_phase) statusLabel += ' · ' + data.current_phase.toUpperCase();
+        if (data.current_niche) statusLabel += ' [' + data.current_niche + ']';
+        if (txt) txt.textContent = statusLabel;
+    }
     if (nm)  nm.style.display = 'none';
 
     // ASCII art dreams while sleeping
@@ -3908,7 +3921,15 @@ function feedUpdateDisplay(data) {
         window.petWakeUp();
     }
 
-    if (cntEl) cntEl.textContent = `// ${data.event_count || 0} events today`;
+    // Event count with progress info
+    let countText = `// ${data.event_count || 0} events`;
+    if (data.niches_total > 0) {
+        countText += ` · niches ${data.niches_done}/${data.niches_total}`;
+    }
+    if (data.brands_found > 0) {
+        countText += ` · ${data.brands_found} targets`;
+    }
+    if (cntEl) cntEl.textContent = countText;
 
     if (updEl) {
         updEl.textContent = lastActiveAgo ? 'last active: ' + lastActiveAgo : '';
@@ -4620,20 +4641,41 @@ let spiderFetchFails = 0;
 
 async function fetchSpiderFeed() {
     try {
-        const resp = await fetch('https://ghostline-web-production-7bc6.up.railway.app/api/spider-log.json?t=' + Date.now(), {
+        const resp = await fetch('https://ghostline-collabs-production.up.railway.app/status?t=' + Date.now(), {
             cache: 'no-store',
             headers: { 'Cache-Control': 'no-cache' }
         });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const data = await resp.json();
+        const raw = await resp.json();
         spiderFetchFails = 0; // reset on success
-        console.log('[SpiderFeed]', data.event_count, 'events, generated_at:', data.generated_at);
+
+        // Convert Railway /status format → feedUpdateDisplay format
+        const events = (raw.activity_log || []).map(entry => ({
+            time: entry.t || '',
+            event: entry.msg || ''
+        }));
+
+        const data = {
+            generated_at: raw.started_at || raw.last_scan_start || new Date().toISOString(),
+            event_count: events.length,
+            events: events,
+            // Extra fields from Railway spider
+            spider_name: raw.spider || 'NETWORKER',
+            spider_status: raw.status || 'offline',
+            current_phase: raw.current_phase,
+            current_niche: raw.current_niche,
+            niches_done: raw.niches_done || 0,
+            niches_total: raw.niches_total || 0,
+            brands_found: raw.brands_found || 0,
+            uptime_seconds: raw.uptime_seconds || 0
+        };
+
+        console.log('[SpiderFeed]', data.event_count, 'events, status:', raw.status, 'phase:', raw.current_phase);
         feedUpdateDisplay(data);
 
         // Adaptive polling: 20s when live, 45s when sleeping
         const wasLive = spiderIsLive;
-        spiderIsLive = !!(data.generated_at && data.events && data.events.length >= 1 &&
-            (Date.now() - new Date(data.generated_at).getTime()) / 60000 < 180);
+        spiderIsLive = raw.status === 'scanning' || raw.status === 'running' || raw.status === 'active';
         if (wasLive !== spiderIsLive) {
             clearInterval(spiderPollInterval);
             spiderPollInterval = setInterval(fetchSpiderFeed, spiderIsLive ? 20000 : 45000);
