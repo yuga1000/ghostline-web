@@ -805,13 +805,14 @@
                         <span>[CELLULAR_AUTOMATA]</span>
                         <span class="text-green-400"><span class="status-online active" id="status3"></span>ALIVE // <span id="gol-mode-label">MODE:--</span></span>
                     </div>
-                    <div class="terminal-border relative h-40" id="gol-feed" style="background:#000;">
+                    <div class="terminal-border relative h-40" id="gol-feed" style="background:#000;cursor:pointer;" title="Double-click for fullscreen">
                         <canvas id="gol-canvas" style="width:100%;height:100%;display:block;image-rendering:pixelated;"></canvas>
                     </div>
                     <div class="pixel-font text-green-600 text-xs mt-2 flex gap-6">
                         <div>CYCLE: <span id="gol-generation">0</span></div>
                         <div>CELLS: <span id="gol-cells">0</span></div>
                         <div>SEED: <span id="gol-seed">--</span></div>
+                        <div style="margin-left:auto;cursor:pointer;color:#00ff00;opacity:0.6;" onclick="golFullscreen()" title="Fullscreen screensaver">⛶ EXPAND</div>
                     </div>
                 </div>
 
@@ -5654,6 +5655,257 @@ if (document.readyState === 'loading') {
             lastSeed = seed;
             requestAnimationFrame(tick);
         }, 500);
+    });
+
+    window.addEventListener('resize', function() {
+        syncStart();
+        lastSeed = seed;
+    });
+
+    // === FULLSCREEN SCREENSAVER ===
+    let fsOverlay = null;
+    let fsCanvas = null;
+    let fsCtx = null;
+    let fsActive = false;
+    let fsGrid, fsNextGrid, fsAgeGrid;
+    let fsGRID, fsCELL_SIZE;
+    let fsGeneration = 0;
+    let fsRAF = null;
+
+    function golFullscreen() {
+        if (fsActive) return;
+        fsActive = true;
+
+        // Create overlay
+        fsOverlay = document.createElement('div');
+        fsOverlay.id = 'gol-fs-overlay';
+        fsOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;cursor:none;';
+
+        fsCanvas = document.createElement('canvas');
+        fsCanvas.style.cssText = 'display:block;image-rendering:pixelated;width:100%;height:100%;';
+        fsOverlay.appendChild(fsCanvas);
+
+        // HUD overlay
+        const hud = document.createElement('div');
+        hud.id = 'gol-fs-hud';
+        hud.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:"Share Tech Mono",monospace;font-size:11px;color:rgba(0,255,0,0.4);z-index:100000;pointer-events:none;text-align:center;letter-spacing:1px;';
+        hud.innerHTML = '<span id="gol-fs-rule">--</span> · <span id="gol-fs-gen">0</span> · <span id="gol-fs-cells">0</span> cells · ESC to exit';
+        fsOverlay.appendChild(hud);
+
+        document.body.appendChild(fsOverlay);
+        fsCtx = fsCanvas.getContext('2d');
+
+        // Size canvas to screen
+        fsResizeCanvas();
+        fsInitGrid();
+
+        // Start render
+        fsRAF = requestAnimationFrame(fsTick);
+
+        // ESC / click to exit
+        fsOverlay.addEventListener('click', golExitFullscreen);
+        document.addEventListener('keydown', fsEscHandler);
+
+        // Try native fullscreen
+        fsOverlay.requestFullscreen && fsOverlay.requestFullscreen().catch(() => {});
+    }
+
+    function fsEscHandler(e) {
+        if (e.key === 'Escape') golExitFullscreen();
+    }
+
+    function golExitFullscreen() {
+        fsActive = false;
+        if (fsRAF) cancelAnimationFrame(fsRAF);
+        document.removeEventListener('keydown', fsEscHandler);
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        if (fsOverlay && fsOverlay.parentNode) fsOverlay.parentNode.removeChild(fsOverlay);
+        fsOverlay = null; fsCanvas = null; fsCtx = null;
+    }
+
+    function fsResizeCanvas() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        // Bigger grid for fullscreen — aim for ~3-4px cells
+        fsCELL_SIZE = Math.max(2, Math.min(5, Math.floor(Math.min(w, h) / 200)));
+        fsGRID = Math.floor(Math.min(w, h) / fsCELL_SIZE);
+        fsCanvas.width = fsGRID * fsCELL_SIZE;
+        fsCanvas.height = fsGRID * fsCELL_SIZE;
+        // Center via margin
+        fsCanvas.style.width = fsCanvas.width + 'px';
+        fsCanvas.style.height = fsCanvas.height + 'px';
+    }
+
+    function fsInitGrid() {
+        const N = fsGRID * fsGRID;
+        fsGrid = new Uint8Array(N);
+        fsNextGrid = new Uint8Array(N);
+        fsAgeGrid = new Int8Array(N);
+        fsGeneration = 0;
+
+        // Use current seed and rule from main GoL
+        const cx = Math.floor(fsGRID / 2);
+        const cy = Math.floor(fsGRID / 2);
+
+        // Copy seed logic — pick random symmetry and seed type
+        const syms = ['none','vertical','horizontal','quad','diagonal','octal','radial6','radial8','radial12'];
+        const sym = syms[Math.floor(rng() * syms.length)];
+
+        // Dense seed pattern for fullscreen — fill more area for dramatic evolution
+        const density = 0.08 + rng() * 0.12;
+        const radius = Math.floor(fsGRID * (0.3 + rng() * 0.35));
+
+        for (let i = 0; i < fsGRID * radius * density * 1.5; i++) {
+            const ox = Math.floor((rng() - 0.5) * radius);
+            const oy = Math.floor((rng() - 0.5) * radius);
+            const pts = mirrorPoints(cx + ox, cy + oy, cx, cy, sym);
+            for (const [px, py] of pts) {
+                if (px >= 0 && px < fsGRID && py >= 0 && py < fsGRID) {
+                    fsGrid[py * fsGRID + px] = 1;
+                    fsAgeGrid[py * fsGRID + px] = 1;
+                }
+            }
+        }
+    }
+
+    function fsStep() {
+        const N = fsGRID;
+        const birth = new Set(currentRule.birth);
+        const survive = new Set(currentRule.survive);
+        const states = currentRule.states;
+
+        for (let y = 0; y < N; y++) {
+            for (let x = 0; x < N; x++) {
+                let neighbors = 0;
+                for (let dy = -1; dy <= 1; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (dx === 0 && dy === 0) continue;
+                        const nx = (x + dx + N) % N;
+                        const ny = (y + dy + N) % N;
+                        if (fsGrid[ny * N + nx] === 1) neighbors++;
+                    }
+                }
+
+                const idx = y * N + x;
+                const cell = fsGrid[idx];
+
+                if (cell === 0) {
+                    // Dead cell
+                    fsNextGrid[idx] = birth.has(neighbors) ? 1 : 0;
+                    if (fsNextGrid[idx] === 1) fsAgeGrid[idx] = 1;
+                    else if (fsAgeGrid[idx] > 0) fsAgeGrid[idx] = -4; // ghost
+                    else if (fsAgeGrid[idx] < 0) fsAgeGrid[idx]++;
+                } else if (cell === 1) {
+                    // Alive cell
+                    if (survive.has(neighbors)) {
+                        fsNextGrid[idx] = 1;
+                        if (fsAgeGrid[idx] < 127) fsAgeGrid[idx]++;
+                    } else {
+                        fsNextGrid[idx] = states > 2 ? 2 : 0;
+                        if (states <= 2) fsAgeGrid[idx] = -4;
+                    }
+                } else {
+                    // Generations dying state
+                    fsNextGrid[idx] = cell + 1 >= states ? 0 : cell + 1;
+                    if (fsNextGrid[idx] === 0) fsAgeGrid[idx] = -4;
+                }
+            }
+        }
+
+        const tmp = fsGrid; fsGrid = fsNextGrid; fsNextGrid = tmp;
+        fsGeneration++;
+    }
+
+    function fsDraw() {
+        fsCtx.fillStyle = '#000';
+        fsCtx.fillRect(0, 0, fsCanvas.width, fsCanvas.height);
+        const colors = palette.ages;
+        let alive = 0;
+
+        for (let y = 0; y < fsGRID; y++) {
+            for (let x = 0; x < fsGRID; x++) {
+                const idx = y * fsGRID + x;
+                const age = fsAgeGrid[idx];
+                const cell = fsGrid[idx];
+
+                if (cell === 1) {
+                    alive++;
+                    const ci = Math.min(Math.floor(age / 4), colors.length - 1);
+                    fsCtx.fillStyle = colors[ci];
+                    fsCtx.fillRect(x * fsCELL_SIZE, y * fsCELL_SIZE, fsCELL_SIZE, fsCELL_SIZE);
+                } else if (cell > 1 && currentRule.states > 2) {
+                    const phase = cell / currentRule.states;
+                    const ci = Math.min(Math.floor(phase * 4), colors.length - 1);
+                    fsCtx.globalAlpha = 0.7 - phase * 0.5;
+                    fsCtx.fillStyle = colors[ci];
+                    fsCtx.fillRect(x * fsCELL_SIZE, y * fsCELL_SIZE, fsCELL_SIZE, fsCELL_SIZE);
+                    fsCtx.globalAlpha = 1;
+                } else if (age < 0) {
+                    const alpha = Math.max(0, -age * 0.25);
+                    if (alpha > 0.01) {
+                        fsCtx.fillStyle = colors[0];
+                        fsCtx.globalAlpha = alpha;
+                        fsCtx.fillRect(x * fsCELL_SIZE, y * fsCELL_SIZE, fsCELL_SIZE, fsCELL_SIZE);
+                        fsCtx.globalAlpha = 1;
+                    }
+                }
+            }
+        }
+
+        // HUD
+        const ruleEl = document.getElementById('gol-fs-rule');
+        const genEl = document.getElementById('gol-fs-gen');
+        const cellsEl = document.getElementById('gol-fs-cells');
+        if (ruleEl) ruleEl.textContent = currentRule.name + '/' + palette.name;
+        if (genEl) genEl.textContent = fsGeneration;
+        if (cellsEl) cellsEl.textContent = alive;
+
+        return alive;
+    }
+
+    let fsLastStep = 0;
+    let fsStaleCount = 0;
+    let fsPrevAlive = 0;
+
+    function fsTick(ts) {
+        if (!fsActive) return;
+
+        if (ts - fsLastStep >= 100) { // ~10fps
+            fsLastStep = ts;
+            const stepsPerTick = fsGRID > 200 ? 3 : fsGRID > 120 ? 2 : 1;
+            for (let s = 0; s < stepsPerTick; s++) fsStep();
+            const alive = fsDraw();
+
+            if (alive === fsPrevAlive) fsStaleCount++;
+            else fsStaleCount = 0;
+            fsPrevAlive = alive;
+
+            // Restart if dead, too few cells, or stuck
+            if (alive < Math.max(3, fsGRID * 0.5) || fsStaleCount > 40) {
+                SESSION_SALT++;
+                rng = createRNG((seed + SESSION_SALT) * 2654435761);
+                palette = COLORS[Math.abs(seed + SESSION_SALT) % COLORS.length];
+                const rIdx = Math.floor(rng() * RULES.length);
+                currentRule = RULES[rIdx];
+                fsStaleCount = 0;
+                fsResizeCanvas();
+                fsInitGrid();
+            }
+        }
+
+        fsRAF = requestAnimationFrame(fsTick);
+    }
+
+    // Double-click on canvas opens fullscreen too
+    canvas.addEventListener('dblclick', golFullscreen);
+
+    // Expose globally
+    window.golFullscreen = golFullscreen;
+    window.golExitFullscreen = golExitFullscreen;
+
+    // Exit fullscreen when browser exits fullscreen
+    document.addEventListener('fullscreenchange', function() {
+        if (!document.fullscreenElement && fsActive) golExitFullscreen();
     });
 
     window.addEventListener('resize', function() {
