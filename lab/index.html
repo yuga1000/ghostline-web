@@ -2,672 +2,436 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MYSTRA 01</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=VT323&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  --bg:#000;
+  --bg:#0a0a0a;
   --g:#00FF41;
   --g2:#00cc33;
-  --g-dim:rgba(0,255,65,0.08);
-  --g-lo:rgba(0,255,65,0.15);
-  --g-glow:rgba(0,255,65,0.4);
-  --border:rgba(0,255,65,0.2);
-  --border-hi:rgba(0,255,65,0.5);
-  --amber:#FFB000;
+  --gd:rgba(0,255,65,0.12);
+  --gl:rgba(0,255,65,0.06);
+  --gb:rgba(0,255,65,0.2);
+  --gh:rgba(0,255,65,0.35);
+  --amber:#FF6600;
   --red:#FF003C;
-  --font-display:'Orbitron',sans-serif;
-  --font-ui:'Rajdhani',sans-serif;
-  --font-term:'VT323',monospace;
-  --font-px:'Silkscreen',cursive;
+  --f1:'Press Start 2P', monospace;
+  --f2:'Silkscreen', monospace;
+  --f3:'VT323', monospace;
 }
 
-html{height:100%;scroll-behavior:smooth}
-
-body{
+html,body{
+  height:100%;
+  overflow:hidden;
   background:var(--bg);
   color:var(--g);
-  font-family:var(--font-ui);
-  font-size:14px;
-  font-weight:500;
-  min-height:100%;
-  overflow-x:hidden;
-  position:relative;
-  letter-spacing:0.04em;
 }
 
-/* ── BG: pixel art image (placeholder until user provides file) ── */
-.bg-art{
-  position:fixed;
-  inset:0;
-  z-index:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+/* ── BG IMAGE ── */
+.bg{
+  position:fixed;inset:0;z-index:0;
+  display:flex;align-items:center;justify-content:center;
   pointer-events:none;
 }
-.bg-art img{
-  max-width:min(600px, 90vw);
-  opacity:0.12;
+.bg img{
+  max-width:min(550px,85vw);
+  opacity:0.08;
   image-rendering:pixelated;
-  filter:brightness(0.6) contrast(1.3);
+  filter:brightness(0.5) contrast(1.2);
+  animation:bgp 10s ease-in-out infinite;
 }
-/* glow pulse on BG */
-@keyframes bg-pulse{
-  0%,100%{opacity:0.10;filter:brightness(0.6) contrast(1.3)}
-  50%{opacity:0.15;filter:brightness(0.7) contrast(1.4)}
-}
-.bg-art img{animation:bg-pulse 8s ease-in-out infinite}
+@keyframes bgp{0%,100%{opacity:0.06}50%{opacity:0.11}}
 
-/* ── DOT GRID overlay ── */
-.dot-grid{
-  position:fixed;
-  inset:0;
-  background-image:
-    radial-gradient(circle, var(--g-dim) 0.5px, transparent 0.5px);
-  background-size:32px 32px;
+/* ── DOT GRID ── */
+.dots{
+  position:fixed;inset:0;z-index:1;
+  background:radial-gradient(circle,rgba(0,255,65,0.06) 0.5px,transparent 0.5px);
+  background-size:28px 28px;
   pointer-events:none;
-  z-index:1;
 }
 
-/* ── CRT scanlines ── */
-.scanlines{
-  position:fixed;
-  inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,255,65,0.015) 2px,
-    rgba(0,255,65,0.015) 4px
-  );
+/* ── SCANLINES ── */
+.scan{
+  position:fixed;inset:0;z-index:9998;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.012) 2px,rgba(0,255,65,0.012) 4px);
   pointer-events:none;
-  z-index:9999;
 }
 
-::selection{background:var(--g);color:#000}
-
-/* ── SHELL ── */
-.shell{
-  position:relative;
-  z-index:2;
-  max-width:780px;
-  margin:0 auto;
-  padding:16px 16px 50px;
-}
-
-/* ══════════════════════════════════ */
-/* TOP BAR — multi-zone header       */
-/* ══════════════════════════════════ */
-.topbar{
+/* ══════════════════════════════════════ */
+/* POSTER GRID — single screen, no scroll */
+/* ══════════════════════════════════════ */
+.poster{
+  position:relative;z-index:2;
+  width:100%;height:100vh;
+  padding:6px;
   display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:12px;
-  padding:10px 14px;
-  border:1px solid var(--border);
-  margin-bottom:20px;
-  position:relative;
-  background:rgba(0,255,65,0.015);
-}
-.topbar::before{
-  content:'';
-  position:absolute;
-  bottom:-1px;left:20px;right:20px;
-  height:1px;
-  background:linear-gradient(90deg, transparent, var(--g2), transparent);
-  opacity:0.3;
-}
-.top-id{
-  font-family:var(--font-display);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:3px;
-}
-.top-line{
-  height:1px;
-  background:linear-gradient(90deg, var(--border), transparent);
-}
-.top-status{
-  font-family:var(--font-px);
-  font-size:12px;
-  color:var(--g2);
-  opacity:0.6;
+  grid-template-columns:1fr 1fr 0.7fr;
+  grid-template-rows:auto 1fr 1fr 0.6fr auto;
+  grid-template-areas:
+    "top   top   top"
+    "title  main  side1"
+    "v1     main  side2"
+    "v2     v3    sys"
+    "bot   bot   bot";
+  gap:2px;
 }
 
-/* ══════════════════════════════════ */
-/* HERO                              */
-/* ══════════════════════════════════ */
-.hero{
-  text-align:center;
-  padding:40px 0 24px;
-}
-.hero h1{
-  font-family:var(--font-display);
-  font-size:clamp(28px, 7vw, 52px);
-  font-weight:900;
-  letter-spacing:0.15em;
-  line-height:1.1;
-  text-transform:uppercase;
-  text-shadow:0 0 30px var(--g-glow), 0 0 80px rgba(0,255,65,0.12);
-}
-.hero .tag{
-  display:inline-block;
-  margin-top:14px;
-  padding:4px 16px;
-  border:1px solid var(--border);
-  font-family:var(--font-px);
-  font-size:10px;
-  letter-spacing:3px;
-  opacity:0.4;
-  text-transform:uppercase;
-}
-
-/* ══════════════════════════════════ */
-/* HUD BLOCKS — asymmetric panels    */
-/* ══════════════════════════════════ */
-
-/* ── Notched border mixin via clip-path ── */
-.notch{
-  clip-path:polygon(
-    0 8px, 8px 0,
-    calc(100% - 8px) 0, 100% 8px,
-    100% calc(100% - 8px), calc(100% - 8px) 100%,
-    8px 100%, 0 calc(100% - 8px)
-  );
-}
-
-/* ── Panel base ── */
-.panel{
-  border:1px solid var(--border);
-  background:rgba(0,0,0,0.7);
+/* ── CELLS ── */
+.cell{
+  border:1px solid var(--gb);
+  background:rgba(0,0,0,0.75);
   position:relative;
   overflow:hidden;
   transition:border-color 0.3s, box-shadow 0.3s;
 }
-.panel:hover{
-  border-color:var(--border-hi);
-  box-shadow:0 0 20px rgba(0,255,65,0.06), inset 0 0 40px rgba(0,255,65,0.02);
+.cell:hover{
+  border-color:var(--gh);
+  box-shadow:0 0 12px rgba(0,255,65,0.05), inset 0 0 20px rgba(0,255,65,0.02);
 }
 
-/* ── Panel header strip ── */
-.panel-head{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:6px 12px;
-  border-bottom:1px solid var(--border);
-  background:rgba(0,255,65,0.03);
-  font-family:var(--font-display);
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:2px;
-  text-transform:uppercase;
+/* corner brackets */
+.cell::before, .cell::after{
+  content:'';position:absolute;width:10px;height:10px;opacity:0.25;pointer-events:none;
 }
-.panel-head .dot{
-  width:5px;height:5px;
-  background:var(--g);
-  border-radius:50%;
-  box-shadow:0 0 4px var(--g);
-  flex-shrink:0;
-}
-.panel-head .dot.amber{background:var(--amber);box-shadow:0 0 4px var(--amber)}
-.panel-head .dot.red{background:var(--red);box-shadow:0 0 4px var(--red)}
-.panel-head .fill{flex:1}
-.panel-head .meta{
-  font-family:var(--font-px);
-  font-size:10px;
-  opacity:0.35;
-  font-weight:400;
+.cell::before{top:3px;left:3px;border-top:1px solid var(--g);border-left:1px solid var(--g)}
+.cell::after{top:3px;right:3px;border-top:1px solid var(--g);border-right:1px solid var(--g)}
+
+/* ── CELL LABEL ── */
+.cl{
+  position:absolute;top:4px;left:14px;
+  font-family:var(--f2);font-size:9px;
+  letter-spacing:2px;opacity:0.3;
+  text-transform:uppercase;z-index:3;
 }
 
-/* ── Panel body ── */
-.panel-body{
-  padding:12px;
-  min-height:120px;
+/* ── CELL ID (small corner) ── */
+.cid{
+  position:absolute;bottom:4px;right:6px;
+  font-family:var(--f3);font-size:11px;
+  opacity:0.2;z-index:3;
 }
 
-/* ── Corner brackets ── */
-.brackets{position:relative}
-.brackets::before, .brackets::after,
-.brackets .br-b::before, .brackets .br-b::after{
-  content:'';
-  position:absolute;
-  width:14px;height:14px;
-  opacity:0.3;
-}
-.brackets::before{top:4px;left:4px;border-top:1px solid var(--g);border-left:1px solid var(--g)}
-.brackets::after{top:4px;right:4px;border-top:1px solid var(--g);border-right:1px solid var(--g)}
-.brackets .br-b::before{bottom:4px;left:4px;border-bottom:1px solid var(--g);border-left:1px solid var(--g)}
-.brackets .br-b::after{bottom:4px;right:4px;border-bottom:1px solid var(--g);border-right:1px solid var(--g)}
+/* ══════════════════════════════════════ */
+/* AREAS                                 */
+/* ══════════════════════════════════════ */
 
-/* ══════════════════════════════════ */
-/* LAYOUT: Asymmetric HUD grid       */
-/* ══════════════════════════════════ */
-.hud-grid{
-  display:grid;
-  gap:2px;
-  margin:16px 0;
+/* TOP BAR */
+.c-top{
+  grid-area:top;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 10px;
+  border:1px solid var(--gb);
+  background:rgba(0,255,65,0.02);
+  font-family:var(--f2);font-size:9px;letter-spacing:2px;
 }
-.hud-grid.main{
-  grid-template-columns:1fr;
+.c-top .st{opacity:0.4}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.bk{animation:blink 1.2s step-end infinite}
+
+/* TITLE BLOCK — MYSTRA in huge pixel font */
+.c-title{
+  grid-area:title;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:8px;
 }
-.hud-grid.split{
-  grid-template-columns:1fr 1fr;
+.c-title h1{
+  font-family:var(--f1);
+  font-size:clamp(22px,4.5vw,38px);
+  letter-spacing:0.1em;
+  line-height:1.2;
+  text-align:center;
+  text-shadow:0 0 20px rgba(0,255,65,0.4), 0 0 60px rgba(0,255,65,0.1);
 }
-.hud-grid.asym{
-  grid-template-columns:1.4fr 0.6fr;
-}
-.hud-grid.asym-r{
-  grid-template-columns:0.6fr 1.4fr;
+.c-title .unit{
+  font-family:var(--f2);font-size:8px;
+  letter-spacing:3px;opacity:0.3;
+  margin-top:8px;text-transform:uppercase;
 }
 
-/* ══════════════════════════════════ */
-/* MAIN VIEWPORT                     */
-/* ══════════════════════════════════ */
-.viewport .panel-body{
-  min-height:300px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+/* MAIN VIEWPORT — big schematic */
+.c-main{
+  grid-area:main;
+  display:flex;align-items:center;justify-content:center;
   position:relative;
 }
-.viewport .panel-body img{
-  max-width:80%;
-  max-height:280px;
+.c-main img{
+  max-width:88%;max-height:88%;
   object-fit:contain;
-  animation:float 6s ease-in-out infinite;
-  filter:drop-shadow(0 0 25px rgba(0,255,65,0.2));
+  animation:float 7s ease-in-out infinite;
+  filter:drop-shadow(0 0 15px rgba(0,255,65,0.15));
 }
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-6px)}
-}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 
-/* ── Rotating ring ── */
-.ring-wrap{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+/* ring */
+.ring-w{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
   pointer-events:none;
 }
 .ring{
-  width:260px;height:260px;
-  border:1px solid rgba(0,255,65,0.1);
+  width:min(220px,70%);height:min(220px,70%);
+  border:1px solid rgba(0,255,65,0.08);
   border-radius:50%;
-  animation:spin 25s linear infinite;
-  position:relative;
+  animation:sp 20s linear infinite;
 }
-.ring .pip{
-  position:absolute;
-  width:4px;height:4px;
-  background:var(--g);
-  border-radius:50%;
-  box-shadow:0 0 6px var(--g);
+.ring .p{
+  position:absolute;width:3px;height:3px;
+  background:var(--g);border-radius:50%;
+  box-shadow:0 0 5px var(--g);
 }
-.ring .pip:nth-child(1){top:-2px;left:50%;transform:translateX(-50%)}
-.ring .pip:nth-child(2){bottom:-2px;left:50%;transform:translateX(-50%)}
-.ring .pip:nth-child(3){top:50%;left:-2px;transform:translateY(-50%)}
-.ring .pip:nth-child(4){top:50%;right:-2px;transform:translateY(-50%)}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.ring .p:nth-child(1){top:-1px;left:50%;transform:translateX(-50%)}
+.ring .p:nth-child(2){bottom:-1px;left:50%;transform:translateX(-50%)}
+.ring .p:nth-child(3){top:50%;left:-1px;transform:translateY(-50%)}
+.ring .p:nth-child(4){top:50%;right:-1px;transform:translateY(-50%)}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-/* ── Animated border trace ── */
-@property --border-angle{
-  syntax:'<angle>';
-  initial-value:0deg;
-  inherits:false;
-}
-.trace-border{
-  position:relative;
-}
-.trace-border::after{
-  content:'';
-  position:absolute;
-  inset:-1px;
-  background:conic-gradient(from var(--border-angle), transparent 80%, var(--g) 100%);
-  z-index:-1;
-  animation:border-spin 4s linear infinite;
-  opacity:0.3;
-}
-@keyframes border-spin{
-  to{--border-angle:360deg}
-}
+/* SIDE PANELS */
+.c-side1{grid-area:side1;padding:10px 8px}
+.c-side2{grid-area:side2;padding:10px 8px}
 
-/* ══════════════════════════════════ */
-/* THUMBNAIL BLOCKS                  */
-/* ══════════════════════════════════ */
-.thumb-img{
-  width:100%;
-  height:160px;
+.rd{
+  font-family:var(--f3);font-size:13px;
+  line-height:1.9;color:var(--g2);
+}
+.rd .k{opacity:0.35}
+
+/* progress bar */
+.pb{height:3px;background:rgba(0,255,65,0.08);margin:5px 0;overflow:hidden}
+.pb-f{height:100%;background:var(--g);box-shadow:0 0 4px var(--g)}
+.pb-f.am{background:var(--amber);box-shadow:0 0 4px var(--amber)}
+
+.pb-lbl{font-family:var(--f2);font-size:8px;opacity:0.25;letter-spacing:1px}
+
+/* VARIANT / CONCEPT BLOCKS */
+.c-v1{grid-area:v1}
+.c-v2{grid-area:v2}
+.c-v3{grid-area:v3}
+
+.thumb{
+  width:100%;height:100%;
   object-fit:cover;
-  opacity:0.5;
-  transition:opacity 0.4s, filter 0.4s;
-  filter:brightness(0.6) contrast(1.2);
+  opacity:0.45;
+  filter:brightness(0.5) contrast(1.2);
+  transition:opacity 0.3s,filter 0.3s;
   display:block;
 }
-.panel:hover .thumb-img{
-  opacity:0.75;
-  filter:brightness(0.8) contrast(1.3);
+.cell:hover .thumb{opacity:0.7;filter:brightness(0.7) contrast(1.3)}
+
+/* expand overlay */
+.exp{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0.94);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:10px;
+  opacity:0;transform:scale(0.96);
+  transition:opacity 0.3s cubic-bezier(0.16,1,0.3,1),transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  pointer-events:none;z-index:6;
+}
+.exp.open{opacity:1;transform:scale(1);pointer-events:all}
+.exp img{max-width:92%;max-height:75%;object-fit:contain}
+.exp .el{font-family:var(--f2);font-size:8px;letter-spacing:2px;opacity:0.35;margin-top:6px}
+.exp .cx{
+  position:absolute;top:5px;right:7px;
+  font-family:var(--f2);font-size:12px;
+  cursor:pointer;opacity:0.3;transition:opacity 0.2s;
+}
+.exp .cx:hover{opacity:1}
+
+/* SYSTEMS */
+.c-sys{grid-area:sys;padding:8px}
+
+/* status dots */
+.dot{
+  display:inline-block;width:4px;height:4px;
+  border-radius:50%;margin-right:5px;
+  vertical-align:middle;
+}
+.dot.g{background:var(--g);box-shadow:0 0 4px var(--g)}
+.dot.a{background:var(--amber);box-shadow:0 0 4px var(--amber)}
+.dot.r{background:var(--red);box-shadow:0 0 4px var(--red)}
+
+/* BOTTOM BAR */
+.c-bot{
+  grid-area:bot;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 10px;
+  border:1px solid var(--gb);
+  background:rgba(0,255,65,0.02);
+  font-family:var(--f2);font-size:8px;letter-spacing:2px;opacity:0.3;
 }
 
-/* ── Expand overlay ── */
-.panel-expand{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.93);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-  opacity:0;
-  transform:scale(0.96);
-  transition:opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1);
-  pointer-events:none;
-  z-index:5;
-}
-.panel-expand.open{
-  opacity:1;
-  transform:scale(1);
-  pointer-events:all;
-}
-.panel-expand img{
-  max-width:90%;
-  max-height:65%;
-  object-fit:contain;
-  margin-bottom:10px;
-}
-.panel-expand .exp-label{
-  font-family:var(--font-px);
-  font-size:10px;
-  letter-spacing:2px;
-  opacity:0.45;
-}
-.panel-expand .close-x{
-  position:absolute;
-  top:8px;right:10px;
-  font-family:var(--font-px);
-  font-size:14px;
-  cursor:pointer;
-  opacity:0.35;
-  transition:opacity 0.2s;
-}
-.panel-expand .close-x:hover{opacity:1}
-
-/* ══════════════════════════════════ */
-/* DATA READOUT strips               */
-/* ══════════════════════════════════ */
-.readout{
-  font-family:var(--font-term);
-  font-size:14px;
-  line-height:1.8;
-  color:var(--g2);
-  opacity:0.6;
-}
-.readout .key{opacity:0.4}
-
-/* ══════════════════════════════════ */
-/* PROGRESS STRIP                    */
-/* ══════════════════════════════════ */
-.pbar{
-  height:3px;
-  background:rgba(0,255,65,0.1);
-  margin:6px 0;
-  overflow:hidden;
-}
-.pbar-fill{
-  height:100%;
-  background:var(--g);
-  box-shadow:0 0 6px var(--g);
+/* ══════════════════════════════════════ */
+/* MOBILE — stack to 2-col, allow scroll */
+/* ══════════════════════════════════════ */
+@media(max-width:700px){
+  html,body{overflow:auto}
+  .poster{
+    height:auto;min-height:100vh;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto auto auto auto auto auto;
+    grid-template-areas:
+      "top    top"
+      "title  title"
+      "main   main"
+      "side1  side2"
+      "v1     v2"
+      "v3     sys"
+      "bot    bot";
+  }
+  .c-main{min-height:250px}
+  .c-title h1{font-size:clamp(20px,6vw,30px)}
+  .cell{min-height:100px}
+  .c-side1,.c-side2,.c-sys{min-height:110px}
 }
 
-/* ══════════════════════════════════ */
-/* BOTTOM STATUS BAR                 */
-/* ══════════════════════════════════ */
-.status-bar{
-  display:grid;
-  grid-template-columns:auto 1fr auto auto;
-  gap:16px;
-  align-items:center;
-  padding:10px 14px;
-  border:1px solid var(--border);
-  margin-top:16px;
-  font-family:var(--font-px);
-  font-size:10px;
-  letter-spacing:2px;
-  opacity:0.35;
-  text-transform:uppercase;
-  background:rgba(0,255,65,0.015);
-}
-.status-bar .line{height:1px;background:var(--border)}
-
-/* ══════════════════════════════════ */
-/* ANIMATIONS                        */
-/* ══════════════════════════════════ */
-@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
-.blink{animation:blink 1.2s step-end infinite}
-
-@keyframes glitch{
-  0%{transform:translate(0)}
-  20%{transform:translate(-2px,1px)}
-  40%{transform:translate(2px,-1px)}
-  60%{transform:translate(-1px,-2px)}
-  80%{transform:translate(1px,2px)}
-  100%{transform:translate(0)}
-}
-
-/* ── Scroll reveal ── */
-.reveal{
-  opacity:0;
-  transform:translateY(14px);
-  transition:opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal:nth-child(2){transition-delay:0.05s}
-.reveal:nth-child(3){transition-delay:0.1s}
-.reveal:nth-child(4){transition-delay:0.15s}
-
-/* ══════════════════════════════════ */
-/* MOBILE                            */
-/* ══════════════════════════════════ */
-@media(max-width:600px){
-  .hud-grid.split,
-  .hud-grid.asym,
-  .hud-grid.asym-r{grid-template-columns:1fr}
-  .viewport .panel-body{min-height:240px}
-  .ring{width:190px;height:190px}
-  .shell{padding:10px 10px 40px}
-  .hero h1{letter-spacing:0.08em}
-  .topbar{grid-template-columns:auto 1fr auto;gap:8px;padding:8px 10px}
-  .status-bar{grid-template-columns:auto 1fr auto;gap:10px}
+@media(max-width:400px){
+  .poster{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "top"
+      "title"
+      "main"
+      "side1"
+      "side2"
+      "v1"
+      "v2"
+      "v3"
+      "sys"
+      "bot";
+  }
 }
 </style>
 </head>
 <body>
 
 <!-- BG layers -->
-<div class="bg-art">
-  <img src="img/R8I5I.jpg" alt="">
-</div>
-<div class="dot-grid"></div>
-<div class="scanlines"></div>
+<div class="bg"><img src="img/R8I5I.jpg" alt=""></div>
+<div class="dots"></div>
+<div class="scan"></div>
 
-<div class="shell">
+<div class="poster">
 
-  <!-- ═══ TOP BAR ═══ -->
-  <div class="topbar reveal">
-    <span class="top-id">MYSTRA 01</span>
-    <span class="top-line"></span>
-    <span class="top-status">SYS.ONLINE <span class="blink">_</span></span>
+  <!-- TOP BAR -->
+  <div class="c-top">
+    <span><span class="dot g"></span>MYSTRA 01</span>
+    <span class="st">SYS.ACTIVE <span class="bk">_</span></span>
   </div>
 
-  <!-- ═══ HERO ═══ -->
-  <div class="hero reveal">
+  <!-- TITLE -->
+  <div class="cell c-title">
     <h1>MYSTRA<br>01</h1>
-    <div class="tag">HEXAPOD RESEARCH UNIT</div>
+    <div class="unit">hexapod research unit</div>
+    <span class="cid">No.1</span>
   </div>
 
-  <!-- ═══ MAIN VIEWPORT ═══ -->
-  <div class="hud-grid main reveal">
-    <div class="panel viewport brackets trace-border">
-      <div class="br-b"></div>
-      <div class="panel-head">
-        <span class="dot"></span>
-        ACTIVE SCHEMATIC
-        <span class="fill"></span>
-        <span class="meta">LIVE</span>
-      </div>
-      <div class="panel-body">
-        <div class="ring-wrap">
-          <div class="ring">
-            <div class="pip"></div>
-            <div class="pip"></div>
-            <div class="pip"></div>
-            <div class="pip"></div>
-          </div>
-        </div>
-        <img src="img/schematic-green.jpg" alt="MYSTRA 01">
+  <!-- MAIN VIEWPORT -->
+  <div class="cell c-main" id="mainV">
+    <span class="cl">active schematic</span>
+    <span class="cid">No.2</span>
+    <div class="ring-w">
+      <div class="ring">
+        <div class="p"></div><div class="p"></div>
+        <div class="p"></div><div class="p"></div>
       </div>
     </div>
+    <img src="img/schematic-green.jpg" alt="MYSTRA 01">
   </div>
 
-  <!-- ═══ DIAGNOSTICS + VARIANT A (asymmetric) ═══ -->
-  <div class="hud-grid asym reveal">
-    <div class="panel" onclick="toggleExpand(this)">
-      <div class="panel-head">
-        <span class="dot"></span>
-        VARIANT.A
-        <span class="fill"></span>
-        <span class="meta">HVY</span>
-      </div>
-      <img class="thumb-img" src="img/pixel-hex-large.jpg" alt="Variant A">
-      <div class="panel-expand">
-        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">&#x2715;</div>
-        <img src="img/pixel-hex-large.jpg" alt="Variant A">
-        <div class="exp-label">VARIANT A // HEAVY CHASSIS</div>
-      </div>
+  <!-- SIDE 1: DIAGNOSTICS -->
+  <div class="cell c-side1">
+    <span class="cl"><span class="dot a"></span>diagnostics</span>
+    <span class="cid">No.3</span>
+    <div class="rd" style="margin-top:18px">
+      <span class="k">SRV:</span> 18x MG946R<br>
+      <span class="k">DOF:</span> 3/LEG<br>
+      <span class="k">CPU:</span> RPi4<br>
+      <span class="k">DRV:</span> PCA9685
     </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="dot amber"></span>
-        DIAGNOSTICS
-        <span class="fill"></span>
-      </div>
-      <div class="panel-body">
-        <div class="readout">
-          <span class="key">SERVOS:</span> 18x MG946R<br>
-          <span class="key">DOF/LEG:</span> 3<br>
-          <span class="key">BRAIN:</span> RPi4<br>
-          <span class="key">DRIVER:</span> PCA9685<br>
-          <span class="key">PWR:</span> SBEC 20A
-        </div>
-        <div class="pbar" style="margin-top:12px"><div class="pbar-fill" style="width:85%"></div></div>
-        <div style="font-family:var(--font-px);font-size:10px;opacity:0.3;letter-spacing:1px">BUILD 85%</div>
-      </div>
+    <div class="pb" style="margin-top:8px"><div class="pb-f" style="width:85%"></div></div>
+    <div class="pb-lbl">BUILD 85%</div>
+  </div>
+
+  <!-- SIDE 2: SYSTEMS -->
+  <div class="cell c-side2">
+    <span class="cl"><span class="dot r"></span>systems</span>
+    <span class="cid">No.4</span>
+    <div class="rd" style="margin-top:18px">
+      <span class="k">GAIT:</span> TRIPOD<br>
+      <span class="k">IK:</span> INVERSE.K<br>
+      <span class="k">NAV:</span> STANDBY<br>
+      <span class="k">VIS:</span> OFFLINE
+    </div>
+    <div class="pb" style="margin-top:8px"><div class="pb-f am" style="width:40%"></div></div>
+    <div class="pb-lbl">AI CORE 40%</div>
+  </div>
+
+  <!-- VARIANT 1 -->
+  <div class="cell c-v1" onclick="tgl(this)">
+    <span class="cl">variant.a</span>
+    <span class="cid">No.5</span>
+    <img class="thumb" src="img/pixel-hex-large.jpg" alt="V.A">
+    <div class="exp">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/pixel-hex-large.jpg" alt="V.A">
+      <div class="el">VARIANT A // HEAVY</div>
     </div>
   </div>
 
-  <!-- ═══ VARIANT B + CONCEPT 01 (split) ═══ -->
-  <div class="hud-grid split reveal">
-    <div class="panel" onclick="toggleExpand(this)">
-      <div class="panel-head">
-        <span class="dot"></span>
-        VARIANT.B
-        <span class="fill"></span>
-        <span class="meta">CMP</span>
-      </div>
-      <img class="thumb-img" src="img/pixel-hex-small.jpg" alt="Variant B">
-      <div class="panel-expand">
-        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">&#x2715;</div>
-        <img src="img/pixel-hex-small.jpg" alt="Variant B">
-        <div class="exp-label">VARIANT B // COMPACT UNIT</div>
-      </div>
-    </div>
-    <div class="panel" onclick="toggleExpand(this)">
-      <div class="panel-head">
-        <span class="dot"></span>
-        CONCEPT.01
-        <span class="fill"></span>
-        <span class="meta">ARM</span>
-      </div>
-      <img class="thumb-img" src="img/spider-front.jpg" alt="Concept 01">
-      <div class="panel-expand">
-        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">&#x2715;</div>
-        <img src="img/spider-front.jpg" alt="Concept 01">
-        <div class="exp-label">CONCEPT 01 // ARMORED SHELL</div>
-      </div>
+  <!-- VARIANT 2 -->
+  <div class="cell c-v2" onclick="tgl(this)">
+    <span class="cl">variant.b</span>
+    <span class="cid">No.6</span>
+    <img class="thumb" src="img/pixel-hex-small.jpg" alt="V.B">
+    <div class="exp">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/pixel-hex-small.jpg" alt="V.B">
+      <div class="el">VARIANT B // COMPACT</div>
     </div>
   </div>
 
-  <!-- ═══ CONCEPT 02 + SYSTEMS (asymmetric reversed) ═══ -->
-  <div class="hud-grid asym-r reveal">
-    <div class="panel">
-      <div class="panel-head">
-        <span class="dot red"></span>
-        SYSTEMS
-        <span class="fill"></span>
-      </div>
-      <div class="panel-body">
-        <div class="readout">
-          <span class="key">GAIT:</span> TRIPOD<br>
-          <span class="key">IK:</span> INVERSE.K<br>
-          <span class="key">NAV:</span> STANDBY<br>
-          <span class="key">VISION:</span> OFFLINE
-        </div>
-        <div class="pbar" style="margin-top:12px"><div class="pbar-fill amber" style="width:40%;background:var(--amber);box-shadow:0 0 6px var(--amber)"></div></div>
-        <div style="font-family:var(--font-px);font-size:10px;opacity:0.3;letter-spacing:1px">AI CORE 40%</div>
-      </div>
-    </div>
-    <div class="panel" onclick="toggleExpand(this)">
-      <div class="panel-head">
-        <span class="dot"></span>
-        CONCEPT.02
-        <span class="fill"></span>
-        <span class="meta">MNL</span>
-      </div>
-      <img class="thumb-img" src="img/spider-necron.jpg" alt="Concept 02">
-      <div class="panel-expand">
-        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">&#x2715;</div>
-        <img src="img/spider-necron.jpg" alt="Concept 02">
-        <div class="exp-label">CONCEPT 02 // MONOLITH CLASS</div>
-      </div>
+  <!-- CONCEPT -->
+  <div class="cell c-v3" onclick="tgl(this)">
+    <span class="cl">concept.01</span>
+    <span class="cid">No.7</span>
+    <img class="thumb" src="img/spider-front.jpg" alt="C.01">
+    <div class="exp">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/spider-front.jpg" alt="C.01">
+      <div class="el">CONCEPT 01 // ARMORED</div>
     </div>
   </div>
 
-  <!-- ═══ BOTTOM STATUS ═══ -->
-  <div class="status-bar reveal">
+  <!-- SYS BLOCK -->
+  <div class="cell c-sys" onclick="tgl(this)">
+    <span class="cl">concept.02</span>
+    <span class="cid">No.8</span>
+    <img class="thumb" src="img/spider-necron.jpg" alt="C.02">
+    <div class="exp">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/spider-necron.jpg" alt="C.02">
+      <div class="el">CONCEPT 02 // MONOLITH</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="c-bot">
     <span>GHOSTLINE LAB</span>
-    <span class="line"></span>
-    <span>MYSTRA 01</span>
-    <span>ASSEMBLY <span class="blink">&#x25CF;</span></span>
+    <span>UNIT: MYSTRA 01</span>
+    <span>STATUS: ASSEMBLY</span>
   </div>
 
 </div>
 
 <script>
-/* Scroll reveal */
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
-  });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-/* Expand / collapse */
-function toggleExpand(panel) {
-  const ex = panel.querySelector('.panel-expand');
-  if (ex) ex.classList.toggle('open');
-}
-function closeExpand(btn) {
-  btn.closest('.panel-expand').classList.remove('open');
-}
+function tgl(c){const e=c.querySelector('.exp');if(e)e.classList.toggle('open')}
+function cls(b){b.closest('.exp').classList.remove('open')}
 </script>
 
 </body>
