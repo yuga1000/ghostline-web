@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYSTRA 01</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#000;
+  --g:#00FF41;
+  --g2:#00cc33;
+  --g-dim:rgba(0,255,65,0.15);
+  --g-glow:rgba(0,255,65,0.4);
+  --border:rgba(0,255,65,0.25);
+  --px:'Press Start 2P',monospace;
+}
+
+html{height:100%}
+
+body{
+  background:var(--bg);
+  color:var(--g);
+  font-family:var(--px);
+  font-size:10px;
+  min-height:100%;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ── DOT GRID BG ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:radial-gradient(circle, var(--g-dim) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── CRT scanlines ── */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,255,65,0.02) 2px,
+    rgba(0,255,65,0.02) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+}
+
+::selection{background:var(--g);color:#000}
+
+/* ── LAYOUT ── */
+.shell{
+  position:relative;
+  z-index:1;
+  max-width:720px;
+  margin:0 auto;
+  padding:20px 16px 40px;
+}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+  margin-bottom:24px;
+  font-size:8px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.topbar .status{color:var(--g2);opacity:0.5}
+
+/* ── HERO TITLE ── */
+.hero{
+  text-align:center;
+  padding:30px 0 20px;
+}
+.hero h1{
+  font-size:clamp(18px, 5vw, 32px);
+  letter-spacing:4px;
+  line-height:1.4;
+  text-shadow:0 0 20px var(--g-glow), 0 0 60px rgba(0,255,65,0.15);
+}
+.hero .sub{
+  font-size:8px;
+  letter-spacing:3px;
+  opacity:0.35;
+  margin-top:10px;
+}
+
+/* ── GRID BLOCKS (Pegasus style) ── */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px;
+  margin:24px 0;
+}
+.grid.full{grid-template-columns:1fr}
+
+.block{
+  border:1px solid var(--border);
+  background:rgba(0,255,65,0.02);
+  position:relative;
+  overflow:hidden;
+  min-height:180px;
+  cursor:pointer;
+  transition:border-color 0.3s, box-shadow 0.3s;
+}
+.block:hover{
+  border-color:var(--g2);
+  box-shadow:0 0 15px rgba(0,255,65,0.1), inset 0 0 30px rgba(0,255,65,0.03);
+}
+
+.block-label{
+  position:absolute;
+  top:10px;left:14px;
+  font-size:7px;
+  letter-spacing:2px;
+  opacity:0.4;
+  text-transform:uppercase;
+  z-index:2;
+  background:var(--bg);
+  padding:0 4px;
+}
+
+.block-corner{
+  position:absolute;
+  width:8px;height:8px;
+  border-color:var(--g2);
+  opacity:0.4;
+}
+.block-corner.tl{top:3px;left:3px;border-top:1px solid;border-left:1px solid}
+.block-corner.tr{top:3px;right:3px;border-top:1px solid;border-right:1px solid}
+.block-corner.bl{bottom:3px;left:3px;border-bottom:1px solid;border-left:1px solid}
+.block-corner.br{bottom:3px;right:3px;border-bottom:1px solid;border-right:1px solid}
+
+/* ── MAIN VIEWPORT (rotating schematic) ── */
+.viewport{
+  min-height:340px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.viewport img{
+  max-width:85%;
+  max-height:300px;
+  object-fit:contain;
+  animation:float 6s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(0,255,65,0.2));
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-8px) scale(1.01)}
+}
+
+/* ── ROTATING RING around viewport ── */
+.ring-wrap{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.ring{
+  width:280px;height:280px;
+  border:1px solid var(--g-dim);
+  border-radius:50%;
+  animation:spin 30s linear infinite;
+  position:relative;
+}
+.ring::before{
+  content:'';
+  position:absolute;
+  top:-2px;left:50%;
+  width:4px;height:4px;
+  background:var(--g);
+  border-radius:50%;
+  transform:translateX(-50%);
+  box-shadow:0 0 6px var(--g);
+}
+.ring::after{
+  content:'';
+  position:absolute;
+  bottom:-2px;left:50%;
+  width:4px;height:4px;
+  background:var(--g);
+  border-radius:50%;
+  transform:translateX(-50%);
+  box-shadow:0 0 6px var(--g);
+}
+
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ── VARIANT THUMBNAILS ── */
+.thumb-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0.6;
+  transition:opacity 0.4s, filter 0.4s;
+  filter:brightness(0.7) contrast(1.2);
+}
+.block:hover .thumb-img{
+  opacity:0.85;
+  filter:brightness(0.9) contrast(1.3);
+}
+
+/* ── EXPAND PANELS ── */
+.block-expand{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.92);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  opacity:0;
+  transform:scale(0.95);
+  transition:opacity 0.4s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  pointer-events:none;
+  z-index:5;
+}
+.block-expand.open{
+  opacity:1;
+  transform:scale(1);
+  pointer-events:all;
+}
+.block-expand img{
+  max-width:90%;
+  max-height:70%;
+  object-fit:contain;
+  margin-bottom:10px;
+}
+.block-expand .exp-label{
+  font-size:7px;
+  letter-spacing:2px;
+  opacity:0.5;
+  text-align:center;
+}
+.block-expand .close-x{
+  position:absolute;
+  top:8px;right:10px;
+  font-size:8px;
+  cursor:pointer;
+  opacity:0.4;
+  transition:opacity 0.2s;
+}
+.block-expand .close-x:hover{opacity:1}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-top:1px solid var(--border);
+  margin-top:24px;
+  font-size:7px;
+  letter-spacing:2px;
+  opacity:0.35;
+}
+
+/* ── BLINK ── */
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.blink{animation:blink 1.2s step-end infinite}
+
+/* ── SCROLL REVEAL ── */
+.reveal{
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ── GLITCH on hover ── */
+@keyframes glitch{
+  0%{transform:translate(0)}
+  20%{transform:translate(-2px,1px)}
+  40%{transform:translate(2px,-1px)}
+  60%{transform:translate(-1px,-2px)}
+  80%{transform:translate(1px,2px)}
+  100%{transform:translate(0)}
+}
+.block:active .block-label{animation:glitch 0.3s ease}
+
+/* ── MOBILE ── */
+@media(max-width:540px){
+  .grid{grid-template-columns:1fr;gap:2px}
+  .viewport{min-height:260px}
+  .ring{width:200px;height:200px}
+  .shell{padding:12px 10px 30px}
+  .hero h1{letter-spacing:2px}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOP BAR -->
+  <div class="topbar reveal">
+    <span>MYSTRA 01</span>
+    <span class="status">SYS.ONLINE <span class="blink">_</span></span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero reveal">
+    <h1>MYSTRA<br>01</h1>
+    <div class="sub">HEXAPOD RESEARCH UNIT</div>
+  </div>
+
+  <!-- MAIN VIEWPORT: rotating schematic -->
+  <div class="grid full reveal">
+    <div class="block viewport" id="mainBlock">
+      <div class="block-label">ACTIVE SCHEMATIC</div>
+      <div class="block-corner tl"></div>
+      <div class="block-corner tr"></div>
+      <div class="block-corner bl"></div>
+      <div class="block-corner br"></div>
+      <div class="ring-wrap"><div class="ring"></div></div>
+      <img src="img/schematic-green.jpg" alt="MYSTRA 01 schematic">
+    </div>
+  </div>
+
+  <!-- LOWER BLOCKS: variants / modules -->
+  <div class="grid reveal">
+    <div class="block" onclick="toggleExpand(this)">
+      <div class="block-label">VARIANT.A</div>
+      <div class="block-corner tl"></div>
+      <div class="block-corner tr"></div>
+      <div class="block-corner bl"></div>
+      <div class="block-corner br"></div>
+      <img class="thumb-img" src="img/pixel-hex-large.jpg" alt="Variant A">
+      <div class="block-expand">
+        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">[X]</div>
+        <img src="img/pixel-hex-large.jpg" alt="Variant A expanded">
+        <div class="exp-label">VARIANT A // HEAVY CHASSIS</div>
+      </div>
+    </div>
+    <div class="block" onclick="toggleExpand(this)">
+      <div class="block-label">VARIANT.B</div>
+      <div class="block-corner tl"></div>
+      <div class="block-corner tr"></div>
+      <div class="block-corner bl"></div>
+      <div class="block-corner br"></div>
+      <img class="thumb-img" src="img/pixel-hex-small.jpg" alt="Variant B">
+      <div class="block-expand">
+        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">[X]</div>
+        <img src="img/pixel-hex-small.jpg" alt="Variant B expanded">
+        <div class="exp-label">VARIANT B // COMPACT UNIT</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid reveal">
+    <div class="block" onclick="toggleExpand(this)">
+      <div class="block-label">CONCEPT.01</div>
+      <div class="block-corner tl"></div>
+      <div class="block-corner tr"></div>
+      <div class="block-corner bl"></div>
+      <div class="block-corner br"></div>
+      <img class="thumb-img" src="img/spider-front.jpg" alt="Concept 01">
+      <div class="block-expand">
+        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">[X]</div>
+        <img src="img/spider-front.jpg" alt="Concept 01 expanded">
+        <div class="exp-label">CONCEPT 01 // ARMORED SHELL</div>
+      </div>
+    </div>
+    <div class="block" onclick="toggleExpand(this)">
+      <div class="block-label">CONCEPT.02</div>
+      <div class="block-corner tl"></div>
+      <div class="block-corner tr"></div>
+      <div class="block-corner bl"></div>
+      <div class="block-corner br"></div>
+      <img class="thumb-img" src="img/spider-necron.jpg" alt="Concept 02">
+      <div class="block-expand">
+        <div class="close-x" onclick="event.stopPropagation();closeExpand(this)">[X]</div>
+        <img src="img/spider-necron.jpg" alt="Concept 02 expanded">
+        <div class="exp-label">CONCEPT 02 // MONOLITH CLASS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM STATUS -->
+  <div class="status-bar reveal">
+    <span>GHOSTLINE LAB</span>
+    <span>UNIT: MYSTRA 01</span>
+    <span>STATUS: ASSEMBLY</span>
+  </div>
+
+</div>
+
+<script>
+/* ── Scroll reveal ── */
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+/* ── Block expand/collapse ── */
+function toggleExpand(block) {
+  const panel = block.querySelector('.block-expand');
+  if (!panel) return;
+  panel.classList.toggle('open');
+}
+function closeExpand(closeBtn) {
+  closeBtn.closest('.block-expand').classList.remove('open');
+}
+</script>
+
+</body>
+</html>
