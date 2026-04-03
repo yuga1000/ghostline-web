@@ -44,7 +44,7 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 
 /* CANVAS AREA */
 .canvas-wrap{
-  position:fixed;top:34px;left:0;right:0;bottom:28px;
+  position:fixed;top:34px;left:0;right:220px;bottom:28px;
   overflow:hidden;
 }
 .canvas{
@@ -134,15 +134,20 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
   cursor:pointer;font-size:14px;color:#0f0;
 }
 
-/* PROPERTIES PANEL */
+/* PROPERTIES PANEL — always visible on the right */
 .props{
-  position:fixed;top:34px;right:0;width:210px;bottom:28px;
+  position:fixed;top:34px;right:0;width:220px;bottom:28px;
   background:#1a1a1a;border-left:1px solid #333;
   padding:8px;font-size:11px;overflow-y:auto;
   z-index:50;
-  display:none;
+  display:flex;flex-direction:column;
 }
-.props.open{display:block}
+.props .empty-msg{
+  opacity:0.2;font-size:10px;text-align:center;margin-top:40px;letter-spacing:1px;
+}
+.props .props-content{display:none}
+.props.has-selection .props-content{display:block}
+.props.has-selection .empty-msg{display:none}
 .props h3{font-size:10px;opacity:0.4;margin-bottom:6px;font-weight:normal;letter-spacing:1px;border-bottom:1px solid #333;padding-bottom:4px}
 .props .prop-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
 .props .prop-row label{opacity:0.5;font-size:9px;min-width:48px}
@@ -235,7 +240,8 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 
 <div class="props" id="props">
   <h3>PROPERTIES</h3>
-
+  <div class="empty-msg">SELECT A BLOCK</div>
+  <div class="props-content">
   <div class="prop-row"><label>NAME</label><input type="text" id="propName" onchange="setProp('name',this.value)" style="width:90px"></div>
   <div class="prop-row"><label>LABEL</label><input type="text" id="propLabel" onchange="setProp('label',this.value)" style="width:90px"></div>
   <div class="prop-row"><label>TYPE</label>
@@ -296,6 +302,7 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 
   <button class="action" onclick="copyStyleToAll()">APPLY STYLE TO ALL</button>
   <button class="del" onclick="deleteSelected()">DELETE BLOCK</button>
+  </div><!-- /props-content -->
 </div>
 
 <div class="statusbar">
@@ -356,7 +363,7 @@ function rgbaStr(hex, opacity){
 // CANVAS SETUP
 // ═══════════════════════════════
 function fitCanvas(){
-  const ww = canvasWrap.clientWidth - 220;
+  const ww = canvasWrap.clientWidth - 20;
   const wh = canvasWrap.clientHeight - 20;
   scale = Math.min(ww / canvasW, wh / canvasH, 1);
   canvas.style.width = canvasW + 'px';
@@ -400,6 +407,7 @@ function addBlock(type='image'){
   renderBlock(b);
   selectBlock(id);
   updateStatus();
+  autoSave();
 }
 
 function renderBlock(b){
@@ -492,11 +500,11 @@ function selectBlock(id){
 
   const panel = document.getElementById('props');
   if(id){
-    panel.classList.add('open');
+    panel.classList.add('has-selection');
     const b = blocks.find(b => b.id === id);
     if(b) updatePropsPanel(b);
   } else {
-    panel.classList.remove('open');
+    panel.classList.remove('has-selection');
   }
 }
 
@@ -546,6 +554,7 @@ function deleteSelected(){
   blocks = blocks.filter(b => b.id !== selectedId);
   selectBlock(null);
   updateStatus();
+  autoSave();
 }
 
 function duplicateSelected(){
@@ -558,6 +567,7 @@ function duplicateSelected(){
   renderBlock(b);
   selectBlock(id);
   updateStatus();
+  autoSave();
 }
 
 // Quick color from toolbar swatches
@@ -728,12 +738,32 @@ function exportJSON(){
   const json = JSON.stringify(data, null, 2);
   document.getElementById('exportCode').textContent = json;
   document.getElementById('exportPanel').classList.add('open');
-  navigator.clipboard.writeText(json).catch(()=>{});
+  navigator.clipboard.writeText(json).then(()=>{
+    showToast('JSON copied to clipboard!');
+  }).catch(()=>{});
 }
 
 function importJSON(){
+  // Try clipboard first, then fallback to prompt
+  navigator.clipboard.readText().then(text => {
+    if(text && text.trim().startsWith('{')){
+      if(confirm('Load layout from clipboard?')){
+        loadFromJSON(text);
+      }
+    } else {
+      loadFromPrompt();
+    }
+  }).catch(() => {
+    loadFromPrompt();
+  });
+}
+
+function loadFromPrompt(){
   const input = prompt('Paste JSON layout:');
-  if(!input) return;
+  if(input) loadFromJSON(input);
+}
+
+function loadFromJSON(input){
   try {
     const data = JSON.parse(input);
     canvasW = data.canvasW || 1440;
@@ -748,9 +778,63 @@ function importJSON(){
     renderAll();
     selectBlock(null);
     updateStatus();
+    autoSave();
+    showToast('Layout loaded! (' + blocks.length + ' blocks)');
   } catch(e){
     alert('Invalid JSON: ' + e.message);
   }
+}
+
+// ═══════════════════════════════
+// AUTOSAVE to localStorage
+// ═══════════════════════════════
+const SAVE_KEY = 'mystra-builder-layout';
+
+function autoSave(){
+  const data = { canvasW, canvasH, blocks };
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  } catch(e){}
+}
+
+function autoLoad(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    canvasW = data.canvasW || 1440;
+    canvasH = data.canvasH || 900;
+    blocks = data.blocks || [];
+    idCounter = Math.max(0, ...blocks.map(b => b.id)) + 1;
+    return blocks.length > 0;
+  } catch(e){ return false; }
+}
+
+// Autosave after every drag/resize
+const _origMouseUp = document.onmouseup;
+document.addEventListener('mouseup', () => {
+  if(dragState) setTimeout(autoSave, 50);
+});
+
+// Autosave after property changes
+const _origSetProp = setProp;
+setProp = function(key, val){
+  _origSetProp(key, val);
+  autoSave();
+};
+
+// Toast notification
+function showToast(msg){
+  let t = document.getElementById('toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#0f0;color:#000;padding:6px 16px;font-family:inherit;font-size:11px;letter-spacing:1px;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(()=>{ t.style.opacity = '0'; }, 2000);
 }
 
 // ═══════════════════════════════
@@ -843,7 +927,16 @@ function updateStatus(){
 // ═══════════════════════════════
 window.addEventListener('resize', fitCanvas);
 fitCanvas();
-loadPreset();
+
+// Try to restore from autosave, otherwise load preset
+if(autoLoad()){
+  renderAll();
+  selectBlock(null);
+  updateStatus();
+  showToast('Restored from autosave');
+} else {
+  loadPreset();
+}
 </script>
 
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MYSTRA 01</title>
+<title>MYSTRA 01 — Ghostline Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
@@ -13,259 +13,312 @@
 :root{
   --bg:#000;
   --g:#00FF41;
-  --g2:#00cc33;
-  --gb:rgba(0,255,65,0.15);
-  --gh:rgba(0,255,65,0.35);
-  --amber:#FF6600;
-  --red:#FF003C;
+  --blue:#0033ff;
+  --blue-deep:#00248f;
+  --blue-bright:#0066FF;
+  --orange:#FF6600;
+  --magenta:#ee00ff;
+  --white:#ffffff;
   --f1:'Press Start 2P',monospace;
   --f2:'Silkscreen',monospace;
   --f3:'VT323',monospace;
 }
 
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--g)}
+html,body{
+  height:100%;overflow:hidden;
+  background:var(--bg);color:var(--g);
+}
 
-/* BG */
-.bg-art{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.bg-art img{max-width:min(420px,55vw);opacity:0.03;image-rendering:pixelated;filter:brightness(0.3)}
-.bg-dots{position:fixed;inset:0;z-index:0;background:radial-gradient(circle,rgba(0,255,65,0.025) 0.5px,transparent 0.5px);background-size:64px 64px;pointer-events:none}
-.scan{position:fixed;inset:0;z-index:9998;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.006) 2px,rgba(0,255,65,0.006) 4px);pointer-events:none}
+/* ═══ BACKGROUNDS ═══ */
+.bg-art{
+  position:fixed;inset:0;z-index:0;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.bg-art img{
+  max-width:min(420px,55vw);opacity:0.03;
+  image-rendering:pixelated;filter:brightness(0.3);
+}
+.bg-dots{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(circle,rgba(0,100,255,0.02) 0.5px,transparent 0.5px);
+  background-size:72px 72px;pointer-events:none;
+}
+.scan{
+  position:fixed;inset:0;z-index:9998;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,50,255,0.004) 2px,rgba(0,50,255,0.004) 4px);
+  pointer-events:none;
+}
 
-/* ═══════════════════════════════════════════════ */
-/* POSTER GRID                                     */
-/* ═══════════════════════════════════════════════ */
+/* ═══ POSTER — absolute positioned from builder JSON ═══ */
 .poster{
   position:relative;z-index:2;
   width:100vw;height:100vh;
-  display:grid;
-  /* Left column ~38%, Main ~54%, Vert strip ~8% */
-  grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) 52px;
-  grid-template-rows:14% 30% 6% 22% 14% 2% 12%;
-  grid-template-areas:
-    "title  title  vert"
-    "img1   main   vert"
-    "icons  main   vert"
-    "img2   main   vert"
-    "label  info   vert"
-    "div    div    vert"
-    "foot   foot   vbase";
-  gap:8px;
-  padding:32px 40px 24px;
   overflow:hidden;
 }
 
-/* ═══ AREAS ═══ */
+/* Scale factor: everything in % of viewport */
 
-/* TITLE — big MYSTRA 01 */
+/* ───── IMG2: top-left — schematic/concept (340x240 @ 90,40) ───── */
+.img2{
+  position:absolute;
+  left:6.25%;top:4.44%;
+  width:23.61%;height:26.67%;
+  border:4px dashed rgba(255,255,255,1);
+  background:rgba(7,7,237,0.5);
+  overflow:hidden;
+  box-shadow:0 0 40px rgba(0,50,255,0.2), inset 0 0 60px rgba(0,50,255,0.08);
+}
+
+/* ───── ICONS: small box (130x50 @ 90,300) ───── */
+.icons{
+  position:absolute;
+  left:6.25%;top:33.33%;
+  width:9.03%;height:5.56%;
+  border:6px solid rgba(0,102,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ───── FOOTER line: (340x30 @ 90,370) ───── */
+.foot-line{
+  position:absolute;
+  left:6.25%;top:41.11%;
+  width:23.61%;height:3.33%;
+  display:flex;align-items:center;
+}
+
+/* ───── IMG1: left-bottom — spider render (340x240 @ 90,430) ───── */
+.img1{
+  position:absolute;
+  left:6.25%;top:47.78%;
+  width:23.61%;height:26.67%;
+  border:4px solid var(--orange);
+  overflow:hidden;
+}
+
+/* ───── TITLE: MYSTRA 01 (880x110 @ 480,50) ───── */
 .title{
-  grid-area:title;
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  padding:0 4px 10px;
-  border-bottom:1px solid rgba(0,255,65,0.06);
-}
-.title h1{
-  font-family:var(--f1);
-  font-size:clamp(22px,5.5vw,52px);
-  letter-spacing:0.14em;
-  line-height:0.88;
-  text-shadow:0 0 24px rgba(0,255,65,0.25);
-}
-.title .sub{
-  display:flex;flex-direction:column;
-  align-items:flex-end;gap:5px;
-  padding-bottom:4px;
-}
-.title .sub span{
-  font-family:var(--f2);font-size:8px;
-  letter-spacing:2px;opacity:0.2;
-  text-transform:uppercase;
+  position:absolute;
+  left:33.33%;top:5.56%;
+  width:61.11%;height:12.22%;
+  display:flex;align-items:center;justify-content:flex-start;
 }
 
-/* VERTICAL MYSTRA — stacked letters, no border */
+/* ───── VBASE: dashed block (180x110 @ 1180,190) ───── */
+.vbase{
+  position:absolute;
+  left:81.94%;top:21.11%;
+  width:12.5%;height:12.22%;
+  border:4px dashed rgba(0,255,65,1);
+  background:rgba(0,255,65,0.09);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* ───── MAIN: big center block — gif animation (660x460 @ 480,190) ───── */
+.main{
+  position:absolute;
+  left:33.33%;top:21.11%;
+  width:45.83%;height:51.11%;
+  border:4px solid rgba(0,51,255,0.58);
+  background:rgba(0,36,143,0.17);
+  overflow:hidden;
+  box-shadow:0 0 12px rgba(0,51,255,0.15), inset 0 0 30px rgba(0,36,143,0.06);
+}
+
+/* ───── VERT: vertical MYSTRA text (180x320 @ 1180,320) ───── */
 .vert{
-  grid-area:vert;
+  position:absolute;
+  left:81.94%;top:35.56%;
+  width:12.5%;height:35.56%;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  gap:6px;
+  gap:8px;
+}
+
+/* ───── SMALL GIF: overlay block (180x150 @ 980,520) ───── */
+.small-gif{
+  position:absolute;
+  left:68.06%;top:57.78%;
+  width:12.5%;height:16.67%;
+  border:3px solid rgba(0,51,255,0.58);
+  overflow:hidden;
+  box-shadow:0 0 12px rgba(0,51,255,0.15);
+}
+
+/* ───── LABEL: bottom-left text (320x80 @ 90,690) ───── */
+.label{
+  position:absolute;
+  left:6.25%;top:76.67%;
+  width:22.22%;height:8.89%;
+  display:flex;flex-direction:column;
+  justify-content:center;gap:4px;
+}
+
+/* ───── INFO: bottom bar (910x80 @ 470,690) ───── */
+.info{
+  position:absolute;
+  left:32.64%;top:76.67%;
+  width:63.19%;height:8.89%;
+  border:3px solid var(--magenta);
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:4px;padding:4px;
+}
+
+/* ═══ SHARED STYLES ═══ */
+.th{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:brightness(0.5) contrast(1.15) saturate(0.8);
+  transition:filter 0.4s,opacity 0.4s;
+  opacity:0.6;
+}
+.img1:hover .th,.img2:hover .th,.main:hover .th,.small-gif:hover .th{
+  filter:brightness(0.7) contrast(1.1) saturate(1);
+  opacity:0.85;
+}
+
+.lb{
+  position:absolute;top:8px;left:12px;
+  font-family:var(--f2);font-size:7px;
+  letter-spacing:2px;opacity:0.25;
+  text-transform:uppercase;z-index:3;
+}
+.nr{
+  position:absolute;bottom:6px;right:8px;
+  font-family:var(--f3);font-size:10px;
+  opacity:0.12;z-index:3;
+}
+
+/* ═══ TITLE ═══ */
+.title .custom-font{
+  max-width:100%;max-height:100%;
+  image-rendering:pixelated;
+  display:block;
+}
+
+/* ═══ VERT LETTERS ═══ */
+.vert span{
   font-family:var(--f1);
-  font-size:clamp(12px,1.6vw,17px);
+  font-size:clamp(11px,1.5vw,18px);
+  color:var(--g);
   letter-spacing:0.06em;
   text-shadow:0 0 14px rgba(0,255,65,0.2);
   -webkit-text-stroke:0.5px var(--g);
   paint-order:stroke fill;
 }
 
-/* L-base under vert */
-.vbase{
-  grid-area:vbase;
-  border-left:1px solid var(--gb);
-  border-bottom:1px solid var(--gb);
+/* ═══ ICONS / SENSORS ═══ */
+.sensors{display:flex;align-items:flex-end;gap:2px;height:100%;padding:4px}
+.sensors .bar{
+  width:3px;background:var(--blue-bright);
+  box-shadow:0 0 3px var(--blue-bright);
+  animation:sbar 2s ease-in-out infinite;
 }
+@keyframes sbar{0%,100%{height:15%}50%{height:85%}}
 
-/* IMG1 — top-left */
-.img1{
-  grid-area:img1;
-  border:1px solid var(--gb);
-  position:relative;overflow:hidden;
-  transition:border-color 0.3s;
-  min-height:120px;
-}
-.img1:hover{border-color:var(--gh)}
-
-/* ICONS — thin row */
-.icons{
-  grid-area:icons;
-  display:grid;
-  grid-template-columns:48px repeat(3,1fr) 2.5fr;
-  gap:5px;
-  align-items:stretch;
-}
-.ic{
-  border:1px solid rgba(0,255,65,0.1);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--f3);font-size:11px;
-  opacity:0.25;
-}
-.ic-txt{
-  border:none;
-  font-family:var(--f3);font-size:11px;
-  line-height:1.4;color:var(--g2);
-  opacity:0.25;padding:0 6px;
-  display:flex;align-items:center;
-}
-
-/* IMG2 — bottom-left */
-.img2{
-  grid-area:img2;
-  border:1px solid var(--gb);
-  position:relative;overflow:hidden;
-  transition:border-color 0.3s;
-  min-height:100px;
-}
-.img2:hover{border-color:var(--gh)}
-
-/* MAIN — big right block, spans 3 rows */
-.main{
-  grid-area:main;
-  border:1px solid var(--gb);
-  position:relative;overflow:hidden;
-  transition:border-color 0.3s;
-  min-height:200px;
-}
-.main:hover{border-color:var(--gh)}
-
-/* LABEL — bottom-left text */
-.label{
-  grid-area:label;
-  display:flex;flex-direction:column;
-  justify-content:center;gap:6px;
-  padding:4px 0;
-}
+/* ═══ LABEL ═══ */
 .label .big{
   font-family:var(--f1);
-  font-size:clamp(14px,3.5vw,32px);
-  letter-spacing:0.1em;
-  line-height:1;
-  display:flex;align-items:center;gap:10px;
+  font-size:clamp(12px,3vw,28px);
+  letter-spacing:0.1em;line-height:1;
+  color:var(--g);
+  display:flex;align-items:center;gap:8px;
 }
-.label .big .arr{font-size:0.6em;opacity:0.35}
+.label .big .arr{font-size:0.6em;opacity:0.3}
 .label .tagline{
-  font-family:var(--f2);font-size:8px;
-  letter-spacing:2px;opacity:0.18;
+  font-family:var(--f2);font-size:7px;
+  letter-spacing:2px;opacity:0.15;
   text-transform:uppercase;
 }
 
-/* INFO — bottom-right sub-grid */
-.info{
-  grid-area:info;
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  grid-template-rows:1fr 1fr;
-  gap:5px;
-}
+/* ═══ INFO CELLS ═══ */
 .info-c{
-  border:1px solid rgba(0,255,65,0.08);
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   font-family:var(--f3);font-size:10px;
-  color:var(--g2);opacity:0.25;
+  color:var(--g);opacity:0.35;
 }
-.info-c.open{border:none}
-.info-c .v{font-size:13px;color:var(--g);opacity:0.5;margin-bottom:1px}
+.info-c .v{
+  font-size:14px;color:var(--magenta);
+  opacity:0.7;margin-bottom:1px;
+  text-shadow:0 0 8px rgba(238,0,255,0.2);
+}
 
-/* DIVIDER */
-.divider{
-  grid-area:div;
-  border-top:1px solid rgba(0,255,65,0.06);
-  display:flex;align-items:center;
+/* ═══ FOOT LINE ═══ */
+.foot-line span{
   font-family:var(--f2);font-size:7px;
-  letter-spacing:2px;opacity:0.12;
-  padding:0 4px;
+  letter-spacing:2px;opacity:0.1;
+  text-transform:uppercase;
+}
+.foot-line .fl{flex:1;height:1px;background:rgba(0,255,65,0.04);margin:0 8px}
+
+/* ═══ VBASE content ═══ */
+.vbase-inner{
+  font-family:var(--f3);font-size:10px;
+  color:var(--blue-bright);opacity:0.4;
+  text-align:center;line-height:1.6;
+  letter-spacing:1px;
 }
 
-/* FOOTER */
-.foot{
-  grid-area:foot;
-  display:flex;align-items:center;
-  justify-content:space-between;gap:8px;
-  font-family:var(--f2);font-size:7px;
-  letter-spacing:2px;opacity:0.12;
+/* ═══ EXPAND OVERLAY ═══ */
+.ex{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0.96);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:12px;opacity:0;
+  transform:scale(0.97);
+  transition:opacity 0.3s cubic-bezier(0.16,1,0.3,1),transform 0.3s cubic-bezier(0.16,1,0.3,1);
+  pointer-events:none;z-index:6;
 }
-.foot .fl{flex:1;height:1px;background:rgba(0,255,65,0.04)}
-
-/* ═══ SHARED ═══ */
-.th{width:100%;height:100%;object-fit:cover;display:block;opacity:0.4;filter:brightness(0.45) contrast(1.2);transition:opacity 0.3s}
-.img1:hover .th,.img2:hover .th,.main:hover .th{opacity:0.6}
-
-.lb{position:absolute;top:6px;left:10px;font-family:var(--f2);font-size:7px;letter-spacing:2px;opacity:0.18;text-transform:uppercase;z-index:3}
-.nr{position:absolute;bottom:4px;right:7px;font-family:var(--f3);font-size:10px;opacity:0.1;z-index:3}
-
-/* expand overlay */
-.ex{position:absolute;inset:0;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;opacity:0;transform:scale(0.97);transition:opacity 0.3s cubic-bezier(0.16,1,0.3,1),transform 0.3s cubic-bezier(0.16,1,0.3,1);pointer-events:none;z-index:6}
 .ex.open{opacity:1;transform:scale(1);pointer-events:all}
-.ex img{max-width:92%;max-height:80%;object-fit:contain}
-.ex .el{font-family:var(--f2);font-size:8px;letter-spacing:2px;opacity:0.25;margin-top:8px}
-.ex .cx{position:absolute;top:6px;right:8px;font-family:var(--f2);font-size:12px;cursor:pointer;opacity:0.25}
+.ex img{max-width:94%;max-height:82%;object-fit:contain}
+.ex .el{font-family:var(--f2);font-size:7px;letter-spacing:2px;opacity:0.2;margin-top:8px}
+.ex .cx{position:absolute;top:6px;right:8px;font-family:var(--f2);font-size:14px;cursor:pointer;opacity:0.25}
 .ex .cx:hover{opacity:1}
 
-/* sensor bars */
-.sensors{display:flex;align-items:flex-end;gap:2px;height:100%;padding:4px}
-.sensors .bar{width:3px;background:var(--g);box-shadow:0 0 2px var(--g);animation:sbar 2s ease-in-out infinite}
-@keyframes sbar{0%,100%{height:15%}50%{height:80%}}
-
-/* blink cursor */
+/* ═══ ANIMATIONS ═══ */
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 .bk{animation:blink 1.2s step-end infinite}
 
-/* subtle glow pulse on main */
-@keyframes glowpulse{0%,100%{box-shadow:0 0 0 rgba(0,255,65,0)}50%{box-shadow:0 0 20px rgba(0,255,65,0.04)}}
+@keyframes glowpulse{
+  0%,100%{box-shadow:0 0 12px rgba(0,51,255,0.1), inset 0 0 30px rgba(0,36,143,0.04)}
+  50%{box-shadow:0 0 25px rgba(0,51,255,0.2), inset 0 0 40px rgba(0,36,143,0.08)}
+}
 .main{animation:glowpulse 6s ease-in-out infinite}
+
+@keyframes scanline{
+  0%{transform:translateY(-100%)}
+  100%{transform:translateY(100%)}
+}
+.main::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(transparent 40%,rgba(0,51,255,0.03) 50%,transparent 60%);
+  animation:scanline 4s linear infinite;
+  pointer-events:none;
+}
 
 /* ═══ MOBILE ═══ */
 @media(max-width:768px){
   html,body{overflow:auto}
-  .poster{
-    height:auto;min-height:100vh;
-    grid-template-columns:1fr 36px;
-    grid-template-rows:auto auto auto auto auto auto auto auto;
-    grid-template-areas:
-      "title  vert"
-      "img1   vert"
-      "main   vert"
-      "icons  vert"
-      "img2   vert"
-      "label  vert"
-      "info   vert"
-      "foot   vbase";
-    padding:16px 12px;gap:6px;
+  .poster{height:auto;min-height:100vh;padding:12px}
+
+  .img2,.img1,.main,.small-gif,.title,.vert,.vbase,.icons,.foot-line,.label,.info{
+    position:relative;
+    left:auto;top:auto;
+    width:100%;height:auto;
+    margin-bottom:8px;
   }
-  .img1,.img2{min-height:160px}
-  .main{min-height:220px}
-  .icons{grid-template-columns:40px repeat(2,1fr) 2fr}
-  .divider{display:none}
-  .title h1{font-size:clamp(18px,8vw,36px)}
+  .img2,.img1{height:200px}
+  .main{height:280px}
+  .small-gif{height:150px}
+  .title{height:auto;padding:16px 0}
+  .vert{flex-direction:row;height:auto;padding:8px 0;gap:12px}
+  .vbase{height:60px}
+  .icons{height:40px;width:100%}
+  .info{height:auto;min-height:60px}
+  .label{height:auto;padding:8px 0}
 }
 </style>
 </head>
@@ -277,64 +330,66 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--g)}
 
 <div class="poster">
 
-  <!-- TITLE -->
-  <div class="title">
-    <h1>MYSTRA<br>01</h1>
-    <div class="sub">
-      <span>HEXAPOD RESEARCH UNIT</span>
-      <span>NO — 0001 <span class="bk">_</span></span>
+  <!-- IMG2: top-left — concept/schematic with blue fill -->
+  <div class="img2" onclick="tgl(this)">
+    <span class="lb" style="color:var(--white)">concept render</span>
+    <span class="nr" style="color:var(--white)">No.1</span>
+    <img class="th" src="img/spider-warhammer.jpg" alt="">
+    <div class="ex">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/spider-warhammer.jpg" alt="">
+      <div class="el">CONCEPT 01 // ARMORED VARIANT</div>
     </div>
   </div>
 
-  <!-- VERTICAL MYSTRA — stacked, no border -->
-  <div class="vert">
-    <span>M</span><span>Y</span><span>S</span><span>T</span><span>R</span><span>A</span>
+  <!-- ICONS: small sensor block -->
+  <div class="icons">
+    <div class="sensors">
+      <div class="bar" style="animation-delay:0s"></div>
+      <div class="bar" style="animation-delay:0.12s"></div>
+      <div class="bar" style="animation-delay:0.24s"></div>
+      <div class="bar" style="animation-delay:0.36s"></div>
+      <div class="bar" style="animation-delay:0.48s"></div>
+      <div class="bar" style="animation-delay:0.6s"></div>
+      <div class="bar" style="animation-delay:0.72s"></div>
+    </div>
   </div>
-  <div class="vbase"></div>
 
-  <!-- IMG1: top-left -->
+  <!-- FOOT LINE -->
+  <div class="foot-line">
+    <span>GHOSTLINE LAB</span>
+    <span class="fl"></span>
+    <span>HEX-01</span>
+  </div>
+
+  <!-- IMG1: left-bottom — spider photo -->
   <div class="img1" onclick="tgl(this)">
-    <span class="lb">primary viewport</span>
-    <span class="nr">No.1</span>
+    <span class="lb" style="color:var(--orange)">primary viewport</span>
+    <span class="nr" style="color:var(--orange)">No.2</span>
     <img class="th" src="img/spider-front.jpg" alt="">
     <div class="ex">
       <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
       <img src="img/spider-front.jpg" alt="">
-      <div class="el">CONCEPT 01 // ARMORED SHELL</div>
+      <div class="el">MYSTRA 01 // FRONT VIEW</div>
     </div>
   </div>
 
-  <!-- ICONS ROW -->
-  <div class="icons">
-    <div class="ic">
-      <div class="sensors">
-        <div class="bar" style="animation-delay:0s"></div>
-        <div class="bar" style="animation-delay:0.15s"></div>
-        <div class="bar" style="animation-delay:0.3s"></div>
-        <div class="bar" style="animation-delay:0.45s"></div>
-        <div class="bar" style="animation-delay:0.6s"></div>
-        <div class="bar" style="animation-delay:0.75s"></div>
-      </div>
-    </div>
-    <div class="ic" style="font-size:10px">18</div>
-    <div class="ic" style="font-size:10px">3DOF</div>
-    <div class="ic" style="font-size:10px">RPi4</div>
-    <div class="ic-txt">SIX LEGS. NO ROADS. NO LIMITS.</div>
+  <!-- TITLE: MYSTRA 01 — PNG sequence, plays once -->
+  <div class="title">
+    <img id="titleAnim" class="custom-font" src="img/mystra-anim/1.PNG" alt="MYSTRA 01">
   </div>
 
-  <!-- IMG2: bottom-left -->
-  <div class="img2" onclick="tgl(this)">
-    <span class="lb">schematic</span>
-    <span class="nr">No.2</span>
-    <img class="th" src="img/schematic-green.jpg" alt="">
-    <div class="ex">
-      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-      <img src="img/schematic-green.jpg" alt="">
-      <div class="el">ACTIVE SCHEMATIC // WIREFRAME</div>
+  <!-- VBASE: dashed green block — data/status -->
+  <div class="vbase">
+    <div class="vbase-inner">
+      SYS.ACTIVE<br>
+      LINK:OK<br>
+      PWR:98%<br>
+      <span class="bk">_</span>
     </div>
   </div>
 
-  <!-- MAIN: big right block -->
+  <!-- MAIN: big center block — gif animation -->
   <div class="main" onclick="tgl(this)">
     <span class="lb">main assembly</span>
     <span class="nr">No.3</span>
@@ -346,32 +401,36 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--g)}
     </div>
   </div>
 
-  <!-- LABEL -->
+  <!-- VERT: vertical MYSTRA letters -->
+  <div class="vert">
+    <span>M</span><span>Y</span><span>S</span><span>T</span><span>R</span><span>A</span>
+  </div>
+
+  <!-- SMALL GIF: overlay inside main area -->
+  <div class="small-gif" onclick="tgl(this)">
+    <span class="lb">detail</span>
+    <img class="th" src="img/pixel-hex-large.jpg" alt="">
+    <div class="ex">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/pixel-hex-large.jpg" alt="">
+      <div class="el">PIXEL HEX // DETAIL</div>
+    </div>
+  </div>
+
+  <!-- LABEL: bottom-left -->
   <div class="label">
     <div class="big"><span class="arr">&#x2196;</span> GHSTLN</div>
     <div class="tagline">GHOSTLINE LAB // HEXAPOD DIVISION</div>
   </div>
 
-  <!-- INFO sub-grid -->
+  <!-- INFO: bottom bar with magenta border -->
   <div class="info">
     <div class="info-c"><span class="v">85%</span>BUILD</div>
     <div class="info-c"><span class="v">40%</span>AI</div>
-    <div class="info-c open"><span class="v">v1.0</span>REV</div>
+    <div class="info-c"><span class="v">v1.0</span>REV</div>
     <div class="info-c"><span class="v">18</span>SRV</div>
     <div class="info-c"><span class="v">6</span>LEGS</div>
-    <div class="info-c open"><span class="v">3</span>DOF</div>
-  </div>
-
-  <!-- DIVIDER -->
-  <div class="divider">GHOSTLINE LAB &mdash; MYSTRA 01 &mdash; ASSEMBLY PHASE</div>
-
-  <!-- FOOTER -->
-  <div class="foot">
-    <span>GHOSTLINE LAB</span>
-    <span class="fl"></span>
-    <span>MYSTRA 01</span>
-    <span style="opacity:0.5">&#x25CF;&#x25CF;&#x25CF;</span>
-    <span>2025</span>
+    <div class="info-c"><span class="v">3</span>DOF</div>
   </div>
 
 </div>
@@ -379,6 +438,35 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--g)}
 <script>
 function tgl(c){const e=c.querySelector('.ex');if(e)e.classList.toggle('open')}
 function cls(b){b.closest('.ex').classList.remove('open')}
+
+// ═══ PNG SEQUENCE: play once, stop on last frame ═══
+(function(){
+  const el = document.getElementById('titleAnim');
+  const totalFrames = 8;
+  const frameDelay = 150; // ms between frames
+  let frame = 1;
+
+  // Preload all frames
+  const frames = [];
+  let loaded = 0;
+  for(let i = 1; i <= totalFrames; i++){
+    const img = new Image();
+    img.src = 'img/mystra-anim/' + i + '.PNG';
+    img.onload = ()=>{ loaded++; if(loaded === totalFrames) play(); };
+    frames.push(img);
+  }
+
+  function play(){
+    const timer = setInterval(()=>{
+      frame++;
+      if(frame > totalFrames){
+        clearInterval(timer);
+        return; // stop on last frame
+      }
+      el.src = frames[frame-1].src;
+    }, frameDelay);
+  }
+})();
 </script>
 
 </body>
