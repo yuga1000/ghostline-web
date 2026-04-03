@@ -70,13 +70,17 @@ html,body{
   box-shadow:0 0 40px rgba(0,50,255,0.2), inset 0 0 60px rgba(0,50,255,0.08);
 }
 
-/* ───── ICONS: small box (130x50 @ 90,300) ───── */
+/* ───── ICONS: pixel arcade chart (130x50 @ 90,300) ───── */
 .icons{
   position:absolute;
   left:6.25%;top:33.33%;
   width:9.03%;height:5.56%;
   border:6px solid rgba(0,102,255,0.2);
-  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.icons canvas{
+  width:100%;height:100%;
+  image-rendering:pixelated;
 }
 
 /* ───── FOOTER line: (340x30 @ 90,370) ───── */
@@ -346,17 +350,9 @@ html,body{
     </div>
   </div>
 
-  <!-- ICONS: small sensor block -->
+  <!-- ICONS: pixel arcade bar chart -->
   <div class="icons">
-    <div class="sensors">
-      <div class="bar" style="animation-delay:0s"></div>
-      <div class="bar" style="animation-delay:0.12s"></div>
-      <div class="bar" style="animation-delay:0.24s"></div>
-      <div class="bar" style="animation-delay:0.36s"></div>
-      <div class="bar" style="animation-delay:0.48s"></div>
-      <div class="bar" style="animation-delay:0.6s"></div>
-      <div class="bar" style="animation-delay:0.72s"></div>
-    </div>
+    <canvas id="arcadeChart"></canvas>
   </div>
 
   <!-- FOOT LINE -->
@@ -442,6 +438,117 @@ html,body{
 <script>
 function tgl(c){const e=c.querySelector('.ex');if(e)e.classList.toggle('open')}
 function cls(b){b.closest('.ex').classList.remove('open')}
+
+// ═══ PIXEL ARCADE BAR CHART ═══
+(function(){
+  const canvas = document.getElementById('arcadeChart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const parent = canvas.parentElement;
+
+  const px = 4; // pixel block size
+  const gap = 1; // gap between blocks
+  const step = px + gap;
+  const cols = 8; // number of bar columns
+  const barGap = 2; // columns gap between bars in px-units
+  // Target heights per bar (in pixel-blocks, will animate up)
+  const targets = [6, 10, 4, 12, 8, 14, 5, 9];
+  const fills = []; // current fill level per bar (animated)
+  const colors = [
+    '#0066FF','#00FF41','#ee00ff','#0066FF',
+    '#00FFFF','#00FF41','#FF6600','#0066FF'
+  ];
+
+  let maxRows = 0;
+  let startTime = 0;
+  let started = false;
+
+  function resize(){
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight;
+    maxRows = Math.floor(canvas.height / step);
+    // Reset fills
+    fills.length = 0;
+    for(let i = 0; i < cols; i++) fills.push(0);
+    startTime = performance.now();
+    started = true;
+  }
+
+  function draw(t){
+    if(!started) { requestAnimationFrame(draw); return; }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const elapsed = t - startTime;
+    const totalBarWidth = cols * (px + barGap * step) - barGap * step;
+    const totalW = cols * px + (cols - 1) * barGap * step;
+    const offsetX = Math.max(0, Math.floor((canvas.width - totalW) / 2));
+
+    for(let i = 0; i < cols; i++){
+      // Animate fill — each bar starts with delay
+      const delay = i * 150; // ms between each bar starting
+      const barElapsed = Math.max(0, elapsed - delay);
+      const speed = 0.008; // blocks per ms
+      const target = Math.min(targets[i], maxRows - 1);
+      const current = Math.min(target, barElapsed * speed);
+      fills[i] = current;
+
+      const x = offsetX + i * (px + barGap * step);
+
+      // Draw filled blocks from bottom
+      const fullBlocks = Math.floor(current);
+      const partial = current - fullBlocks;
+
+      for(let row = 0; row < fullBlocks; row++){
+        const y = canvas.height - (row + 1) * step;
+        // Flicker — slight random brightness
+        const flicker = 0.7 + 0.3 * Math.random();
+        ctx.globalAlpha = flicker;
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(x, y, px, px);
+
+        // CRT glow on top pixel
+        if(row === fullBlocks - 1){
+          ctx.globalAlpha = 0.3 + 0.2 * Math.sin(t * 0.005 + i);
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(x, y, px, 1);
+        }
+      }
+
+      // Partial block (growing)
+      if(partial > 0 && fullBlocks < target){
+        const y = canvas.height - (fullBlocks + 1) * step;
+        ctx.globalAlpha = partial * 0.8;
+        ctx.fillStyle = colors[i];
+        ctx.fillRect(x, y, px, px);
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    // After all bars filled — subtle pulse on random blocks
+    if(elapsed > cols * 150 + 2000){
+      for(let i = 0; i < cols; i++){
+        const target = Math.min(targets[i], maxRows - 1);
+        // Random block flashes brighter
+        if(Math.random() < 0.02){
+          const row = Math.floor(Math.random() * target);
+          const x = offsetX + i * (px + barGap * step);
+          const y = canvas.height - (row + 1) * step;
+          ctx.globalAlpha = 0.9;
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(x, y, px, px);
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
+})();
 
 // ═══ PNG SEQUENCE: play once, stop on last frame ═══
 (function(){
