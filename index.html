@@ -58,9 +58,9 @@
 <body>
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
-<div id="sun-bg" style="position:fixed;z-index:0;pointer-events:none;bottom:-220px;right:18%;">
+<div id="sun-bg" style="position:fixed;z-index:0;pointer-events:none;bottom:-140px;right:18%;">
   <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
-       alt="" style="width:200px;height:200px;border-radius:50%;opacity:0.6;filter:brightness(0.5) saturate(0.6);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 40%,transparent 72%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 40%,transparent 72%);">
+       alt="" style="width:280px;height:280px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 30%,transparent 65%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 30%,transparent 65%);">
 </div>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
 <script>
