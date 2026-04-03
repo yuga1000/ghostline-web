@@ -70,11 +70,11 @@ html,body{
   box-shadow:0 0 40px rgba(0,50,255,0.2), inset 0 0 60px rgba(0,50,255,0.08);
 }
 
-/* ───── ICONS: isometric pixel chart (130x50 @ 90,300) ───── */
+/* ───── ICONS: isometric pixel chart — full left column width ───── */
 .icons{
   position:absolute;
   left:6.25%;top:33.33%;
-  width:9.03%;height:5.56%;
+  width:23.61%;height:5.56%;
   overflow:hidden;
 }
 .icons canvas{
@@ -438,16 +438,16 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   const ctx = canvas.getContext('2d');
   const parent = canvas.parentElement;
 
-  const cols = 6;
-  const colors = ['#0044cc','#0055ee','#0033ff','#0066FF','#0044dd','#0055cc'];
-  const topColors = ['#0077ff','#0088ff','#0066ff','#0099ff','#0077ff','#0088ff'];
-  const sideColors = ['#001a66','#002288','#001a55','#002299','#001a77','#002266'];
+  const cols = 12;
+  const colors = ['#0044cc','#0055ee','#0033ff','#0066FF','#0044dd','#0055cc','#0033ee','#0055ff','#0044bb','#0066ee','#0033dd','#0055bb'];
+  const topColors = ['#0077ff','#0088ff','#0066ff','#0099ff','#0077ff','#0088ff','#0077ff','#0099ff','#0088ff','#0077ff','#0066ff','#0099ff'];
+  const sideColors = ['#001a66','#002288','#001a55','#002299','#001a77','#002266','#001a66','#002288','#001a55','#002299','#001a77','#002266'];
 
   // Current and target heights (in blocks)
-  let heights = [3,5,2,7,4,6];
-  let displayed = [0,0,0,0,0,0];
+  let heights = [3,5,2,7,4,6,5,3,8,4,6,2];
+  let displayed = new Array(cols).fill(0);
   let nextChange = 0;
-  const changeInterval = 3000; // ms between height changes
+  const changeInterval = 1800; // ms between height changes
 
   function resize(){
     canvas.width = parent.clientWidth * 2;
@@ -500,10 +500,13 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   function draw(t){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Slowly step displayed heights toward targets (discrete)
-    for(let i = 0; i < cols; i++){
-      if(displayed[i] < heights[i]) displayed[i]++;
-      else if(displayed[i] > heights[i]) displayed[i]--;
+    // Step displayed heights toward targets — 8 steps per second
+    if(!draw.lastStep || t - draw.lastStep > 120){
+      draw.lastStep = t;
+      for(let i = 0; i < cols; i++){
+        if(displayed[i] < heights[i]) displayed[i]++;
+        else if(displayed[i] > heights[i]) displayed[i]--;
+      }
     }
 
     // Draw bars back to front
@@ -527,7 +530,7 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   window.addEventListener('resize', resize);
   resize();
   // Initial fill animation — start from 0
-  displayed = [0,0,0,0,0,0];
+  displayed = new Array(cols).fill(0);
   nextChange = performance.now() + changeInterval;
   requestAnimationFrame(draw);
 })();
