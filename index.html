@@ -140,10 +140,19 @@
       // random blink
       const flash = (Math.sin(t * 0.003 + d.phase * 100) > 0.997) ? 0.3 : 0;
 
-      const shimmer = 0.04 + 0.02 * Math.sin(t * 0.0006 * d.speed + d.phase);
-      const alpha = Math.min(shimmer + cursorGlow + pulse + flash, 0.5);
+      // Solar activity boosts shimmer
+      const kpMult = window.solarKpMultiplier || 1;
+      const kpBoost = window.solarKpBrightness || 0;
 
-      ctx.strokeStyle = `rgba(0,80,255,${alpha})`;
+      const shimmer = (0.04 + 0.02 * Math.sin(t * 0.0006 * d.speed + d.phase)) * kpMult;
+      const alpha = Math.min(shimmer + cursorGlow + pulse + flash + kpBoost, 0.6);
+
+      // Kp 7+ shifts crosses toward green/cyan
+      const kp = (window.solarState && window.solarState.kp) || 0;
+      const r = kp >= 7 ? 0 : 0;
+      const g = kp >= 7 ? 180 : kp >= 5 ? 120 : 80;
+      const b = kp >= 5 ? 200 : 255;
+      ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
       ctx.lineWidth = 1;
       const s = 4;
       ctx.beginPath();
@@ -1537,6 +1546,9 @@ initATASquare();
   });
 })();
 </script>
+
+<!-- Solar Activity System — real-time space weather effects -->
+<script src="js/solar-activity.js"></script>
 
   </body>
   </html>
