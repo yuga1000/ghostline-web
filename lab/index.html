@@ -70,12 +70,11 @@ html,body{
   box-shadow:0 0 40px rgba(0,50,255,0.2), inset 0 0 60px rgba(0,50,255,0.08);
 }
 
-/* ───── ICONS: pixel arcade chart (130x50 @ 90,300) ───── */
+/* ───── ICONS: isometric pixel chart (130x50 @ 90,300) ───── */
 .icons{
   position:absolute;
   left:6.25%;top:33.33%;
   width:9.03%;height:5.56%;
-  border:6px solid rgba(0,102,255,0.2);
   overflow:hidden;
 }
 .icons canvas{
@@ -439,106 +438,93 @@ html,body{
 function tgl(c){const e=c.querySelector('.ex');if(e)e.classList.toggle('open')}
 function cls(b){b.closest('.ex').classList.remove('open')}
 
-// ═══ PIXEL ARCADE BAR CHART ═══
+// ═══ ISOMETRIC PIXEL BAR CHART ═══
 (function(){
   const canvas = document.getElementById('arcadeChart');
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
   const parent = canvas.parentElement;
 
-  const px = 4; // pixel block size
-  const gap = 1; // gap between blocks
-  const step = px + gap;
-  const cols = 8; // number of bar columns
-  const barGap = 2; // columns gap between bars in px-units
-  // Target heights per bar (in pixel-blocks, will animate up)
-  const targets = [6, 10, 4, 12, 8, 14, 5, 9];
-  const fills = []; // current fill level per bar (animated)
-  const colors = [
-    '#0066FF','#00FF41','#ee00ff','#0066FF',
-    '#00FFFF','#00FF41','#FF6600','#0066FF'
-  ];
+  const cols = 6;
+  const colors = ['#0044cc','#0055ee','#0033ff','#0066FF','#0044dd','#0055cc'];
+  const topColors = ['#0077ff','#0088ff','#0066ff','#0099ff','#0077ff','#0088ff'];
+  const sideColors = ['#001a66','#002288','#001a55','#002299','#001a77','#002266'];
 
-  let maxRows = 0;
-  let startTime = 0;
-  let started = false;
+  // Current and target heights (in blocks)
+  let heights = [3,5,2,7,4,6];
+  let displayed = [0,0,0,0,0,0];
+  let nextChange = 0;
+  const changeInterval = 3000; // ms between height changes
 
   function resize(){
-    canvas.width = parent.clientWidth;
-    canvas.height = parent.clientHeight;
-    maxRows = Math.floor(canvas.height / step);
-    // Reset fills
-    fills.length = 0;
-    for(let i = 0; i < cols; i++) fills.push(0);
-    startTime = performance.now();
-    started = true;
+    canvas.width = parent.clientWidth * 2;
+    canvas.height = parent.clientHeight * 2;
+    canvas.style.width = parent.clientWidth + 'px';
+    canvas.style.height = parent.clientHeight + 'px';
+  }
+
+  // Draw isometric block at grid position
+  function drawBlock(bx, by, bz, color, topC, sideC){
+    const w = 8; // block width in iso
+    const h = 6; // block height in iso
+    const d = 5; // depth
+
+    // Iso projection
+    const sx = canvas.width/2 + (bx - bz) * (w + 2) - cols * (w+2)/2;
+    const sy = canvas.height - 10 - by * h + (bx + bz) * d/2;
+
+    // Top face
+    ctx.fillStyle = topC;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - h);
+    ctx.lineTo(sx + w, sy - h + d/2);
+    ctx.lineTo(sx, sy + d);
+    ctx.lineTo(sx - w, sy - h + d/2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Left face
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(sx - w, sy - h + d/2);
+    ctx.lineTo(sx, sy + d);
+    ctx.lineTo(sx, sy + d + h);
+    ctx.lineTo(sx - w, sy + d/2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Right face
+    ctx.fillStyle = sideC;
+    ctx.beginPath();
+    ctx.moveTo(sx + w, sy - h + d/2);
+    ctx.lineTo(sx, sy + d);
+    ctx.lineTo(sx, sy + d + h);
+    ctx.lineTo(sx + w, sy + d/2);
+    ctx.closePath();
+    ctx.fill();
   }
 
   function draw(t){
-    if(!started) { requestAnimationFrame(draw); return; }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const elapsed = t - startTime;
-    const totalBarWidth = cols * (px + barGap * step) - barGap * step;
-    const totalW = cols * px + (cols - 1) * barGap * step;
-    const offsetX = Math.max(0, Math.floor((canvas.width - totalW) / 2));
-
+    // Slowly step displayed heights toward targets (discrete)
     for(let i = 0; i < cols; i++){
-      // Animate fill — each bar starts with delay
-      const delay = i * 150; // ms between each bar starting
-      const barElapsed = Math.max(0, elapsed - delay);
-      const speed = 0.008; // blocks per ms
-      const target = Math.min(targets[i], maxRows - 1);
-      const current = Math.min(target, barElapsed * speed);
-      fills[i] = current;
-
-      const x = offsetX + i * (px + barGap * step);
-
-      // Draw filled blocks from bottom
-      const fullBlocks = Math.floor(current);
-      const partial = current - fullBlocks;
-
-      for(let row = 0; row < fullBlocks; row++){
-        const y = canvas.height - (row + 1) * step;
-        // Flicker — slight random brightness
-        const flicker = 0.7 + 0.3 * Math.random();
-        ctx.globalAlpha = flicker;
-        ctx.fillStyle = colors[i];
-        ctx.fillRect(x, y, px, px);
-
-        // CRT glow on top pixel
-        if(row === fullBlocks - 1){
-          ctx.globalAlpha = 0.3 + 0.2 * Math.sin(t * 0.005 + i);
-          ctx.fillStyle = '#fff';
-          ctx.fillRect(x, y, px, 1);
-        }
-      }
-
-      // Partial block (growing)
-      if(partial > 0 && fullBlocks < target){
-        const y = canvas.height - (fullBlocks + 1) * step;
-        ctx.globalAlpha = partial * 0.8;
-        ctx.fillStyle = colors[i];
-        ctx.fillRect(x, y, px, px);
-      }
-
-      ctx.globalAlpha = 1;
+      if(displayed[i] < heights[i]) displayed[i]++;
+      else if(displayed[i] > heights[i]) displayed[i]--;
     }
 
-    // After all bars filled — subtle pulse on random blocks
-    if(elapsed > cols * 150 + 2000){
+    // Draw bars back to front
+    for(let i = 0; i < cols; i++){
+      for(let row = 0; row < displayed[i]; row++){
+        drawBlock(i, row, 0, colors[i], topColors[i], sideColors[i]);
+      }
+    }
+
+    // Change target heights periodically
+    if(t > nextChange){
+      nextChange = t + changeInterval;
       for(let i = 0; i < cols; i++){
-        const target = Math.min(targets[i], maxRows - 1);
-        // Random block flashes brighter
-        if(Math.random() < 0.02){
-          const row = Math.floor(Math.random() * target);
-          const x = offsetX + i * (px + barGap * step);
-          const y = canvas.height - (row + 1) * step;
-          ctx.globalAlpha = 0.9;
-          ctx.fillStyle = '#fff';
-          ctx.fillRect(x, y, px, px);
-          ctx.globalAlpha = 1;
-        }
+        heights[i] = 2 + Math.floor(Math.random() * 8);
       }
     }
 
@@ -547,6 +533,9 @@ function cls(b){b.closest('.ex').classList.remove('open')}
 
   window.addEventListener('resize', resize);
   resize();
+  // Initial fill animation — start from 0
+  displayed = [0,0,0,0,0,0];
+  nextChange = performance.now() + changeInterval;
   requestAnimationFrame(draw);
 })();
 
