@@ -58,9 +58,11 @@
 <body>
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
-<a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" id="sun-bg" style="position:fixed;z-index:0;bottom:-200px;right:18%;cursor:pointer;">
-  <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
-       alt="" style="width:420px;height:420px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 35%,transparent 80%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 35%,transparent 80%);">
+<a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" id="sun-bg" style="position:fixed;z-index:0;bottom:-220px;right:16%;cursor:pointer;">
+  <div style="width:600px;height:600px;display:flex;align-items:center;justify-content:center;mask-image:radial-gradient(circle,rgba(0,0,0,1) 15%,rgba(0,0,0,0.6) 30%,transparent 50%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 15%,rgba(0,0,0,0.6) 30%,transparent 50%);">
+    <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
+         alt="" style="width:160px;height:160px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;">
+  </div>
 </a>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:2;pointer-events:none;"></canvas>
 <script>
