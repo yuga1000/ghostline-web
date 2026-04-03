@@ -12,31 +12,39 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 .toolbar{
   position:fixed;top:0;left:0;right:0;z-index:100;
   background:#1a1a1a;border-bottom:1px solid #333;
-  display:flex;align-items:center;gap:8px;
-  padding:6px 12px;font-size:12px;
+  display:flex;align-items:center;gap:6px;
+  padding:5px 10px;font-size:12px;
   flex-wrap:wrap;
 }
 .toolbar button{
   background:#222;color:#0f0;border:1px solid #444;
-  padding:4px 10px;font-family:inherit;font-size:11px;
-  cursor:pointer;
+  padding:3px 8px;font-family:inherit;font-size:10px;
+  cursor:pointer;white-space:nowrap;
 }
 .toolbar button:hover{background:#333;border-color:#0f0}
 .toolbar button.active{background:#0f0;color:#000}
-.toolbar .sep{width:1px;height:20px;background:#333;margin:0 4px}
-.toolbar label{font-size:11px;opacity:0.6;margin-left:4px}
+.toolbar .sep{width:1px;height:18px;background:#333;margin:0 2px}
+.toolbar label{font-size:10px;opacity:0.6;margin-left:2px}
 .toolbar input[type="number"]{
-  width:44px;background:#222;color:#0f0;border:1px solid #444;
-  padding:2px 4px;font-family:inherit;font-size:11px;text-align:center;
+  width:40px;background:#222;color:#0f0;border:1px solid #444;
+  padding:2px 3px;font-family:inherit;font-size:10px;text-align:center;
 }
 .toolbar select{
   background:#222;color:#0f0;border:1px solid #444;
-  padding:2px 4px;font-family:inherit;font-size:11px;
+  padding:2px 3px;font-family:inherit;font-size:10px;
 }
+
+/* COLOR SWATCHES in toolbar */
+.swatches{display:flex;gap:3px;align-items:center}
+.swatch{
+  width:16px;height:16px;border:1px solid #555;cursor:pointer;
+  transition:transform 0.1s,border-color 0.1s;
+}
+.swatch:hover{transform:scale(1.3);border-color:#fff}
 
 /* CANVAS AREA */
 .canvas-wrap{
-  position:fixed;top:36px;left:0;right:0;bottom:30px;
+  position:fixed;top:34px;left:0;right:0;bottom:28px;
   overflow:hidden;
 }
 .canvas{
@@ -56,35 +64,32 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 /* BLOCKS */
 .block{
   position:absolute;
-  border:1px solid rgba(0,255,65,0.4);
-  background:rgba(0,255,65,0.03);
   cursor:move;
   user-select:none;
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;letter-spacing:1px;opacity:0.9;
+  font-size:10px;letter-spacing:1px;
   transition:box-shadow 0.15s;
 }
-.block:hover{box-shadow:0 0 12px rgba(0,255,65,0.15)}
+.block:hover{filter:brightness(1.2)}
 .block.selected{
-  border-color:#0f0;
-  box-shadow:0 0 16px rgba(0,255,65,0.25);
+  box-shadow:0 0 0 2px #fff;
 }
-.block.no-border{border-style:dashed;border-color:rgba(0,255,65,0.15)}
 .block .block-label{
   pointer-events:none;
-  font-size:9px;opacity:0.5;
+  font-size:9px;opacity:0.7;
   text-transform:uppercase;letter-spacing:1px;
   text-align:center;line-height:1.3;
+  white-space:pre-line;
 }
 
 /* RESIZE HANDLES */
 .block .handle{
   position:absolute;width:8px;height:8px;
-  background:#0f0;opacity:0;
+  background:#fff;opacity:0;
   transition:opacity 0.15s;
   z-index:10;
 }
-.block:hover .handle,.block.selected .handle{opacity:0.6}
+.block:hover .handle,.block.selected .handle{opacity:0.5}
 .block .handle:hover{opacity:1}
 .handle.tl{top:-4px;left:-4px;cursor:nw-resize}
 .handle.tr{top:-4px;right:-4px;cursor:ne-resize}
@@ -95,11 +100,17 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 .handle.ml{left:-4px;top:50%;transform:translateY(-50%);cursor:w-resize}
 .handle.mr{right:-4px;top:50%;transform:translateY(-50%);cursor:e-resize}
 
+/* Z-INDEX layer badges */
+.block .z-badge{
+  position:absolute;top:2px;right:3px;
+  font-size:7px;opacity:0.3;pointer-events:none;
+}
+
 /* STATUSBAR */
 .statusbar{
   position:fixed;bottom:0;left:0;right:0;
   background:#1a1a1a;border-top:1px solid #333;
-  padding:4px 12px;font-size:10px;opacity:0.5;
+  padding:3px 12px;font-size:9px;opacity:0.5;
   display:flex;justify-content:space-between;
 }
 
@@ -125,31 +136,53 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 
 /* PROPERTIES PANEL */
 .props{
-  position:fixed;top:36px;right:0;width:200px;bottom:30px;
+  position:fixed;top:34px;right:0;width:210px;bottom:28px;
   background:#1a1a1a;border-left:1px solid #333;
-  padding:10px;font-size:11px;overflow-y:auto;
+  padding:8px;font-size:11px;overflow-y:auto;
   z-index:50;
   display:none;
 }
 .props.open{display:block}
-.props h3{font-size:11px;opacity:0.5;margin-bottom:8px;font-weight:normal;letter-spacing:1px}
-.props .prop-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.props .prop-row label{opacity:0.5;font-size:10px}
+.props h3{font-size:10px;opacity:0.4;margin-bottom:6px;font-weight:normal;letter-spacing:1px;border-bottom:1px solid #333;padding-bottom:4px}
+.props .prop-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.props .prop-row label{opacity:0.5;font-size:9px;min-width:48px}
 .props .prop-row input{
-  width:60px;background:#222;color:#0f0;border:1px solid #444;
-  padding:2px 4px;font-family:inherit;font-size:11px;text-align:center;
+  width:56px;background:#222;color:#0f0;border:1px solid #444;
+  padding:2px 3px;font-family:inherit;font-size:10px;text-align:center;
 }
 .props .prop-row input[type="checkbox"]{width:auto}
+.props .prop-row input[type="color"]{
+  width:32px;height:20px;padding:0;border:1px solid #444;
+  background:#222;cursor:pointer;
+}
+.props .prop-row input[type="range"]{
+  width:70px;accent-color:#0f0;
+}
 .props .prop-row select{
-  width:80px;background:#222;color:#0f0;border:1px solid #444;
-  padding:2px;font-family:inherit;font-size:10px;
+  width:76px;background:#222;color:#0f0;border:1px solid #444;
+  padding:2px;font-family:inherit;font-size:9px;
 }
-.props button{
+.props .prop-row .val-display{
+  font-size:9px;opacity:0.5;width:24px;text-align:right;
+}
+.props .section-label{font-size:8px;opacity:0.3;letter-spacing:1px;margin:8px 0 4px;text-transform:uppercase}
+.props .color-presets{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}
+.props .color-presets .cp{
+  width:14px;height:14px;border:1px solid #444;cursor:pointer;
+}
+.props .color-presets .cp:hover{border-color:#fff;transform:scale(1.2)}
+.props button.del{
   width:100%;background:#300;color:#f33;border:1px solid #633;
-  padding:4px;font-family:inherit;font-size:10px;cursor:pointer;
-  margin-top:8px;
+  padding:3px;font-family:inherit;font-size:9px;cursor:pointer;
+  margin-top:6px;
 }
-.props button:hover{background:#500}
+.props button.del:hover{background:#500}
+.props button.action{
+  width:100%;background:#222;color:#0f0;border:1px solid #444;
+  padding:3px;font-family:inherit;font-size:9px;cursor:pointer;
+  margin-top:4px;
+}
+.props button.action:hover{background:#333;border-color:#0f0}
 </style>
 </head>
 <body>
@@ -165,21 +198,33 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
   <div class="sep"></div>
   <label>Canvas:</label>
   <select id="canvasPreset" onchange="setCanvasSize(this.value)">
-    <option value="1440x900">1440 x 900</option>
-    <option value="1280x800">1280 x 800</option>
-    <option value="1920x1080">1920 x 1080</option>
-    <option value="375x812">Mobile 375x812</option>
+    <option value="1440x900">1440x900</option>
+    <option value="1280x800">1280x800</option>
+    <option value="1920x1080">1920x1080</option>
+    <option value="375x812">375x812</option>
   </select>
   <div class="sep"></div>
   <button onclick="duplicateSelected()">DUPE</button>
-  <button onclick="alignSelectedH()">ALIGN-H</button>
-  <button onclick="alignSelectedV()">ALIGN-V</button>
+  <button onclick="bringForward()">FWD</button>
+  <button onclick="sendBackward()">BWD</button>
   <div class="sep"></div>
-  <button onclick="exportLayout()">EXPORT CSS</button>
-  <button onclick="exportJSON()">SAVE JSON</button>
-  <button onclick="importJSON()">LOAD JSON</button>
+  <label>Quick:</label>
+  <div class="swatches">
+    <div class="swatch" style="background:#00FF41" onclick="quickColor('#00FF41')" title="Green"></div>
+    <div class="swatch" style="background:#00FFFF" onclick="quickColor('#00FFFF')" title="Cyan"></div>
+    <div class="swatch" style="background:#FF00FF" onclick="quickColor('#FF00FF')" title="Magenta"></div>
+    <div class="swatch" style="background:#FF6600" onclick="quickColor('#FF6600')" title="Amber"></div>
+    <div class="swatch" style="background:#FF003C" onclick="quickColor('#FF003C')" title="Red"></div>
+    <div class="swatch" style="background:#0066FF" onclick="quickColor('#0066FF')" title="Blue"></div>
+    <div class="swatch" style="background:#FFFFFF" onclick="quickColor('#FFFFFF')" title="White"></div>
+    <div class="swatch" style="background:#666666" onclick="quickColor('#666666')" title="Gray"></div>
+  </div>
   <div class="sep"></div>
-  <button onclick="loadPreset()">LOAD MYSTRA PRESET</button>
+  <button onclick="exportLayout()">EXPORT</button>
+  <button onclick="exportJSON()">SAVE</button>
+  <button onclick="importJSON()">LOAD</button>
+  <div class="sep"></div>
+  <button onclick="loadPreset()">PRESET</button>
 </div>
 
 <div class="canvas-wrap" id="canvasWrap">
@@ -190,12 +235,9 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
 
 <div class="props" id="props">
   <h3>PROPERTIES</h3>
-  <div class="prop-row"><label>NAME</label><input type="text" id="propName" onchange="setProp('name',this.value)" style="width:80px"></div>
-  <div class="prop-row"><label>X</label><input type="number" id="propX" onchange="setProp('x',+this.value)"></div>
-  <div class="prop-row"><label>Y</label><input type="number" id="propY" onchange="setProp('y',+this.value)"></div>
-  <div class="prop-row"><label>W</label><input type="number" id="propW" onchange="setProp('w',+this.value)"></div>
-  <div class="prop-row"><label>H</label><input type="number" id="propH" onchange="setProp('h',+this.value)"></div>
-  <div class="prop-row"><label>BORDER</label><input type="checkbox" id="propBorder" onchange="setProp('border',this.checked)"></div>
+
+  <div class="prop-row"><label>NAME</label><input type="text" id="propName" onchange="setProp('name',this.value)" style="width:90px"></div>
+  <div class="prop-row"><label>LABEL</label><input type="text" id="propLabel" onchange="setProp('label',this.value)" style="width:90px"></div>
   <div class="prop-row"><label>TYPE</label>
     <select id="propType" onchange="setProp('type',this.value)">
       <option value="image">IMAGE</option>
@@ -205,13 +247,60 @@ body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hid
       <option value="info">INFO</option>
     </select>
   </div>
-  <div class="prop-row"><label>LABEL</label><input type="text" id="propLabel" onchange="setProp('label',this.value)" style="width:80px"></div>
-  <button onclick="deleteSelected()">DELETE BLOCK</button>
+
+  <div class="section-label">POSITION & SIZE</div>
+  <div class="prop-row"><label>X</label><input type="number" id="propX" onchange="setProp('x',+this.value)"></div>
+  <div class="prop-row"><label>Y</label><input type="number" id="propY" onchange="setProp('y',+this.value)"></div>
+  <div class="prop-row"><label>W</label><input type="number" id="propW" onchange="setProp('w',+this.value)"></div>
+  <div class="prop-row"><label>H</label><input type="number" id="propH" onchange="setProp('h',+this.value)"></div>
+
+  <div class="section-label">BORDER</div>
+  <div class="prop-row"><label>SHOW</label><input type="checkbox" id="propBorder" onchange="setProp('border',this.checked)"></div>
+  <div class="prop-row"><label>COLOR</label><input type="color" id="propBorderColor" value="#00FF41" onchange="setProp('borderColor',this.value)"></div>
+  <div class="prop-row"><label>WIDTH</label><input type="range" min="1" max="6" value="1" id="propBorderWidth" oninput="setProp('borderWidth',+this.value);document.getElementById('bwVal').textContent=this.value+'px'"><span class="val-display" id="bwVal">1px</span></div>
+  <div class="prop-row"><label>OPACITY</label><input type="range" min="0" max="100" value="40" id="propBorderOpacity" oninput="setProp('borderOpacity',+this.value);document.getElementById('boVal').textContent=this.value+'%'"><span class="val-display" id="boVal">40%</span></div>
+  <div class="prop-row"><label>STYLE</label>
+    <select id="propBorderStyle" onchange="setProp('borderStyle',this.value)">
+      <option value="solid">SOLID</option>
+      <option value="dashed">DASHED</option>
+      <option value="dotted">DOTTED</option>
+      <option value="double">DOUBLE</option>
+    </select>
+  </div>
+
+  <div class="section-label">FILL</div>
+  <div class="prop-row"><label>COLOR</label><input type="color" id="propFillColor" value="#00FF41" onchange="setProp('fillColor',this.value)"></div>
+  <div class="prop-row"><label>OPACITY</label><input type="range" min="0" max="100" value="3" id="propFillOpacity" oninput="setProp('fillOpacity',+this.value);document.getElementById('foVal').textContent=this.value+'%'"><span class="val-display" id="foVal">3%</span></div>
+
+  <div class="section-label">TEXT</div>
+  <div class="prop-row"><label>COLOR</label><input type="color" id="propTextColor" value="#00FF41" onchange="setProp('textColor',this.value)"></div>
+  <div class="prop-row"><label>SIZE</label><input type="range" min="6" max="48" value="9" id="propTextSize" oninput="setProp('textSize',+this.value);document.getElementById('tsVal').textContent=this.value+'px'"><span class="val-display" id="tsVal">9px</span></div>
+
+  <div class="section-label">GLOW</div>
+  <div class="prop-row"><label>SHOW</label><input type="checkbox" id="propGlow" onchange="setProp('glow',this.checked)"></div>
+  <div class="prop-row"><label>SIZE</label><input type="range" min="0" max="40" value="10" id="propGlowSize" oninput="setProp('glowSize',+this.value);document.getElementById('gsVal').textContent=this.value+'px'"><span class="val-display" id="gsVal">10px</span></div>
+
+  <div class="section-label">PRESETS</div>
+  <div class="color-presets">
+    <div class="cp" style="background:#00FF41" onclick="applyColorPreset('#00FF41')" title="Matrix Green"></div>
+    <div class="cp" style="background:#00FFFF" onclick="applyColorPreset('#00FFFF')" title="Cyan"></div>
+    <div class="cp" style="background:#FF00FF" onclick="applyColorPreset('#FF00FF')" title="Magenta"></div>
+    <div class="cp" style="background:#FF6600" onclick="applyColorPreset('#FF6600')" title="Amber"></div>
+    <div class="cp" style="background:#FF003C" onclick="applyColorPreset('#FF003C')" title="Red"></div>
+    <div class="cp" style="background:#0066FF" onclick="applyColorPreset('#0066FF')" title="Blue"></div>
+    <div class="cp" style="background:#FFFF00" onclick="applyColorPreset('#FFFF00')" title="Yellow"></div>
+    <div class="cp" style="background:#FFFFFF" onclick="applyColorPreset('#FFFFFF')" title="White"></div>
+    <div class="cp" style="background:#000080" onclick="applyColorPreset('#000080')" title="Navy"></div>
+    <div class="cp" style="background:#800080" onclick="applyColorPreset('#800080')" title="Purple"></div>
+  </div>
+
+  <button class="action" onclick="copyStyleToAll()">APPLY STYLE TO ALL</button>
+  <button class="del" onclick="deleteSelected()">DELETE BLOCK</button>
 </div>
 
 <div class="statusbar">
   <span id="statusPos">X: 0 Y: 0</span>
-  <span id="statusInfo">Blocks: 0 | Click canvas to deselect</span>
+  <span id="statusInfo">Blocks: 0 | Arrows=nudge | Shift+Arrow=50px | Del=remove</span>
 </div>
 
 <div class="export-panel" id="exportPanel">
@@ -229,17 +318,45 @@ let snapEnabled = true;
 let snapVal = 10;
 let canvasW = 1440, canvasH = 900;
 let scale = 1;
-let dragState = null; // {type:'move'|'resize', id, startX, startY, startBlock:{...}, handle:''}
+let dragState = null;
 let idCounter = 0;
 
 const canvas = document.getElementById('canvas');
 const canvasWrap = document.getElementById('canvasWrap');
 
+// Default style for new blocks
+const defaultStyle = {
+  borderColor: '#00FF41',
+  borderWidth: 1,
+  borderOpacity: 40,
+  borderStyle: 'solid',
+  fillColor: '#00FF41',
+  fillOpacity: 3,
+  textColor: '#00FF41',
+  textSize: 9,
+  glow: false,
+  glowSize: 10,
+};
+
+// ═══════════════════════════════
+// HELPERS
+// ═══════════════════════════════
+function hexToRgb(hex){
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+function rgbaStr(hex, opacity){
+  const {r,g,b} = hexToRgb(hex);
+  return `rgba(${r},${g},${b},${opacity/100})`;
+}
+
 // ═══════════════════════════════
 // CANVAS SETUP
 // ═══════════════════════════════
 function fitCanvas(){
-  const ww = canvasWrap.clientWidth - 220; // room for props panel
+  const ww = canvasWrap.clientWidth - 220;
   const wh = canvasWrap.clientHeight - 20;
   scale = Math.min(ww / canvasW, wh / canvasH, 1);
   canvas.style.width = canvasW + 'px';
@@ -276,7 +393,9 @@ function addBlock(type='image'){
     border: type !== 'open',
     type,
     label: type === 'text' ? 'LABEL TEXT' : type === 'open' ? '' : 'block ' + id,
+    ...JSON.parse(JSON.stringify(defaultStyle)),
   };
+  if(type === 'open'){ b.borderOpacity = 12; b.borderStyle = 'dashed'; }
   blocks.push(b);
   renderBlock(b);
   selectBlock(id);
@@ -291,6 +410,7 @@ function renderBlock(b){
     el.id = 'blk-' + b.id;
     el.innerHTML = `
       <div class="block-label"></div>
+      <div class="z-badge"></div>
       <div class="handle tl" data-h="tl"></div>
       <div class="handle tr" data-h="tr"></div>
       <div class="handle bl" data-h="bl"></div>
@@ -302,7 +422,6 @@ function renderBlock(b){
     `;
     canvas.appendChild(el);
 
-    // Mouse events on block
     el.addEventListener('mousedown', (e) => {
       if(e.target.classList.contains('handle')){
         startResize(e, b.id, e.target.dataset.h);
@@ -313,23 +432,42 @@ function renderBlock(b){
     });
   }
 
+  // Position & size
   el.style.left = b.x + 'px';
   el.style.top = b.y + 'px';
   el.style.width = b.w + 'px';
   el.style.height = b.h + 'px';
-  el.classList.toggle('no-border', !b.border);
-  el.classList.toggle('selected', b.id === selectedId);
-  el.querySelector('.block-label').textContent = b.name + (b.label ? '\n' + b.label : '');
 
-  // Color coding by type
-  const colors = {
-    image: 'rgba(0,255,65,0.03)',
-    text: 'rgba(0,150,255,0.04)',
-    open: 'rgba(255,255,0,0.02)',
-    icons: 'rgba(255,100,0,0.03)',
-    info: 'rgba(0,255,200,0.03)',
-  };
-  el.style.background = colors[b.type] || colors.image;
+  // Border
+  if(b.border){
+    el.style.border = `${b.borderWidth||1}px ${b.borderStyle||'solid'} ${rgbaStr(b.borderColor||'#00FF41', b.borderOpacity||40)}`;
+  } else {
+    el.style.border = `1px dashed ${rgbaStr(b.borderColor||'#00FF41', 8)}`;
+  }
+
+  // Fill
+  el.style.background = rgbaStr(b.fillColor||'#00FF41', b.fillOpacity||3);
+
+  // Glow
+  if(b.glow && b.border){
+    el.style.boxShadow = `0 0 ${b.glowSize||10}px ${rgbaStr(b.borderColor||'#00FF41', 25)}, inset 0 0 ${(b.glowSize||10)/2}px ${rgbaStr(b.borderColor||'#00FF41', 8)}`;
+  } else {
+    el.style.boxShadow = b.id === selectedId ? '0 0 0 2px #fff' : 'none';
+  }
+
+  // Selected outline (on top of glow)
+  el.classList.toggle('selected', b.id === selectedId);
+
+  // Label
+  const labelEl = el.querySelector('.block-label');
+  labelEl.textContent = b.name + (b.label ? '\n' + b.label : '');
+  labelEl.style.color = b.textColor || '#00FF41';
+  labelEl.style.fontSize = (b.textSize||9) + 'px';
+
+  // Z-index badge
+  const zi = blocks.indexOf(b);
+  el.querySelector('.z-badge').textContent = 'z' + zi;
+  el.style.zIndex = zi + 1;
 }
 
 function renderAll(){
@@ -337,28 +475,55 @@ function renderAll(){
 }
 
 function selectBlock(id){
+  const prevId = selectedId;
   selectedId = id;
-  document.querySelectorAll('.block').forEach(el => el.classList.remove('selected'));
+
+  // Re-render prev to remove selection styling
+  if(prevId){
+    const pb = blocks.find(b => b.id === prevId);
+    if(pb) renderBlock(pb);
+  }
+
   const el = document.getElementById('blk-' + id);
-  if(el) el.classList.add('selected');
+  if(el){
+    const b = blocks.find(b => b.id === id);
+    if(b) renderBlock(b);
+  }
 
   const panel = document.getElementById('props');
   if(id){
     panel.classList.add('open');
     const b = blocks.find(b => b.id === id);
-    if(b){
-      document.getElementById('propName').value = b.name;
-      document.getElementById('propX').value = Math.round(b.x);
-      document.getElementById('propY').value = Math.round(b.y);
-      document.getElementById('propW').value = Math.round(b.w);
-      document.getElementById('propH').value = Math.round(b.h);
-      document.getElementById('propBorder').checked = b.border;
-      document.getElementById('propType').value = b.type;
-      document.getElementById('propLabel').value = b.label;
-    }
+    if(b) updatePropsPanel(b);
   } else {
     panel.classList.remove('open');
   }
+}
+
+function updatePropsPanel(b){
+  document.getElementById('propName').value = b.name;
+  document.getElementById('propLabel').value = b.label;
+  document.getElementById('propType').value = b.type;
+  document.getElementById('propX').value = Math.round(b.x);
+  document.getElementById('propY').value = Math.round(b.y);
+  document.getElementById('propW').value = Math.round(b.w);
+  document.getElementById('propH').value = Math.round(b.h);
+  document.getElementById('propBorder').checked = b.border;
+  document.getElementById('propBorderColor').value = b.borderColor || '#00FF41';
+  document.getElementById('propBorderWidth').value = b.borderWidth || 1;
+  document.getElementById('bwVal').textContent = (b.borderWidth||1) + 'px';
+  document.getElementById('propBorderOpacity').value = b.borderOpacity || 40;
+  document.getElementById('boVal').textContent = (b.borderOpacity||40) + '%';
+  document.getElementById('propBorderStyle').value = b.borderStyle || 'solid';
+  document.getElementById('propFillColor').value = b.fillColor || '#00FF41';
+  document.getElementById('propFillOpacity').value = b.fillOpacity || 3;
+  document.getElementById('foVal').textContent = (b.fillOpacity||3) + '%';
+  document.getElementById('propTextColor').value = b.textColor || '#00FF41';
+  document.getElementById('propTextSize').value = b.textSize || 9;
+  document.getElementById('tsVal').textContent = (b.textSize||9) + 'px';
+  document.getElementById('propGlow').checked = b.glow || false;
+  document.getElementById('propGlowSize').value = b.glowSize || 10;
+  document.getElementById('gsVal').textContent = (b.glowSize||10) + 'px';
 }
 
 function setProp(key, val){
@@ -366,6 +531,12 @@ function setProp(key, val){
   if(!b) return;
   b[key] = val;
   renderBlock(b);
+  // Update display values
+  if(key === 'borderWidth') document.getElementById('bwVal').textContent = val + 'px';
+  if(key === 'borderOpacity') document.getElementById('boVal').textContent = val + '%';
+  if(key === 'fillOpacity') document.getElementById('foVal').textContent = val + '%';
+  if(key === 'textSize') document.getElementById('tsVal').textContent = val + 'px';
+  if(key === 'glowSize') document.getElementById('gsVal').textContent = val + 'px';
 }
 
 function deleteSelected(){
@@ -382,11 +553,53 @@ function duplicateSelected(){
   const src = blocks.find(b => b.id === selectedId);
   if(!src) return;
   const id = ++idCounter;
-  const b = {...src, id, name: src.name + '_copy', x: src.x + 20, y: src.y + 20};
+  const b = {...JSON.parse(JSON.stringify(src)), id, name: src.name + '_copy', x: src.x + 20, y: src.y + 20};
   blocks.push(b);
   renderBlock(b);
   selectBlock(id);
   updateStatus();
+}
+
+// Quick color from toolbar swatches
+function quickColor(hex){
+  const b = blocks.find(b => b.id === selectedId);
+  if(!b) return;
+  b.borderColor = hex;
+  b.fillColor = hex;
+  b.textColor = hex;
+  renderBlock(b);
+  updatePropsPanel(b);
+}
+
+// Color preset in props panel
+function applyColorPreset(hex){
+  quickColor(hex);
+}
+
+// Apply selected block's style to all blocks
+function copyStyleToAll(){
+  const src = blocks.find(b => b.id === selectedId);
+  if(!src) return;
+  const styleKeys = ['borderColor','borderWidth','borderOpacity','borderStyle','fillColor','fillOpacity','textColor','textSize','glow','glowSize'];
+  blocks.forEach(b => {
+    if(b.id === src.id) return;
+    styleKeys.forEach(k => { b[k] = src[k]; });
+    renderBlock(b);
+  });
+}
+
+// Z-order
+function bringForward(){
+  const idx = blocks.findIndex(b => b.id === selectedId);
+  if(idx < 0 || idx >= blocks.length - 1) return;
+  [blocks[idx], blocks[idx+1]] = [blocks[idx+1], blocks[idx]];
+  renderAll();
+}
+function sendBackward(){
+  const idx = blocks.findIndex(b => b.id === selectedId);
+  if(idx <= 0) return;
+  [blocks[idx], blocks[idx-1]] = [blocks[idx-1], blocks[idx]];
+  renderAll();
 }
 
 // ═══════════════════════════════
@@ -413,7 +626,6 @@ function startResize(e, id, handle){
 }
 
 document.addEventListener('mousemove', (e) => {
-  // Update status pos
   const rect = canvas.getBoundingClientRect();
   const mx = Math.round((e.clientX - rect.left) / scale);
   const my = Math.round((e.clientY - rect.top) / scale);
@@ -430,29 +642,21 @@ document.addEventListener('mousemove', (e) => {
   if(dragState.type === 'move'){
     b.x = snap(s.x + dx);
     b.y = snap(s.y + dy);
-    // Clamp to canvas
     b.x = Math.max(0, Math.min(canvasW - b.w, b.x));
     b.y = Math.max(0, Math.min(canvasH - b.h, b.y));
   } else {
     const h = dragState.handle;
     let nx = s.x, ny = s.y, nw = s.w, nh = s.h;
-
     if(h.includes('r')) nw = snap(s.w + dx);
     if(h.includes('l')){ nx = snap(s.x + dx); nw = s.w - (nx - s.x); }
     if(h.includes('b')) nh = snap(s.h + dy);
     if(h.includes('t')){ ny = snap(s.y + dy); nh = s.h - (ny - s.y); }
-    if(h === 'mr' || h === 'ml') { /* only horizontal */ }
-    if(h === 'tm' || h === 'bm') { /* only vertical */ }
-
-    // Min size
     if(nw < 20){ nw = 20; if(h.includes('l')) nx = s.x + s.w - 20; }
     if(nh < 16){ nh = 16; if(h.includes('t')) ny = s.y + s.h - 16; }
-
     b.x = nx; b.y = ny; b.w = nw; b.h = nh;
   }
 
   renderBlock(b);
-  // Update props
   if(b.id === selectedId){
     document.getElementById('propX').value = Math.round(b.x);
     document.getElementById('propY').value = Math.round(b.y);
@@ -461,11 +665,8 @@ document.addEventListener('mousemove', (e) => {
   }
 });
 
-document.addEventListener('mouseup', () => {
-  dragState = null;
-});
+document.addEventListener('mouseup', () => { dragState = null; });
 
-// Click canvas to deselect
 canvas.addEventListener('mousedown', (e) => {
   if(e.target === canvas || e.target.classList.contains('grid-lines')){
     selectBlock(null);
@@ -474,7 +675,7 @@ canvas.addEventListener('mousedown', (e) => {
 
 // Keyboard
 document.addEventListener('keydown', (e) => {
-  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
   const b = blocks.find(b => b.id === selectedId);
   if(!b) return;
 
@@ -489,38 +690,6 @@ document.addEventListener('keydown', (e) => {
   renderBlock(b);
   selectBlock(b.id);
 });
-
-// ═══════════════════════════════
-// ALIGN
-// ═══════════════════════════════
-function alignSelectedH(){
-  if(blocks.length < 2) return;
-  const b = blocks.find(b => b.id === selectedId);
-  if(!b) return;
-  // Align all to selected Y center
-  const cy = b.y + b.h / 2;
-  // find blocks that overlap horizontally
-  blocks.forEach(ob => {
-    if(ob.id === b.id) return;
-    if(Math.abs((ob.y + ob.h/2) - cy) < 60){
-      ob.y = snap(cy - ob.h/2);
-      renderBlock(ob);
-    }
-  });
-}
-function alignSelectedV(){
-  if(blocks.length < 2) return;
-  const b = blocks.find(b => b.id === selectedId);
-  if(!b) return;
-  const cx = b.x + b.w / 2;
-  blocks.forEach(ob => {
-    if(ob.id === b.id) return;
-    if(Math.abs((ob.x + ob.w/2) - cx) < 60){
-      ob.x = snap(cx - ob.w/2);
-      renderBlock(ob);
-    }
-  });
-}
 
 // ═══════════════════════════════
 // EXPORT
@@ -538,9 +707,15 @@ function exportLayout(){
     const cls = b.name.toLowerCase().replace(/[^a-z0-9]/g,'-');
     css += `.${cls} {\n`;
     css += `  position: absolute;\n`;
-    css += `  left: ${xp}%;\n  top: ${yp}%;\n  width: ${wp}%;\n  height: ${hp}%;\n`;
-    if(b.border) css += `  border: 1px solid rgba(0,255,65,0.15);\n`;
-    css += `  /* type: ${b.type} | label: ${b.label} */\n`;
+    css += `  left: ${xp}%; top: ${yp}%;\n  width: ${wp}%; height: ${hp}%;\n`;
+    if(b.border){
+      css += `  border: ${b.borderWidth||1}px ${b.borderStyle||'solid'} ${rgbaStr(b.borderColor||'#00FF41', b.borderOpacity||40)};\n`;
+    }
+    css += `  background: ${rgbaStr(b.fillColor||'#00FF41', b.fillOpacity||3)};\n`;
+    if(b.glow){
+      css += `  box-shadow: 0 0 ${b.glowSize||10}px ${rgbaStr(b.borderColor||'#00FF41', 25)};\n`;
+    }
+    css += `  /* ${b.type}: ${b.label} */\n`;
     css += `}\n\n`;
   });
 
@@ -553,8 +728,6 @@ function exportJSON(){
   const json = JSON.stringify(data, null, 2);
   document.getElementById('exportCode').textContent = json;
   document.getElementById('exportPanel').classList.add('open');
-
-  // Also copy to clipboard
   navigator.clipboard.writeText(json).catch(()=>{});
 }
 
@@ -565,7 +738,6 @@ function importJSON(){
     const data = JSON.parse(input);
     canvasW = data.canvasW || 1440;
     canvasH = data.canvasH || 900;
-    // Clear existing
     blocks.forEach(b => {
       const el = document.getElementById('blk-' + b.id);
       if(el) el.remove();
@@ -582,10 +754,9 @@ function importJSON(){
 }
 
 // ═══════════════════════════════
-// PRESET: MYSTRA poster blocks
+// PRESET
 // ═══════════════════════════════
 function loadPreset(){
-  // Clear
   blocks.forEach(b => {
     const el = document.getElementById('blk-' + b.id);
     if(el) el.remove();
@@ -593,54 +764,62 @@ function loadPreset(){
   blocks = [];
   idCounter = 0;
 
-  const pad = 40; // edge padding
-  const gap = 10;
-  const vertW = 50;
+  const pad = 40, gap = 10, vertW = 50;
   const rightEdge = canvasW - pad - vertW - gap;
   const bottomEdge = canvasH - pad;
   const topStart = pad;
+  const g = '#00FF41';
 
-  // Define preset blocks matching poster structure
   const presets = [
-    // TITLE — top full width
     { name: 'TITLE', type: 'text', border: false, label: 'MYSTRA 01',
-      x: pad, y: topStart, w: rightEdge - pad, h: 100 },
+      x: pad, y: topStart, w: rightEdge - pad, h: 100,
+      borderColor:g,borderWidth:1,borderOpacity:0,borderStyle:'solid',
+      fillColor:g,fillOpacity:0,textColor:g,textSize:12,glow:false,glowSize:10 },
 
-    // IMG1 — top left
     { name: 'IMG1', type: 'image', border: true, label: 'primary viewport',
-      x: pad, y: topStart + 110, w: 380, h: 230 },
+      x: pad, y: topStart + 110, w: 380, h: 230,
+      borderColor:g,borderWidth:1,borderOpacity:30,borderStyle:'solid',
+      fillColor:g,fillOpacity:2,textColor:g,textSize:9,glow:false,glowSize:10 },
 
-    // ICONS — thin row under IMG1
     { name: 'ICONS', type: 'icons', border: true, label: '18 | 3DOF | RPi4',
-      x: pad, y: topStart + 350, w: 380, h: 50 },
+      x: pad, y: topStart + 350, w: 380, h: 50,
+      borderColor:g,borderWidth:1,borderOpacity:20,borderStyle:'solid',
+      fillColor:g,fillOpacity:1,textColor:g,textSize:8,glow:false,glowSize:10 },
 
-    // IMG2 — below icons
     { name: 'IMG2', type: 'image', border: true, label: 'schematic',
-      x: pad, y: topStart + 410, w: 380, h: 190 },
+      x: pad, y: topStart + 410, w: 380, h: 190,
+      borderColor:g,borderWidth:1,borderOpacity:30,borderStyle:'solid',
+      fillColor:g,fillOpacity:2,textColor:g,textSize:9,glow:false,glowSize:10 },
 
-    // MAIN — big right block spanning 3 rows
     { name: 'MAIN', type: 'image', border: true, label: 'main assembly',
-      x: pad + 390, y: topStart + 110, w: rightEdge - pad - 390, h: 490 },
+      x: pad + 390, y: topStart + 110, w: rightEdge - pad - 390, h: 490,
+      borderColor:g,borderWidth:1,borderOpacity:30,borderStyle:'solid',
+      fillColor:g,fillOpacity:2,textColor:g,textSize:9,glow:true,glowSize:12 },
 
-    // LABEL — bottom left
     { name: 'LABEL', type: 'text', border: false, label: 'GHSTLN',
-      x: pad, y: topStart + 620, w: 380, h: 80 },
+      x: pad, y: topStart + 620, w: 380, h: 80,
+      borderColor:g,borderWidth:1,borderOpacity:0,borderStyle:'solid',
+      fillColor:g,fillOpacity:0,textColor:g,textSize:11,glow:false,glowSize:10 },
 
-    // INFO — bottom right sub-grid
     { name: 'INFO', type: 'info', border: true, label: 'BUILD AI REV SRV',
-      x: pad + 390, y: topStart + 620, w: rightEdge - pad - 390, h: 80 },
+      x: pad + 390, y: topStart + 620, w: rightEdge - pad - 390, h: 80,
+      borderColor:g,borderWidth:1,borderOpacity:15,borderStyle:'solid',
+      fillColor:g,fillOpacity:1,textColor:g,textSize:8,glow:false,glowSize:10 },
 
-    // VERT — right strip
     { name: 'VERT', type: 'text', border: false, label: 'M Y S T R A',
-      x: rightEdge + gap, y: topStart + 110, w: vertW, h: 490 },
+      x: rightEdge + gap, y: topStart + 110, w: vertW, h: 490,
+      borderColor:g,borderWidth:1,borderOpacity:0,borderStyle:'solid',
+      fillColor:g,fillOpacity:0,textColor:g,textSize:11,glow:false,glowSize:10 },
 
-    // VBASE — L connector
     { name: 'VBASE', type: 'open', border: true, label: '',
-      x: rightEdge + gap, y: topStart + 620, w: vertW, h: 80 },
+      x: rightEdge + gap, y: topStart + 620, w: vertW, h: 80,
+      borderColor:g,borderWidth:1,borderOpacity:15,borderStyle:'dashed',
+      fillColor:g,fillOpacity:0,textColor:g,textSize:8,glow:false,glowSize:10 },
 
-    // FOOTER
-    { name: 'FOOTER', type: 'text', border: false, label: 'GHOSTLINE LAB — 2025',
-      x: pad, y: bottomEdge - 50, w: rightEdge - pad, h: 30 },
+    { name: 'FOOTER', type: 'text', border: false, label: 'GHOSTLINE LAB 2025',
+      x: pad, y: bottomEdge - 50, w: rightEdge - pad, h: 30,
+      borderColor:g,borderWidth:1,borderOpacity:0,borderStyle:'solid',
+      fillColor:g,fillOpacity:0,textColor:g,textSize:7,glow:false,glowSize:10 },
   ];
 
   presets.forEach(p => {
@@ -656,7 +835,7 @@ function loadPreset(){
 
 function updateStatus(){
   document.getElementById('statusInfo').textContent =
-    `Blocks: ${blocks.length} | Arrows to nudge | Shift+Arrow = 50px | Del to remove`;
+    `Blocks: ${blocks.length} | Arrows=nudge | Shift+Arrow=50px | Del=remove`;
 }
 
 // ═══════════════════════════════
@@ -664,8 +843,6 @@ function updateStatus(){
 // ═══════════════════════════════
 window.addEventListener('resize', fitCanvas);
 fitCanvas();
-
-// Auto-load preset
 loadPreset();
 </script>
 
