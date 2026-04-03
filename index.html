@@ -58,11 +58,11 @@
 <body>
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
-<a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" id="sun-bg" style="position:fixed;z-index:-1;bottom:-200px;right:18%;cursor:pointer;">
+<a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" id="sun-bg" style="position:fixed;z-index:0;bottom:-200px;right:18%;cursor:pointer;">
   <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
        alt="" style="width:420px;height:420px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 35%,transparent 80%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 35%,transparent 80%);">
 </a>
-<canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
+<canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:2;pointer-events:none;"></canvas>
 <script>
 // Sun parallax — moves with scroll but slower (0.3x speed)
 (function(){
