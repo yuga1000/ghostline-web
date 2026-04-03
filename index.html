@@ -59,11 +59,17 @@
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
 <a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" id="sun-bg" style="position:fixed;z-index:0;bottom:-250px;right:16%;cursor:pointer;">
-  <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
-       alt="" style="width:380px;height:380px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);">
+  <img id="sun-img" src="" alt="" style="width:380px;height:380px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);">
 </a>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:2;pointer-events:none;"></canvas>
 <script>
+// Random SDO sun channel on each page load
+(function(){
+  var channels = ['0094','0131','0171','0193','0211','0304','0335','1700'];
+  var ch = channels[Math.floor(Math.random() * channels.length)];
+  document.getElementById('sun-img').src = 'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_' + ch + '.jpg';
+})();
+
 // Sun parallax — moves with scroll but slower (0.3x speed)
 (function(){
   const sun = document.getElementById('sun-bg');
