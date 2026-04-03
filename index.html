@@ -64,26 +64,32 @@
 </div>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
 <script>
-// Sun parallax — rises slowly on scroll
+// Sun parallax — rises slowly on scroll, smoothed
 (function(){
   const sun = document.getElementById('sun-bg');
-  const container = document.querySelector('.slide-container') || document.documentElement;
+  let currentBottom = -180;
+  let targetBottom = -180;
 
   function onScroll(){
-    const scrollEl = document.querySelector('.slide-container') || document.documentElement;
-    const scrollTop = scrollEl.scrollTop || window.pageYOffset || 0;
-    const maxScroll = scrollEl.scrollHeight - window.innerHeight;
+    const scrollEl = document.querySelector('.slide-container');
+    const scrollTop = (scrollEl ? scrollEl.scrollTop : 0) || window.pageYOffset || 0;
+    const maxScroll = (scrollEl ? scrollEl.scrollHeight : document.documentElement.scrollHeight) - window.innerHeight;
     const progress = Math.min(scrollTop / (maxScroll || 1), 1);
-    // Sun starts at bottom:-180px (mostly hidden), rises to bottom:60px
-    const bottomVal = -180 + progress * 240;
-    sun.style.bottom = bottomVal + 'px';
+    targetBottom = -180 + progress * 240;
   }
 
-  // Listen on both — some pages scroll on container, some on window
+  // Smooth lerp — sun glides instead of jumping
+  function animate(){
+    currentBottom += (targetBottom - currentBottom) * 0.04;
+    sun.style.bottom = currentBottom + 'px';
+    requestAnimationFrame(animate);
+  }
+
   const scrollTarget = document.querySelector('.slide-container');
   if(scrollTarget) scrollTarget.addEventListener('scroll', onScroll, {passive:true});
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
+  animate();
 })();
 
 // Plus signs (+) at grid crossings with subtle shimmer
@@ -107,19 +113,39 @@
   let mx = -999, my = -999;
   document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
+  // Pulse wave from center on load
+  const startTime = performance.now();
+  const cx = () => w / 2, cy = () => h / 2;
+  const pulseSpeed = 0.4; // px per ms
+  const pulseDuration = 4000; // how long pulse lasts
+
   function draw(t){
     ctx.clearRect(0, 0, w, h);
+    const elapsed = t - startTime;
+    const pulseRadius = elapsed * pulseSpeed;
+    const pulseActive = elapsed < pulseDuration;
+
     dots.forEach(d => {
       // distance to cursor
       const dx = d.x - mx, dy = d.y - my;
       const dist = Math.sqrt(dx*dx + dy*dy);
-      const cursorGlow = dist < 200 ? (1 - dist/200) * 0.35 : 0;
+      const cursorGlow = dist < 180 ? (1 - dist/180) * 0.4 : 0;
 
-      // random blink — each dot has small chance to flash
+      // pulse wave from center
+      let pulse = 0;
+      if(pulseActive){
+        const distCenter = Math.sqrt((d.x-cx())**2 + (d.y-cy())**2);
+        const diff = Math.abs(distCenter - pulseRadius);
+        if(diff < 80){
+          pulse = (1 - diff/80) * 0.5 * Math.max(0, 1 - elapsed/pulseDuration);
+        }
+      }
+
+      // random blink
       const flash = (Math.sin(t * 0.003 + d.phase * 100) > 0.997) ? 0.3 : 0;
 
-      const shimmer = 0.06 + 0.05 * Math.sin(t * 0.001 * d.speed + d.phase);
-      const alpha = Math.min(shimmer + cursorGlow + flash, 0.6);
+      const shimmer = 0.05 + 0.04 * Math.sin(t * 0.001 * d.speed + d.phase);
+      const alpha = Math.min(shimmer + cursorGlow + pulse + flash, 0.65);
 
       ctx.strokeStyle = `rgba(0,80,255,${alpha})`;
       ctx.lineWidth = 1;
