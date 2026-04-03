@@ -60,7 +60,7 @@
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
 <div id="sun-bg" style="position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center;">
   <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
-       alt="" style="width:280px;height:280px;border-radius:50%;opacity:0.04;filter:brightness(0.6) saturate(0.5);object-fit:cover;">
+       alt="" style="width:280px;height:280px;border-radius:50%;opacity:0.08;filter:brightness(0.6) saturate(0.5);object-fit:cover;position:absolute;bottom:40px;left:50%;transform:translateX(-50%);">
 </div>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
 <script>
@@ -73,7 +73,7 @@
   function resize(){
     w = c.width = window.innerWidth;
     h = c.height = window.innerHeight;
-    cellSize = w / 5;
+    cellSize = w / 10;
     dots = [];
     for(let x = 0; x <= w + cellSize; x += cellSize){
       for(let y = 0; y <= h + cellSize; y += cellSize){
@@ -85,11 +85,11 @@
   function draw(t){
     ctx.clearRect(0, 0, w, h);
     dots.forEach(d => {
-      const shimmer = 0.15 + 0.1 * Math.sin(t * 0.001 * d.speed + d.phase);
-      ctx.strokeStyle = `rgba(255,255,255,${shimmer})`;
+      const shimmer = 0.12 + 0.08 * Math.sin(t * 0.001 * d.speed + d.phase);
+      ctx.strokeStyle = `rgba(0,80,255,${shimmer})`;
       ctx.lineWidth = 1;
       // draw +
-      const s = 5;
+      const s = 4;
       ctx.beginPath();
       ctx.moveTo(d.x - s, d.y);
       ctx.lineTo(d.x + s, d.y);

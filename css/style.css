@@ -43,7 +43,7 @@
         overflow-y: auto;
     }
 
-    /* Thin grid lines — continuous */
+    /* Thin grid lines — blue, continuous, 10 columns */
     body::before {
         content: '';
         position: fixed;
@@ -51,9 +51,9 @@
         z-index: 0;
         pointer-events: none;
         background-image:
-            linear-gradient(0deg, rgba(255,255,255,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-        background-size: calc(100vw / 5) calc(100vw / 5);
+            linear-gradient(0deg, rgba(0,60,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,60,255,0.05) 1px, transparent 1px);
+        background-size: calc(100vw / 10) calc(100vw / 10);
     }
     
     .slide-container {
