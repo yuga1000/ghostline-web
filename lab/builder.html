@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYSTRA 01 — Layout Builder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;color:#0f0;font-family:'Courier New',monospace;overflow:hidden;height:100vh}
+
+/* TOOLBAR */
+.toolbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:#1a1a1a;border-bottom:1px solid #333;
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;font-size:12px;
+  flex-wrap:wrap;
+}
+.toolbar button{
+  background:#222;color:#0f0;border:1px solid #444;
+  padding:4px 10px;font-family:inherit;font-size:11px;
+  cursor:pointer;
+}
+.toolbar button:hover{background:#333;border-color:#0f0}
+.toolbar button.active{background:#0f0;color:#000}
+.toolbar .sep{width:1px;height:20px;background:#333;margin:0 4px}
+.toolbar label{font-size:11px;opacity:0.6;margin-left:4px}
+.toolbar input[type="number"]{
+  width:44px;background:#222;color:#0f0;border:1px solid #444;
+  padding:2px 4px;font-family:inherit;font-size:11px;text-align:center;
+}
+.toolbar select{
+  background:#222;color:#0f0;border:1px solid #444;
+  padding:2px 4px;font-family:inherit;font-size:11px;
+}
+
+/* CANVAS AREA */
+.canvas-wrap{
+  position:fixed;top:36px;left:0;right:0;bottom:30px;
+  overflow:hidden;
+}
+.canvas{
+  position:absolute;
+  background:#000;
+  border:1px solid #222;
+  transform-origin:0 0;
+}
+.canvas .grid-lines{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,255,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,0,0.04) 1px, transparent 1px);
+  background-size:50px 50px;
+}
+
+/* BLOCKS */
+.block{
+  position:absolute;
+  border:1px solid rgba(0,255,65,0.4);
+  background:rgba(0,255,65,0.03);
+  cursor:move;
+  user-select:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;letter-spacing:1px;opacity:0.9;
+  transition:box-shadow 0.15s;
+}
+.block:hover{box-shadow:0 0 12px rgba(0,255,65,0.15)}
+.block.selected{
+  border-color:#0f0;
+  box-shadow:0 0 16px rgba(0,255,65,0.25);
+}
+.block.no-border{border-style:dashed;border-color:rgba(0,255,65,0.15)}
+.block .block-label{
+  pointer-events:none;
+  font-size:9px;opacity:0.5;
+  text-transform:uppercase;letter-spacing:1px;
+  text-align:center;line-height:1.3;
+}
+
+/* RESIZE HANDLES */
+.block .handle{
+  position:absolute;width:8px;height:8px;
+  background:#0f0;opacity:0;
+  transition:opacity 0.15s;
+  z-index:10;
+}
+.block:hover .handle,.block.selected .handle{opacity:0.6}
+.block .handle:hover{opacity:1}
+.handle.tl{top:-4px;left:-4px;cursor:nw-resize}
+.handle.tr{top:-4px;right:-4px;cursor:ne-resize}
+.handle.bl{bottom:-4px;left:-4px;cursor:sw-resize}
+.handle.br{bottom:-4px;right:-4px;cursor:se-resize}
+.handle.tm{top:-4px;left:50%;transform:translateX(-50%);cursor:n-resize}
+.handle.bm{bottom:-4px;left:50%;transform:translateX(-50%);cursor:s-resize}
+.handle.ml{left:-4px;top:50%;transform:translateY(-50%);cursor:w-resize}
+.handle.mr{right:-4px;top:50%;transform:translateY(-50%);cursor:e-resize}
+
+/* STATUSBAR */
+.statusbar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#1a1a1a;border-top:1px solid #333;
+  padding:4px 12px;font-size:10px;opacity:0.5;
+  display:flex;justify-content:space-between;
+}
+
+/* EXPORT PANEL */
+.export-panel{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:#111;border:1px solid #0f0;
+  padding:16px;z-index:200;
+  max-width:90vw;max-height:80vh;overflow:auto;
+  display:none;
+  box-shadow:0 0 40px rgba(0,255,65,0.15);
+}
+.export-panel.open{display:block}
+.export-panel pre{
+  color:#0f0;font-size:11px;line-height:1.5;
+  white-space:pre-wrap;word-break:break-all;
+  max-height:60vh;overflow:auto;
+}
+.export-panel .close-exp{
+  position:absolute;top:6px;right:8px;
+  cursor:pointer;font-size:14px;color:#0f0;
+}
+
+/* PROPERTIES PANEL */
+.props{
+  position:fixed;top:36px;right:0;width:200px;bottom:30px;
+  background:#1a1a1a;border-left:1px solid #333;
+  padding:10px;font-size:11px;overflow-y:auto;
+  z-index:50;
+  display:none;
+}
+.props.open{display:block}
+.props h3{font-size:11px;opacity:0.5;margin-bottom:8px;font-weight:normal;letter-spacing:1px}
+.props .prop-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.props .prop-row label{opacity:0.5;font-size:10px}
+.props .prop-row input{
+  width:60px;background:#222;color:#0f0;border:1px solid #444;
+  padding:2px 4px;font-family:inherit;font-size:11px;text-align:center;
+}
+.props .prop-row input[type="checkbox"]{width:auto}
+.props .prop-row select{
+  width:80px;background:#222;color:#0f0;border:1px solid #444;
+  padding:2px;font-family:inherit;font-size:10px;
+}
+.props button{
+  width:100%;background:#300;color:#f33;border:1px solid #633;
+  padding:4px;font-family:inherit;font-size:10px;cursor:pointer;
+  margin-top:8px;
+}
+.props button:hover{background:#500}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="addBlock()">+ BLOCK</button>
+  <button onclick="addBlock('open')">+ OPEN</button>
+  <button onclick="addBlock('text')">+ TEXT</button>
+  <div class="sep"></div>
+  <button onclick="snapToggle(this)" class="active" id="snapBtn">SNAP</button>
+  <label>Grid:</label>
+  <input type="number" value="10" min="1" max="100" id="snapSize" onchange="snapVal=+this.value">
+  <div class="sep"></div>
+  <label>Canvas:</label>
+  <select id="canvasPreset" onchange="setCanvasSize(this.value)">
+    <option value="1440x900">1440 x 900</option>
+    <option value="1280x800">1280 x 800</option>
+    <option value="1920x1080">1920 x 1080</option>
+    <option value="375x812">Mobile 375x812</option>
+  </select>
+  <div class="sep"></div>
+  <button onclick="duplicateSelected()">DUPE</button>
+  <button onclick="alignSelectedH()">ALIGN-H</button>
+  <button onclick="alignSelectedV()">ALIGN-V</button>
+  <div class="sep"></div>
+  <button onclick="exportLayout()">EXPORT CSS</button>
+  <button onclick="exportJSON()">SAVE JSON</button>
+  <button onclick="importJSON()">LOAD JSON</button>
+  <div class="sep"></div>
+  <button onclick="loadPreset()">LOAD MYSTRA PRESET</button>
+</div>
+
+<div class="canvas-wrap" id="canvasWrap">
+  <div class="canvas" id="canvas">
+    <div class="grid-lines"></div>
+  </div>
+</div>
+
+<div class="props" id="props">
+  <h3>PROPERTIES</h3>
+  <div class="prop-row"><label>NAME</label><input type="text" id="propName" onchange="setProp('name',this.value)" style="width:80px"></div>
+  <div class="prop-row"><label>X</label><input type="number" id="propX" onchange="setProp('x',+this.value)"></div>
+  <div class="prop-row"><label>Y</label><input type="number" id="propY" onchange="setProp('y',+this.value)"></div>
+  <div class="prop-row"><label>W</label><input type="number" id="propW" onchange="setProp('w',+this.value)"></div>
+  <div class="prop-row"><label>H</label><input type="number" id="propH" onchange="setProp('h',+this.value)"></div>
+  <div class="prop-row"><label>BORDER</label><input type="checkbox" id="propBorder" onchange="setProp('border',this.checked)"></div>
+  <div class="prop-row"><label>TYPE</label>
+    <select id="propType" onchange="setProp('type',this.value)">
+      <option value="image">IMAGE</option>
+      <option value="text">TEXT</option>
+      <option value="open">OPEN</option>
+      <option value="icons">ICONS</option>
+      <option value="info">INFO</option>
+    </select>
+  </div>
+  <div class="prop-row"><label>LABEL</label><input type="text" id="propLabel" onchange="setProp('label',this.value)" style="width:80px"></div>
+  <button onclick="deleteSelected()">DELETE BLOCK</button>
+</div>
+
+<div class="statusbar">
+  <span id="statusPos">X: 0 Y: 0</span>
+  <span id="statusInfo">Blocks: 0 | Click canvas to deselect</span>
+</div>
+
+<div class="export-panel" id="exportPanel">
+  <span class="close-exp" onclick="document.getElementById('exportPanel').classList.remove('open')">&times;</span>
+  <pre id="exportCode"></pre>
+</div>
+
+<script>
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let blocks = [];
+let selectedId = null;
+let snapEnabled = true;
+let snapVal = 10;
+let canvasW = 1440, canvasH = 900;
+let scale = 1;
+let dragState = null; // {type:'move'|'resize', id, startX, startY, startBlock:{...}, handle:''}
+let idCounter = 0;
+
+const canvas = document.getElementById('canvas');
+const canvasWrap = document.getElementById('canvasWrap');
+
+// ═══════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════
+function fitCanvas(){
+  const ww = canvasWrap.clientWidth - 220; // room for props panel
+  const wh = canvasWrap.clientHeight - 20;
+  scale = Math.min(ww / canvasW, wh / canvasH, 1);
+  canvas.style.width = canvasW + 'px';
+  canvas.style.height = canvasH + 'px';
+  canvas.style.transform = `scale(${scale})`;
+  canvas.style.left = ((canvasWrap.clientWidth - canvasW * scale) / 2) + 'px';
+  canvas.style.top = ((canvasWrap.clientHeight - canvasH * scale) / 2) + 'px';
+}
+
+function setCanvasSize(v){
+  const [w,h] = v.split('x').map(Number);
+  canvasW = w; canvasH = h;
+  fitCanvas();
+}
+
+// ═══════════════════════════════
+// SNAP
+// ═══════════════════════════════
+function snap(v){ return snapEnabled ? Math.round(v / snapVal) * snapVal : v; }
+function snapToggle(btn){ snapEnabled = !snapEnabled; btn.classList.toggle('active'); }
+
+// ═══════════════════════════════
+// BLOCK CRUD
+// ═══════════════════════════════
+function addBlock(type='image'){
+  const id = ++idCounter;
+  const b = {
+    id,
+    name: type === 'text' ? 'LABEL' : type === 'open' ? 'OPEN' : 'IMG' + id,
+    x: 40 + (blocks.length % 5) * 30,
+    y: 40 + (blocks.length % 5) * 30,
+    w: type === 'text' ? 200 : 300,
+    h: type === 'text' ? 60 : 200,
+    border: type !== 'open',
+    type,
+    label: type === 'text' ? 'LABEL TEXT' : type === 'open' ? '' : 'block ' + id,
+  };
+  blocks.push(b);
+  renderBlock(b);
+  selectBlock(id);
+  updateStatus();
+}
+
+function renderBlock(b){
+  let el = document.getElementById('blk-' + b.id);
+  if(!el){
+    el = document.createElement('div');
+    el.className = 'block';
+    el.id = 'blk-' + b.id;
+    el.innerHTML = `
+      <div class="block-label"></div>
+      <div class="handle tl" data-h="tl"></div>
+      <div class="handle tr" data-h="tr"></div>
+      <div class="handle bl" data-h="bl"></div>
+      <div class="handle br" data-h="br"></div>
+      <div class="handle tm" data-h="tm"></div>
+      <div class="handle bm" data-h="bm"></div>
+      <div class="handle ml" data-h="ml"></div>
+      <div class="handle mr" data-h="mr"></div>
+    `;
+    canvas.appendChild(el);
+
+    // Mouse events on block
+    el.addEventListener('mousedown', (e) => {
+      if(e.target.classList.contains('handle')){
+        startResize(e, b.id, e.target.dataset.h);
+      } else {
+        startMove(e, b.id);
+      }
+      e.stopPropagation();
+    });
+  }
+
+  el.style.left = b.x + 'px';
+  el.style.top = b.y + 'px';
+  el.style.width = b.w + 'px';
+  el.style.height = b.h + 'px';
+  el.classList.toggle('no-border', !b.border);
+  el.classList.toggle('selected', b.id === selectedId);
+  el.querySelector('.block-label').textContent = b.name + (b.label ? '\n' + b.label : '');
+
+  // Color coding by type
+  const colors = {
+    image: 'rgba(0,255,65,0.03)',
+    text: 'rgba(0,150,255,0.04)',
+    open: 'rgba(255,255,0,0.02)',
+    icons: 'rgba(255,100,0,0.03)',
+    info: 'rgba(0,255,200,0.03)',
+  };
+  el.style.background = colors[b.type] || colors.image;
+}
+
+function renderAll(){
+  blocks.forEach(b => renderBlock(b));
+}
+
+function selectBlock(id){
+  selectedId = id;
+  document.querySelectorAll('.block').forEach(el => el.classList.remove('selected'));
+  const el = document.getElementById('blk-' + id);
+  if(el) el.classList.add('selected');
+
+  const panel = document.getElementById('props');
+  if(id){
+    panel.classList.add('open');
+    const b = blocks.find(b => b.id === id);
+    if(b){
+      document.getElementById('propName').value = b.name;
+      document.getElementById('propX').value = Math.round(b.x);
+      document.getElementById('propY').value = Math.round(b.y);
+      document.getElementById('propW').value = Math.round(b.w);
+      document.getElementById('propH').value = Math.round(b.h);
+      document.getElementById('propBorder').checked = b.border;
+      document.getElementById('propType').value = b.type;
+      document.getElementById('propLabel').value = b.label;
+    }
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function setProp(key, val){
+  const b = blocks.find(b => b.id === selectedId);
+  if(!b) return;
+  b[key] = val;
+  renderBlock(b);
+}
+
+function deleteSelected(){
+  if(!selectedId) return;
+  const el = document.getElementById('blk-' + selectedId);
+  if(el) el.remove();
+  blocks = blocks.filter(b => b.id !== selectedId);
+  selectBlock(null);
+  updateStatus();
+}
+
+function duplicateSelected(){
+  if(!selectedId) return;
+  const src = blocks.find(b => b.id === selectedId);
+  if(!src) return;
+  const id = ++idCounter;
+  const b = {...src, id, name: src.name + '_copy', x: src.x + 20, y: src.y + 20};
+  blocks.push(b);
+  renderBlock(b);
+  selectBlock(id);
+  updateStatus();
+}
+
+// ═══════════════════════════════
+// DRAG & RESIZE
+// ═══════════════════════════════
+function startMove(e, id){
+  selectBlock(id);
+  const b = blocks.find(b => b.id === id);
+  dragState = {
+    type: 'move', id,
+    startX: e.clientX, startY: e.clientY,
+    startBlock: {...b}
+  };
+}
+
+function startResize(e, id, handle){
+  selectBlock(id);
+  const b = blocks.find(b => b.id === id);
+  dragState = {
+    type: 'resize', id, handle,
+    startX: e.clientX, startY: e.clientY,
+    startBlock: {...b}
+  };
+}
+
+document.addEventListener('mousemove', (e) => {
+  // Update status pos
+  const rect = canvas.getBoundingClientRect();
+  const mx = Math.round((e.clientX - rect.left) / scale);
+  const my = Math.round((e.clientY - rect.top) / scale);
+  document.getElementById('statusPos').textContent = `X: ${mx}  Y: ${my}`;
+
+  if(!dragState) return;
+
+  const dx = (e.clientX - dragState.startX) / scale;
+  const dy = (e.clientY - dragState.startY) / scale;
+  const b = blocks.find(b => b.id === dragState.id);
+  if(!b) return;
+  const s = dragState.startBlock;
+
+  if(dragState.type === 'move'){
+    b.x = snap(s.x + dx);
+    b.y = snap(s.y + dy);
+    // Clamp to canvas
+    b.x = Math.max(0, Math.min(canvasW - b.w, b.x));
+    b.y = Math.max(0, Math.min(canvasH - b.h, b.y));
+  } else {
+    const h = dragState.handle;
+    let nx = s.x, ny = s.y, nw = s.w, nh = s.h;
+
+    if(h.includes('r')) nw = snap(s.w + dx);
+    if(h.includes('l')){ nx = snap(s.x + dx); nw = s.w - (nx - s.x); }
+    if(h.includes('b')) nh = snap(s.h + dy);
+    if(h.includes('t')){ ny = snap(s.y + dy); nh = s.h - (ny - s.y); }
+    if(h === 'mr' || h === 'ml') { /* only horizontal */ }
+    if(h === 'tm' || h === 'bm') { /* only vertical */ }
+
+    // Min size
+    if(nw < 20){ nw = 20; if(h.includes('l')) nx = s.x + s.w - 20; }
+    if(nh < 16){ nh = 16; if(h.includes('t')) ny = s.y + s.h - 16; }
+
+    b.x = nx; b.y = ny; b.w = nw; b.h = nh;
+  }
+
+  renderBlock(b);
+  // Update props
+  if(b.id === selectedId){
+    document.getElementById('propX').value = Math.round(b.x);
+    document.getElementById('propY').value = Math.round(b.y);
+    document.getElementById('propW').value = Math.round(b.w);
+    document.getElementById('propH').value = Math.round(b.h);
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  dragState = null;
+});
+
+// Click canvas to deselect
+canvas.addEventListener('mousedown', (e) => {
+  if(e.target === canvas || e.target.classList.contains('grid-lines')){
+    selectBlock(null);
+  }
+});
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  const b = blocks.find(b => b.id === selectedId);
+  if(!b) return;
+
+  const step = e.shiftKey ? 50 : snapVal;
+  switch(e.key){
+    case 'ArrowLeft':  b.x = snap(b.x - step); e.preventDefault(); break;
+    case 'ArrowRight': b.x = snap(b.x + step); e.preventDefault(); break;
+    case 'ArrowUp':    b.y = snap(b.y - step); e.preventDefault(); break;
+    case 'ArrowDown':  b.y = snap(b.y + step); e.preventDefault(); break;
+    case 'Delete': case 'Backspace': deleteSelected(); e.preventDefault(); return;
+  }
+  renderBlock(b);
+  selectBlock(b.id);
+});
+
+// ═══════════════════════════════
+// ALIGN
+// ═══════════════════════════════
+function alignSelectedH(){
+  if(blocks.length < 2) return;
+  const b = blocks.find(b => b.id === selectedId);
+  if(!b) return;
+  // Align all to selected Y center
+  const cy = b.y + b.h / 2;
+  // find blocks that overlap horizontally
+  blocks.forEach(ob => {
+    if(ob.id === b.id) return;
+    if(Math.abs((ob.y + ob.h/2) - cy) < 60){
+      ob.y = snap(cy - ob.h/2);
+      renderBlock(ob);
+    }
+  });
+}
+function alignSelectedV(){
+  if(blocks.length < 2) return;
+  const b = blocks.find(b => b.id === selectedId);
+  if(!b) return;
+  const cx = b.x + b.w / 2;
+  blocks.forEach(ob => {
+    if(ob.id === b.id) return;
+    if(Math.abs((ob.x + ob.w/2) - cx) < 60){
+      ob.x = snap(cx - ob.w/2);
+      renderBlock(ob);
+    }
+  });
+}
+
+// ═══════════════════════════════
+// EXPORT
+// ═══════════════════════════════
+function exportLayout(){
+  let css = `/* MYSTRA 01 — Layout from Builder */\n`;
+  css += `/* Canvas: ${canvasW} x ${canvasH} */\n\n`;
+  css += `.poster {\n  position: relative;\n  width: 100vw;\n  height: 100vh;\n  background: #000;\n  overflow: hidden;\n}\n\n`;
+
+  blocks.forEach(b => {
+    const xp = (b.x / canvasW * 100).toFixed(2);
+    const yp = (b.y / canvasH * 100).toFixed(2);
+    const wp = (b.w / canvasW * 100).toFixed(2);
+    const hp = (b.h / canvasH * 100).toFixed(2);
+    const cls = b.name.toLowerCase().replace(/[^a-z0-9]/g,'-');
+    css += `.${cls} {\n`;
+    css += `  position: absolute;\n`;
+    css += `  left: ${xp}%;\n  top: ${yp}%;\n  width: ${wp}%;\n  height: ${hp}%;\n`;
+    if(b.border) css += `  border: 1px solid rgba(0,255,65,0.15);\n`;
+    css += `  /* type: ${b.type} | label: ${b.label} */\n`;
+    css += `}\n\n`;
+  });
+
+  document.getElementById('exportCode').textContent = css;
+  document.getElementById('exportPanel').classList.add('open');
+}
+
+function exportJSON(){
+  const data = { canvasW, canvasH, blocks };
+  const json = JSON.stringify(data, null, 2);
+  document.getElementById('exportCode').textContent = json;
+  document.getElementById('exportPanel').classList.add('open');
+
+  // Also copy to clipboard
+  navigator.clipboard.writeText(json).catch(()=>{});
+}
+
+function importJSON(){
+  const input = prompt('Paste JSON layout:');
+  if(!input) return;
+  try {
+    const data = JSON.parse(input);
+    canvasW = data.canvasW || 1440;
+    canvasH = data.canvasH || 900;
+    // Clear existing
+    blocks.forEach(b => {
+      const el = document.getElementById('blk-' + b.id);
+      if(el) el.remove();
+    });
+    blocks = data.blocks || [];
+    idCounter = Math.max(0, ...blocks.map(b => b.id)) + 1;
+    fitCanvas();
+    renderAll();
+    selectBlock(null);
+    updateStatus();
+  } catch(e){
+    alert('Invalid JSON: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════
+// PRESET: MYSTRA poster blocks
+// ═══════════════════════════════
+function loadPreset(){
+  // Clear
+  blocks.forEach(b => {
+    const el = document.getElementById('blk-' + b.id);
+    if(el) el.remove();
+  });
+  blocks = [];
+  idCounter = 0;
+
+  const pad = 40; // edge padding
+  const gap = 10;
+  const vertW = 50;
+  const rightEdge = canvasW - pad - vertW - gap;
+  const bottomEdge = canvasH - pad;
+  const topStart = pad;
+
+  // Define preset blocks matching poster structure
+  const presets = [
+    // TITLE — top full width
+    { name: 'TITLE', type: 'text', border: false, label: 'MYSTRA 01',
+      x: pad, y: topStart, w: rightEdge - pad, h: 100 },
+
+    // IMG1 — top left
+    { name: 'IMG1', type: 'image', border: true, label: 'primary viewport',
+      x: pad, y: topStart + 110, w: 380, h: 230 },
+
+    // ICONS — thin row under IMG1
+    { name: 'ICONS', type: 'icons', border: true, label: '18 | 3DOF | RPi4',
+      x: pad, y: topStart + 350, w: 380, h: 50 },
+
+    // IMG2 — below icons
+    { name: 'IMG2', type: 'image', border: true, label: 'schematic',
+      x: pad, y: topStart + 410, w: 380, h: 190 },
+
+    // MAIN — big right block spanning 3 rows
+    { name: 'MAIN', type: 'image', border: true, label: 'main assembly',
+      x: pad + 390, y: topStart + 110, w: rightEdge - pad - 390, h: 490 },
+
+    // LABEL — bottom left
+    { name: 'LABEL', type: 'text', border: false, label: 'GHSTLN',
+      x: pad, y: topStart + 620, w: 380, h: 80 },
+
+    // INFO — bottom right sub-grid
+    { name: 'INFO', type: 'info', border: true, label: 'BUILD AI REV SRV',
+      x: pad + 390, y: topStart + 620, w: rightEdge - pad - 390, h: 80 },
+
+    // VERT — right strip
+    { name: 'VERT', type: 'text', border: false, label: 'M Y S T R A',
+      x: rightEdge + gap, y: topStart + 110, w: vertW, h: 490 },
+
+    // VBASE — L connector
+    { name: 'VBASE', type: 'open', border: true, label: '',
+      x: rightEdge + gap, y: topStart + 620, w: vertW, h: 80 },
+
+    // FOOTER
+    { name: 'FOOTER', type: 'text', border: false, label: 'GHOSTLINE LAB — 2025',
+      x: pad, y: bottomEdge - 50, w: rightEdge - pad, h: 30 },
+  ];
+
+  presets.forEach(p => {
+    const id = ++idCounter;
+    blocks.push({id, ...p});
+  });
+
+  fitCanvas();
+  renderAll();
+  selectBlock(null);
+  updateStatus();
+}
+
+function updateStatus(){
+  document.getElementById('statusInfo').textContent =
+    `Blocks: ${blocks.length} | Arrows to nudge | Shift+Arrow = 50px | Del to remove`;
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+window.addEventListener('resize', fitCanvas);
+fitCanvas();
+
+// Auto-load preset
+loadPreset();
+</script>
+
+</body>
+</html>
