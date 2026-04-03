@@ -96,12 +96,14 @@ html,body{
   overflow:hidden;
 }
 
-/* ───── TITLE: MYSTRA 01 (880x110 @ 480,50) ───── */
+/* ───── TITLE: MYSTRA 01 — stretches from left-col to VBASE ───── */
 .title{
   position:absolute;
-  left:33.33%;top:5.56%;
-  width:61.11%;height:12.22%;
-  display:flex;align-items:center;justify-content:flex-start;
+  left:33.33%;top:3%;
+  right:6%;
+  height:17%;
+  display:flex;align-items:flex-end;justify-content:flex-start;
+  padding-bottom:8px;
 }
 
 /* ───── VBASE: dashed block (180x110 @ 1180,190) ───── */
@@ -195,6 +197,8 @@ html,body{
   max-width:100%;max-height:100%;
   image-rendering:pixelated;
   display:block;
+  object-fit:contain;
+  object-position:left bottom;
 }
 
 /* ═══ VERT LETTERS ═══ */
