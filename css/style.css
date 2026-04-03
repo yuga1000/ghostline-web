@@ -43,21 +43,20 @@
         overflow-y: auto;
     }
 
-    /* Thin grid lines with glow at intersections */
+    /* Blue cross grid — lines with gap in middle of each cell */
     body::before {
         content: '';
         position: fixed;
         inset: 0;
         z-index: 0;
         pointer-events: none;
+        --cell: calc(100vw / 10);
         background-image:
-            /* glow dots at intersections */
-            radial-gradient(circle 1.5px, rgba(200,255,200,0.12) 0%, transparent 100%),
-            /* horizontal lines */
-            linear-gradient(0deg, rgba(100,255,100,0.04) 1px, transparent 1px),
-            /* vertical lines */
-            linear-gradient(90deg, rgba(100,255,100,0.04) 1px, transparent 1px);
-        background-size: calc(100vw / 8) calc(100vw / 8);
+            /* vertical lines — top segment */
+            linear-gradient(0deg, rgba(0,60,255,0.06) 0%, rgba(0,60,255,0.06) 30%, transparent 30%, transparent 70%, rgba(0,60,255,0.06) 70%, rgba(0,60,255,0.06) 100%),
+            /* horizontal lines — left segment */
+            linear-gradient(90deg, rgba(0,60,255,0.06) 0%, rgba(0,60,255,0.06) 30%, transparent 30%, transparent 70%, rgba(0,60,255,0.06) 70%, rgba(0,60,255,0.06) 100%);
+        background-size: var(--cell) var(--cell);
     }
     
     .slide-container {
@@ -190,14 +189,8 @@
     }
     
     .scanlines {
-        background: linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
-        background-size: 100% 4px;
-        animation: scanlines 0.1s linear infinite;
-    }
-    
-    @keyframes scanlines {
-        0% { background-position: 0 0; }
-        100% { background-position: 0 4px; }
+        background: none;
+        animation: none;
     }
     
     @keyframes blink {

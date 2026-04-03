@@ -57,6 +57,47 @@
 </head>
 <body>
 
+<!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
+<div id="sun-bg" style="position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center;">
+  <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
+       alt="" style="width:280px;height:280px;border-radius:50%;opacity:0.04;filter:brightness(0.6) saturate(0.5);object-fit:cover;">
+</div>
+<canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
+<script>
+// Shimmer pixels at grid crossings
+(function(){
+  const c = document.getElementById('shimmer-dots');
+  const ctx = c.getContext('2d');
+  let w, h, cellSize, dots = [];
+
+  function resize(){
+    w = c.width = window.innerWidth;
+    h = c.height = window.innerHeight;
+    cellSize = w / 10;
+    dots = [];
+    for(let x = 0; x <= w; x += cellSize){
+      for(let y = 0; y <= h; y += cellSize){
+        dots.push({x, y, phase: Math.random() * Math.PI * 2, speed: 0.5 + Math.random() * 1.5});
+      }
+    }
+  }
+
+  function draw(t){
+    ctx.clearRect(0, 0, w, h);
+    dots.forEach(d => {
+      const flicker = 0.03 + 0.04 * Math.sin(t * 0.001 * d.speed + d.phase);
+      ctx.fillStyle = `rgba(80,140,255,${flicker})`;
+      ctx.fillRect(d.x - 1, d.y - 1, 2, 2);
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+
 <!-- Terminal Loading Screen -->
 
 <div id="terminal-loading" style="
