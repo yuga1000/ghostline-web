@@ -11,12 +11,13 @@
 *{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  --bg:#0a0a0a;
+  --bg:#000;
   --g:#00FF41;
   --g2:#00cc33;
-  --gd:rgba(0,255,65,0.08);
-  --gb:rgba(0,255,65,0.18);
-  --lime:#CCFF00;
+  --gb:rgba(0,255,65,0.15);
+  --gh:rgba(0,255,65,0.35);
+  --amber:#FF6600;
+  --red:#FF003C;
   --f1:'Press Start 2P',monospace;
   --f2:'Silkscreen',monospace;
   --f3:'VT323',monospace;
@@ -25,396 +26,352 @@
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--g)}
 
 /* BG */
-.bg{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.bg img{max-width:min(500px,80vw);opacity:0.07;image-rendering:pixelated;filter:brightness(0.5);animation:bgp 10s ease-in-out infinite}
-@keyframes bgp{0%,100%{opacity:0.05}50%{opacity:0.09}}
+.bg-art{position:fixed;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.bg-art img{max-width:min(420px,55vw);opacity:0.03;image-rendering:pixelated;filter:brightness(0.3)}
+.bg-dots{position:fixed;inset:0;z-index:0;background:radial-gradient(circle,rgba(0,255,65,0.025) 0.5px,transparent 0.5px);background-size:64px 64px;pointer-events:none}
+.scan{position:fixed;inset:0;z-index:9998;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.006) 2px,rgba(0,255,65,0.006) 4px);pointer-events:none}
 
-.dots{position:fixed;inset:0;z-index:1;background:radial-gradient(circle,rgba(0,255,65,0.05) 0.5px,transparent 0.5px);background-size:30px 30px;pointer-events:none}
-.scan{position:fixed;inset:0;z-index:9998;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.01) 2px,rgba(0,255,65,0.01) 4px);pointer-events:none}
-
-/* ════════════════════════════════════ */
-/* MAIN LAYOUT — matches reference     */
-/* 3 rows: top banner, main body, bot  */
-/* main body: left col + center + right vertical text */
-/* ════════════════════════════════════ */
-.page{
+/* ═══════════════════════════════════════════════ */
+/* POSTER GRID                                     */
+/* ═══════════════════════════════════════════════ */
+.poster{
   position:relative;z-index:2;
-  width:100%;height:100vh;
+  width:100vw;height:100vh;
   display:grid;
-  grid-template-rows:auto 1fr auto;
-  padding:6px;
-  gap:2px;
+  /* Left column ~38%, Main ~54%, Vert strip ~8% */
+  grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) 52px;
+  grid-template-rows:14% 30% 6% 22% 14% 2% 12%;
+  grid-template-areas:
+    "title  title  vert"
+    "img1   main   vert"
+    "icons  main   vert"
+    "img2   main   vert"
+    "label  info   vert"
+    "div    div    vert"
+    "foot   foot   vbase";
+  gap:8px;
+  padding:32px 40px 24px;
+  overflow:hidden;
 }
 
-/* ── TOP BANNER (wide title bar) ── */
-.top-banner{
-  border:1px solid var(--gb);
-  background:rgba(0,255,65,0.03);
-  padding:10px 14px;
+/* ═══ AREAS ═══ */
+
+/* TITLE — big MYSTRA 01 */
+.title{
+  grid-area:title;
   display:flex;
-  align-items:center;
-  gap:12px;
-  overflow:hidden;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding:0 4px 10px;
+  border-bottom:1px solid rgba(0,255,65,0.06);
 }
-.top-banner h1{
+.title h1{
   font-family:var(--f1);
-  font-size:clamp(16px,3.5vw,28px);
-  letter-spacing:0.08em;
-  white-space:nowrap;
-  text-shadow:0 0 15px rgba(0,255,65,0.3);
+  font-size:clamp(22px,5.5vw,52px);
+  letter-spacing:0.14em;
+  line-height:0.88;
+  text-shadow:0 0 24px rgba(0,255,65,0.25);
 }
-.top-banner .line{flex:1;height:1px;background:var(--gb)}
-.top-banner .tag{
-  font-family:var(--f2);font-size:8px;letter-spacing:2px;
-  opacity:0.3;white-space:nowrap;
+.title .sub{
+  display:flex;flex-direction:column;
+  align-items:flex-end;gap:5px;
+  padding-bottom:4px;
 }
-
-/* ── BODY GRID ── */
-.body{
-  display:grid;
-  grid-template-columns:0.35fr 1fr 40px;
-  gap:2px;
-  min-height:0;
-}
-
-/* ── LEFT COLUMN (stacked small panels) ── */
-.left{
-  display:grid;
-  grid-template-rows:auto 1fr 1fr;
-  gap:2px;
-}
-
-/* ── CENTER (main open space) ── */
-.center{
-  display:grid;
-  grid-template-rows:1fr 0.5fr;
-  gap:2px;
-}
-
-.center-top{
-  display:grid;
-  grid-template-columns:1fr 0.7fr;
-  gap:2px;
-}
-
-.center-bottom{
-  display:grid;
-  grid-template-columns:0.6fr 0.5fr 0.5fr 1fr;
-  gap:2px;
-}
-
-/* ── RIGHT VERTICAL TEXT ── */
-.right-vert{
-  border:1px solid var(--gb);
-  background:rgba(0,255,65,0.02);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  writing-mode:vertical-rl;
-  text-orientation:mixed;
-  font-family:var(--f1);
-  font-size:clamp(14px,2.5vw,22px);
-  letter-spacing:0.15em;
-  text-shadow:0 0 15px rgba(0,255,65,0.3);
-  user-select:none;
-  overflow:hidden;
-  white-space:nowrap;
-}
-
-/* ── BOTTOM BAR ── */
-.bot-bar{
-  border:1px solid var(--gb);
-  background:rgba(0,255,65,0.02);
-  display:grid;
-  grid-template-columns:auto auto 1fr auto auto auto;
-  align-items:center;
-  gap:10px;
-  padding:5px 12px;
-  font-family:var(--f2);font-size:8px;letter-spacing:2px;opacity:0.3;
-}
-.bot-bar .bl{flex:1;height:1px;background:var(--gb)}
-
-/* ════════════════════════════════════ */
-/* CELL STYLES                         */
-/* ════════════════════════════════════ */
-.c{
-  border:1px solid var(--gb);
-  background:rgba(0,0,0,0.7);
-  position:relative;
-  overflow:hidden;
-  transition:border-color 0.25s;
-  min-height:0;
-}
-.c:hover{border-color:rgba(0,255,65,0.35)}
-
-/* cell label */
-.c .lb{
-  position:absolute;top:4px;left:10px;
+.title .sub span{
   font-family:var(--f2);font-size:8px;
-  letter-spacing:2px;opacity:0.25;
-  text-transform:uppercase;z-index:3;
+  letter-spacing:2px;opacity:0.2;
+  text-transform:uppercase;
 }
 
-/* cell ID corner */
-.c .id{
-  position:absolute;bottom:3px;right:6px;
+/* VERTICAL MYSTRA — stacked letters, no border */
+.vert{
+  grid-area:vert;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:6px;
+  font-family:var(--f1);
+  font-size:clamp(12px,1.6vw,17px);
+  letter-spacing:0.06em;
+  text-shadow:0 0 14px rgba(0,255,65,0.2);
+  -webkit-text-stroke:0.5px var(--g);
+  paint-order:stroke fill;
+}
+
+/* L-base under vert */
+.vbase{
+  grid-area:vbase;
+  border-left:1px solid var(--gb);
+  border-bottom:1px solid var(--gb);
+}
+
+/* IMG1 — top-left */
+.img1{
+  grid-area:img1;
+  border:1px solid var(--gb);
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s;
+  min-height:120px;
+}
+.img1:hover{border-color:var(--gh)}
+
+/* ICONS — thin row */
+.icons{
+  grid-area:icons;
+  display:grid;
+  grid-template-columns:48px repeat(3,1fr) 2.5fr;
+  gap:5px;
+  align-items:stretch;
+}
+.ic{
+  border:1px solid rgba(0,255,65,0.1);
+  display:flex;align-items:center;justify-content:center;
   font-family:var(--f3);font-size:11px;
-  opacity:0.15;z-index:3;
+  opacity:0.25;
+}
+.ic-txt{
+  border:none;
+  font-family:var(--f3);font-size:11px;
+  line-height:1.4;color:var(--g2);
+  opacity:0.25;padding:0 6px;
+  display:flex;align-items:center;
 }
 
-/* thumbnail */
-.c .th{
-  width:100%;height:100%;object-fit:cover;display:block;
-  opacity:0.4;filter:brightness(0.5) contrast(1.2);
-  transition:opacity 0.3s;
+/* IMG2 — bottom-left */
+.img2{
+  grid-area:img2;
+  border:1px solid var(--gb);
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s;
+  min-height:100px;
 }
-.c:hover .th{opacity:0.65}
+.img2:hover{border-color:var(--gh)}
+
+/* MAIN — big right block, spans 3 rows */
+.main{
+  grid-area:main;
+  border:1px solid var(--gb);
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s;
+  min-height:200px;
+}
+.main:hover{border-color:var(--gh)}
+
+/* LABEL — bottom-left text */
+.label{
+  grid-area:label;
+  display:flex;flex-direction:column;
+  justify-content:center;gap:6px;
+  padding:4px 0;
+}
+.label .big{
+  font-family:var(--f1);
+  font-size:clamp(14px,3.5vw,32px);
+  letter-spacing:0.1em;
+  line-height:1;
+  display:flex;align-items:center;gap:10px;
+}
+.label .big .arr{font-size:0.6em;opacity:0.35}
+.label .tagline{
+  font-family:var(--f2);font-size:8px;
+  letter-spacing:2px;opacity:0.18;
+  text-transform:uppercase;
+}
+
+/* INFO — bottom-right sub-grid */
+.info{
+  grid-area:info;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:5px;
+}
+.info-c{
+  border:1px solid rgba(0,255,65,0.08);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:var(--f3);font-size:10px;
+  color:var(--g2);opacity:0.25;
+}
+.info-c.open{border:none}
+.info-c .v{font-size:13px;color:var(--g);opacity:0.5;margin-bottom:1px}
+
+/* DIVIDER */
+.divider{
+  grid-area:div;
+  border-top:1px solid rgba(0,255,65,0.06);
+  display:flex;align-items:center;
+  font-family:var(--f2);font-size:7px;
+  letter-spacing:2px;opacity:0.12;
+  padding:0 4px;
+}
+
+/* FOOTER */
+.foot{
+  grid-area:foot;
+  display:flex;align-items:center;
+  justify-content:space-between;gap:8px;
+  font-family:var(--f2);font-size:7px;
+  letter-spacing:2px;opacity:0.12;
+}
+.foot .fl{flex:1;height:1px;background:rgba(0,255,65,0.04)}
+
+/* ═══ SHARED ═══ */
+.th{width:100%;height:100%;object-fit:cover;display:block;opacity:0.4;filter:brightness(0.45) contrast(1.2);transition:opacity 0.3s}
+.img1:hover .th,.img2:hover .th,.main:hover .th{opacity:0.6}
+
+.lb{position:absolute;top:6px;left:10px;font-family:var(--f2);font-size:7px;letter-spacing:2px;opacity:0.18;text-transform:uppercase;z-index:3}
+.nr{position:absolute;bottom:4px;right:7px;font-family:var(--f3);font-size:10px;opacity:0.1;z-index:3}
 
 /* expand overlay */
-.c .ex{
-  position:absolute;inset:0;
-  background:rgba(0,0,0,0.94);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:10px;opacity:0;transform:scale(0.96);
-  transition:opacity 0.3s cubic-bezier(0.16,1,0.3,1),transform 0.3s cubic-bezier(0.16,1,0.3,1);
-  pointer-events:none;z-index:6;
-}
-.c .ex.open{opacity:1;transform:scale(1);pointer-events:all}
-.c .ex img{max-width:92%;max-height:80%;object-fit:contain}
-.c .ex .el{font-family:var(--f2);font-size:8px;letter-spacing:2px;opacity:0.3;margin-top:5px}
-.c .ex .cx{position:absolute;top:5px;right:7px;font-family:var(--f2);font-size:12px;cursor:pointer;opacity:0.3}
-.c .ex .cx:hover{opacity:1}
+.ex{position:absolute;inset:0;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;opacity:0;transform:scale(0.97);transition:opacity 0.3s cubic-bezier(0.16,1,0.3,1),transform 0.3s cubic-bezier(0.16,1,0.3,1);pointer-events:none;z-index:6}
+.ex.open{opacity:1;transform:scale(1);pointer-events:all}
+.ex img{max-width:92%;max-height:80%;object-fit:contain}
+.ex .el{font-family:var(--f2);font-size:8px;letter-spacing:2px;opacity:0.25;margin-top:8px}
+.ex .cx{position:absolute;top:6px;right:8px;font-family:var(--f2);font-size:12px;cursor:pointer;opacity:0.25}
+.ex .cx:hover{opacity:1}
 
-/* ── readout text ── */
-.rd{font-family:var(--f3);font-size:13px;line-height:1.8;color:var(--g2);padding:18px 8px 8px}
-.rd .k{opacity:0.3}
+/* sensor bars */
+.sensors{display:flex;align-items:flex-end;gap:2px;height:100%;padding:4px}
+.sensors .bar{width:3px;background:var(--g);box-shadow:0 0 2px var(--g);animation:sbar 2s ease-in-out infinite}
+@keyframes sbar{0%,100%{height:15%}50%{height:80%}}
 
-/* ── progress bar ── */
-.pb{height:3px;background:rgba(0,255,65,0.07);margin:4px 8px;overflow:hidden}
-.pb .f{height:100%;background:var(--g);box-shadow:0 0 4px var(--g)}
-.pb .f.am{background:#FF6600;box-shadow:0 0 4px #FF6600}
-.pb-l{font-family:var(--f2);font-size:7px;opacity:0.2;letter-spacing:1px;padding:0 8px}
-
-/* ── status dot ── */
-.dt{display:inline-block;width:4px;height:4px;border-radius:50%;margin-right:4px;vertical-align:middle}
-.dt.g{background:var(--g);box-shadow:0 0 3px var(--g)}
-.dt.a{background:#FF6600;box-shadow:0 0 3px #FF6600}
-.dt.r{background:#FF003C;box-shadow:0 0 3px #FF003C}
-
-/* ── scanning bar ── */
-.scan-bar{
-  height:100%;
-  display:flex;align-items:center;justify-content:center;
-  padding:8px;
-}
-.scan-anim{
-  width:100%;height:2px;
-  background:rgba(0,255,65,0.1);
-  position:relative;overflow:hidden;
-}
-.scan-anim::after{
-  content:'';position:absolute;
-  width:40%;height:100%;
-  background:var(--g);box-shadow:0 0 8px var(--g);
-  animation:scanmove 3s ease-in-out infinite;
-}
-@keyframes scanmove{0%{left:-40%}100%{left:100%}}
-
-/* ── sensor bars ── */
-.sensors{
-  display:flex;align-items:flex-end;gap:2px;
-  height:40px;padding:0 8px;margin-top:14px;
-}
-.sensors .bar{
-  width:4px;background:var(--g);
-  box-shadow:0 0 3px var(--g);
-  animation:sbar 2s ease-in-out infinite;
-}
-@keyframes sbar{0%,100%{height:20%}50%{height:90%}}
-
-/* blink */
+/* blink cursor */
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 .bk{animation:blink 1.2s step-end infinite}
 
-/* ════════════════════════════════════ */
-/* MOBILE                              */
-/* ════════════════════════════════════ */
+/* subtle glow pulse on main */
+@keyframes glowpulse{0%,100%{box-shadow:0 0 0 rgba(0,255,65,0)}50%{box-shadow:0 0 20px rgba(0,255,65,0.04)}}
+.main{animation:glowpulse 6s ease-in-out infinite}
+
+/* ═══ MOBILE ═══ */
 @media(max-width:768px){
   html,body{overflow:auto}
-  .page{height:auto;min-height:100vh}
-  .body{
-    grid-template-columns:1fr 40px;
-    grid-template-rows:auto auto;
+  .poster{
+    height:auto;min-height:100vh;
+    grid-template-columns:1fr 36px;
+    grid-template-rows:auto auto auto auto auto auto auto auto;
+    grid-template-areas:
+      "title  vert"
+      "img1   vert"
+      "main   vert"
+      "icons  vert"
+      "img2   vert"
+      "label  vert"
+      "info   vert"
+      "foot   vbase";
+    padding:16px 12px;gap:6px;
   }
-  .left{display:none}
-  .center{grid-column:1}
-  .right-vert{grid-column:2;grid-row:1/3}
-  .center-top{grid-template-columns:1fr}
-  .center-bottom{grid-template-columns:1fr 1fr}
-}
-
-@media(max-width:480px){
-  .right-vert{font-size:12px;min-width:30px}
-  .top-banner h1{font-size:14px}
-  .center-bottom{grid-template-columns:1fr}
+  .img1,.img2{min-height:160px}
+  .main{min-height:220px}
+  .icons{grid-template-columns:40px repeat(2,1fr) 2fr}
+  .divider{display:none}
+  .title h1{font-size:clamp(18px,8vw,36px)}
 }
 </style>
 </head>
 <body>
 
-<div class="bg"><img src="img/R8I5I.jpg" alt=""></div>
-<div class="dots"></div>
+<div class="bg-art"><img src="img/R8I5I.jpg" alt=""></div>
+<div class="bg-dots"></div>
 <div class="scan"></div>
 
-<div class="page">
+<div class="poster">
 
-  <!-- ═══ TOP BANNER ═══ -->
-  <div class="top-banner">
-    <h1>MYSTRA 01</h1>
-    <div class="line"></div>
-    <span class="tag">HEXAPOD RESEARCH UNIT</span>
-    <span class="tag" style="opacity:0.5"><span class="bk">_</span></span>
+  <!-- TITLE -->
+  <div class="title">
+    <h1>MYSTRA<br>01</h1>
+    <div class="sub">
+      <span>HEXAPOD RESEARCH UNIT</span>
+      <span>NO — 0001 <span class="bk">_</span></span>
+    </div>
   </div>
 
-  <!-- ═══ BODY ═══ -->
-  <div class="body">
+  <!-- VERTICAL MYSTRA — stacked, no border -->
+  <div class="vert">
+    <span>M</span><span>Y</span><span>S</span><span>T</span><span>R</span><span>A</span>
+  </div>
+  <div class="vbase"></div>
 
-    <!-- LEFT COLUMN -->
-    <div class="left">
-
-      <!-- scanning -->
-      <div class="c">
-        <span class="lb">scanning</span>
-        <div class="scan-bar"><div class="scan-anim"></div></div>
-        <div class="pb-l" style="position:absolute;bottom:4px;left:8px">57%</div>
-      </div>
-
-      <!-- sensors -->
-      <div class="c">
-        <span class="lb"><span class="dt g"></span>sensors</span>
-        <div class="sensors">
-          <div class="bar" style="animation-delay:0s"></div>
-          <div class="bar" style="animation-delay:0.15s"></div>
-          <div class="bar" style="animation-delay:0.3s"></div>
-          <div class="bar" style="animation-delay:0.45s"></div>
-          <div class="bar" style="animation-delay:0.6s"></div>
-          <div class="bar" style="animation-delay:0.75s"></div>
-          <div class="bar" style="animation-delay:0.9s"></div>
-          <div class="bar" style="animation-delay:1.05s"></div>
-          <div class="bar" style="animation-delay:1.2s"></div>
-          <div class="bar" style="animation-delay:1.35s"></div>
-          <div class="bar" style="animation-delay:1.5s"></div>
-          <div class="bar" style="animation-delay:1.65s"></div>
-        </div>
-        <div class="rd" style="padding-top:8px">
-          <span class="k">SRV:</span> 18x MG946R<br>
-          <span class="k">DOF:</span> 3/LEG<br>
-          <span class="k">CPU:</span> RPi4<br>
-          <span class="k">DRV:</span> PCA9685
-        </div>
-        <div class="pb"><div class="f" style="width:85%"></div></div>
-        <div class="pb-l">BUILD 85%</div>
-      </div>
-
-      <!-- systems -->
-      <div class="c">
-        <span class="lb"><span class="dt r"></span>systems</span>
-        <div class="rd" style="padding-top:18px">
-          <span class="k">GAIT:</span> TRIPOD<br>
-          <span class="k">IK:</span> INVERSE.K<br>
-          <span class="k">NAV:</span> STANDBY<br>
-          <span class="k">VIS:</span> OFFLINE
-        </div>
-        <div class="pb"><div class="f am" style="width:40%"></div></div>
-        <div class="pb-l">AI CORE 40%</div>
-      </div>
-
+  <!-- IMG1: top-left -->
+  <div class="img1" onclick="tgl(this)">
+    <span class="lb">primary viewport</span>
+    <span class="nr">No.1</span>
+    <img class="th" src="img/spider-front.jpg" alt="">
+    <div class="ex">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/spider-front.jpg" alt="">
+      <div class="el">CONCEPT 01 // ARMORED SHELL</div>
     </div>
-
-    <!-- CENTER -->
-    <div class="center">
-      <div class="center-top">
-        <!-- big image -->
-        <div class="c" onclick="tgl(this)">
-          <span class="lb">primary viewport</span>
-          <span class="id">No.1</span>
-          <img class="th" src="img/spider-front.jpg" alt="">
-          <div class="ex">
-            <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-            <img src="img/spider-front.jpg" alt="">
-            <div class="el">CONCEPT 01 // ARMORED SHELL</div>
-          </div>
-        </div>
-        <!-- schematic -->
-        <div class="c" onclick="tgl(this)">
-          <span class="lb">schematic</span>
-          <span class="id">No.2</span>
-          <img class="th" src="img/schematic-green.jpg" alt="">
-          <div class="ex">
-            <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-            <img src="img/schematic-green.jpg" alt="">
-            <div class="el">ACTIVE SCHEMATIC // WIREFRAME</div>
-          </div>
-        </div>
-      </div>
-      <div class="center-bottom">
-        <!-- variant a -->
-        <div class="c" onclick="tgl(this)">
-          <span class="lb">variant.a</span>
-          <span class="id">No.3</span>
-          <img class="th" src="img/pixel-hex-large.jpg" alt="">
-          <div class="ex">
-            <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-            <img src="img/pixel-hex-large.jpg" alt="">
-            <div class="el">VARIANT A // HEAVY</div>
-          </div>
-        </div>
-        <!-- variant b -->
-        <div class="c" onclick="tgl(this)">
-          <span class="lb">variant.b</span>
-          <span class="id">No.4</span>
-          <img class="th" src="img/pixel-hex-small.jpg" alt="">
-          <div class="ex">
-            <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-            <img src="img/pixel-hex-small.jpg" alt="">
-            <div class="el">VARIANT B // COMPACT</div>
-          </div>
-        </div>
-        <!-- concept 02 -->
-        <div class="c" onclick="tgl(this)">
-          <span class="lb">concept.02</span>
-          <span class="id">No.5</span>
-          <img class="th" src="img/spider-necron.jpg" alt="">
-          <div class="ex">
-            <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-            <img src="img/spider-necron.jpg" alt="">
-            <div class="el">CONCEPT 02 // MONOLITH</div>
-          </div>
-        </div>
-        <!-- text block -->
-        <div class="c">
-          <span class="lb">mission</span>
-          <div class="rd" style="padding-top:18px;font-size:12px;line-height:1.6;opacity:0.5">
-            PRIMARY AIM OF HEXAPOD AUTONOMOUS INTELLIGENCE IS TO NAVIGATE TERRAIN WHERE WHEELS FAIL. SIX LEGS. NO ROADS. NO LIMITS.
-          </div>
-          <div class="pb-l" style="position:absolute;bottom:4px;right:6px">2025</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT VERTICAL TEXT -->
-    <div class="right-vert">MYSTRA</div>
-
   </div>
 
-  <!-- ═══ BOTTOM BAR ═══ -->
-  <div class="bot-bar">
+  <!-- ICONS ROW -->
+  <div class="icons">
+    <div class="ic">
+      <div class="sensors">
+        <div class="bar" style="animation-delay:0s"></div>
+        <div class="bar" style="animation-delay:0.15s"></div>
+        <div class="bar" style="animation-delay:0.3s"></div>
+        <div class="bar" style="animation-delay:0.45s"></div>
+        <div class="bar" style="animation-delay:0.6s"></div>
+        <div class="bar" style="animation-delay:0.75s"></div>
+      </div>
+    </div>
+    <div class="ic" style="font-size:10px">18</div>
+    <div class="ic" style="font-size:10px">3DOF</div>
+    <div class="ic" style="font-size:10px">RPi4</div>
+    <div class="ic-txt">SIX LEGS. NO ROADS. NO LIMITS.</div>
+  </div>
+
+  <!-- IMG2: bottom-left -->
+  <div class="img2" onclick="tgl(this)">
+    <span class="lb">schematic</span>
+    <span class="nr">No.2</span>
+    <img class="th" src="img/schematic-green.jpg" alt="">
+    <div class="ex">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/schematic-green.jpg" alt="">
+      <div class="el">ACTIVE SCHEMATIC // WIREFRAME</div>
+    </div>
+  </div>
+
+  <!-- MAIN: big right block -->
+  <div class="main" onclick="tgl(this)">
+    <span class="lb">main assembly</span>
+    <span class="nr">No.3</span>
+    <img class="th" src="img/spider-angle.jpg" alt="">
+    <div class="ex">
+      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
+      <img src="img/spider-angle.jpg" alt="">
+      <div class="el">MYSTRA 01 // ASSEMBLY VIEW</div>
+    </div>
+  </div>
+
+  <!-- LABEL -->
+  <div class="label">
+    <div class="big"><span class="arr">&#x2196;</span> GHSTLN</div>
+    <div class="tagline">GHOSTLINE LAB // HEXAPOD DIVISION</div>
+  </div>
+
+  <!-- INFO sub-grid -->
+  <div class="info">
+    <div class="info-c"><span class="v">85%</span>BUILD</div>
+    <div class="info-c"><span class="v">40%</span>AI</div>
+    <div class="info-c open"><span class="v">v1.0</span>REV</div>
+    <div class="info-c"><span class="v">18</span>SRV</div>
+    <div class="info-c"><span class="v">6</span>LEGS</div>
+    <div class="info-c open"><span class="v">3</span>DOF</div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider">GHOSTLINE LAB &mdash; MYSTRA 01 &mdash; ASSEMBLY PHASE</div>
+
+  <!-- FOOTER -->
+  <div class="foot">
     <span>GHOSTLINE LAB</span>
-    <span style="opacity:0.15">////</span>
-    <span class="bl" style="height:1px;background:var(--gb)"></span>
-    <span>NO &mdash; 0001</span>
-    <span style="opacity:0.15">&#x25CF;&#x25CF;&#x25CF;</span>
-    <span>STATUS: ASSEMBLY</span>
+    <span class="fl"></span>
+    <span>MYSTRA 01</span>
+    <span style="opacity:0.5">&#x25CF;&#x25CF;&#x25CF;</span>
+    <span>2025</span>
   </div>
 
 </div>
