@@ -58,12 +58,34 @@
 <body>
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
-<div id="sun-bg" style="position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;align-items:center;justify-content:center;">
+<div id="sun-bg" style="position:fixed;z-index:0;pointer-events:none;bottom:-180px;right:18%;transition:none;">
   <img id="sun-img" src="https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0193.jpg"
-       alt="" style="width:280px;height:280px;border-radius:50%;opacity:0.08;filter:brightness(0.6) saturate(0.5);object-fit:cover;position:absolute;bottom:40px;left:50%;transform:translateX(-50%);">
+       alt="" style="width:320px;height:320px;border-radius:50%;opacity:0.15;filter:brightness(0.5) saturate(0.6);object-fit:cover;">
 </div>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
 <script>
+// Sun parallax — rises slowly on scroll
+(function(){
+  const sun = document.getElementById('sun-bg');
+  const container = document.querySelector('.slide-container') || document.documentElement;
+
+  function onScroll(){
+    const scrollEl = document.querySelector('.slide-container') || document.documentElement;
+    const scrollTop = scrollEl.scrollTop || window.pageYOffset || 0;
+    const maxScroll = scrollEl.scrollHeight - window.innerHeight;
+    const progress = Math.min(scrollTop / (maxScroll || 1), 1);
+    // Sun starts at bottom:-180px (mostly hidden), rises to bottom:60px
+    const bottomVal = -180 + progress * 240;
+    sun.style.bottom = bottomVal + 'px';
+  }
+
+  // Listen on both — some pages scroll on container, some on window
+  const scrollTarget = document.querySelector('.slide-container');
+  if(scrollTarget) scrollTarget.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+
 // Plus signs (+) at grid crossings with subtle shimmer
 (function(){
   const c = document.getElementById('shimmer-dots');
@@ -82,13 +104,25 @@
     }
   }
 
+  let mx = -999, my = -999;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
   function draw(t){
     ctx.clearRect(0, 0, w, h);
     dots.forEach(d => {
-      const shimmer = 0.12 + 0.08 * Math.sin(t * 0.001 * d.speed + d.phase);
-      ctx.strokeStyle = `rgba(0,80,255,${shimmer})`;
+      // distance to cursor
+      const dx = d.x - mx, dy = d.y - my;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const cursorGlow = dist < 200 ? (1 - dist/200) * 0.35 : 0;
+
+      // random blink — each dot has small chance to flash
+      const flash = (Math.sin(t * 0.003 + d.phase * 100) > 0.997) ? 0.3 : 0;
+
+      const shimmer = 0.06 + 0.05 * Math.sin(t * 0.001 * d.speed + d.phase);
+      const alpha = Math.min(shimmer + cursorGlow + flash, 0.6);
+
+      ctx.strokeStyle = `rgba(0,80,255,${alpha})`;
       ctx.lineWidth = 1;
-      // draw +
       const s = 4;
       ctx.beginPath();
       ctx.moveTo(d.x - s, d.y);
