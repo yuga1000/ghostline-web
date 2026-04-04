@@ -396,9 +396,43 @@ html,body{
   .info{height:auto;min-height:60px}
   .label{height:auto;padding:8px 0}
 }
+
+/* ═══ SKIN OVERLAY ═══ */
+#skin-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.92);
+  flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+#skin-overlay.open{display:flex}
+#skin-overlay img{
+  max-width:80vw;max-height:70vh;object-fit:contain;
+  border:2px solid var(--orange);
+  box-shadow:0 0 30px rgba(255,100,0,0.3);
+  animation:skinIn 0.3s ease-out;
+}
+#skin-overlay .skin-name{
+  font-family:var(--f2);font-size:11px;letter-spacing:2px;
+  color:var(--orange);opacity:0.7;margin-top:12px;
+}
+#skin-overlay .skin-nav{
+  font-family:var(--f3);font-size:14px;color:var(--orange);
+  opacity:0.4;margin-top:8px;
+}
+@keyframes skinIn{
+  from{transform:scale(0.7) translateY(40px);opacity:0}
+  to{transform:scale(1) translateY(0);opacity:1}
+}
 </style>
 </head>
 <body>
+
+<!-- Skin overlay -->
+<div id="skin-overlay" onclick="closeSkinOverlay()">
+  <img id="skin-overlay-img" src="" alt="">
+  <div class="skin-name" id="skin-overlay-name"></div>
+  <div class="skin-nav">click anywhere to close // ← → to browse</div>
+</div>
 
 <div class="bg-art"><img src="img/R8I5I.jpg" alt=""></div>
 <div class="bg-grid"></div>
@@ -479,8 +513,7 @@ html,body{
 
   <!-- LABEL: bottom-left -->
   <div class="label">
-    <div class="big"><span class="arr">&#x2196;</span> GHSTLN</div>
-    <div class="tagline">MYSTRA 01 — autonomous hexapod platform<br>6-leg walker // 18 DOF // onboard AI<br>prototype stage — seeking partners</div>
+    <div class="tagline" style="font-size:11px;opacity:0.7;line-height:1.7;letter-spacing:1px;">MYSTRA 01 — autonomous hexapod platform<br>6-leg walker // 18 DOF // onboard AI<br>prototype stage — seeking partners</div>
   </div>
 
   <!-- INFO: bottom bar with magenta border -->
@@ -853,39 +886,64 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   }
 })();
 
-// ═══ SKIN ARCHIVE — auto-cycle + click to switch ═══
+// ═══ SKIN ARCHIVE — auto-cycle + click opens overlay ═══
+const skinData = [
+  {src:'img/skins/spider-front.jpg',   name:'STANDARD // FRONT'},
+  {src:'img/skins/spider-angle.jpg',   name:'STANDARD // ANGLE'},
+  {src:'img/skins/spider-standing.jpg', name:'STANDARD // STANDING'},
+  {src:'img/skins/spider-necron.jpg',  name:'NECRON SKIN'},
+  {src:'img/skins/spider-warhammer.jpg',name:'WARHAMMER SKIN'},
+  {src:'img/skins/IMG_6647.JPG',       name:'CONCEPT 01'},
+  {src:'img/skins/IMG_6662.JPG',       name:'CONCEPT 02'}
+];
+let skinIdx = 0;
+
 (function(){
-  const skins = [
-    'img/skins/spider-front.jpg',
-    'img/skins/spider-angle.jpg',
-    'img/skins/spider-standing.jpg',
-    'img/skins/spider-necron.jpg',
-    'img/skins/spider-warhammer.jpg',
-    'img/skins/IMG_6647.JPG',
-    'img/skins/IMG_6662.JPG'
-  ];
   const frame = document.querySelector('.skin-frame');
   if(!frame) return;
-  let idx = 0;
 
   // Preload
-  skins.forEach(s => { const i = new Image(); i.src = s; });
+  skinData.forEach(s => { const i = new Image(); i.src = s.src; });
 
-  function next(){
-    idx = (idx + 1) % skins.length;
+  // Auto-cycle thumbnail every 4s
+  setInterval(() => {
+    skinIdx = (skinIdx + 1) % skinData.length;
     frame.style.opacity = '0';
     setTimeout(() => {
-      frame.src = skins[idx];
+      frame.src = skinData[skinIdx].src;
       frame.style.opacity = '1';
     }, 300);
-  }
+  }, 4000);
 
-  // Auto-cycle every 4s
-  setInterval(next, 4000);
-
-  // Click to skip
-  document.getElementById('skins-block').addEventListener('click', next);
+  // Click opens overlay
+  document.getElementById('skins-block').addEventListener('click', () => {
+    openSkinOverlay(skinIdx);
+  });
 })();
+
+function openSkinOverlay(i){
+  skinIdx = i;
+  const ov = document.getElementById('skin-overlay');
+  document.getElementById('skin-overlay-img').src = skinData[skinIdx].src;
+  document.getElementById('skin-overlay-name').textContent = skinData[skinIdx].name + '  [' + (skinIdx+1) + '/' + skinData.length + ']';
+  ov.classList.add('open');
+}
+function closeSkinOverlay(){ document.getElementById('skin-overlay').classList.remove('open'); }
+
+// Arrow keys to browse in overlay
+document.addEventListener('keydown', e => {
+  const ov = document.getElementById('skin-overlay');
+  if(!ov.classList.contains('open')) return;
+  if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){
+    e.preventDefault();
+    openSkinOverlay((skinIdx + 1) % skinData.length);
+  } else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    openSkinOverlay((skinIdx - 1 + skinData.length) % skinData.length);
+  } else if(e.key === 'Escape'){
+    closeSkinOverlay();
+  }
+});
 </script>
 
 </body>
