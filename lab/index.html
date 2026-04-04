@@ -838,10 +838,10 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     setInterval(() => {
       idx = (idx + 1) % total;
 
-      // Random glitch: ~8% chance to switch to glitch for 2-4 frames
-      if(!useGlitch && Math.random() < 0.08){
+      // Random glitch: ~8% chance per loop to play full glitch cycle
+      if(!useGlitch && idx === 0 && Math.random() < 0.08){
         useGlitch = true;
-        glitchCountdown = 2 + Math.floor(Math.random() * 3);
+        glitchCountdown = total; // full loop
       }
 
       if(useGlitch){

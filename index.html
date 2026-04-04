@@ -91,12 +91,19 @@
 (function(){
   const sun = document.getElementById('sun-bg');
 
+  const isMobile = window.innerWidth <= 768;
+
   function onScroll(){
     const scrollEl = document.querySelector('.slide-container');
     const scrollTop = (scrollEl ? scrollEl.scrollTop : 0) || window.pageYOffset || 0;
     // Sun moves at 30% of scroll speed — true parallax
     const offset = scrollTop * 0.3;
-    sun.style.transform = 'translateY(-' + offset + 'px)';
+    if(isMobile){
+      // Mobile: keep centered (translateX(50%)) + parallax
+      sun.style.transform = 'translateX(50%) translateY(-' + offset + 'px)';
+    } else {
+      sun.style.transform = 'translateY(-' + offset + 'px)';
+    }
   }
 
   const scrollTarget = document.querySelector('.slide-container');
