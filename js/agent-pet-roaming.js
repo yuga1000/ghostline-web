@@ -335,8 +335,20 @@
     }
 
     // ===== TARGET SELECTION =====
+    function isElementVisible(el) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        // Must have real size and be at least partially in viewport
+        return rect.width > 10 && rect.height > 10 &&
+               rect.bottom > -100 && rect.top < window.innerHeight + 100 &&
+               rect.right > -100 && rect.left < window.innerWidth + 100;
+    }
+
     function getRandomTarget() {
-        const available = targets.filter(t => document.getElementById(t.id));
+        const available = targets.filter(t => {
+            const el = document.getElementById(t.id);
+            return el && isElementVisible(el);
+        });
         if (available.length === 0) return null;
         return available[Math.floor(Math.random() * available.length)];
     }
