@@ -554,17 +554,17 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   const title = document.querySelector('.title');
   const titleImg = document.getElementById('titleAnim');
 
-  // All blocks with unique log text — all run in PARALLEL
+  // Blocks in order — each log types, then block reveals, then next
   const blockCfg = [
-    {sel:'.main',     logs:['CORE_FRAME [INIT]','3D_VIEWPORT [OK]','RENDER_ENGINE [READY]']},
-    {sel:'.img2',     logs:['CONCEPT_DB [SCAN]','ASSET_01 [LOADED]']},
-    {sel:'.img1',     logs:['CAM_FEED [ONLINE]','OPTICS [CALIBRATED]']},
-    {sel:'.vbase',    logs:['SYS.CHECK','PWR:98%']},
-    {sel:'.icons',    logs:['SENSORS [ACTIVE]','DATA_STREAM [OK]']},
-    {sel:'.small-gif',logs:['3D_ROT [LOADING]','DRAFT_V1']},
-    {sel:'.foot-line',logs:['NAV [OK]']},
-    {sel:'.label',    logs:['ID:GHSTLN','HEX_DIV']},
-    {sel:'.info',     logs:['TELEMETRY [LIVE]','6x SRV [ACTIVE]']},
+    {sel:'.main',     logs:['> INIT CORE_FRAME','  3D_VIEWPORT ........ OK','  RENDER_ENGINE ...... READY']},
+    {sel:'.img2',     logs:['> SCAN CONCEPT_DB','  ASSET_01 ........... LOADED']},
+    {sel:'.img1',     logs:['> CAM_FEED ONLINE','  OPTICS ............. CALIBRATED']},
+    {sel:'.vbase',    logs:['> SYS.CHECK','  PWR ................ 98%','  LINK ............... OK']},
+    {sel:'.icons',    logs:['> SENSOR_ARRAY INIT','  DATA_STREAM ........ ACTIVE']},
+    {sel:'.small-gif',logs:['> LOAD 3D_ROTATION','  DRAFT_V1 ........... OK']},
+    {sel:'.foot-line',logs:['> NAV MODULE [OK]']},
+    {sel:'.label',    logs:['> ID: GHSTLN','  HEX_DIVISION']},
+    {sel:'.info',     logs:['> TELEMETRY STREAM','  6x SERVO ........... ACTIVE','  DOF ................ 18']},
   ];
 
   // Wait for PNG animation to finish (8 frames × 150ms = 1200ms), then blink
@@ -587,61 +587,54 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     blink();
   }
 
-  // Type log into a block — fast, returns promise
+  // Type log into block, then reveal block, then call next
   function typeLog(el, lines){
     return new Promise(resolve => {
       const log = document.createElement('div');
       log.className = 'block-log typing';
       el.appendChild(log);
 
-      // Show border/outline immediately so logs are visible in the block area
-      el.style.opacity = '1';
-
-      let text = '';
       let lineIdx = 0, charIdx = 0;
-      const speed = 15; // fast typing
+      const speed = 12; // very fast typing
 
       function tick(){
         if(lineIdx >= lines.length){
-          // Done — hold briefly then reveal
+          // Log done — brief hold, then reveal block
           setTimeout(() => {
             log.classList.remove('typing');
             log.classList.add('done');
             el.classList.add('revealed');
-            setTimeout(() => log.remove(), 300);
+            setTimeout(() => log.remove(), 250);
             resolve();
-          }, 150);
+          }, 120);
           return;
         }
         const line = lines[lineIdx];
         if(charIdx <= line.length){
           const built = lines.slice(0, lineIdx).join('\n') +
             (lineIdx > 0 ? '\n' : '') + line.slice(0, charIdx);
-          log.textContent = built + '_';
+          log.textContent = built + '█';
           charIdx++;
           setTimeout(tick, speed);
         } else {
           lineIdx++;
           charIdx = 0;
-          setTimeout(tick, 60); // short line pause
+          setTimeout(tick, 50);
         }
       }
       tick();
     });
   }
 
-  // ALL blocks log simultaneously, then reveal
-  function bootAllBlocks(){
-    const promises = blockCfg.map(cfg => {
+  // Sequential: log → reveal → next block → log → reveal → ...
+  async function bootBlocksSequential(){
+    for(const cfg of blockCfg){
       const el = document.querySelector(cfg.sel);
-      if(!el) return Promise.resolve();
-      return typeLog(el, cfg.logs);
-    });
-
-    Promise.all(promises).then(() => {
-      // After all blocks revealed — light up VERT
-      bootVert();
-    });
+      if(!el) continue;
+      await typeLog(el, cfg.logs);
+    }
+    // All done — VERT letters last
+    bootVert();
   }
 
   function bootVert(){
@@ -663,13 +656,11 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     }, 3000 + Math.random() * 4000);
   }
 
-  // === GO: anim → blink → all logs at once → reveal ===
-  // First show title for animation
+  // === GO: anim → blink → logs one by one → reveal each → next ===
   title.style.opacity = '1';
   waitForAnim(() => {
-    // PNG anim done — now blink
     arcadeBlink(() => {
-      setTimeout(bootAllBlocks, 300);
+      setTimeout(bootBlocksSequential, 300);
     });
   });
 })();
