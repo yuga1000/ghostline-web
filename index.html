@@ -63,11 +63,9 @@
 </a>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:2;pointer-events:none;"></canvas>
 <script>
-// Random SDO sun channel on each page load
+// Sun: show latest 304 image immediately, timelapse loads in background
 (function(){
-  var channels = ['0094','0131','0171','0193','0211','0304','0335','1700'];
-  var ch = channels[Math.floor(Math.random() * channels.length)];
-  document.getElementById('sun-img').src = 'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_' + ch + '.jpg';
+  document.getElementById('sun-img').src = 'https://sdo.gsfc.nasa.gov/assets/img/latest/latest_512_0304.jpg';
 })();
 
 // Sun parallax — moves with scroll but slower (0.3x speed)
@@ -1549,6 +1547,8 @@ initATASquare();
 
 <!-- Solar Activity System — real-time space weather effects -->
 <script src="js/solar-activity.js"></script>
+<!-- Sun timelapse — 200 frames sliding window from NASA SDO -->
+<script src="js/sun-timelapse.js"></script>
 
   </body>
   </html>
