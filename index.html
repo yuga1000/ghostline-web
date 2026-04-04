@@ -31,6 +31,18 @@
     </script>
 
     <style>
+      /* Mobile: sun smaller, Lost Archive below sun */
+      @media (max-width: 768px) {
+        #sun-bg {
+          right: 50% !important;
+          transform: translateX(50%) !important;
+          bottom: -180px !important;
+        }
+        #sun-img {
+          width: 280px !important;
+          height: 280px !important;
+        }
+      }
       #terminal-popup {
         display: none;
         position: fixed;
