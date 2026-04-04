@@ -158,6 +158,11 @@ html,body{
   border:3px solid rgba(0,51,255,0.58);
   overflow:hidden;
   box-shadow:0 0 12px rgba(0,51,255,0.15);
+  background:#000;
+}
+.small-gif .th{
+  object-fit:contain !important;
+  width:100%;height:100%;
 }
 
 /* ───── LABEL: bottom-left text (320x80 @ 90,690) ───── */
@@ -443,9 +448,8 @@ html,body{
     </div>
   </div>
 
-  <!-- MAIN: big center block — 3D pixel rotation gif -->
+  <!-- MAIN: big center block — reserved for final content -->
   <div class="main">
-    <img class="th" src="img/scheme-pixel-mystra-3d/finalized_20260403_173400_x_boost.gif" alt="" style="filter:none;opacity:1;">
   </div>
 
   <!-- VERT: vertical MYSTRA letters -->
@@ -453,14 +457,14 @@ html,body{
     <span>M</span><span>Y</span><span>S</span><span>T</span><span>R</span><span>A</span>
   </div>
 
-  <!-- SMALL GIF: overlay inside main area -->
+  <!-- SMALL GIF: 3D rotation draft -->
   <div class="small-gif" onclick="tgl(this)">
-    <span class="lb">detail</span>
-    <img class="th" src="img/pixel-hex-large.jpg" alt="">
+    <span class="lb">3d rotation</span>
+    <img class="th" src="img/scheme-pixel-mystra-3d/finalized_20260403_173400_x_boost.gif" alt="" style="filter:none;opacity:0.85;object-fit:contain;background:#000;">
     <div class="ex">
       <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-      <img src="img/pixel-hex-large.jpg" alt="">
-      <div class="el">PIXEL HEX // DETAIL</div>
+      <img src="img/scheme-pixel-mystra-3d/finalized_20260403_173400_x_boost.gif" alt="" style="object-fit:contain;">
+      <div class="el">MYSTRA 01 // 3D ROTATION DRAFT</div>
     </div>
   </div>
 
