@@ -356,7 +356,6 @@ html,body{
 .poster > *.revealed .lb,
 .poster > *.revealed .nr{
   opacity:1 !important;
-  transition:opacity 0.3s;
 }
 /* Log overlay — bright, impossible to miss */
 .block-log{
@@ -607,56 +606,40 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     blink();
   }
 
-  // Type log into block, then reveal block content
-  function typeLog(el, lines){
-    return new Promise(resolve => {
-      // Show block frame + dark bg with log
-      el.classList.add('logging');
-
-      const log = document.createElement('div');
-      log.className = 'block-log';
-      el.appendChild(log);
-
-      let lineIdx = 0, charIdx = 0;
-      const speed = 6; // 2x faster
-
-      function tick(){
-        if(lineIdx >= lines.length){
-          // Log done — quick swap to content
-          setTimeout(() => {
-            el.classList.remove('logging');
-            el.classList.add('revealed');
-            log.remove();
-            resolve();
-          }, 80);
-          return;
-        }
-        const line = lines[lineIdx];
-        if(charIdx <= line.length){
-          const built = lines.slice(0, lineIdx).join('\n') +
-            (lineIdx > 0 ? '\n' : '') + line.slice(0, charIdx);
-          log.textContent = built + '█';
-          charIdx++;
-          setTimeout(tick, speed);
-        } else {
-          lineIdx++;
-          charIdx = 0;
-          setTimeout(tick, 30);
-        }
-      }
-      tick();
-    });
-  }
-
-  // Sequential: log → reveal → next block → log → reveal → ...
-  async function bootBlocksSequential(){
-    for(const cfg of blockCfg){
+  // Cascade 1: show all logs fast, one after another
+  // Cascade 2: replace logs with blocks fast, one after another
+  function bootBlocks(){
+    const blocks = [];
+    blockCfg.forEach(cfg => {
       const el = document.querySelector(cfg.sel);
-      if(!el) continue;
-      await typeLog(el, cfg.logs);
-    }
-    // All done — VERT letters last
-    bootVert();
+      if(!el) return;
+      blocks.push({el, text: cfg.logs.join('\n')});
+    });
+
+    // Cascade 1 — logs appear instantly, staggered 80ms apart
+    blocks.forEach((b, i) => {
+      setTimeout(() => {
+        b.el.classList.add('logging');
+        const log = document.createElement('div');
+        log.className = 'block-log';
+        log.textContent = b.text;
+        b.el.appendChild(log);
+        b.log = log;
+      }, i * 80);
+    });
+
+    // Cascade 2 — after all logs shown, swap to blocks staggered 60ms
+    const logsTime = blocks.length * 80 + 600; // hold logs visible for 600ms
+    blocks.forEach((b, i) => {
+      setTimeout(() => {
+        b.el.classList.remove('logging');
+        b.el.classList.add('revealed');
+        if(b.log) b.log.remove();
+      }, logsTime + i * 60);
+    });
+
+    // VERT letters after all blocks
+    setTimeout(() => bootVert(), logsTime + blocks.length * 60 + 100);
   }
 
   function bootVert(){
@@ -678,11 +661,11 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     }, 3000 + Math.random() * 4000);
   }
 
-  // === GO: anim → blink → logs one by one → reveal each → next ===
+  // === GO: anim → blink → cascade logs → cascade blocks ===
   title.style.opacity = '1';
   waitForAnim(() => {
     arcadeBlink(() => {
-      setTimeout(bootBlocksSequential, 300);
+      setTimeout(bootBlocks, 200);
     });
   });
 })();
