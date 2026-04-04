@@ -335,11 +335,15 @@ html,body{
 .poster > *.logging .vbase-inner,
 .poster > *.logging .info-c,
 .poster > *.logging .custom-font,
+.poster > *.logging #main3d,
 .poster > *.logging canvas,
 .poster > *.logging .big,
 .poster > *.logging .tagline,
 .poster > *.logging .lb,
-.poster > *.logging .nr{
+.poster > *.logging .nr,
+.poster > *.logging .sensors,
+.poster > *.logging .fl,
+.poster > *.logging .foot-line span{
   opacity:0 !important;
 }
 /* Phase 2: everything visible */
@@ -350,11 +354,15 @@ html,body{
 .poster > *.revealed .vbase-inner,
 .poster > *.revealed .info-c,
 .poster > *.revealed .custom-font,
+.poster > *.revealed #main3d,
 .poster > *.revealed canvas,
 .poster > *.revealed .big,
 .poster > *.revealed .tagline,
 .poster > *.revealed .lb,
-.poster > *.revealed .nr{
+.poster > *.revealed .nr,
+.poster > *.revealed .sensors,
+.poster > *.revealed .fl,
+.poster > *.revealed .foot-line span{
   opacity:1 !important;
 }
 /* Log overlay — bright, impossible to miss */
@@ -609,6 +617,18 @@ function cls(b){b.closest('.ex').classList.remove('open')}
 
   // Cascade 1: show all logs fast, one after another
   // Cascade 2: replace logs with blocks fast, one after another
+  // Type text character by character into a log div
+  function typeInto(logDiv, text, speed, cb){
+    let i = 0;
+    function tick(){
+      if(i >= text.length){ if(cb) cb(); return; }
+      i++;
+      logDiv.textContent = text.slice(0, i) + '█';
+      setTimeout(tick, speed);
+    }
+    tick();
+  }
+
   function bootBlocks(){
     const blocks = [];
     blockCfg.forEach(cfg => {
@@ -617,30 +637,38 @@ function cls(b){b.closest('.ex').classList.remove('open')}
       blocks.push({el, text: cfg.logs.join('\n')});
     });
 
-    // Cascade 1 — logs appear instantly, staggered 80ms apart
+    // Cascade 1 — logs appear staggered, each types fast
+    let logDelay = 0;
     blocks.forEach((b, i) => {
+      const startAt = logDelay;
       setTimeout(() => {
         b.el.classList.add('logging');
         const log = document.createElement('div');
         log.className = 'block-log';
-        log.textContent = b.text;
+        log.textContent = '█';
         b.el.appendChild(log);
         b.log = log;
-      }, i * 80);
+        typeInto(log, b.text, 8);
+      }, startAt);
+      // Stagger: next log starts 120ms after this one
+      logDelay += 120;
     });
 
-    // Cascade 2 — after all logs shown, swap to blocks staggered 60ms
-    const logsTime = blocks.length * 80 + 600; // hold logs visible for 600ms
+    // Cascade 2 — after ALL logs typed + hold 800ms, swap to blocks
+    const allLogsTyped = logDelay + 400; // worst case typing time
+    const holdTime = 800;
+    const cascade2Start = allLogsTyped + holdTime;
+
     blocks.forEach((b, i) => {
       setTimeout(() => {
         b.el.classList.remove('logging');
         b.el.classList.add('revealed');
         if(b.log) b.log.remove();
-      }, logsTime + i * 60);
+      }, cascade2Start + i * 80);
     });
 
-    // VERT letters after all blocks
-    setTimeout(() => bootVert(), logsTime + blocks.length * 60 + 100);
+    // VERT letters after all blocks revealed
+    setTimeout(() => bootVert(), cascade2Start + blocks.length * 80 + 100);
   }
 
   function bootVert(){
@@ -804,12 +832,12 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   }
 })();
 
-// ═══ MAIN 3D ROTATION — 31 frames, loop forever ═══
+// ═══ MAIN 3D ROTATION — 10 frames, discrete step animation ═══
 (function(){
   const el = document.getElementById('main3d');
   if(!el) return;
-  const total = 31;
-  const delay = 80; // ~12.5fps
+  const total = 10;
+  const holdTime = 320; // ms per frame — slow discrete steps like stop-motion
   const frames = [];
   let loaded = 0;
   let idx = 0;
@@ -825,7 +853,7 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     setInterval(() => {
       idx = (idx + 1) % total;
       el.src = frames[idx].src;
-    }, delay);
+    }, holdTime);
   }
 })();
 </script>
