@@ -225,49 +225,38 @@
         return;
       }
 
-      // Particle count based on wind speed
-      const targetCount = Math.floor((wind - 400) / 20);
-      const maxParticles = Math.min(targetCount, 80);
+      // Few tiny pixel particles — subtle, not distracting
+      const targetCount = Math.floor((wind - 400) / 40);
+      const maxParticles = Math.min(targetCount, 25);
 
-      // Spawn from sun direction (bottom-right)
+      // Spawn from sun direction (bottom-right), spread wide
       while(particles.length < maxParticles){
         particles.push({
-          x: w * 0.85 + Math.random() * 100,
-          y: h * 0.85 + Math.random() * 100,
-          vx: -(2 + Math.random() * 3) * (wind / 500),
-          vy: -(1 + Math.random() * 2) * (wind / 500),
+          x: w * (0.7 + Math.random() * 0.3),
+          y: h * (0.7 + Math.random() * 0.3),
+          vx: -(0.3 + Math.random() * 0.6),
+          vy: -(0.2 + Math.random() * 0.4),
           life: 1,
-          decay: 0.003 + Math.random() * 0.005,
-          size: 1 + Math.random() * 2
+          decay: 0.002 + Math.random() * 0.003
         });
       }
 
-      // Update + draw
+      // Update + draw as 1px squares
       for(let i = particles.length - 1; i >= 0; i--){
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
         p.life -= p.decay;
 
-        if(p.life <= 0 || p.x < -50 || p.y < -50){
+        if(p.life <= 0 || p.x < -10 || p.y < -10){
           particles.splice(i, 1);
           continue;
         }
 
-        particleCtx.beginPath();
-        particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        // Color: yellow-white for fast wind, blue-white for moderate
-        const hue = wind > 600 ? '60,100%' : '200,80%';
-        particleCtx.fillStyle = `hsla(${hue},90%,${p.life * 0.5})`;
-        particleCtx.fill();
-
-        // Trail
-        particleCtx.beginPath();
-        particleCtx.moveTo(p.x, p.y);
-        particleCtx.lineTo(p.x - p.vx * 3, p.y - p.vy * 3);
-        particleCtx.strokeStyle = `hsla(${hue},90%,${p.life * 0.2})`;
-        particleCtx.lineWidth = p.size * 0.5;
-        particleCtx.stroke();
+        // 1px square, blue tint, very faint
+        const a = p.life * 0.15;
+        particleCtx.fillStyle = `rgba(100,160,255,${a})`;
+        particleCtx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
       }
 
       requestAnimationFrame(drawParticles);
