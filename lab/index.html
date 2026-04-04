@@ -467,11 +467,12 @@ html,body{
   </div>
 
   <!-- IMG1: left-bottom — skins archive -->
-  <div class="img1" id="skins-block">
-    <span class="lb" style="color:var(--orange)">SKIN ARCHIVE</span>
-    <span class="nr" style="color:var(--orange)">7 units</span>
-    <div id="skins-slider" style="display:flex;width:100%;height:100%;overflow:hidden;position:relative;cursor:pointer;">
-      <img class="skin-frame" src="img/skins/spider-front.jpg" alt="" style="width:100%;height:100%;object-fit:cover;flex-shrink:0;transition:opacity 0.3s;">
+  <div class="img1" id="skins-block" style="border:none;background:transparent;cursor:pointer;position:absolute;">
+    <div style="position:relative;width:100%;height:100%;">
+      <!-- Skin preview behind -->
+      <img class="skin-frame" src="img/skins/spider-front.jpg" alt="" style="position:absolute;inset:6%;width:88%;height:75%;object-fit:cover;transition:opacity 0.3s;image-rendering:auto;">
+      <!-- Folder icon on top -->
+      <img src="img/ui/skins_icon_transparent.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;z-index:2;">
     </div>
   </div>
 
