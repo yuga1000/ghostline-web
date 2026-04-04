@@ -92,23 +92,30 @@
   const sun = document.getElementById('sun-bg');
 
   const isMobile = window.innerWidth <= 768;
+  const scrollTarget = document.querySelector('.slide-container');
+
+  function getScroll(){
+    // Try all scroll sources
+    if(scrollTarget && scrollTarget.scrollTop > 0) return scrollTarget.scrollTop;
+    if(window.pageYOffset > 0) return window.pageYOffset;
+    if(document.documentElement.scrollTop > 0) return document.documentElement.scrollTop;
+    if(document.body.scrollTop > 0) return document.body.scrollTop;
+    return 0;
+  }
 
   function onScroll(){
-    const scrollEl = document.querySelector('.slide-container');
-    const scrollTop = (scrollEl ? scrollEl.scrollTop : 0) || window.pageYOffset || 0;
-    // Sun moves at 30% of scroll speed — true parallax
+    const scrollTop = getScroll();
     const offset = scrollTop * 0.3;
     if(isMobile){
-      // Mobile: keep centered (translateX(50%)) + parallax
       sun.style.transform = 'translateX(50%) translateY(-' + offset + 'px)';
     } else {
       sun.style.transform = 'translateY(-' + offset + 'px)';
     }
   }
 
-  const scrollTarget = document.querySelector('.slide-container');
   if(scrollTarget) scrollTarget.addEventListener('scroll', onScroll, {passive:true});
   window.addEventListener('scroll', onScroll, {passive:true});
+  document.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 })();
 
