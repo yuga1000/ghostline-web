@@ -323,33 +323,53 @@ html,body{
 /* ═══ BOOT ENTRANCE ═══ */
 .poster > *{
   opacity:0;
-  transition:opacity 0.3s ease;
 }
 .poster > .title{
   opacity:0;
 }
+/* Phase 1: block frame visible, content hidden */
+.poster > *.logging{
+  opacity:1;
+}
+.poster > *.logging .th,
+.poster > *.logging .vbase-inner,
+.poster > *.logging .info-c,
+.poster > *.logging .custom-font,
+.poster > *.logging canvas,
+.poster > *.logging .big,
+.poster > *.logging .tagline,
+.poster > *.logging .lb,
+.poster > *.logging .nr{
+  opacity:0 !important;
+}
+/* Phase 2: everything visible */
 .poster > *.revealed{
   opacity:1;
 }
-/* Block log overlay — visible green terminal text */
+.poster > *.revealed .th,
+.poster > *.revealed .vbase-inner,
+.poster > *.revealed .info-c,
+.poster > *.revealed .custom-font,
+.poster > *.revealed canvas,
+.poster > *.revealed .big,
+.poster > *.revealed .tagline,
+.poster > *.revealed .lb,
+.poster > *.revealed .nr{
+  opacity:1 !important;
+  transition:opacity 0.3s;
+}
+/* Log overlay — bright, impossible to miss */
 .block-log{
   position:absolute;inset:0;z-index:5;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--f3);font-size:14px;
-  color:var(--g);opacity:0;
+  font-family:var(--f3);font-size:15px;
+  color:#00ff41;
   letter-spacing:1.5px;
-  text-shadow:0 0 8px rgba(0,255,65,0.5);
+  text-shadow:0 0 10px rgba(0,255,65,0.6), 0 0 20px rgba(0,255,65,0.2);
   pointer-events:none;
   white-space:pre;line-height:1.6;
   text-align:center;
-  background:rgba(0,0,0,0.7);
-}
-.block-log.typing{
-  opacity:1;
-}
-.block-log.done{
-  opacity:0;
-  transition:opacity 0.2s;
+  background:rgba(0,0,0,0.85);
 }
 
 /* ═══ VERT LETTERS GLOW ═══ */
@@ -587,26 +607,28 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     blink();
   }
 
-  // Type log into block, then reveal block, then call next
+  // Type log into block, then reveal block content
   function typeLog(el, lines){
     return new Promise(resolve => {
+      // Show block frame + dark bg with log
+      el.classList.add('logging');
+
       const log = document.createElement('div');
-      log.className = 'block-log typing';
+      log.className = 'block-log';
       el.appendChild(log);
 
       let lineIdx = 0, charIdx = 0;
-      const speed = 12; // very fast typing
+      const speed = 6; // 2x faster
 
       function tick(){
         if(lineIdx >= lines.length){
-          // Log done — brief hold, then reveal block
+          // Log done — quick swap to content
           setTimeout(() => {
-            log.classList.remove('typing');
-            log.classList.add('done');
+            el.classList.remove('logging');
             el.classList.add('revealed');
-            setTimeout(() => log.remove(), 250);
+            log.remove();
             resolve();
-          }, 120);
+          }, 80);
           return;
         }
         const line = lines[lineIdx];
@@ -619,7 +641,7 @@ function cls(b){b.closest('.ex').classList.remove('open')}
         } else {
           lineIdx++;
           charIdx = 0;
-          setTimeout(tick, 50);
+          setTimeout(tick, 30);
         }
       }
       tick();
