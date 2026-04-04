@@ -58,9 +58,16 @@
 <body>
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
-<a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" id="sun-bg" style="position:fixed;z-index:0;bottom:-250px;right:16%;cursor:pointer;">
-  <img id="sun-img" src="" alt="" style="width:380px;height:380px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);">
-</a>
+<div id="sun-bg" style="position:fixed;z-index:0;bottom:-250px;right:16%;display:flex;flex-direction:column;align-items:center;">
+  <a href="https://sdo.gsfc.nasa.gov/data/" target="_blank" style="cursor:pointer;">
+    <img id="sun-img" src="" alt="" style="width:380px;height:380px;border-radius:50%;opacity:1;filter:brightness(0.5) saturate(0.7);object-fit:cover;mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);-webkit-mask-image:radial-gradient(circle,rgba(0,0,0,1) 25%,rgba(0,0,0,0.4) 45%,transparent 70%);">
+  </a>
+  <div id="sun-data" style="margin-top:-30px;font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,100,0,0.35);letter-spacing:1.5px;text-align:center;line-height:1.6;pointer-events:none;">
+    SDO/AIA 304<br>
+    <span id="sun-data-kp">Kp --</span> │ <span id="sun-data-wind">WIND ---</span><br>
+    NASA REAL-TIME
+  </div>
+</div>
 <canvas id="shimmer-dots" style="position:fixed;inset:0;z-index:2;pointer-events:none;"></canvas>
 <script>
 // Sun: show latest 304 image immediately, timelapse loads in background

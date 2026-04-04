@@ -319,6 +319,12 @@
       Bz ${s.bz.toFixed(1)} <span style="color:${s.bz<-5?'#ff3366':'#00ff66'}">[${bzStatus}]</span> │
       FLARE: ${s.flareClass}
     `;
+
+    // Update sun-data labels under the sun
+    const sunKp = document.getElementById('sun-data-kp');
+    const sunWind = document.getElementById('sun-data-wind');
+    if(sunKp) sunKp.textContent = 'Kp ' + s.kp.toFixed(1);
+    if(sunWind) sunWind.textContent = 'WIND ' + Math.round(s.windSpeed) + ' km/s';
   }
 
   // 5. Modify cross shimmer based on Kp
