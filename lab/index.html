@@ -49,13 +49,13 @@ html,body{
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,50,255,0.004) 2px,rgba(0,50,255,0.004) 4px);
   pointer-events:none;
 }
-/* Grid lines — like main site but smaller cells (30 columns) */
+/* Grid lines — orange, smaller cells (30 columns) */
 .bg-grid{
   position:fixed;inset:0;z-index:0;
   pointer-events:none;
   background-image:
-    linear-gradient(0deg, rgba(0,60,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,60,255,0.04) 1px, transparent 1px);
+    linear-gradient(0deg, rgba(255,100,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,100,0,0.04) 1px, transparent 1px);
   background-size: calc(100vw / 30) calc(100vw / 30);
 }
 
@@ -528,7 +528,7 @@ function cls(b){b.closest('.ex').classList.remove('open')}
       const flash = (Math.sin(t * 0.003 + d.phase * 100) > 0.997) ? 0.2 : 0;
       const alpha = Math.min(shimmer + cursorGlow + flash, 0.4);
 
-      ctx.strokeStyle = `rgba(0,80,255,${alpha})`;
+      ctx.strokeStyle = `rgba(255,120,0,${alpha})`;
       ctx.lineWidth = 1;
       const s = 3;
       ctx.beginPath();
