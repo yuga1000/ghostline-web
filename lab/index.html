@@ -320,27 +320,34 @@ html,body{
   pointer-events:none;
 }
 
-/* ═══ STAGGER ENTRANCE ═══ */
+/* ═══ BOOT ENTRANCE ═══ */
 .poster > *{
   opacity:0;
-  transform:translateY(8px);
-  transition:opacity 0.6s ease, transform 0.6s ease;
+  transition:opacity 0.5s ease, transform 0.4s ease;
+}
+.poster > .title{
+  opacity:0;
 }
 .poster > *.revealed{
   opacity:1;
-  transform:translateY(0);
 }
-/* Borders flash in first — content fades after */
-.poster > *.revealed .th,
-.poster > *.revealed .vbase-inner,
-.poster > *.revealed .info-c,
-.poster > *.revealed .custom-font,
-.poster > *.revealed canvas{
-  animation:contentFadeIn 0.5s ease 0.3s both;
+/* Block log overlay — shows before block content */
+.block-log{
+  position:absolute;inset:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f3);font-size:11px;
+  color:var(--g);opacity:0;
+  letter-spacing:1px;
+  text-shadow:0 0 6px rgba(0,255,65,0.3);
+  pointer-events:none;
+  white-space:pre;line-height:1.4;
 }
-@keyframes contentFadeIn{
-  from{opacity:0}
-  to{opacity:1}
+.block-log.typing{
+  opacity:0.6;
+}
+.block-log.done{
+  opacity:0;
+  transition:opacity 0.3s;
 }
 
 /* ═══ VERT LETTERS GLOW ═══ */
@@ -539,48 +546,138 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   requestAnimationFrame(draw);
 })();
 
-// ═══ STAGGER ENTRANCE — blocks appear one by one ═══
+// ═══ ARCADE BOOT SEQUENCE ═══
 (function(){
-  const blocks = document.querySelectorAll('.poster > *');
-  const order = ['.title','.main','.img2','.img1','.vbase','.vert','.icons','.foot-line','.small-gif','.label','.info'];
-  let delay = 200;
+  const title = document.querySelector('.title');
+  const titleImg = document.getElementById('titleAnim');
 
-  order.forEach(sel => {
-    const el = document.querySelector(sel);
-    if(!el) return;
-    setTimeout(() => el.classList.add('revealed'), delay);
-    delay += 150;
-  });
+  // Block configs: selector, log lines to type
+  const blockSeq = [
+    {sel:'.main',    logs:['CORE_FRAME [INIT]','VIEWPORT [OK]','3D_ENGINE [READY]']},
+    {sel:'.img2',    logs:['SCAN CONCEPT_DB...','RENDER [LOADED]']},
+    {sel:'.img1',    logs:['CAM_FEED [ONLINE]','VIEWPORT_2 [OK]']},
+    {sel:'.vbase',   logs:['SYS.LINK [CHECK]','PWR [98%]']},
+    {sel:'.icons',   logs:['SENSOR_ARRAY [OK]']},
+    {sel:'.small-gif',logs:['3D_ROT [DRAFT]','LOADING...']},
+    {sel:'.foot-line',logs:['NAV [OK]']},
+    {sel:'.label',   logs:['ID: GHSTLN']},
+    {sel:'.info',    logs:['TELEMETRY [STREAM]','6x SRV [ACTIVE]']},
+  ];
 
-  // Reveal any remaining blocks
-  setTimeout(() => {
-    blocks.forEach(b => b.classList.add('revealed'));
-  }, delay + 200);
-})();
+  // Phase 1: Title blinks 3 times arcade-style then stays
+  function arcadeBlink(cb){
+    title.style.transition = 'none';
+    let count = 0;
+    const blinkOn = 180, blinkOff = 140;
+    function doBlink(){
+      if(count >= 3){
+        title.style.opacity = '1';
+        cb();
+        return;
+      }
+      title.style.opacity = '1';
+      setTimeout(() => {
+        title.style.opacity = '0';
+        setTimeout(() => {
+          count++;
+          doBlink();
+        }, blinkOff);
+      }, blinkOn);
+    }
+    // Small pause then start blinking
+    setTimeout(doBlink, 400);
+  }
 
-// ═══ VERT LETTERS — sequential glow + random glitch ═══
-(function(){
-  const letters = document.querySelectorAll('.vert span');
-  if(!letters.length) return;
+  // Phase 2: For each block — inject log overlay, type text, then reveal block
+  function typeLog(el, lines, cb){
+    // Create log overlay
+    const log = document.createElement('div');
+    log.className = 'block-log';
+    el.style.position = el.style.position || 'absolute'; // ensure positioning context
+    el.appendChild(log);
+    log.classList.add('typing');
 
-  // Sequential light-up after stagger reveal
-  setTimeout(() => {
-    letters.forEach((l, i) => {
-      setTimeout(() => l.classList.add('lit'), i * 180);
+    let lineIdx = 0;
+    let charIdx = 0;
+    let text = '';
+    const speed = 25; // ms per char
+
+    function type(){
+      if(lineIdx >= lines.length){
+        // Done typing — fade log, reveal block
+        setTimeout(() => {
+          log.classList.remove('typing');
+          log.classList.add('done');
+          el.classList.add('revealed');
+          setTimeout(() => log.remove(), 400);
+          cb();
+        }, 200);
+        return;
+      }
+      const line = lines[lineIdx];
+      if(charIdx <= line.length){
+        text = lines.slice(0, lineIdx).join('\n') + (lineIdx > 0 ? '\n' : '') + line.slice(0, charIdx);
+        log.textContent = text + '_';
+        charIdx++;
+        setTimeout(type, speed);
+      } else {
+        lineIdx++;
+        charIdx = 0;
+        text += '\n';
+        setTimeout(type, 100); // pause between lines
+      }
+    }
+    type();
+  }
+
+  function bootBlocks(){
+    let i = 0;
+    function next(){
+      if(i >= blockSeq.length){
+        // All done — light up VERT letters
+        bootVert();
+        return;
+      }
+      const cfg = blockSeq[i];
+      const el = document.querySelector(cfg.sel);
+      i++;
+      if(!el){
+        next();
+        return;
+      }
+      typeLog(el, cfg.logs, next);
+    }
+    next();
+  }
+
+  // Phase 3: VERT letters glow sequentially
+  function bootVert(){
+    const vert = document.querySelector('.vert');
+    if(vert) vert.classList.add('revealed');
+
+    const letters = document.querySelectorAll('.vert span');
+    letters.forEach((l, idx) => {
+      setTimeout(() => l.classList.add('lit'), idx * 180);
     });
-  }, 1200); // start after blocks have appeared
 
-  // Random glitch every few seconds
-  setInterval(() => {
-    const idx = Math.floor(Math.random() * letters.length);
-    const l = letters[idx];
-    l.style.animation = 'vertGlitch 0.15s steps(2) 2';
-    l.style.color = 'var(--blue-bright)';
-    setTimeout(() => {
-      l.style.animation = '';
-      l.style.color = '';
-    }, 400);
-  }, 3000 + Math.random() * 4000);
+    // Random glitch loop
+    setInterval(() => {
+      const idx = Math.floor(Math.random() * letters.length);
+      const l = letters[idx];
+      l.style.animation = 'vertGlitch 0.15s steps(2) 2';
+      l.style.color = 'var(--blue-bright)';
+      setTimeout(() => {
+        l.style.animation = '';
+        l.style.color = '';
+      }, 400);
+    }, 3000 + Math.random() * 4000);
+  }
+
+  // === GO ===
+  arcadeBlink(() => {
+    // Small pause after title appears, then boot blocks
+    setTimeout(bootBlocks, 500);
+  });
 })();
 
 // ═══ ISOMETRIC PIXEL BAR CHART ═══
