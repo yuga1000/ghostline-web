@@ -327,45 +327,18 @@ html,body{
 .poster > .title{
   opacity:0;
 }
-/* Phase 1: block frame visible, content hidden */
+/* Phase 1: block border visible, ALL content hidden, only log shows */
 .poster > *.logging{
   opacity:1;
 }
-.poster > *.logging .th,
-.poster > *.logging .vbase-inner,
-.poster > *.logging .info-c,
-.poster > *.logging .custom-font,
-.poster > *.logging #main3d,
-.poster > *.logging canvas,
-.poster > *.logging .big,
-.poster > *.logging .tagline,
-.poster > *.logging .lb,
-.poster > *.logging .nr,
-.poster > *.logging .sensors,
-.poster > *.logging .fl,
-.poster > *.logging .foot-line span{
-  opacity:0 !important;
+.poster > *.logging > *:not(.block-log){
+  visibility:hidden !important;
 }
 /* Phase 2: everything visible */
 .poster > *.revealed{
   opacity:1;
 }
-.poster > *.revealed .th,
-.poster > *.revealed .vbase-inner,
-.poster > *.revealed .info-c,
-.poster > *.revealed .custom-font,
-.poster > *.revealed #main3d,
-.poster > *.revealed canvas,
-.poster > *.revealed .big,
-.poster > *.revealed .tagline,
-.poster > *.revealed .lb,
-.poster > *.revealed .nr,
-.poster > *.revealed .sensors,
-.poster > *.revealed .fl,
-.poster > *.revealed .foot-line span{
-  opacity:1 !important;
-}
-/* Log overlay — bright, impossible to miss */
+/* Log overlay */
 .block-log{
   position:absolute;inset:0;z-index:5;
   display:flex;align-items:center;justify-content:center;
@@ -377,6 +350,7 @@ html,body{
   white-space:pre;line-height:1.6;
   text-align:center;
   background:rgba(0,0,0,0.85);
+  visibility:visible !important;
 }
 
 /* ═══ VERT LETTERS GLOW ═══ */
