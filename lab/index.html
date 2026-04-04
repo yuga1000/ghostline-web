@@ -432,15 +432,12 @@ html,body{
     <span>HEX-01</span>
   </div>
 
-  <!-- IMG1: left-bottom — spider photo -->
-  <div class="img1" onclick="tgl(this)">
-    <span class="lb" style="color:var(--orange)">primary viewport</span>
-    <span class="nr" style="color:var(--orange)">No.2</span>
-    <img class="th" src="img/spider-front.jpg" alt="">
-    <div class="ex">
-      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-      <img src="img/spider-front.jpg" alt="">
-      <div class="el">MYSTRA 01 // FRONT VIEW</div>
+  <!-- IMG1: left-bottom — skins archive -->
+  <div class="img1" id="skins-block">
+    <span class="lb" style="color:var(--orange)">SKIN ARCHIVE</span>
+    <span class="nr" style="color:var(--orange)">7 units</span>
+    <div id="skins-slider" style="display:flex;width:100%;height:100%;overflow:hidden;position:relative;cursor:pointer;">
+      <img class="skin-frame" src="img/skins/spider-front.jpg" alt="" style="width:100%;height:100%;object-fit:cover;flex-shrink:0;transition:opacity 0.3s;">
     </div>
   </div>
 
@@ -854,6 +851,40 @@ function cls(b){b.closest('.ex').classList.remove('open')}
       }
     }, holdTime);
   }
+})();
+
+// ═══ SKIN ARCHIVE — auto-cycle + click to switch ═══
+(function(){
+  const skins = [
+    'img/skins/spider-front.jpg',
+    'img/skins/spider-angle.jpg',
+    'img/skins/spider-standing.jpg',
+    'img/skins/spider-necron.jpg',
+    'img/skins/spider-warhammer.jpg',
+    'img/skins/IMG_6647.JPG',
+    'img/skins/IMG_6662.JPG'
+  ];
+  const frame = document.querySelector('.skin-frame');
+  if(!frame) return;
+  let idx = 0;
+
+  // Preload
+  skins.forEach(s => { const i = new Image(); i.src = s; });
+
+  function next(){
+    idx = (idx + 1) % skins.length;
+    frame.style.opacity = '0';
+    setTimeout(() => {
+      frame.src = skins[idx];
+      frame.style.opacity = '1';
+    }, 300);
+  }
+
+  // Auto-cycle every 4s
+  setInterval(next, 4000);
+
+  // Click to skip
+  document.getElementById('skins-block').addEventListener('click', next);
 })();
 </script>
 
