@@ -35,12 +35,11 @@
       @media (max-width: 768px) {
         #sun-bg {
           right: 50% !important;
-          transform: translateX(50%) !important;
-          bottom: -80px !important;
+          bottom: 20px !important;
         }
         #sun-img {
-          width: 240px !important;
-          height: 240px !important;
+          width: 220px !important;
+          height: 220px !important;
         }
       }
       #terminal-popup {
@@ -94,13 +93,17 @@
   const isMobile = window.innerWidth <= 768;
   const scrollTarget = document.querySelector('.slide-container');
 
+  // Mobile: set initial centered position immediately
+  if(isMobile){
+    sun.style.transform = 'translateX(50%) translateY(0px)';
+  }
+
   function getScroll(){
-    // Try all scroll sources
-    if(scrollTarget && scrollTarget.scrollTop > 0) return scrollTarget.scrollTop;
-    if(window.pageYOffset > 0) return window.pageYOffset;
-    if(document.documentElement.scrollTop > 0) return document.documentElement.scrollTop;
-    if(document.body.scrollTop > 0) return document.body.scrollTop;
-    return 0;
+    const a = scrollTarget ? scrollTarget.scrollTop : 0;
+    const b = window.pageYOffset || 0;
+    const c = document.documentElement.scrollTop || 0;
+    const d = document.body.scrollTop || 0;
+    return Math.max(a, b, c, d);
   }
 
   function onScroll(){
