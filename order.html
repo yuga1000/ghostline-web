@@ -78,10 +78,14 @@
             transition: transform 0.1s linear;
         }
         .galaxy-bg img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            width: 60%;
+            height: auto;
+            object-fit: contain;
             opacity: 0.45;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         /* ═══ GRID LINES — on top of Saturn ═══ */
@@ -1338,15 +1342,15 @@
         <div class="section-header">[02. VIBE (OPTIONAL)]<span class="cursor"></span></div>
         <div class="vibe-grid">
             <div class="vibe-option">
-                <input type="checkbox" value="Checks" style="display:none;">
-                CHECKS
+                <input type="radio" name="vibe" value="Receipts" style="display:none;">
+                RECEIPTS
             </div>
             <div class="vibe-option">
-                <input type="checkbox" value="Acrylic" style="display:none;">
+                <input type="radio" name="vibe" value="Acrylic" style="display:none;">
                 ACRYLIC
             </div>
             <div class="vibe-option">
-                <input type="checkbox" value="Watercolor" style="display:none;">
+                <input type="radio" name="vibe" value="Watercolor" style="display:none;">
                 WATERCOLOR
             </div>
         </div>
@@ -1850,20 +1854,19 @@
         }
     }
 
-    // Vibe selection (multiple allowed)
+    // Vibe selection (single choice)
     document.querySelectorAll('.vibe-option').forEach(option => {
         option.addEventListener('click', function() {
-            const checkbox = this.querySelector('input');
+            const radio = this.querySelector('input');
 
-            this.classList.toggle('selected');
-            checkbox.checked = !checkbox.checked;
+            // Deselect all
+            document.querySelectorAll('.vibe-option').forEach(o => o.classList.remove('selected'));
 
-            const vibe = checkbox.value;
-            if (checkbox.checked) {
-                selectedVibes.push(vibe);
-            } else {
-                selectedVibes = selectedVibes.filter(v => v !== vibe);
-            }
+            // Select this one
+            this.classList.add('selected');
+            radio.checked = true;
+
+            selectedVibes = [radio.value];
             updateTotalPrice();
             drawConnectionLines();
             updateProgress();
