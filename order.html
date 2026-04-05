@@ -58,7 +58,7 @@
 
         body {
             font-family: 'Press Start 2P', cursive;
-            background: #0a0a0a;
+            background: #000;
             color: #00ff00;
             line-height: 1.6;
             overflow-x: hidden;
@@ -67,12 +67,29 @@
             cursor: crosshair;
         }
 
-        /* ═══ GRID LINES ═══ */
+        /* ═══ SATURN BACKGROUND — sits on top of black body ═══ */
+        .galaxy-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 120vh;
+            z-index: 1;
+            pointer-events: none;
+            transition: transform 0.1s linear;
+        }
+        .galaxy-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.45;
+        }
+
+        /* ═══ GRID LINES — on top of Saturn ═══ */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            z-index: 0;
+            z-index: 2;
             pointer-events: none;
             background-image:
                 linear-gradient(0deg, rgba(0,60,255,0.10) 1px, transparent 1px),
@@ -80,7 +97,7 @@
             background-size: calc(100vw / 20) calc(100vw / 20);
         }
 
-        /* ═══ SCANLINE OVERLAY ═══ */
+        /* ═══ SCANLINE OVERLAY — on top of everything ═══ */
         body::after {
             content: '';
             position: fixed;
@@ -94,19 +111,6 @@
                 rgba(0,50,255,0.015) 2px,
                 rgba(0,50,255,0.015) 4px
             );
-        }
-
-        /* ═══ GALAXY BACKGROUND ═══ */
-        .galaxy-bg {
-            position: fixed;
-            inset: -50px;
-            z-index: 0;
-            pointer-events: none;
-            background:
-                radial-gradient(ellipse at 20% 50%, rgba(0,0,80,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 30%, rgba(40,0,80,0.10) 0%, transparent 40%),
-                radial-gradient(ellipse at 50% 80%, rgba(0,40,80,0.08) 0%, transparent 45%);
-            transition: transform 0.1s linear;
         }
 
         /* SVG Canvas for lines */
@@ -159,10 +163,10 @@
         .top-nav {
             background: rgba(0,0,0,0.85);
             border: 1px solid rgba(0,60,255,0.3);
-            border-bottom: 1px solid rgba(0,255,255,0.15);
+            border-bottom: 1px solid rgba(0,100,255,0.25);
             padding: 0.8rem 2rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-bottom: 2rem;
             max-width: 1400px;
@@ -173,63 +177,37 @@
             box-shadow: 0 2px 20px rgba(0,0,128,0.15);
         }
 
-        .top-nav-logo {
-            font-size: 14px;
-            color: #00ffff;
-            letter-spacing: 3px;
-            font-weight: 400;
-            text-shadow: 0 0 8px rgba(0,255,255,0.3);
-        }
-
         .top-nav-links {
             display: flex;
             gap: 2rem;
-            font-size: 8px;
+            font-size: 11px;
             font-family: 'Share Tech Mono', monospace;
         }
 
         .top-nav-links a {
-            color: #00ff00;
+            color: #8cb4ff;
             text-decoration: none;
-            transition: color 0.2s, text-shadow 0.2s;
+            transition: color 0.2s, text-shadow 0.2s, border-color 0.2s;
+            padding-bottom: 4px;
+            border-bottom: 1px solid transparent;
         }
 
         .top-nav-links a::before {
             content: '[';
             margin-right: 4px;
-            color: rgba(0,255,255,0.4);
+            color: rgba(68,136,255,0.4);
         }
 
         .top-nav-links a::after {
             content: ']';
             margin-left: 4px;
-            color: rgba(0,255,255,0.4);
+            color: rgba(68,136,255,0.4);
         }
 
         .top-nav-links a:hover {
-            color: #00ffff;
-            text-shadow: 0 0 8px rgba(0,255,255,0.5);
-        }
-
-        .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #00ff00;
-            font-size: 8px;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: #00ff00;
-            border-radius: 50%;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(68,136,255,0.6);
+            border-bottom: 1px solid #4488ff;
         }
 
         /* Cursor styles - simple and effective */
@@ -271,7 +249,7 @@
         }
 
         .header-gif img {
-            max-width: 300px;
+            max-width: 240px;
             width: 100%;
             height: auto;
             image-rendering: pixelated;
@@ -391,10 +369,10 @@
             font-weight: 400;
         }
 
-        /* Vibe options - all in one row, square */
+        /* Vibe options - three columns */
         .vibe-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 0.3rem;
             margin-bottom: 0.5rem;
             justify-items: center;
@@ -444,12 +422,20 @@
         }
 
         .vibe-option:hover {
-            background: #001a00;
+            background: #000a1a;
+            border-color: #4488ff;
         }
 
-        /* Vibe selected colors will be set randomly via JavaScript */
         .vibe-option.selected {
-            /* Colors set dynamically */
+            background: #0044cc;
+            color: #ffffff;
+            border-color: #4488ff;
+            box-shadow: inset 0 0 20px rgba(68,136,255,0.3), 0 0 8px rgba(68,136,255,0.4);
+        }
+
+        .vibe-option.selected::before,
+        .vibe-option.selected::after {
+            color: #4488ff;
         }
 
         /* Format options - horizontal */
@@ -1072,7 +1058,7 @@
 
             .vibe-grid {
                 display: grid;
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 0.3rem;
             }
 
@@ -1117,8 +1103,8 @@
             }
 
             .top-nav-links {
-                font-size: 6px;
-                gap: 0.5rem;
+                font-size: 9px;
+                gap: 0.8rem;
             }
 
             .top-nav-links a {
@@ -1161,7 +1147,7 @@
             }
 
             .vibe-grid {
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 gap: 0.2rem;
             }
 
@@ -1218,23 +1204,18 @@
 
             .top-nav {
                 padding: 0.4rem 0.5rem;
-            }
-
-            .top-nav-logo {
-                font-size: 8px;
+                flex-wrap: wrap;
             }
 
             .top-nav-links {
-                font-size: 5px;
-                gap: 0.3rem;
+                font-size: 7px;
+                gap: 0.4rem;
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
             .top-nav-links a {
                 padding: 0.2rem 0.3rem;
-            }
-
-            .live-indicator {
-                font-size: 5px;
             }
 
             #orderGif {
@@ -1267,7 +1248,7 @@
 </audio>
 
 <!-- Background layers -->
-<div class="galaxy-bg"></div>
+<div class="galaxy-bg"><img src="components/saturn-bg-web.jpg" alt=""></div>
 <canvas id="order-shimmer" style="position:fixed;inset:0;z-index:1;pointer-events:none;"></canvas>
 
 <!-- Audio toggle button -->
@@ -1275,7 +1256,6 @@
 
 <!-- Top Navigation Bar -->
 <div class="top-nav">
-    <div class="top-nav-logo">GHOSTLINE</div>
     <div class="top-nav-links">
         <a href="/">HOME</a>
         <a href="/stream.html">LIVE STREAM</a>
@@ -1283,10 +1263,6 @@
         <a href="/polaroids.html">POLAROIDS</a>
         <a href="/order.html">ORDER</a>
         <a href="/market.html">MARKET</a>
-    </div>
-    <div class="live-indicator">
-        <div class="live-dot"></div>
-        LIVE
     </div>
 </div>
 
@@ -1362,28 +1338,16 @@
         <div class="section-header">[02. VIBE (OPTIONAL)]<span class="cursor"></span></div>
         <div class="vibe-grid">
             <div class="vibe-option">
-                <input type="checkbox" value="Buddhism" style="display:none;">
-                BUDDHISM
+                <input type="checkbox" value="Checks" style="display:none;">
+                CHECKS
             </div>
             <div class="vibe-option">
-                <input type="checkbox" value="Angels" style="display:none;">
-                ANGELS
+                <input type="checkbox" value="Acrylic" style="display:none;">
+                ACRYLIC
             </div>
             <div class="vibe-option">
-                <input type="checkbox" value="Nature" style="display:none;">
-                NATURE
-            </div>
-            <div class="vibe-option">
-                <input type="checkbox" value="Japanese" style="display:none;">
-                JAPANESE
-            </div>
-            <div class="vibe-option">
-                <input type="checkbox" value="Minimal" style="display:none;">
-                MINIMAL
-            </div>
-            <div class="vibe-option" id="randomVibe">
-                <input type="checkbox" value="Random" style="display:none;">
-                RANDOM
+                <input type="checkbox" value="Watercolor" style="display:none;">
+                WATERCOLOR
             </div>
         </div>
 
@@ -1886,36 +1850,10 @@
         }
     }
 
-    // Random color generator for vibe selection
-    function getRandomVibeColor() {
-        const colors = [
-            { bg: '#1a0033', border: '#8844ff', glow: 'rgba(136, 68, 255, 0.3)' },   // Purple
-            { bg: '#331a00', border: '#ff8844', glow: 'rgba(255, 136, 68, 0.3)' },   // Orange
-            { bg: '#00331a', border: '#44ff88', glow: 'rgba(68, 255, 136, 0.3)' },   // Cyan
-            { bg: '#330019', border: '#ff4488', glow: 'rgba(255, 68, 136, 0.3)' },   // Pink
-            { bg: '#1a3300', border: '#88ff44', glow: 'rgba(136, 255, 68, 0.3)' },   // Lime
-            { bg: '#001933', border: '#4488ff', glow: 'rgba(68, 136, 255, 0.3)' }    // Blue
-        ];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    // Initialize RANDOM vibe as selected by default - REMOVED for cleaner start
-    // selectedVibes.push('Random');
-    // const randomVibe = document.getElementById('randomVibe');
-    // const randomColor = getRandomVibeColor();
-    // randomVibe.style.background = randomColor.bg;
-    // randomVibe.style.borderColor = randomColor.border;
-    // randomVibe.style.boxShadow = `inset 0 0 20px ${randomColor.glow}`;
-
-    // Vibe selection (max 2)
+    // Vibe selection (multiple allowed)
     document.querySelectorAll('.vibe-option').forEach(option => {
         option.addEventListener('click', function() {
             const checkbox = this.querySelector('input');
-
-            // If trying to select and already have 2 selected, do nothing
-            if (!checkbox.checked && selectedVibes.length >= 2) {
-                return;
-            }
 
             this.classList.toggle('selected');
             checkbox.checked = !checkbox.checked;
@@ -1923,22 +1861,13 @@
             const vibe = checkbox.value;
             if (checkbox.checked) {
                 selectedVibes.push(vibe);
-                // Apply random color
-                const color = getRandomVibeColor();
-                this.style.background = color.bg;
-                this.style.borderColor = color.border;
-                this.style.boxShadow = `inset 0 0 20px ${color.glow}`;
             } else {
                 selectedVibes = selectedVibes.filter(v => v !== vibe);
-                // Reset to default
-                this.style.background = '#000';
-                this.style.borderColor = '#00ff00';
-                this.style.boxShadow = 'none';
             }
             updateTotalPrice();
             drawConnectionLines();
             updateProgress();
-            saveFormState(); // Save state when vibes change
+            saveFormState();
         });
     });
 
