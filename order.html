@@ -99,13 +99,14 @@
         /* ═══ GALAXY BACKGROUND ═══ */
         .galaxy-bg {
             position: fixed;
-            inset: 0;
+            inset: -50px;
             z-index: 0;
             pointer-events: none;
             background:
                 radial-gradient(ellipse at 20% 50%, rgba(0,0,80,0.15) 0%, transparent 50%),
                 radial-gradient(ellipse at 80% 30%, rgba(40,0,80,0.10) 0%, transparent 40%),
                 radial-gradient(ellipse at 50% 80%, rgba(0,40,80,0.08) 0%, transparent 45%);
+            transition: transform 0.1s linear;
         }
 
         /* SVG Canvas for lines */
@@ -2919,6 +2920,18 @@
             }, 200);
         }
     });
+</script>
+
+<!-- ═══ GALAXY PARALLAX ═══ -->
+<script>
+(function(){
+  const galaxy = document.querySelector('.galaxy-bg');
+  if(!galaxy) return;
+  window.addEventListener('scroll', function(){
+    const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    galaxy.style.transform = 'translateY(' + (y * -0.15) + 'px)';
+  }, {passive:true});
+})();
 </script>
 
 <!-- ═══ SHIMMER CROSSES ═══ -->
