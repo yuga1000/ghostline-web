@@ -578,8 +578,11 @@
 
             // 77% — walk around current or nearby element (much more common)
             if (roll < 0.87) {
-                const walkTargets = targets.filter(t => document.getElementById(t.id));
-                if (walkTargets.length > 0 && currentAnchorEl) {
+                const walkTargets = targets.filter(t => {
+                    const el = document.getElementById(t.id);
+                    return el && isElementVisible(el);
+                });
+                if (walkTargets.length > 0 && currentAnchorEl && isElementVisible(currentAnchorEl)) {
                     // 60% walk around current element, 40% walk to a random one nearby
                     if (Math.random() < 0.6) {
                         const curTarget = targets.find(t => document.getElementById(t.id) === currentAnchorEl);
@@ -668,13 +671,27 @@
             const c = document.getElementById('roaming-pet-container');
             if (!c) return;
 
-            // Pet follows its anchor element — scrolls with it, even off-screen
+            // If anchor scrolled off-screen, jump to a visible element
+            if (!isElementVisible(currentAnchorEl)) {
+                const target = getRandomTarget();
+                if (target) {
+                    currentTarget = target;
+                    spiderJumpToTarget(target);
+                }
+                return;
+            }
+
+            // Pet follows its anchor element
             const pos = getStableEdgePosition(currentAnchorEl, currentEdge);
             c.style.left = pos.x + 'px';
             c.style.top = pos.y + 'px';
         }
 
         window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Listen to slide-container (main scroll on desktop)
+        const slideContainer = document.querySelector('.slide-container');
+        if (slideContainer) slideContainer.addEventListener('scroll', onScroll, { passive: true });
 
         const mainContent = document.getElementById('main-content');
         if (mainContent) mainContent.addEventListener('scroll', onScroll, { passive: true });
