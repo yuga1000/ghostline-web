@@ -751,15 +751,17 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     canvas.style.height = parent.clientHeight + 'px';
   }
 
-  // Draw isometric block at grid position
+  // Draw isometric block at grid position — scales to fill container
   function drawBlock(bx, by, bz, color, topC, sideC){
-    const w = 8; // block width in iso
-    const h = 6; // block height in iso
-    const d = 5; // depth
+    const totalW = canvas.width;
+    const totalH = canvas.height;
+    const w = Math.floor(totalW / (cols * 2.5)); // block width scales with canvas
+    const h = Math.floor(w * 0.75); // block height
+    const d = Math.floor(w * 0.6); // depth
 
-    // Iso projection
-    const sx = canvas.width/2 + (bx - bz) * (w + 2) - cols * (w+2)/2;
-    const sy = canvas.height - 10 - by * h + (bx + bz) * d/2;
+    // Iso projection — spread across full width
+    const sx = w * 1.2 + bx * (totalW - w * 2.4) / (cols - 1);
+    const sy = totalH - 4 - by * h + (bx + bz) * d/2;
 
     // Top face
     ctx.fillStyle = topC;
