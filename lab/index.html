@@ -155,6 +155,29 @@ html,body{
   animation:blink-uc 1.5s ease-in-out infinite;
 }
 @keyframes blink-uc{0%,100%{opacity:0.4}50%{opacity:0.15}}
+.marquee{
+  display:flex;
+  white-space:nowrap;
+  animation:marquee-scroll 20s linear infinite;
+  font-family:var(--f2);font-size:9px;
+  color:rgba(68,136,255,0.4);
+  letter-spacing:3px;
+}
+.marquee span{flex-shrink:0;}
+@keyframes marquee-scroll{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+.uc-stripes{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 6px,
+    rgba(68,136,255,0.18) 6px,
+    rgba(68,136,255,0.18) 12px
+  );
+}
 
 /* ───── MAIN: big center block — gif animation (660x460 @ 480,190) ───── */
 .main{
@@ -495,16 +518,11 @@ html,body{
 
 <div class="poster">
 
-  <!-- IMG2: top-left — concept/schematic with blue fill -->
-  <div class="img2" onclick="tgl(this)">
-    <span class="lb" style="color:rgba(68,136,255,0.7);opacity:1;">concept render</span>
-    <span class="nr" style="color:var(--white)">No.1</span>
-    <img class="th" src="img/spider-warhammer.jpg" alt="">
-    <div class="ex">
-      <div class="cx" onclick="event.stopPropagation();cls(this)">&#x2715;</div>
-      <img src="img/spider-warhammer.jpg" alt="">
-      <div class="el">CONCEPT 01 // ARMORED VARIANT</div>
-    </div>
+  <!-- IMG2: top-left — under construction -->
+  <div class="img2" style="cursor:pointer;" onclick="alert('MODULE // COMING SOON')">
+    <div class="vbase-label">[MODULE TBD]</div>
+    <div class="uc-stripes"></div>
+    <div class="vbase-status" style="bottom:auto;top:50%;transform:translateY(-50%);">UNDER<br>CONSTRUCTION</div>
   </div>
 
   <!-- ICONS: pixel arcade bar chart -->
@@ -565,13 +583,11 @@ html,body{
   </div>
 
   <!-- INFO: bottom bar with magenta border -->
-  <div class="info">
-    <div class="info-c"><span class="v">85%</span>BUILD</div>
-    <div class="info-c"><span class="v">40%</span>AI</div>
-    <div class="info-c"><span class="v">v1.0</span>REV</div>
-    <div class="info-c"><span class="v">18</span>SRV</div>
-    <div class="info-c"><span class="v">6</span>LEGS</div>
-    <div class="info-c"><span class="v">3</span>DOF</div>
+  <div class="info" style="overflow:hidden;position:relative;display:flex;align-items:center;">
+    <div class="marquee">
+      <span>PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp;</span>
+      <span>PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp; PARTNERS &nbsp; // &nbsp;</span>
+    </div>
   </div>
 
 </div>
