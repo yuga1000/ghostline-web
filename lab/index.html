@@ -448,23 +448,104 @@ html,body{
 /* ═══ MOBILE ═══ */
 @media(max-width:768px){
   html,body{overflow:auto}
-  .poster{height:auto;min-height:100vh;padding:12px}
+  .poster{
+    position:relative !important;
+    top:auto !important;
+    height:auto !important;
+    min-height:auto;
+    padding:44px 8px 8px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto;
+    gap:6px;
+  }
+  .top-nav{
+    padding:6px 8px;
+    flex-wrap:wrap;gap:2px;
+  }
+  .top-nav a{font-size:8px;padding:3px 6px;letter-spacing:1px;}
 
   .img2,.img1,.main,.small-gif,.title,.vert,.vbase,.icons,.foot-line,.label,.info{
-    position:relative;
-    left:auto;top:auto;
-    width:100%;height:auto;
-    margin-bottom:8px;
+    position:relative !important;
+    left:auto !important;top:auto !important;
+    width:100% !important;height:auto !important;
+    margin:0;
   }
-  .img2,.img1{height:200px}
-  .main{height:280px}
-  .small-gif{height:150px}
-  .title{height:auto;padding:16px 0}
-  .vert{flex-direction:row;height:auto;padding:8px 0;gap:12px}
-  .vbase{height:60px}
-  .icons{height:40px;width:100%}
-  .info{height:auto;min-height:60px}
-  .label{height:auto;padding:8px 0}
+
+  /* Title — full width, first */
+  .title{
+    grid-column:1 / -1;
+    order:1;
+    padding:8px 0;
+  }
+
+  /* Main 3D — full width, big */
+  .main{
+    grid-column:1 / -1;
+    order:2;
+    height:220px !important;
+  }
+
+  /* Two columns: small blocks side by side */
+  .vbase{
+    order:3;
+    height:80px !important;
+  }
+  .small-gif{
+    order:4;
+    height:80px !important;
+  }
+
+  /* Sketches + chart row */
+  .img1{
+    order:5;
+    height:140px !important;
+  }
+  .icons{
+    order:6;
+    height:40px !important;
+  }
+
+  /* Under construction block */
+  .img2{
+    grid-column:1 / -1;
+    order:7;
+    height:80px !important;
+  }
+
+  /* Label */
+  .label{
+    grid-column:1 / -1;
+    order:8;
+    padding:6px 0;
+  }
+  .label .tagline{font-size:9px !important;}
+
+  /* Foot line */
+  .foot-line{
+    grid-column:1 / -1;
+    order:9;
+  }
+
+  /* VERT letters — horizontal row */
+  .vert{
+    grid-column:1 / -1;
+    order:10;
+    flex-direction:row !important;
+    height:auto !important;
+    padding:4px 0;gap:8px;
+    justify-content:center;
+  }
+
+  /* Partners marquee — full width */
+  .info{
+    grid-column:1 / -1;
+    order:11;
+    height:36px !important;
+    min-height:36px;
+  }
+
+  .marquee{font-size:7px;}
 }
 
 /* ═══ SKIN OVERLAY ═══ */
