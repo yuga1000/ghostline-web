@@ -54,8 +54,8 @@ html,body{
   position:fixed;inset:0;z-index:0;
   pointer-events:none;
   background-image:
-    linear-gradient(0deg, rgba(255,100,0,0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,100,0,0.12) 1px, transparent 1px);
+    linear-gradient(0deg, rgba(255,100,0,0.20) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,100,0,0.20) 1px, transparent 1px);
   background-size: calc(100vw / 30) calc(100vw / 30);
 }
 
@@ -73,7 +73,7 @@ html,body{
   position:absolute;
   left:6.25%;top:4.44%;
   width:23.61%;height:26.67%;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   background:rgba(0,20,60,0.3);
   overflow:hidden;
 }
@@ -103,7 +103,7 @@ html,body{
   position:absolute;
   left:6.25%;top:47.78%;
   width:23.61%;height:26.67%;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   overflow:hidden;
 }
 
@@ -122,7 +122,7 @@ html,body{
   position:absolute;
   left:81.94%;top:21.11%;
   width:12.5%;height:12.22%;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   background:rgba(0,20,60,0.2);
   overflow:hidden;
   cursor:pointer;
@@ -135,8 +135,8 @@ html,body{
     -45deg,
     transparent,
     transparent 6px,
-    rgba(68,136,255,0.18) 6px,
-    rgba(68,136,255,0.18) 12px
+    rgba(0,0,170,0.25) 6px,
+    rgba(0,0,170,0.25) 12px
   );
   z-index:0;
 }
@@ -174,8 +174,8 @@ html,body{
     -45deg,
     transparent,
     transparent 6px,
-    rgba(68,136,255,0.18) 6px,
-    rgba(68,136,255,0.18) 12px
+    rgba(0,0,170,0.25) 6px,
+    rgba(0,0,170,0.25) 12px
   );
 }
 
@@ -184,7 +184,7 @@ html,body{
   position:absolute;
   left:33.33%;top:21.11%;
   width:45.83%;height:51.11%;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   background:rgba(0,20,60,0.15);
   overflow:hidden;
   display:flex;align-items:flex-start;justify-content:center;
@@ -205,7 +205,7 @@ html,body{
   position:absolute;
   left:68.06%;top:57.78%;
   width:12.5%;height:16.67%;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   overflow:hidden;
   background:#000;
 }
@@ -228,7 +228,7 @@ html,body{
   position:absolute;
   left:32.64%;top:76.67%;
   width:63.19%;height:8.89%;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:4px;padding:4px;
@@ -454,7 +454,7 @@ html,body{
 #skin-overlay.open{display:flex}
 #skin-overlay img{
   max-width:80vw;max-height:65vh;object-fit:contain;
-  border:1px solid rgba(68,136,255,0.5);
+  border:2px solid #0000AA;
   animation:skinIn 0.3s ease-out;
 }
 #skin-overlay .skin-name{
@@ -622,10 +622,10 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     dots.forEach(d => {
       const dx = d.x - mx, dy = d.y - my;
       const dist = Math.sqrt(dx*dx + dy*dy);
-      const cursorGlow = dist < 120 ? (1 - dist/120) * 0.3 : 0;
+      const cursorGlow = dist < 200 ? (1 - dist/200) * 0.6 : 0;
       const shimmer = 0.08 + 0.04 * Math.sin(t * 0.0006 * d.speed + d.phase);
-      const flash = (Math.sin(t * 0.003 + d.phase * 100) > 0.997) ? 0.25 : 0;
-      const alpha = Math.min(shimmer + cursorGlow + flash, 0.5);
+      const flash = (Math.sin(t * 0.003 + d.phase * 100) > 0.997) ? 0.30 : 0;
+      const alpha = Math.min(shimmer + cursorGlow + flash, 0.7);
 
       ctx.strokeStyle = `rgba(255,120,0,${alpha})`;
       ctx.lineWidth = 1;
