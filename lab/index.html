@@ -73,10 +73,9 @@ html,body{
   position:absolute;
   left:6.25%;top:4.44%;
   width:23.61%;height:26.67%;
-  border:4px dashed rgba(255,255,255,1);
-  background:rgba(7,7,237,0.5);
+  border:1px solid rgba(68,136,255,0.5);
+  background:rgba(0,20,60,0.3);
   overflow:hidden;
-  box-shadow:0 0 40px rgba(0,50,255,0.2), inset 0 0 60px rgba(0,50,255,0.08);
 }
 
 /* ───── ICONS: isometric pixel chart — full left column width ───── */
@@ -104,7 +103,7 @@ html,body{
   position:absolute;
   left:6.25%;top:47.78%;
   width:23.61%;height:26.67%;
-  border:4px solid var(--orange);
+  border:1px solid rgba(68,136,255,0.5);
   overflow:hidden;
 }
 
@@ -123,8 +122,8 @@ html,body{
   position:absolute;
   left:81.94%;top:21.11%;
   width:12.5%;height:12.22%;
-  border:4px dashed rgba(0,255,65,1);
-  background:rgba(0,255,65,0.09);
+  border:1px solid rgba(68,136,255,0.5);
+  background:rgba(0,20,60,0.2);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
 }
@@ -134,10 +133,9 @@ html,body{
   position:absolute;
   left:33.33%;top:21.11%;
   width:45.83%;height:51.11%;
-  border:4px solid rgba(0,51,255,0.58);
-  background:rgba(0,36,143,0.17);
+  border:1px solid rgba(68,136,255,0.5);
+  background:rgba(0,20,60,0.15);
   overflow:hidden;
-  box-shadow:0 0 12px rgba(0,51,255,0.15), inset 0 0 30px rgba(0,36,143,0.06);
   display:flex;align-items:flex-start;justify-content:center;
 }
 
@@ -156,9 +154,8 @@ html,body{
   position:absolute;
   left:68.06%;top:57.78%;
   width:12.5%;height:16.67%;
-  border:3px solid rgba(0,51,255,0.58);
+  border:1px solid rgba(68,136,255,0.5);
   overflow:hidden;
-  box-shadow:0 0 12px rgba(0,51,255,0.15);
   background:#000;
 }
 .small-gif .th{
@@ -180,7 +177,7 @@ html,body{
   position:absolute;
   left:32.64%;top:76.67%;
   width:63.19%;height:8.89%;
-  border:3px solid var(--magenta);
+  border:1px solid rgba(68,136,255,0.5);
   display:grid;
   grid-template-columns:repeat(6,1fr);
   gap:4px;padding:4px;
@@ -402,23 +399,46 @@ html,body{
   display:none;position:fixed;inset:0;z-index:9999;
   background:rgba(0,0,0,0.92);
   flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;
 }
 #skin-overlay.open{display:flex}
 #skin-overlay img{
-  max-width:80vw;max-height:70vh;object-fit:contain;
-  border:2px solid var(--orange);
-  box-shadow:0 0 30px rgba(255,100,0,0.3);
+  max-width:80vw;max-height:65vh;object-fit:contain;
+  border:1px solid rgba(68,136,255,0.5);
   animation:skinIn 0.3s ease-out;
 }
 #skin-overlay .skin-name{
   font-family:var(--f2);font-size:11px;letter-spacing:2px;
-  color:var(--orange);opacity:0.7;margin-top:12px;
+  color:rgba(68,136,255,0.8);margin-top:12px;
 }
-#skin-overlay .skin-nav{
-  font-family:var(--f3);font-size:14px;color:var(--orange);
-  opacity:0.4;margin-top:8px;
+#skin-overlay .skin-controls{
+  display:flex;align-items:center;gap:24px;margin-top:16px;
 }
+#skin-overlay .skin-btn{
+  width:36px;height:36px;
+  border:1px solid rgba(68,136,255,0.4);
+  background:rgba(0,20,60,0.5);
+  color:#8cb4ff;
+  font-family:var(--f3);font-size:20px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+#skin-overlay .skin-btn:hover{
+  background:rgba(68,136,255,0.3);
+  border-color:#4488ff;
+  color:#fff;
+}
+#skin-overlay .skin-hint{
+  font-family:var(--f3);font-size:12px;
+  color:rgba(68,136,255,0.35);
+}
+#skin-overlay .skin-close{
+  position:absolute;top:20px;right:24px;
+  font-family:var(--f3);font-size:24px;
+  color:rgba(68,136,255,0.5);cursor:pointer;
+  transition:color 0.2s;
+}
+#skin-overlay .skin-close:hover{color:#fff}
 @keyframes skinIn{
   from{transform:scale(0.7) translateY(40px);opacity:0}
   to{transform:scale(1) translateY(0);opacity:1}
@@ -428,10 +448,15 @@ html,body{
 <body>
 
 <!-- Skin overlay -->
-<div id="skin-overlay" onclick="closeSkinOverlay()">
+<div id="skin-overlay">
+  <div class="skin-close" onclick="closeSkinOverlay()">&#x2715;</div>
   <img id="skin-overlay-img" src="" alt="">
   <div class="skin-name" id="skin-overlay-name"></div>
-  <div class="skin-nav">click anywhere to close // ← → to browse</div>
+  <div class="skin-controls">
+    <div class="skin-btn" onclick="event.stopPropagation();skinPrev()">&#x2190;</div>
+    <div class="skin-hint">swipe or arrows</div>
+    <div class="skin-btn" onclick="event.stopPropagation();skinNext()">&#x2192;</div>
+  </div>
 </div>
 
 <div class="bg-art"><img src="img/R8I5I.jpg" alt=""></div>
@@ -467,13 +492,9 @@ html,body{
   </div>
 
   <!-- IMG1: left-bottom — skins archive -->
-  <div class="img1" id="skins-block" style="border:none;background:transparent;cursor:pointer;position:absolute;">
-    <div style="position:relative;width:100%;height:100%;">
-      <!-- Skin preview behind folder -->
-      <img class="skin-frame" src="img/skins/spider-front.jpg" alt="" style="position:absolute;top:20%;left:4%;width:92%;height:55%;object-fit:cover;transition:opacity 0.3s;z-index:1;">
-      <!-- Transparent folder icon on top -->
-      <img src="img/ui/skins_icon.PNG" alt="" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;z-index:2;">
-    </div>
+  <div class="img1" id="skins-block" style="cursor:pointer;">
+    <span class="lb" style="color:rgba(68,136,255,0.7);z-index:3;">skins archive</span>
+    <img class="skin-frame th" src="img/skins/spider-front.jpg" alt="" style="transition:opacity 0.3s;">
   </div>
 
   <!-- TITLE: MYSTRA 01 — PNG sequence, plays once -->
@@ -930,21 +951,37 @@ function openSkinOverlay(i){
   ov.classList.add('open');
 }
 function closeSkinOverlay(){ document.getElementById('skin-overlay').classList.remove('open'); }
+function skinNext(){ openSkinOverlay((skinIdx + 1) % skinData.length); }
+function skinPrev(){ openSkinOverlay((skinIdx - 1 + skinData.length) % skinData.length); }
 
 // Arrow keys to browse in overlay
 document.addEventListener('keydown', e => {
   const ov = document.getElementById('skin-overlay');
   if(!ov.classList.contains('open')) return;
   if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){
-    e.preventDefault();
-    openSkinOverlay((skinIdx + 1) % skinData.length);
+    e.preventDefault(); skinNext();
   } else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){
-    e.preventDefault();
-    openSkinOverlay((skinIdx - 1 + skinData.length) % skinData.length);
+    e.preventDefault(); skinPrev();
   } else if(e.key === 'Escape'){
     closeSkinOverlay();
   }
 });
+
+// Touch swipe for skin overlay
+(function(){
+  const ov = document.getElementById('skin-overlay');
+  let tx = 0;
+  ov.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  ov.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if(Math.abs(dx) < 50) return;
+    if(dx < 0) skinNext(); else skinPrev();
+  });
+  // Click on background (not on buttons/img) closes
+  ov.addEventListener('click', e => {
+    if(e.target === ov) closeSkinOverlay();
+  });
+})();
 </script>
 
 </body>
