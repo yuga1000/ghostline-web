@@ -82,10 +82,10 @@ html,body{
 
 /* ═══ POSTER — absolute positioned from builder JSON ═══ */
 .poster{
-  position:relative;z-index:2;
-  width:100vw;height:100vh;
+  position:absolute;z-index:2;
+  top:36px;left:0;
+  width:100vw;height:calc(100vh - 36px);
   overflow:hidden;
-  padding-top:36px;
 }
 
 /* Scale factor: everything in % of viewport */
