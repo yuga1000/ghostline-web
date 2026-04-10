@@ -665,6 +665,7 @@ html,body{
 
   <!-- VBASE: hexapod data — under construction -->
   <div class="vbase" onclick="alert('HEXAPOD DATA // COMING SOON\n\nGait codes, GL proportions, firmware — in progress.')">
+    <canvas id="chipCanvas" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:0;"></canvas>
     <div class="vbase-label">[HEXAPOD DATA]</div>
     <div class="vbase-status">UNDER<br>CONSTRUCTION</div>
   </div>
@@ -960,6 +961,106 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   displayed = new Array(cols).fill(0);
   nextChange = performance.now() + changeInterval;
   requestAnimationFrame(draw);
+})();
+
+// ═══ PIXEL CHIP — microchip art for HEXAPOD DATA block ═══
+(function(){
+  const c = document.getElementById('chipCanvas');
+  if(!c) return;
+  const ctx = c.getContext('2d');
+  // Low-res pixel grid
+  const W = 48, H = 48;
+  c.width = W; c.height = H;
+
+  const g = '#00AA00';   // DOS green
+  const gd = '#006600';  // dark green
+  const gb = '#00FF41';  // bright green
+  const bg = '#000408';  // near-black
+
+  // Fill background
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Chip body — centered rectangle
+  const cx=12, cy=10, cw=24, ch=28;
+  ctx.fillStyle = '#001a00';
+  ctx.fillRect(cx,cy,cw,ch);
+  ctx.strokeStyle = g;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(cx+0.5,cy+0.5,cw-1,ch-1);
+
+  // Inner die
+  ctx.fillStyle = '#002200';
+  ctx.fillRect(cx+4,cy+4,cw-8,ch-8);
+  ctx.strokeStyle = gd;
+  ctx.strokeRect(cx+4.5,cy+4.5,cw-9,ch-9);
+
+  // Pin 1 dot
+  ctx.fillStyle = gb;
+  ctx.fillRect(cx+2, cy+2, 1, 1);
+
+  // Die pattern — circuit traces
+  ctx.fillStyle = g;
+  // Horizontal traces
+  ctx.fillRect(cx+6, cy+8, 12, 1);
+  ctx.fillRect(cx+6, cy+14, 8, 1);
+  ctx.fillRect(cx+6, cy+20, 12, 1);
+  ctx.fillRect(cx+10, cy+26, 8, 1);
+  // Vertical traces
+  ctx.fillRect(cx+10, cy+8, 1, 6);
+  ctx.fillRect(cx+16, cy+8, 1, 12);
+  ctx.fillRect(cx+12, cy+14, 1, 6);
+  ctx.fillRect(cx+18, cy+20, 1, 6);
+  // Nodes (bright dots at intersections)
+  ctx.fillStyle = gb;
+  ctx.fillRect(cx+10, cy+8, 1,1);
+  ctx.fillRect(cx+16, cy+14, 1,1);
+  ctx.fillRect(cx+12, cy+20, 1,1);
+  ctx.fillRect(cx+18, cy+20, 1,1);
+  ctx.fillRect(cx+10, cy+14, 1,1);
+  ctx.fillRect(cx+16, cy+8, 1,1);
+
+  // Pins — left side
+  ctx.fillStyle = g;
+  for(let i=0; i<5; i++){
+    const py = cy + 4 + i*5;
+    ctx.fillRect(cx-4, py, 4, 1);  // pin
+    ctx.fillStyle = gb;
+    ctx.fillRect(cx-4, py, 1, 1);  // tip
+    ctx.fillStyle = g;
+  }
+  // Pins — right side
+  for(let i=0; i<5; i++){
+    const py = cy + 4 + i*5;
+    ctx.fillRect(cx+cw, py, 4, 1);
+    ctx.fillStyle = gb;
+    ctx.fillRect(cx+cw+3, py, 1, 1);
+    ctx.fillStyle = g;
+  }
+  // Pins — top
+  for(let i=0; i<4; i++){
+    const px = cx + 4 + i*5;
+    ctx.fillRect(px, cy-4, 1, 4);
+    ctx.fillStyle = gb;
+    ctx.fillRect(px, cy-4, 1, 1);
+    ctx.fillStyle = g;
+  }
+  // Pins — bottom
+  for(let i=0; i<4; i++){
+    const px = cx + 4 + i*5;
+    ctx.fillRect(px, cy+ch, 1, 4);
+    ctx.fillStyle = gb;
+    ctx.fillRect(px, cy+ch+3, 1, 1);
+    ctx.fillStyle = g;
+  }
+
+  // Blinking activity LED
+  let on = true;
+  setInterval(() => {
+    on = !on;
+    ctx.fillStyle = on ? gb : '#003300';
+    ctx.fillRect(cx+cw-3, cy+2, 1, 1);
+  }, 800);
 })();
 
 // ═══ PNG SEQUENCE: play once, stop on last frame ═══
