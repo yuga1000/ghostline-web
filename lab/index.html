@@ -41,7 +41,7 @@ html,body{
 }
 .bg-dots{
   position:fixed;inset:0;z-index:0;
-  background:radial-gradient(circle,rgba(0,100,255,0.02) 0.5px,transparent 0.5px);
+  background:radial-gradient(circle,rgba(0,100,255,0.04) 0.5px,transparent 0.5px);
   background-size:72px 72px;pointer-events:none;
 }
 .scan{
@@ -57,6 +57,27 @@ html,body{
     linear-gradient(0deg, rgba(255,100,0,0.20) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,100,0,0.20) 1px, transparent 1px);
   background-size: calc(100vw / 30) calc(100vw / 30);
+}
+
+/* ═══ TOP NAV ═══ */
+.top-nav{
+  position:fixed;top:0;left:0;right:0;z-index:9000;
+  background:rgba(0,0,0,0.85);
+  border-bottom:1px solid #0000AA;
+  padding:8px 16px;
+  display:flex;justify-content:center;align-items:center;
+}
+.top-nav a{
+  font-family:var(--f2);font-size:10px;
+  color:rgba(68,136,255,0.7);
+  text-decoration:none;letter-spacing:2px;
+  padding:4px 10px;
+  transition:color 0.2s, border-color 0.2s;
+  border-bottom:1px solid transparent;
+}
+.top-nav a:hover{
+  color:#fff;
+  border-bottom:1px solid #4488ff;
 }
 
 /* ═══ POSTER — absolute positioned from builder JSON ═══ */
@@ -508,6 +529,16 @@ html,body{
     <div class="skin-hint">swipe or arrows</div>
     <div class="skin-btn" onclick="event.stopPropagation();skinNext()">&#x2192;</div>
   </div>
+</div>
+
+<div class="top-nav">
+  <a href="/">HOME</a>
+  <a href="/stream.html">LIVE STREAM</a>
+  <a href="/gallery.html">GALLERY</a>
+  <a href="/polaroids.html">POLAROIDS</a>
+  <a href="/order.html">ORDER</a>
+  <a href="/market.html">MARKET</a>
+  <a href="/lab/" style="color:#fff;border-bottom:1px solid #4488ff;">MYSTRA</a>
 </div>
 
 <div class="bg-art"><img src="img/R8I5I.jpg" alt=""></div>
