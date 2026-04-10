@@ -801,8 +801,6 @@ function cls(b){b.closest('.ex').classList.remove('open')}
     requestAnimationFrame(draw);
   }
 
-  window.addEventListener('resize', resize);
-  resize();
   // Initial fill animation — start from 0
   displayed = new Array(cols).fill(0);
   nextChange = performance.now() + changeInterval;
