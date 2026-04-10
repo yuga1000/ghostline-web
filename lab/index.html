@@ -731,74 +731,38 @@ function cls(b){b.closest('.ex').classList.remove('open')}
   const canvas = document.getElementById('arcadeChart');
   if(!canvas) return;
   const ctx = canvas.getContext('2d');
-  const parent = canvas.parentElement;
 
-  const cols = 12;
-  const colors = ['#0044cc','#0055ee','#0033ff','#0066FF','#0044dd','#0055cc','#0033ee','#0055ff','#0044bb','#0066ee','#0033dd','#0055bb'];
-  const topColors = ['#0077ff','#0088ff','#0066ff','#0099ff','#0077ff','#0088ff','#0077ff','#0099ff','#0088ff','#0077ff','#0066ff','#0099ff'];
-  const sideColors = ['#001a66','#002288','#001a55','#002299','#001a77','#002266','#001a66','#002288','#001a55','#002299','#001a77','#002266'];
+  // Pixel grid: low-res, stretched with image-rendering:pixelated
+  const cols = 16;
+  const maxH = 12; // max bar height in pixels
+  const pxW = cols * 3 + (cols - 1); // 3px per bar + 1px gap
+  const pxH = maxH + 2; // +2 for baseline
+  canvas.width = pxW;
+  canvas.height = pxH;
 
-  // Current and target heights (in blocks)
-  let heights = [3,5,2,7,4,6,5,3,8,4,6,2];
+  const barColors = [
+    '#0033cc','#0044dd','#0055ee','#0066ff',
+    '#0044cc','#0055dd','#0033ee','#0066ff',
+    '#0044dd','#0055ee','#0033ff','#0066cc',
+    '#0044cc','#0055dd','#0033ee','#0066ff'
+  ];
+  const topColors = [
+    '#4488ff','#5599ff','#4488ff','#66aaff',
+    '#4488ff','#5599ff','#4488ff','#66aaff',
+    '#5599ff','#4488ff','#5599ff','#66aaff',
+    '#4488ff','#5599ff','#4488ff','#66aaff'
+  ];
+
+  let heights = [3,6,4,8,5,7,6,4,9,5,7,3,6,4,8,5];
   let displayed = new Array(cols).fill(0);
   let nextChange = 0;
-  const changeInterval = 1800; // ms between height changes
-
-  function resize(){
-    canvas.width = parent.clientWidth * 2;
-    canvas.height = parent.clientHeight * 2;
-    canvas.style.width = parent.clientWidth + 'px';
-    canvas.style.height = parent.clientHeight + 'px';
-  }
-
-  // Draw isometric block at grid position — scales to fill container
-  function drawBlock(bx, by, bz, color, topC, sideC){
-    const totalW = canvas.width;
-    const totalH = canvas.height;
-    const w = Math.floor(totalW / (cols * 2.5)); // block width scales with canvas
-    const h = Math.floor(w * 0.75); // block height
-    const d = Math.floor(w * 0.6); // depth
-
-    // Iso projection — spread across full width
-    const sx = w * 1.2 + bx * (totalW - w * 2.4) / (cols - 1);
-    const sy = totalH - 4 - by * h + (bx + bz) * d/2;
-
-    // Top face
-    ctx.fillStyle = topC;
-    ctx.beginPath();
-    ctx.moveTo(sx, sy - h);
-    ctx.lineTo(sx + w, sy - h + d/2);
-    ctx.lineTo(sx, sy + d);
-    ctx.lineTo(sx - w, sy - h + d/2);
-    ctx.closePath();
-    ctx.fill();
-
-    // Left face
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(sx - w, sy - h + d/2);
-    ctx.lineTo(sx, sy + d);
-    ctx.lineTo(sx, sy + d + h);
-    ctx.lineTo(sx - w, sy + d/2);
-    ctx.closePath();
-    ctx.fill();
-
-    // Right face
-    ctx.fillStyle = sideC;
-    ctx.beginPath();
-    ctx.moveTo(sx + w, sy - h + d/2);
-    ctx.lineTo(sx, sy + d);
-    ctx.lineTo(sx, sy + d + h);
-    ctx.lineTo(sx + w, sy + d/2);
-    ctx.closePath();
-    ctx.fill();
-  }
+  const changeInterval = 1800;
 
   function draw(t){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, pxW, pxH);
 
-    // Step displayed heights toward targets — 8 steps per second
-    if(!draw.lastStep || t - draw.lastStep > 120){
+    // Animate toward targets
+    if(!draw.lastStep || t - draw.lastStep > 100){
       draw.lastStep = t;
       for(let i = 0; i < cols; i++){
         if(displayed[i] < heights[i]) displayed[i]++;
@@ -806,18 +770,31 @@ function cls(b){b.closest('.ex').classList.remove('open')}
       }
     }
 
-    // Draw bars back to front
+    // Draw pixel bars
     for(let i = 0; i < cols; i++){
-      for(let row = 0; row < displayed[i]; row++){
-        drawBlock(i, row, 0, colors[i], topColors[i], sideColors[i]);
+      const x = i * 4; // 3px bar + 1px gap
+      const h = displayed[i];
+      // Bar body
+      ctx.fillStyle = barColors[i];
+      for(let py = 0; py < h; py++){
+        ctx.fillRect(x, pxH - 1 - py, 3, 1);
+      }
+      // Bright top pixel
+      if(h > 0){
+        ctx.fillStyle = topColors[i];
+        ctx.fillRect(x, pxH - 1 - h, 3, 1);
       }
     }
 
-    // Change target heights periodically
+    // Baseline
+    ctx.fillStyle = 'rgba(68,136,255,0.3)';
+    ctx.fillRect(0, pxH - 1, pxW, 1);
+
+    // Change targets
     if(t > nextChange){
       nextChange = t + changeInterval;
       for(let i = 0; i < cols; i++){
-        heights[i] = 2 + Math.floor(Math.random() * 8);
+        heights[i] = 1 + Math.floor(Math.random() * maxH);
       }
     }
 
