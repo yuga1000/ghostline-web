@@ -134,16 +134,16 @@ html,body{
   background:repeating-linear-gradient(
     -45deg,
     transparent,
-    transparent 4px,
-    rgba(68,136,255,0.06) 4px,
-    rgba(68,136,255,0.06) 8px
+    transparent 6px,
+    rgba(68,136,255,0.18) 6px,
+    rgba(68,136,255,0.18) 12px
   );
   z-index:0;
 }
 .vbase-label{
   position:absolute;top:6px;left:6px;
-  font-family:var(--f2);font-size:6px;
-  color:rgba(68,136,255,0.8);
+  font-family:var(--f2);font-size:7px;
+  color:rgba(68,136,255,0.9);
   letter-spacing:1px;z-index:1;
 }
 .vbase-status{
@@ -521,9 +521,9 @@ html,body{
 
   <!-- IMG1: left-bottom — sketches/skins archive -->
   <div class="img1" id="skins-block" style="cursor:pointer;">
-    <img class="skin-frame" src="img/skins/spider-front.jpg" alt="" style="width:100%;height:100%;object-fit:cover;image-rendering:pixelated;filter:brightness(0.4) contrast(1.2);transition:opacity 0.3s;">
+    <canvas id="skinPixelCanvas" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:1;"></canvas>
     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;">
-      <span style="font-family:var(--f2);font-size:14px;color:rgba(68,136,255,0.85);letter-spacing:4px;text-shadow:0 0 12px rgba(68,136,255,0.3);">SKETCHES</span>
+      <span style="font-family:var(--f1);font-size:18px;color:rgba(68,136,255,0.9);letter-spacing:6px;text-shadow:0 0 16px rgba(68,136,255,0.4);">SKETCHES</span>
     </div>
   </div>
 
@@ -924,20 +924,40 @@ const skinData = [
 let skinIdx = 0;
 
 (function(){
-  const frame = document.querySelector('.skin-frame');
-  if(!frame) return;
+  const pxCanvas = document.getElementById('skinPixelCanvas');
+  if(!pxCanvas) return;
+  const pxCtx = pxCanvas.getContext('2d');
 
-  // Preload
-  skinData.forEach(s => { const i = new Image(); i.src = s.src; });
+  // Low-res pixel size — tiny canvas, CSS stretches it pixelated
+  const PX = 48; // width in pixels
+  pxCanvas.width = PX;
+  pxCanvas.height = PX;
 
-  // Auto-cycle thumbnail every 4s
+  // Preload all skin images
+  const imgs = skinData.map(s => { const i = new Image(); i.src = s.src; return i; });
+
+  function drawPixelPreview(idx){
+    const img = imgs[idx];
+    if(!img.complete){ img.onload = () => drawPixelPreview(idx); return; }
+    pxCtx.clearRect(0, 0, PX, PX);
+    // Draw full image into tiny canvas = instant pixelation
+    const aspect = img.width / img.height;
+    let dw = PX, dh = PX;
+    if(aspect > 1){ dh = PX / aspect; } else { dw = PX * aspect; }
+    const dx = (PX - dw) / 2, dy = (PX - dh) / 2;
+    pxCtx.filter = 'brightness(0.4) contrast(1.2)';
+    pxCtx.drawImage(img, dx, dy, dw, dh);
+    pxCtx.filter = 'none';
+  }
+
+  // Initial draw
+  imgs[0].onload = () => drawPixelPreview(0);
+  if(imgs[0].complete) drawPixelPreview(0);
+
+  // Auto-cycle every 4s
   setInterval(() => {
     skinIdx = (skinIdx + 1) % skinData.length;
-    frame.style.opacity = '0';
-    setTimeout(() => {
-      frame.src = skinData[skinIdx].src;
-      frame.style.opacity = '1';
-    }, 300);
+    drawPixelPreview(skinIdx);
   }, 4000);
 
   // Click opens overlay
