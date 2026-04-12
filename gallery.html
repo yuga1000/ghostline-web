@@ -176,6 +176,7 @@
         border: 2px solid #555;
         box-shadow: 0 0 15px rgba(100, 100, 100, 0.15);
         background: #000080;
+        position: relative;
     }
 
     .manifesto-titlebar {
@@ -667,26 +668,7 @@
         <span class="cursor-blink"></span>
     </div>
 </div>
-
-<!-- BTC Signal Widget -->
-<div style="display:flex;justify-content:center;margin:12px 0;">
-  <div id="btc-signal-btn" onclick="document.getElementById('btcModal').classList.add('open')" style="
-    width:120px;height:120px;
-    background:#0000AA;
-    border:2px solid #5555ff;
-    cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:4px;
-    position:relative;overflow:hidden;
-    box-shadow:2px 2px 0 rgba(0,0,0,0.5);
-    transition:all 0.2s;
-  ">
-    <div style="position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 4px,rgba(255,255,255,0.04) 4px,rgba(255,255,255,0.04) 8px);pointer-events:none;"></div>
-    <span style="font-family:'Courier New',monospace;font-size:22px;color:#55ffff;">₿</span>
-    <span style="font-family:'Courier New',monospace;font-size:8px;color:#aaaaaa;letter-spacing:1px;">SIGNAL</span>
-    <span style="font-family:'Courier New',monospace;font-size:7px;color:#555555;">click to open</span>
-  </div>
-</div>
+<div id="btcTrigger" onclick="document.getElementById('btcModal').classList.add('open')" style="width:12px;height:12px;background:#0000AA;border:1px solid #5555ff;position:absolute;right:-18px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:0.6;transition:opacity 0.3s,box-shadow 0.3s;" onmouseenter="this.style.opacity='1';this.style.boxShadow='0 0 6px rgba(85,85,255,0.8)'" onmouseleave="this.style.opacity='0.6';this.style.boxShadow='none'"></div>
 
 <!-- BTC Signal Modal -->
 <div id="btcModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);align-items:center;justify-content:center;cursor:pointer;" onclick="if(event.target===this)this.classList.remove('open')">
@@ -698,10 +680,7 @@
     <iframe src="oracle/index.html" style="width:100%;height:calc(100% - 22px);border:none;background:#0000AA;"></iframe>
   </div>
 </div>
-<style>
-  #btc-signal-btn:hover{background:#0000CC;box-shadow:0 0 12px rgba(85,85,255,0.4),2px 2px 0 rgba(0,0,0,0.5);}
-  #btcModal.open{display:flex !important;}
-</style>
+<style>#btcModal.open{display:flex !important;}</style>
 
 <!-- Gallery Grid -->
 <div class="gallery-grid" id="galleryGrid">
