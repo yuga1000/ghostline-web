@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGNAL</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0000aa;
+  color: #aaaaaa;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 16px;
+  min-height: 100vh;
+}
+
+#terminal {
+  max-width: 720px;
+  margin: 0 auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.dim { color: #555555; }
+.bright { color: #ffffff; }
+.red { color: #ff5555; }
+.yellow { color: #ffff55; }
+.white { color: #ffffff; }
+.cyan { color: #55ffff; }
+.bold { font-weight: bold; }
+.big { font-size: 22px; }
+
+.blink { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.bar-green { color: #55ff55; }
+.bar-red { color: #ff5555; }
+.bar-neutral { color: #ffff55; }
+
+#controls {
+  margin: 8px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#controls button {
+  background: #0000aa;
+  color: #55ffff;
+  border: 1px solid #55ffff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+#controls button:hover { background: #000088; }
+#controls button.active {
+  background: #55ffff;
+  color: #0000aa;
+  font-weight: bold;
+}
+
+#auto-toggle { margin-left: auto; }
+.loading { color: #ffff55; }
+.error { color: #ff5555; }
+</style>
+</head>
+<body>
+<div id="terminal">
+<pre id="header"></pre>
+<div id="controls">
+  <button id="auto-toggle">[A] AUTO: ON</button>
+</div>
+<pre id="output"><span class="loading">Connecting to exchange...</span><span class="blink">_</span></pre>
+<pre id="patterns-output"></pre>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const CONFIG = {
+  symbol: 'BTCUSDT',
+  limit: 200,
+  refreshIntervals: { '60': 120, '240': 300, 'D': 600 },
+};
+
+let state = {
+  timeframe: '240',
+  autoRefresh: true,
+  countdown: 0,
+  countdownTimer: null,
+  isLoading: false,
+  retryCount: 0,
+  fearGreed: null,
+  fundingRate: null,
+  longShortRatio: null,
+  openInterest: null,
+  btcDominance: null,
+  ethBtcRatio: null,
+  halvingCycle: null,
+  showDetails: false,
+  showPatterns: false,
+  patternData: null,
+  patternRawCandles: null,
+  patternLoading: false,
+  lang: localStorage.getItem('signal_lang') || 'en',
+};
+
+const LANG = {
+  en: {
+    tomorrow: 'TOMORROW BTC WILL MOST LIKELY:',
+    up: 'GO UP', down: 'GO DOWN',
+    confidence: 'confidence:',
+    accuracy: 'accuracy:', collecting: 'collecting data...',
+    ofTotal: 'of',
+    week: 'This week:', weekUp: '▲ go up', weekDown: '▼ go down',
+    lastCandles: 'LAST',  candlesWord: 'CANDLES',
+    showDetails: 'Show details', hideDetails: 'Hide details',
+    patterns: 'Pattern analysis',
+    patternLab: 'PATTERN LAB — Does History Repeat?',
+    patternCandles: 'daily candles',
+    patternCoinFlip: '50% = coin flip',
+    patternUseful: '>55% = useful signal',
+    patternGrowth: 'GROWTH & PULLBACK ANALYSIS',
+    patternAlwaysGrows: 'Does BTC always grow long-term?',
+    patternAfterPeak: 'After strong weekly growth (>{pct}%), does a pullback follow?',
+    patternYes: 'Yes', patternNo: 'No', patternMaybe: 'Uncertain',
+    patternLoading: 'Loading BTC history...',
+    patternProgress: 'Progress:',
+    refreshIn: 'Refresh in', autoOff: 'Auto-refresh OFF',
+    disclaimer: 'For entertainment only. Not financial advice.',
+    header: 'SIGNAL │ [A] Auto │ [R] Refresh │ [D] Details │ [P] Patterns │ [L] Lang',
+    tomorrowIs: 'Tomorrow =', inTime: 'in',
+    monthsShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    weekIs: 'Week ends:', weekDays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+  },
+  ru: {
+    tomorrow: 'ЗАВТРА БИТКОИН СКОРЕЕ ВСЕГО:',
+    up: 'ВЫРАСТЕТ', down: 'УПАДЁТ',
+    confidence: 'уверенность:',
+    accuracy: 'точность:', collecting: 'собираем данные...',
+    ofTotal: 'из',
+    week: 'На неделе:', weekUp: '▲ вырастет', weekDown: '▼ упадёт',
+    lastCandles: 'ПОСЛЕДНИЕ', candlesWord: 'СВЕЧЕЙ',
+    showDetails: 'Показать детали', hideDetails: 'Скрыть детали',
+    patterns: 'Анализ паттернов',
+    patternLab: 'ЛАБОРАТОРИЯ ПАТТЕРНОВ — Повторяется ли история?',
+    patternCandles: 'дневных свечей',
+    patternCoinFlip: '50% = подбросить монету',
+    patternUseful: '>55% = полезный сигнал',
+    patternGrowth: 'АНАЛИЗ РОСТА И КОРРЕКЦИЙ',
+    patternAlwaysGrows: 'Биткоин всегда растёт в долгосроке?',
+    patternAfterPeak: 'После сильного недельного роста (>{pct}%), следует ли коррекция?',
+    patternYes: 'Да', patternNo: 'Нет', patternMaybe: 'Неопределённо',
+    patternLoading: 'Загрузка истории BTC...',
+    patternProgress: 'Прогресс:',
+    refreshIn: 'Обновление через', autoOff: 'Авто-обновление выкл',
+    disclaimer: 'Только для развлечения. Не финансовый совет.',
+    header: 'SIGNAL │ [A] Авто │ [R] Обновить │ [D] Детали │ [P] Паттерны │ [L] Язык',
+    tomorrowIs: 'Завтра =', inTime: 'через',
+    monthsShort: ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'],
+    weekIs: 'Неделя до:', weekDays: ['вс','пн','вт','ср','чт','пт','сб'],
+  },
+};
+
+// ============================================================
+// PREDICTION TRACKER — localStorage
+// ============================================================
+function getTracker() {
+  try {
+    return JSON.parse(localStorage.getItem('satoshi_tracker') || '{}');
+  } catch { return {}; }
+}
+
+function savePrediction(timeframe, price, direction, probability) {
+  const tracker = getTracker();
+  const key = `${timeframe}`;
+  if (!tracker[key]) tracker[key] = { predictions: [], correct: 0, total: 0 };
+
+  // Minimum time before checking: tomorrow = 24h, week = 7 days
+  const minMs = timeframe === 'tomorrow' ? 24 * 3600000 : 7 * 24 * 3600000;
+
+  // Check unresolved predictions that are old enough
+  for (const pred of tracker[key].predictions) {
+    if (!pred.resolved && Date.now() - pred.time >= minMs) {
+      const actualDir = price > pred.price ? 'UP' : price < pred.price ? 'DOWN' : null;
+      if (actualDir) {
+        pred.resolved = true;
+        pred.actualDir = actualDir;
+        pred.actualPrice = price;
+        pred.correct = actualDir === pred.direction;
+        tracker[key].total++;
+        if (pred.correct) tracker[key].correct++;
+      }
+    }
+  }
+
+  // Only save one prediction per day (tomorrow) or per week (week)
+  const last = tracker[key].predictions[tracker[key].predictions.length - 1];
+  const dedupMs = timeframe === 'tomorrow' ? 12 * 3600000 : 3 * 24 * 3600000;
+  if (!last || Date.now() - last.time >= dedupMs) {
+    tracker[key].predictions.push({
+      time: Date.now(),
+      price,
+      direction,
+      probability,
+      resolved: false,
+    });
+  }
+
+  // Keep only last 100 predictions
+  if (tracker[key].predictions.length > 100) {
+    tracker[key].predictions = tracker[key].predictions.slice(-100);
+  }
+
+  localStorage.setItem('satoshi_tracker', JSON.stringify(tracker));
+  return tracker[key];
+}
+
+function getAccuracy(timeframe) {
+  const tracker = getTracker();
+  const data = tracker[timeframe];
+  if (!data || data.total === 0) return null;
+  return { correct: data.correct, total: data.total, pct: (data.correct / data.total * 100) };
+}
+
+// ============================================================
+// API
+// ============================================================
+const CORS_PROXIES = ['', 'https://corsproxy.io/?', 'https://api.allorigins.win/raw?url='];
+
+async function tryFetch(url, timeoutMs = 8000) {
+  // Sites with proper CORS — skip proxies
+  const directDomains = ['coingecko.com', 'alternative.me', 'mempool.space'];
+  const isDirect = directDomains.some(d => url.includes(d));
+  const proxies = isDirect ? [''] : CORS_PROXIES;
+
+  for (const proxy of proxies) {
+    try {
+      const target = proxy ? proxy + encodeURIComponent(url) : url;
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      const res = await fetch(target, { signal: ctrl.signal });
+      clearTimeout(timer);
+      if (res.status === 429) throw new Error('Rate limited');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      if (text.startsWith('Throttled') || text.startsWith('<!')) throw new Error('Throttled');
+      return JSON.parse(text);
+    } catch (e) { continue; }
+  }
+  throw new Error('All fetch attempts failed');
+}
+
+// ── CoinGecko (primary — works without CORS issues) ──
+function buildCandlesFromMarketChart(prices, volumes, intervalMs) {
+  // Group price points into candle intervals
+  if (prices.length < 2) return [];
+  const candles = [];
+  let i = 0;
+  while (i < prices.length) {
+    const bucketStart = prices[i][0];
+    const bucketEnd = bucketStart + intervalMs;
+    let open = prices[i][1], high = prices[i][1], low = prices[i][1], close = prices[i][1];
+    let vol = 0, volCount = 0;
+    while (i < prices.length && prices[i][0] < bucketEnd) {
+      const p = prices[i][1];
+      high = Math.max(high, p);
+      low = Math.min(low, p);
+      close = p;
+      // Find closest volume entry
+      if (volumes.length > 0) {
+        const vi = volumes.findIndex(v => Math.abs(v[0] - prices[i][0]) < intervalMs / 2);
+        if (vi >= 0) { vol += volumes[vi][1]; volCount++; }
+      }
+      i++;
+    }
+    candles.push({
+      timestamp: bucketStart, open, high, low, close,
+      volume: volCount > 0 ? vol / volCount : 0, takerBuyVol: 0,
+    });
+  }
+  return candles;
+}
+
+async function fetchCoinGecko(timeframe) {
+  // CoinGecko free: days=1 → ~5min data, days=7-30 → hourly, days=90+ → daily
+  const daysMap = { '60': 2, '240': 14, 'D': 90 };
+  const intervalMs = { '60': 3600000, '240': 14400000, 'D': 86400000 };
+  const days = daysMap[timeframe];
+
+  const mcUrl = `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`;
+  const mc = await tryFetch(mcUrl);
+
+  const candles = buildCandlesFromMarketChart(mc.prices, mc.total_volumes, intervalMs[timeframe]);
+  const price = mc.prices[mc.prices.length - 1][1];
+  const price24hAgo = mc.prices.find(p => p[0] >= Date.now() - 86400000);
+  const change24h = price24hAgo ? ((price - price24hAgo[1]) / price24hAgo[1]) * 100 : 0;
+
+  return { candles, price, change24h };
+}
+
+async function fetchCoinGeckoDaily() {
+  const mc = await tryFetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=90');
+  return { candles: buildCandlesFromMarketChart(mc.prices, mc.total_volumes, 86400000) };
+}
+
+// ── Binance/Bybit (fallback) ──
+async function fetchBinance(timeframe) {
+  const intervalMap = { '60': '1h', '240': '4h', 'D': '1d' };
+  const klineUrl = `https://api.binance.com/api/v3/klines?symbol=${CONFIG.symbol}&interval=${intervalMap[timeframe]}&limit=${CONFIG.limit}`;
+  const tickerUrl = `https://api.binance.com/api/v3/ticker/24hr?symbol=${CONFIG.symbol}`;
+  const [klineRes, tickerRes] = await Promise.all([tryFetch(klineUrl), tryFetch(tickerUrl)]);
+  return {
+    candles: klineRes.map(c => ({
+      timestamp: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]),
+      low: parseFloat(c[3]), close: parseFloat(c[4]), volume: parseFloat(c[5]),
+      takerBuyVol: parseFloat(c[9]),
+    })),
+    price: parseFloat(tickerRes.lastPrice),
+    change24h: parseFloat(tickerRes.priceChangePercent),
+  };
+}
+
+async function fetchBybit(timeframe) {
+  const klineUrl = `https://api.bybit.com/v5/market/kline?category=spot&symbol=${CONFIG.symbol}&interval=${timeframe}&limit=${CONFIG.limit}`;
+  const tickerUrl = `https://api.bybit.com/v5/market/tickers?category=spot&symbol=${CONFIG.symbol}`;
+  const [klineRes, tickerRes] = await Promise.all([tryFetch(klineUrl), tryFetch(tickerUrl)]);
+  if (klineRes.retCode !== 0) throw new Error(klineRes.retMsg);
+  const ticker = tickerRes.result.list[0];
+  return {
+    candles: klineRes.result.list.map(c => ({
+      timestamp: parseInt(c[0]), open: parseFloat(c[1]), high: parseFloat(c[2]),
+      low: parseFloat(c[3]), close: parseFloat(c[4]), volume: parseFloat(c[5]),
+      takerBuyVol: 0,
+    })).reverse(),
+    price: parseFloat(ticker.lastPrice),
+    change24h: parseFloat(ticker.price24hPcnt) * 100,
+  };
+}
+
+// ── External signals ──
+async function fetchFearGreed() {
+  try {
+    const d = await tryFetch('https://api.alternative.me/fng/?limit=1&format=json');
+    return { value: parseInt(d.data[0].value), label: d.data[0].value_classification };
+  } catch { return null; }
+}
+
+async function fetchFundingRate() {
+  try {
+    const d = await tryFetch('https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&limit=1');
+    return parseFloat(d[0].fundingRate);
+  } catch {
+    try {
+      const d = await tryFetch('https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT');
+      return parseFloat(d.result.list[0].fundingRate);
+    } catch { return null; }
+  }
+}
+
+async function fetchLongShortRatio() {
+  try {
+    const d = await tryFetch('https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol=BTCUSDT&period=1h&limit=1');
+    return parseFloat(d[0].longShortRatio);
+  } catch { return null; }
+}
+
+async function fetchOpenInterest() {
+  try {
+    const d = await tryFetch('https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT');
+    const hist = await tryFetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=24');
+    const current = parseFloat(d.openInterest);
+    if (hist.length >= 2) {
+      const prev = parseFloat(hist[0].sumOpenInterest);
+      return { current, change: prev === 0 ? 0 : (current - prev) / prev * 100 };
+    }
+    return { current, change: 0 };
+  } catch { return null; }
+}
+
+async function fetchBtcDominance() {
+  try {
+    const d = await tryFetch('https://api.coingecko.com/api/v3/global');
+    return d.data.market_cap_percentage.btc;
+  } catch { return null; }
+}
+
+async function fetchEthBtcRatio() {
+  try {
+    const d = await tryFetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ETHBTC');
+    return { price: parseFloat(d.lastPrice), change: parseFloat(d.priceChangePercent) };
+  } catch { return null; }
+}
+
+async function fetchHalvingCycle() {
+  try {
+    const d = await tryFetch('https://mempool.space/api/blocks/tip/height');
+    const height = typeof d === 'number' ? d : parseInt(d);
+    const halvingInterval = 210000;
+    const lastHalving = Math.floor(height / halvingInterval) * halvingInterval;
+    const nextHalving = lastHalving + halvingInterval;
+    const progress = (height - lastHalving) / halvingInterval;
+    return { height, progress, blocksToNext: nextHalving - height };
+  } catch { return null; }
+}
+
+async function fetchData(timeframe) {
+  // Step 1: Main candle data (CoinGecko primary, Binance/Bybit fallback)
+  const marketData = await fetchCoinGecko(timeframe).catch(() => fetchBinance(timeframe)).catch(() => fetchBybit(timeframe));
+
+  // Step 2: Non-CoinGecko signals in parallel
+  const [fg, fr, lsr, oi, ethbtc, halving] = await Promise.all([
+    fetchFearGreed(),
+    fetchFundingRate(),
+    fetchLongShortRatio(),
+    fetchOpenInterest(),
+    fetchEthBtcRatio(),
+    fetchHalvingCycle(),
+  ]);
+
+  state.fearGreed = fg;
+  state.fundingRate = fr;
+  state.longShortRatio = lsr;
+  state.openInterest = oi;
+  state.ethBtcRatio = ethbtc;
+  state.halvingCycle = halving;
+
+  // Step 3: More CoinGecko calls — sequential with delays to avoid rate limit
+  let dailyData = null;
+  if (timeframe !== 'D') {
+    await new Promise(r => setTimeout(r, 1500));
+    dailyData = await fetchCoinGeckoDaily().catch(() => null);
+  }
+  await new Promise(r => setTimeout(r, 1500));
+  state.btcDominance = await fetchBtcDominance().catch(() => null);
+
+  marketData.dailyCandles = dailyData ? dailyData.candles : null;
+  return marketData;
+}
+
+// ============================================================
+// TECHNICAL INDICATORS
+// ============================================================
+function calcRSI(candles, period = 14) {
+  if (candles.length < period + 1) return 50;
+  let gains = 0, losses = 0;
+  for (let i = 1; i <= period; i++) {
+    const ch = candles[i].close - candles[i-1].close;
+    if (ch >= 0) gains += ch; else losses -= ch;
+  }
+  let ag = gains / period, al = losses / period;
+  for (let i = period + 1; i < candles.length; i++) {
+    const ch = candles[i].close - candles[i-1].close;
+    ag = (ag * (period-1) + Math.max(ch, 0)) / period;
+    al = (al * (period-1) + Math.max(-ch, 0)) / period;
+  }
+  return al === 0 ? 100 : 100 - 100 / (1 + ag / al);
+}
+
+function calcMACD(candles) {
+  if (candles.length < 26) return { histogram: 0 };
+  let e12 = candles[0].close, e26 = candles[0].close, sig = 0, hist = 0;
+  for (let i = 1; i < candles.length; i++) {
+    e12 = candles[i].close * 2/13 + e12 * 11/13;
+    e26 = candles[i].close * 2/27 + e26 * 25/27;
+    const macd = e12 - e26;
+    sig = macd * 2/10 + sig * 8/10;
+    hist = macd - sig;
+  }
+  return { histogram: hist };
+}
+
+function calcBollinger(candles, period = 20) {
+  if (candles.length < period) return { percentB: 0.5 };
+  const cl = candles.slice(-period).map(c => c.close);
+  const sma = cl.reduce((a,b) => a+b) / period;
+  const sd = Math.sqrt(cl.reduce((s,c) => s + (c-sma)**2, 0) / period);
+  const up = sma + 2*sd, lo = sma - 2*sd;
+  return { percentB: (up-lo) === 0 ? 0.5 : (candles[candles.length-1].close - lo) / (up - lo) };
+}
+
+function calcATR(candles, period = 14) {
+  if (candles.length < 2) return 0;
+  let atr = 0;
+  for (let i = 1; i < candles.length; i++) {
+    const tr = Math.max(candles[i].high-candles[i].low, Math.abs(candles[i].high-candles[i-1].close), Math.abs(candles[i].low-candles[i-1].close));
+    if (i <= period) atr += tr / period;
+    else atr = (atr * (period-1) + tr) / period;
+  }
+  return atr;
+}
+
+function detectPatterns(candles) {
+  if (candles.length < 3) return [];
+  const L = candles[candles.length-1], P = candles[candles.length-2];
+  const body = Math.abs(L.close-L.open), range = L.high-L.low;
+  const uW = L.high - Math.max(L.open,L.close), lW = Math.min(L.open,L.close) - L.low;
+  const isG = L.close > L.open, pBody = Math.abs(P.close-P.open);
+  const pats = [];
+  if (range > 0 && body/range < 0.1) pats.push({ name: 'Doji', s: 0 });
+  if (body > 0 && lW > body*2 && uW < body*0.5) pats.push({ name: 'Hammer', s: 50 });
+  if (body > 0 && uW > body*2 && lW < body*0.5) pats.push({ name: 'Shoot.Star', s: -50 });
+  if (P.close<P.open && isG && body>pBody*1.5 && L.open<=P.close && L.close>=P.open) pats.push({ name: 'Bull Engulf', s: 70 });
+  if (P.close>P.open && !isG && body>pBody*1.5 && L.open>=P.close && L.close<=P.open) pats.push({ name: 'Bear Engulf', s: -70 });
+  return pats;
+}
+
+// ============================================================
+// PREDICTION ENGINE
+// ============================================================
+
+// Weight profiles per horizon
+const HORIZON_WEIGHTS = {
+  SHORT: { // next candle — momentum & order flow heavy
+    bodyMass: 0.08, volume: 0.08, momentum: 0.12, takerBuy: 0.14,
+    rsi: 0.10, macd: 0.08, bollinger: 0.05, streak: 0.07, wicks: 0.05,
+    patterns: 0.07, grRatio: 0.02, longShort: 0.05, openInterest: 0.05,
+    rainbow: 0.02, painDD: 0.02,
+  },
+  MEDIUM: { // next 24h — trend indicators + historical context
+    bodyMass: 0.05, volume: 0.05, momentum: 0.07, takerBuy: 0.08,
+    rsi: 0.12, macd: 0.10, bollinger: 0.08, streak: 0.04, wicks: 0.03,
+    patterns: 0.05, grRatio: 0.03, longShort: 0.07, openInterest: 0.05,
+    btcDom: 0.03, ethBtc: 0.02,
+    rainbow: 0.06, seasonality: 0.03, painDD: 0.04,
+  },
+  LONG: { // next 7 days — macro + historical data heavy
+    bodyMass: 0.03, volume: 0.03, momentum: 0.04, takerBuy: 0.04,
+    rsi: 0.08, macd: 0.07, bollinger: 0.07, streak: 0.02, wicks: 0.02,
+    patterns: 0.03, grRatio: 0.02, longShort: 0.06, openInterest: 0.06,
+    btcDom: 0.04, ethBtc: 0.03, halving: 0.04, fearGreed: 0.05, funding: 0.03,
+    rainbow: 0.10, seasonality: 0.05, painDD: 0.06,
+  },
+};
+
+function computeFactors(candles) {
+  const N = candles.length;
+  const factors = {};
+
+  // 1. Body Mass
+  let gm = 0, rm = 0;
+  for (const c of candles) { const b = c.close-c.open; if (b>=0) gm+=b; else rm-=b; }
+  factors.bodyMass = { name: 'Body Mass', score: (gm+rm)===0?0:((gm-rm)/(gm+rm))*100 };
+
+  // 2. Volume Sentiment
+  let vNet = 0, vTot = 0;
+  for (const c of candles) { const d = c.close>=c.open?1:-1; vNet+=d*c.volume; vTot+=c.volume; }
+  factors.volume = { name: 'Volume', score: vTot===0?0:(vNet/vTot)*100 };
+
+  // 3. Momentum
+  const rev = [...candles].reverse();
+  const hl = N/3, dk = Math.pow(0.5, 1/hl);
+  let mW = 0, mMax = 0;
+  for (let i = 0; i < N; i++) {
+    const w = Math.pow(dk, i), bp = rev[i].open===0?0:(rev[i].close-rev[i].open)/rev[i].open;
+    mW += bp*w; mMax += Math.abs(bp)*w;
+  }
+  factors.momentum = { name: 'Momentum', score: mMax===0?0:(mW/mMax)*100 };
+
+  // 4. Taker Buy
+  let tBuy = 0, tVol2 = 0;
+  for (const c of candles) { tBuy += c.takerBuyVol||0; tVol2 += c.volume; }
+  factors.takerBuy = { name: 'Taker Buy', score: (tVol2===0||tBuy===0)?0:(tBuy/tVol2-0.5)*200 };
+
+  // 5. RSI
+  const rsi = calcRSI(candles);
+  let rsiScore;
+  if (rsi <= 30) rsiScore = (30-rsi)/30*100;
+  else if (rsi >= 70) rsiScore = (70-rsi)/30*100;
+  else rsiScore = (50-rsi)/20*50;
+  factors.rsi = { name: 'RSI', score: rsiScore, detail: rsi.toFixed(0) };
+
+  // 6. MACD
+  const { histogram } = calcMACD(candles);
+  const price = candles[N-1].close;
+  factors.macd = { name: 'MACD', score: Math.max(-100,Math.min(100,price===0?0:(histogram/price)*10000)) };
+
+  // 7. Bollinger
+  const { percentB } = calcBollinger(candles);
+  factors.bollinger = { name: 'Bollinger', score: Math.max(-100,Math.min(100,(0.5-percentB)*200)) };
+
+  // 8. Streak
+  const lastDir = candles[N-1].close>=candles[N-1].open?1:-1;
+  let streak = 1;
+  for (let i = N-2; i>=0; i--) { if ((candles[i].close>=candles[i].open?1:-1)===lastDir) streak++; else break; }
+  factors.streak = { name: 'Streak', score: lastDir*Math.min(streak,10)*10, detail: `${streak} ${lastDir>0?'green':'red'}` };
+
+  // 9. Wicks
+  let wBias = 0, wCnt = 0;
+  for (const c of candles.slice(-5)) {
+    const r = c.high-c.low; if (r===0) continue;
+    wBias += (Math.min(c.open,c.close)-c.low-(c.high-Math.max(c.open,c.close)))/r; wCnt++;
+  }
+  factors.wicks = { name: 'Wicks', score: wCnt===0?0:(wBias/wCnt)*100 };
+
+  // 10. Patterns
+  const pats = detectPatterns(candles);
+  const patScore = pats.reduce((s,p) => s+p.s, 0);
+  factors.patterns = { name: 'Patterns', score: Math.max(-100,Math.min(100,patScore)), detail: pats.map(p=>p.name).join(',')||'none' };
+
+  // 11. G/R Ratio
+  let gC = 0, rC = 0;
+  for (const c of candles) { if (c.close>=c.open) gC++; else rC++; }
+  factors.grRatio = { name: 'G/R Ratio', score: N===0?0:((gC-rC)/N)*100, detail: `${gC}/${rC}` };
+
+  // 12. Long/Short Ratio (contrarian — high longs = bearish)
+  if (state.longShortRatio !== null) {
+    const lsr = state.longShortRatio;
+    const lsScore = Math.max(-100, Math.min(100, (1 - lsr) * 100));
+    factors.longShort = { name: 'L/S Ratio', score: lsScore, detail: lsr.toFixed(2) };
+  } else {
+    factors.longShort = { name: 'L/S Ratio', score: 0, detail: 'N/A' };
+  }
+
+  // 13. Open Interest (rising OI + trend = confirmation)
+  if (state.openInterest) {
+    const oiChange = state.openInterest.change;
+    // OI rising in direction of trend = bullish confirmation
+    const trendDir = factors.momentum.score >= 0 ? 1 : -1;
+    const oiScore = Math.max(-100, Math.min(100, trendDir * oiChange * 5));
+    factors.openInterest = { name: 'Open Int.', score: oiScore, detail: `${oiChange>=0?'+':''}${oiChange.toFixed(1)}%` };
+  } else {
+    factors.openInterest = { name: 'Open Int.', score: 0, detail: 'N/A' };
+  }
+
+  // 14. BTC Dominance (rising dom = risk-off, bearish for alts but bullish for BTC)
+  if (state.btcDominance !== null) {
+    const dom = state.btcDominance;
+    const domScore = Math.max(-100, Math.min(100, (dom - 50) * 4));
+    factors.btcDom = { name: 'BTC Dom.', score: domScore, detail: `${dom.toFixed(1)}%` };
+  } else {
+    factors.btcDom = { name: 'BTC Dom.', score: 0, detail: 'N/A' };
+  }
+
+  // 15. ETH/BTC Ratio (falling = risk-off, BTC strength)
+  if (state.ethBtcRatio && isFinite(state.ethBtcRatio.change)) {
+    const ethScore = Math.max(-100, Math.min(100, -state.ethBtcRatio.change * 5));
+    factors.ethBtc = { name: 'ETH/BTC', score: ethScore, detail: `${state.ethBtcRatio.change>=0?'+':''}${state.ethBtcRatio.change.toFixed(2)}%` };
+  } else {
+    factors.ethBtc = { name: 'ETH/BTC', score: 0, detail: 'N/A' };
+  }
+
+  // 16. Halving Cycle (0-25% post-halving = accumulation/bullish, 50-75% = euphoria, 75-100% = exhaustion)
+  if (state.halvingCycle) {
+    const p = state.halvingCycle.progress;
+    let hScore;
+    if (p < 0.25) hScore = 60;       // accumulation phase
+    else if (p < 0.5) hScore = 40;   // early bull
+    else if (p < 0.75) hScore = 10;  // late bull
+    else hScore = -30;               // pre-halving cooldown
+    factors.halving = { name: 'Halving', score: hScore, detail: `${(p*100).toFixed(0)}%` };
+  } else {
+    factors.halving = { name: 'Halving', score: 0, detail: 'N/A' };
+  }
+
+  // Fear & Greed as a factor (not just external modifier)
+  if (state.fearGreed) {
+    const fgScore = (50 - state.fearGreed.value) / 50 * 80; // contrarian
+    factors.fearGreed = { name: 'Fear&Greed', score: fgScore, detail: `${state.fearGreed.value} ${state.fearGreed.label}` };
+  } else {
+    factors.fearGreed = { name: 'Fear&Greed', score: 0, detail: 'N/A' };
+  }
+
+  // Funding Rate as a factor
+  if (state.fundingRate !== null) {
+    const frScore = Math.max(-100, Math.min(100, -state.fundingRate * 50000));
+    factors.funding = { name: 'Funding', score: frScore, detail: `${(state.fundingRate*100).toFixed(4)}%` };
+  } else {
+    factors.funding = { name: 'Funding', score: 0, detail: 'N/A' };
+  }
+
+  // 17. Rainbow Z-Score (from historical pattern analysis — strongest macro signal)
+  if (state.patternData && state.patternData.growth && state.patternData.growth.rainbow) {
+    const z = state.patternData.growth.rainbow.zScore;
+    // z < -1.5 = very cheap (bullish), z > 1.5 = very expensive (bearish)
+    // Scale: z=-2 → +100, z=0 → 0, z=+2 → -100
+    const rbScore = Math.max(-100, Math.min(100, -z * 50));
+    factors.rainbow = { name: 'Rainbow', score: rbScore, detail: `z=${z.toFixed(2)}` };
+  } else {
+    factors.rainbow = { name: 'Rainbow', score: 0, detail: 'N/A' };
+  }
+
+  // 18. Seasonality (current month historical performance)
+  if (state.patternData && state.patternData.growth && state.patternData.growth.months) {
+    const curMonth = new Date().getMonth();
+    const mData = state.patternData.growth.months[curMonth];
+    if (mData) {
+      // Above 55% up = bullish, below 45% = bearish
+      const seaScore = Math.max(-100, Math.min(100, (mData.upPct - 50) * 4));
+      factors.seasonality = { name: 'Season', score: seaScore, detail: `${mData.name} ${mData.upPct.toFixed(0)}%` };
+    } else {
+      factors.seasonality = { name: 'Season', score: 0, detail: 'N/A' };
+    }
+  } else {
+    factors.seasonality = { name: 'Season', score: 0, detail: 'N/A' };
+  }
+
+  // 19. Pain/Drawdown contrarian (deep drawdown from ATH = historically bullish)
+  if (state.patternData && state.patternData.growth && state.patternData.growth.pain) {
+    const dd = state.patternData.growth.pain.currentDD;
+    // -50% DD → strong buy signal (+80), -20% → mild (+30), 0% (at ATH) → neutral, stays positive
+    const painScore = Math.max(-20, Math.min(100, dd * 1.6));
+    factors.painDD = { name: 'Drawdown', score: painScore, detail: `-${dd.toFixed(0)}% ATH` };
+  } else {
+    factors.painDD = { name: 'Drawdown', score: 0, detail: 'N/A' };
+  }
+
+  // Meta
+  factors._meta = { price, rsi, pats, gC, rC, N };
+  return factors;
+}
+
+function scoreHorizon(factors, weights) {
+  let raw = 0;
+  for (const [key, w] of Object.entries(weights)) {
+    const s = factors[key] && isFinite(factors[key].score) ? factors[key].score : 0;
+    raw += s * w;
+  }
+  const score = Math.max(-100, Math.min(100, isFinite(raw) ? raw : 0));
+  const direction = score >= 0 ? 'UP' : 'DOWN';
+  const probability = Math.round(50 + (Math.abs(score) / 100) * 35);
+  return { score, direction, probability };
+}
+
+function computePrediction(candles, dailyCandles) {
+  const factors = computeFactors(candles);
+
+  // If we have daily candles, blend daily RSI/MACD/Bollinger for LONG horizon
+  let dailyFactors = null;
+  if (dailyCandles && dailyCandles.length >= 30) {
+    dailyFactors = computeFactors(dailyCandles);
+  }
+
+  // Compute 3 horizons
+  const short = scoreHorizon(factors, HORIZON_WEIGHTS.SHORT);
+  const medium = scoreHorizon(factors, HORIZON_WEIGHTS.MEDIUM);
+
+  // For LONG: blend current + daily factors if available
+  let longFactors = factors;
+  if (dailyFactors) {
+    longFactors = { ...factors };
+    // Override trend indicators with daily timeframe data
+    for (const k of ['rsi', 'macd', 'bollinger', 'momentum', 'bodyMass']) {
+      if (dailyFactors[k]) longFactors[k] = dailyFactors[k];
+    }
+  }
+  const long = scoreHorizon(longFactors, HORIZON_WEIGHTS.LONG);
+
+  // ATR
+  const price = factors._meta.price;
+  const atr = calcATR(candles);
+  const atrPct = price===0?0:(atr/price)*100;
+
+  // Stats
+  const { gC, rC, N, rsi, pats } = factors._meta;
+  let largestBody = 0, lbTime = '', totalVol = 0;
+  for (const c of candles) {
+    const b = Math.abs(c.close-c.open);
+    if (b > largestBody) { largestBody = b; lbTime = new Date(c.timestamp).toISOString().slice(11,16); }
+    totalVol += c.volume;
+  }
+
+  // Build factor list for display (using SHORT weights for the detail view)
+  const displayFactors = [];
+  for (const [key, w] of Object.entries(HORIZON_WEIGHTS.SHORT)) {
+    if (factors[key]) displayFactors.push({ ...factors[key], w });
+  }
+
+  return {
+    short, medium, long,
+    factors: displayFactors,
+    allFactors: factors,
+    atrPct, rsi, patterns: pats,
+    stats: { greenCount: gC, redCount: rC, largestBody, largestTime: lbTime, avgVolume: totalVol/N },
+  };
+}
+
+// ============================================================
+// PATTERN ANALYSIS — Historical data
+// ============================================================
+async function fetchAllHistory(onProgress) {
+  onProgress && onProgress(10, 'Loading history.json...');
+  // Load daily candles from local pre-downloaded file
+  const resp = await fetch('history.json');
+  if (!resp.ok) throw new Error('history.json not found — run data download script first');
+  const candles = await resp.json();
+  if (!candles || candles.length < 100) throw new Error('history.json has too few candles (' + (candles ? candles.length : 0) + ')');
+  onProgress && onProgress(100, candles.length + ' daily candles loaded');
+  return candles;
+}
+
+function analyzePatterns(candles) {
+  const L = LANG[state.lang];
+  const N = candles.length;
+  const results = [];
+
+  // Helpers
+  const bodies = candles.map(c => Math.abs(c.c - c.o));
+  const avgBody = bodies.reduce((a, b) => a + b, 0) / N;
+  const stdBody = Math.sqrt(bodies.reduce((s, b) => s + (b - avgBody) ** 2, 0) / N);
+  const avgVol = candles.reduce((s, c) => s + c.v, 0) / N;
+  const dir = c => c.c >= c.o ? 1 : -1;
+
+  // 1. Streak reversal: after 3/5/7 same-color daily candles
+  for (const streakLen of [3, 5, 7]) {
+    let total = 0, reversed = 0;
+    for (let i = streakLen; i < N; i++) {
+      const d = dir(candles[i - 1]);
+      let ok = true;
+      for (let j = i - streakLen; j < i; j++) { if (dir(candles[j]) !== d) { ok = false; break; } }
+      if (ok) { total++; if (dir(candles[i]) !== d) reversed++; }
+    }
+    if (total > 20) {
+      const pct = reversed / total * 100;
+      results.push({
+        name: state.lang === 'ru' ? `${streakLen} дней подряд один цвет` : `${streakLen} days in a row same color`,
+        question: state.lang === 'ru' ? 'Следующий день будет противоположным?' : 'Will the next day be opposite?',
+        yes: reversed, total, pct,
+        verdict: pct > 55 ? (state.lang === 'ru' ? 'Да — тренд склонен разворачиваться' : 'Yes — trend tends to reverse')
+               : pct < 45 ? (state.lang === 'ru' ? 'Нет — тренд продолжается' : 'No — trend tends to continue')
+               : (state.lang === 'ru' ? 'Монетка — нет чёткого паттерна' : 'Coin flip — no clear pattern'),
+      });
+    }
+  }
+
+  // 2. Big candle (body > 2σ) → mean reversion within 3 days
+  {
+    let total = 0, reverted = 0;
+    for (let i = 0; i < N - 3; i++) {
+      if (bodies[i] > avgBody + 2 * stdBody) {
+        total++;
+        const d = dir(candles[i]);
+        for (let j = 1; j <= 3; j++) { if (dir(candles[i + j]) !== d) { reverted++; break; } }
+      }
+    }
+    if (total > 20) {
+      results.push({
+        name: state.lang === 'ru' ? 'Огромная свеча (аномально большая)' : 'Huge candle (abnormally large)',
+        question: state.lang === 'ru' ? 'Цена откатится в течение 3 дней?' : 'Will price bounce back within 3 days?',
+        yes: reverted, total, pct: reverted / total * 100,
+        verdict: reverted / total > 0.55
+          ? (state.lang === 'ru' ? 'Да — большие движения обычно частично откатываются' : 'Yes — big moves tend to partially reverse')
+          : (state.lang === 'ru' ? 'Ненадёжно' : 'Not reliably'),
+      });
+    }
+  }
+
+  // 3. Volume spike + red → bounce?
+  {
+    let total = 0, bounced = 0;
+    for (let i = 0; i < N - 1; i++) {
+      if (candles[i].v > avgVol * 2 && candles[i].c < candles[i].o) {
+        total++;
+        if (candles[i + 1].c > candles[i + 1].o) bounced++;
+      }
+    }
+    if (total > 20) {
+      results.push({
+        name: state.lang === 'ru' ? 'Распродажа на объёме (паника)' : 'High-volume sell-off (panic)',
+        question: state.lang === 'ru' ? 'Следующий день будет зелёным?' : 'Will the next day be green (recovery)?',
+        yes: bounced, total, pct: bounced / total * 100,
+        verdict: bounced / total > 0.53
+          ? (state.lang === 'ru' ? 'Да — паника часто ведёт к отскоку' : 'Yes — panic selling often leads to a bounce')
+          : (state.lang === 'ru' ? 'Ненадёжно' : 'Not reliably'),
+      });
+    }
+  }
+
+  // 4. Doji → reversal?
+  {
+    let total = 0, reversed = 0;
+    for (let i = 1; i < N - 1; i++) {
+      const range = candles[i].h - candles[i].l;
+      const body = Math.abs(candles[i].c - candles[i].o);
+      if (range > 0 && body / range < 0.1) {
+        total++;
+        if (dir(candles[i + 1]) !== dir(candles[i - 1])) reversed++;
+      }
+    }
+    if (total > 20) {
+      results.push({
+        name: state.lang === 'ru' ? 'Свеча неопределённости (Doji)' : 'Indecision candle (Doji)',
+        question: state.lang === 'ru' ? 'Направление меняется после Doji?' : 'Does direction reverse after indecision?',
+        yes: reversed, total, pct: reversed / total * 100,
+        verdict: reversed / total > 0.53
+          ? (state.lang === 'ru' ? 'Небольшая склонность к развороту' : 'Slight tendency to reverse')
+          : (state.lang === 'ru' ? 'Нет чёткого паттерна' : 'No clear pattern'),
+      });
+    }
+  }
+
+  // 5. Hammer → bullish?
+  {
+    let total = 0, bullish = 0;
+    for (let i = 0; i < N - 1; i++) {
+      const body = Math.abs(candles[i].c - candles[i].o);
+      const lw = Math.min(candles[i].o, candles[i].c) - candles[i].l;
+      const uw = candles[i].h - Math.max(candles[i].o, candles[i].c);
+      if (body > 0 && lw > body * 2 && uw < body * 0.5) {
+        total++;
+        if (candles[i + 1].c > candles[i + 1].o) bullish++;
+      }
+    }
+    if (total > 20) {
+      results.push({
+        name: state.lang === 'ru' ? 'Молот (длинная тень вниз)' : 'Hammer (long lower shadow)',
+        question: state.lang === 'ru' ? 'Следующий день зелёный?' : 'Is the next day green (bullish)?',
+        yes: bullish, total, pct: bullish / total * 100,
+        verdict: bullish / total > 0.53
+          ? (state.lang === 'ru' ? 'Да — покупатели вошли на дне' : 'Yes — buyers stepped in at the bottom')
+          : (state.lang === 'ru' ? 'Ненадёжно' : 'Not reliably'),
+      });
+    }
+  }
+
+  // 6. Shooting Star → bearish?
+  {
+    let total = 0, bearish = 0;
+    for (let i = 0; i < N - 1; i++) {
+      const body = Math.abs(candles[i].c - candles[i].o);
+      const uw = candles[i].h - Math.max(candles[i].o, candles[i].c);
+      const lw = Math.min(candles[i].o, candles[i].c) - candles[i].l;
+      if (body > 0 && uw > body * 2 && lw < body * 0.5) {
+        total++;
+        if (candles[i + 1].c < candles[i + 1].o) bearish++;
+      }
+    }
+    if (total > 20) {
+      results.push({
+        name: state.lang === 'ru' ? 'Падающая звезда (длинная тень вверх)' : 'Shooting star (long upper shadow)',
+        question: state.lang === 'ru' ? 'Следующий день красный?' : 'Is the next day red (bearish)?',
+        yes: bearish, total, pct: bearish / total * 100,
+        verdict: bearish / total > 0.53
+          ? (state.lang === 'ru' ? 'Да — продавцы отвергли вершину' : 'Yes — sellers rejected the top')
+          : (state.lang === 'ru' ? 'Ненадёжно' : 'Not reliably'),
+      });
+    }
+  }
+
+  // 7. Bull Engulfing → continuation?
+  {
+    let total = 0, contUp = 0;
+    for (let i = 1; i < N - 1; i++) {
+      const prev = candles[i - 1], curr = candles[i];
+      if (prev.c < prev.o && curr.c > curr.o && Math.abs(curr.c - curr.o) > Math.abs(prev.c - prev.o) * 1.5) {
+        total++;
+        if (candles[i + 1].c > candles[i + 1].o) contUp++;
+      }
+    }
+    if (total > 20) {
+      results.push({
+        name: state.lang === 'ru' ? 'Бычье поглощение (зелёная > красной)' : 'Bull Engulfing (green swallows red)',
+        question: state.lang === 'ru' ? 'Рост продолжится?' : 'Does the upward move continue?',
+        yes: contUp, total, pct: contUp / total * 100,
+        verdict: contUp / total > 0.53
+          ? (state.lang === 'ru' ? 'Да — сильный сигнал покупки подтверждён историей' : 'Yes — strong buy signal confirmed by history')
+          : (state.lang === 'ru' ? 'Ненадёжно' : 'Not reliably'),
+      });
+    }
+  }
+
+  // =============================================
+  // GROWTH & PULLBACK ANALYSIS
+  // User's hypothesis: "BTC always grows long-term but after growth peaks there's always a pullback"
+  // =============================================
+  const growth = {};
+
+  // A) Long-term growth: compare price at yearly intervals
+  {
+    const yearlyReturns = [];
+    for (let i = 0; i < N - 365; i += 30) {
+      const ret = ((candles[i + 365].c - candles[i].c) / candles[i].c) * 100;
+      yearlyReturns.push(ret);
+    }
+    if (yearlyReturns.length > 5) {
+      const positive = yearlyReturns.filter(r => r > 0).length;
+      growth.yearlyUp = positive;
+      growth.yearlyTotal = yearlyReturns.length;
+      growth.yearlyPct = positive / yearlyReturns.length * 100;
+      growth.avgReturn = yearlyReturns.reduce((a, b) => a + b, 0) / yearlyReturns.length;
+    }
+  }
+
+  // B) After strong weekly growth → pullback within next week?
+  growth.pullbacks = [];
+  for (const threshold of [10, 15, 20]) {
+    let total = 0, pulled = 0;
+    for (let i = 7; i < N - 7; i += 1) {
+      const weekReturn = ((candles[i].c - candles[i - 7].c) / candles[i - 7].c) * 100;
+      if (weekReturn >= threshold) {
+        total++;
+        // Check if next week has any day closing lower than current close
+        const nextWeekMin = Math.min(...candles.slice(i + 1, i + 8).map(c => c.l));
+        if (nextWeekMin < candles[i].c * 0.98) pulled++; // >2% pullback
+      }
+    }
+    if (total > 5) {
+      growth.pullbacks.push({ threshold, total, pulled, pct: pulled / total * 100 });
+    }
+  }
+
+  // C) Drawdown from ATH analysis
+  {
+    let ath = 0;
+    const drawdowns = [];
+    for (const c of candles) {
+      if (c.h > ath) ath = c.h;
+      const dd = ((ath - c.l) / ath) * 100;
+      drawdowns.push(dd);
+    }
+    const maxDD = Math.max(...drawdowns);
+    const avgDD = drawdowns.reduce((a, b) => a + b, 0) / drawdowns.length;
+    const bigDDs = drawdowns.filter(d => d > 20).length;
+    growth.maxDrawdown = maxDD;
+    growth.avgDrawdown = avgDD;
+    growth.daysBelow20pct = bigDDs;
+    growth.totalDays = N;
+  }
+
+  // D) First price vs last price (skip early $0 candles)
+  const firstReal = candles.find(c => c.c > 1) || candles[0];
+  growth.firstPrice = firstReal.c;
+  growth.firstDate = new Date(firstReal.t).toISOString().slice(0, 10);
+  growth.lastPrice = candles[N - 1].c;
+  growth.totalReturn = ((candles[N - 1].c - firstReal.c) / firstReal.c) * 100;
+
+  // =============================================
+  // E) Monthly seasonality — which months are best?
+  // =============================================
+  const months = {};
+  for (let i = 0; i < N - 30; i++) {
+    const m = new Date(candles[i].t).getMonth(); // 0-11
+    const ret = ((candles[Math.min(i + 30, N - 1)].c - candles[i].c) / candles[i].c) * 100;
+    if (!months[m]) months[m] = { up: 0, total: 0, returns: [] };
+    months[m].total++;
+    months[m].returns.push(ret);
+    if (ret > 0) months[m].up++;
+  }
+  growth.months = [];
+  const mNames = state.lang === 'ru'
+    ? ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
+    : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for (let m = 0; m < 12; m++) {
+    if (months[m] && months[m].total > 20) {
+      const d = months[m];
+      const avgRet = d.returns.reduce((a, b) => a + b, 0) / d.returns.length;
+      growth.months.push({ name: mNames[m], upPct: d.up / d.total * 100, avgRet, total: d.total });
+    }
+  }
+
+  // =============================================
+  // F) Recovery after big drops: after -30% from ATH, how long to recover?
+  // =============================================
+  {
+    let ath = 0;
+    const recoveries = [];
+    let inDrop = false, dropStart = -1;
+    for (let i = 0; i < N; i++) {
+      if (candles[i].h > ath) ath = candles[i].h;
+      const dd = ((ath - candles[i].c) / ath) * 100;
+      if (!inDrop && dd >= 30) {
+        inDrop = true;
+        dropStart = i;
+      } else if (inDrop && candles[i].c >= ath * 0.95) {
+        // recovered to within 5% of ATH
+        recoveries.push(i - dropStart);
+        inDrop = false;
+      }
+    }
+    if (recoveries.length > 0) {
+      growth.recoveries = {
+        count: recoveries.length,
+        avgDays: Math.round(recoveries.reduce((a, b) => a + b, 0) / recoveries.length),
+        minDays: Math.min(...recoveries),
+        maxDays: Math.max(...recoveries),
+        stillDown: inDrop,
+      };
+    }
+  }
+
+  // =============================================
+  // G) HODL TABLE — profit probability by holding period
+  // =============================================
+  {
+    const periods = [
+      { days: 1, label: state.lang === 'ru' ? '1 день' : '1 day' },
+      { days: 7, label: state.lang === 'ru' ? '1 неделя' : '1 week' },
+      { days: 30, label: state.lang === 'ru' ? '1 месяц' : '1 month' },
+      { days: 90, label: state.lang === 'ru' ? '3 месяца' : '3 months' },
+      { days: 180, label: state.lang === 'ru' ? '6 месяцев' : '6 months' },
+      { days: 365, label: state.lang === 'ru' ? '1 год' : '1 year' },
+      { days: 730, label: state.lang === 'ru' ? '2 года' : '2 years' },
+      { days: 1095, label: state.lang === 'ru' ? '3 года' : '3 years' },
+      { days: 1460, label: state.lang === 'ru' ? '4 года' : '4 years' },
+    ];
+    growth.hodl = [];
+    // Skip early candles with price < $1 to avoid distortion
+    const startIdx = candles.findIndex(c => c.c > 1);
+    for (const p of periods) {
+      const returns = [];
+      for (let i = Math.max(0, startIdx); i < N - p.days; i++) {
+        if (candles[i].c <= 0) continue;
+        returns.push(((candles[i + p.days].c - candles[i].c) / candles[i].c) * 100);
+      }
+      if (returns.length < 10) continue;
+      returns.sort((a, b) => a - b);
+      const profitable = returns.filter(r => r > 0).length;
+      const median = returns[Math.floor(returns.length / 2)];
+      const p5 = returns[Math.floor(returns.length * 0.05)];
+      const p95 = returns[Math.floor(returns.length * 0.95)];
+      growth.hodl.push({
+        label: p.label, days: p.days, n: returns.length,
+        profitPct: profitable / returns.length * 100,
+        median, p5, p95,
+      });
+    }
+  }
+
+  // =============================================
+  // H) HALVING CYCLE — position and historical returns by phase
+  // =============================================
+  {
+    const halvings = [
+      new Date('2012-11-28').getTime(),
+      new Date('2016-07-09').getTime(),
+      new Date('2020-05-11').getTime(),
+      new Date('2024-04-20').getTime(),
+    ];
+    const cycleLen = 1461 * 86400000; // ~4 years in ms
+    const nextHalving = halvings[halvings.length - 1] + cycleLen;
+    const lastT = candles[N - 1].t;
+    const daysSinceLast = (lastT - halvings[halvings.length - 1]) / 86400000;
+    const currentPct = Math.min(100, daysSinceLast / 1461 * 100);
+
+    // Bucket returns by cycle position (10 buckets)
+    const buckets = Array.from({ length: 10 }, () => ({ returns: [], n: 0 }));
+    for (let i = 0; i < N - 30; i++) {
+      const t = candles[i].t;
+      // Find which cycle
+      let cycleStart = null;
+      for (let h = halvings.length - 1; h >= 0; h--) {
+        if (t >= halvings[h]) { cycleStart = halvings[h]; break; }
+      }
+      if (!cycleStart) continue;
+      const pos = (t - cycleStart) / cycleLen;
+      if (pos >= 1) continue;
+      const bucket = Math.min(9, Math.floor(pos * 10));
+      if (candles[i].c <= 0) continue;
+      const ret = ((candles[i + 30].c - candles[i].c) / candles[i].c) * 100;
+      buckets[bucket].returns.push(ret);
+      buckets[bucket].n++;
+    }
+
+    growth.halving = {
+      currentPct: Math.round(currentPct),
+      daysSinceLast: Math.round(daysSinceLast),
+      nextHalvingEst: new Date(nextHalving).toISOString().slice(0, 7),
+      buckets: buckets.map((b, i) => ({
+        from: i * 10, to: (i + 1) * 10,
+        avgRet: b.returns.length > 0 ? b.returns.reduce((a, v) => a + v, 0) / b.returns.length : 0,
+        n: b.n,
+      })),
+    };
+  }
+
+  // =============================================
+  // I) RAINBOW PRICE — log regression + z-score zones
+  // =============================================
+  {
+    // Skip zero/tiny prices for regression
+    const valid = candles.filter(c => c.c > 1);
+    const n = valid.length;
+    if (n > 100) {
+      const xs = valid.map((_, i) => i);
+      const ys = valid.map(c => Math.log(c.c));
+      const xMean = xs.reduce((a, b) => a + b, 0) / n;
+      const yMean = ys.reduce((a, b) => a + b, 0) / n;
+      let num = 0, den = 0;
+      for (let i = 0; i < n; i++) {
+        num += (xs[i] - xMean) * (ys[i] - yMean);
+        den += (xs[i] - xMean) ** 2;
+      }
+      const slope = num / den;
+      const intercept = yMean - slope * xMean;
+      const residuals = ys.map((y, i) => y - (slope * xs[i] + intercept));
+      const stdRes = Math.sqrt(residuals.reduce((s, r) => s + r * r, 0) / n);
+
+      const lastIdx = n - 1;
+      const expected = Math.exp(slope * lastIdx + intercept);
+      const zScore = residuals[lastIdx] / stdRes;
+
+      // Backtest zones
+      const zones = [
+        { name: state.lang === 'ru' ? 'ОЧЕНЬ ДЁШЕВО' : 'VERY CHEAP', min: -Infinity, max: -1.5 },
+        { name: state.lang === 'ru' ? 'Ниже тренда' : 'Below trend', min: -1.5, max: -0.5 },
+        { name: state.lang === 'ru' ? 'Справедливая цена' : 'Fair value', min: -0.5, max: 0.5 },
+        { name: state.lang === 'ru' ? 'Выше тренда' : 'Above trend', min: 0.5, max: 1.5 },
+        { name: state.lang === 'ru' ? 'ОЧЕНЬ ДОРОГО' : 'VERY EXPENSIVE', min: 1.5, max: Infinity },
+      ];
+      for (const z of zones) {
+        z.total = 0; z.profitable = 0; z.returns = [];
+      }
+      for (let i = 0; i < n - 90; i++) {
+        const zs = residuals[i] / stdRes;
+        const ret = ((valid[i + 90].c - valid[i].c) / valid[i].c) * 100;
+        for (const z of zones) {
+          if (zs > z.min && zs <= z.max) {
+            z.total++;
+            z.returns.push(ret);
+            if (ret > 0) z.profitable++;
+            break;
+          }
+        }
+      }
+      for (const z of zones) {
+        z.profitPct = z.total > 0 ? z.profitable / z.total * 100 : 0;
+        z.avgRet = z.returns.length > 0 ? z.returns.reduce((a, b) => a + b, 0) / z.returns.length : 0;
+      }
+
+      growth.rainbow = { expected, zScore, zones, currentPrice: candles[N - 1].c };
+    }
+  }
+
+  // =============================================
+  // J) PAIN DURATION — time spent below ATH at various levels
+  // =============================================
+  {
+    let ath = 0;
+    const thresholds = [5, 10, 20, 30, 40, 50, 60, 70, 80];
+    const counts = {};
+    thresholds.forEach(t => counts[t] = 0);
+    let daysAtAth = 0;
+
+    for (const c of candles) {
+      if (c.h >= ath) {
+        if (c.h > ath) ath = c.h;
+        daysAtAth++;
+      }
+      const dd = ((ath - c.c) / ath) * 100;
+      for (const t of thresholds) {
+        if (dd >= t) counts[t]++;
+      }
+    }
+
+    const currentDD = ((ath - candles[N - 1].c) / ath) * 100;
+    // What % of time BTC was at same or worse drawdown
+    let worseOrEqual = 0;
+    let tempAth = 0;
+    for (const c of candles) {
+      if (c.h > tempAth) tempAth = c.h;
+      if (((tempAth - c.c) / tempAth) * 100 >= currentDD) worseOrEqual++;
+    }
+
+    growth.pain = {
+      thresholds: thresholds.map(t => ({ level: t, days: counts[t], pct: counts[t] / N * 100 })),
+      currentDD, ath, daysAtAth, pctAtAth: daysAtAth / N * 100,
+      normalPct: worseOrEqual / N * 100,
+    };
+  }
+
+  // =============================================
+  // K) ROUND NUMBERS — approach/break/reject analysis
+  // =============================================
+  {
+    const levels = [1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 100000];
+    const lastPrice = candles[N - 1].c;
+    growth.roundNumbers = [];
+    for (const level of levels) {
+      if (lastPrice < level * 0.3) continue; // too far above current price
+      if (candles.filter(c => c.h > level * 0.8).length < 5) continue; // not enough data near this level
+      let approaches = 0, breakthroughs = 0;
+      let i = 0;
+      while (i < N - 7) {
+        // Price within 5% below the round number
+        if (candles[i].c >= level * 0.95 && candles[i].c < level) {
+          approaches++;
+          // Check if breaks above within 7 days
+          let broke = false;
+          for (let j = 1; j <= 7 && i + j < N; j++) {
+            if (candles[i + j].c > level * 1.02) { broke = true; break; }
+          }
+          if (broke) breakthroughs++;
+          i += 8; // skip ahead to avoid double-counting
+        } else {
+          i++;
+        }
+      }
+      if (approaches >= 3) {
+        growth.roundNumbers.push({
+          level, approaches, breakthroughs,
+          breakPct: breakthroughs / approaches * 100,
+          rejectPct: (1 - breakthroughs / approaches) * 100,
+        });
+      }
+    }
+  }
+
+  // =============================================
+  // L) MOMENTUM TRAP — acceleration predicts pullback
+  // =============================================
+  {
+    let accelEvents = 0, pullbacks = 0;
+    const window = 30;
+    for (let i = window * 2; i < N - window; i++) {
+      if (candles[i].c <= 0 || candles[i - window].c <= 0 || candles[i - window * 2].c <= 0) continue;
+      const recentRet = ((candles[i].c - candles[i - window].c) / candles[i - window].c) * 100;
+      const priorRet = ((candles[i - window].c - candles[i - window * 2].c) / candles[i - window * 2].c) * 100;
+      if (recentRet > 0 && priorRet > 0 && recentRet > priorRet * 3 && recentRet > 10) {
+        accelEvents++;
+        // Check if >10% drop within next 30 days
+        const peakAfter = Math.max(...candles.slice(i, i + window + 1).map(c => c.h));
+        const lowAfter = Math.min(...candles.slice(i, i + window + 1).map(c => c.l));
+        if ((peakAfter - lowAfter) / peakAfter * 100 > 10) pullbacks++;
+      }
+    }
+
+    // Current status
+    let currentAccel = null;
+    if (N >= window * 2) {
+      const recent = ((candles[N - 1].c - candles[N - 1 - window].c) / candles[N - 1 - window].c) * 100;
+      const prior = ((candles[N - 1 - window].c - candles[N - 1 - window * 2].c) / candles[N - 1 - window * 2].c) * 100;
+      if (prior > 0) currentAccel = { recent, prior, ratio: recent / prior };
+    }
+
+    growth.momentum = {
+      accelEvents, pullbacks,
+      pullbackPct: accelEvents > 0 ? pullbacks / accelEvents * 100 : 0,
+      current: currentAccel,
+    };
+  }
+
+  return {
+    results, growth, totalCandles: N,
+    fromDate: new Date(candles[0].t).toISOString().slice(0, 10),
+    toDate: new Date(candles[N - 1].t).toISOString().slice(0, 10),
+  };
+}
+
+async function loadPatterns() {
+  if (state.patternData) { state.showPatterns = !state.showPatterns; renderPatternBlock(); return; }
+  if (state.patternLoading) return;
+  state.patternLoading = true;
+  state.showPatterns = true;
+
+  const L = LANG[state.lang];
+  const out = document.getElementById('patterns-output');
+  out.innerHTML = `<span class="loading">  ${L.patternLoading}</span>\n  <span class="dim">${L.patternProgress} </span><span id="pattern-progress" class="yellow">...</span><span class="blink">_</span>`;
+
+  try {
+    const candles = await fetchAllHistory((pct, msg) => {
+      const el = document.getElementById('pattern-progress');
+      if (el) el.textContent = `${pct}% — ${msg}`;
+    });
+    state.patternRawCandles = candles;
+    state.patternData = analyzePatterns(candles);
+    state.patternLoading = false;
+    renderPatternBlock();
+  } catch (err) {
+    state.patternLoading = false;
+    out.innerHTML = `<span class="error">  Failed to load history: ${err.message}</span>`;
+  }
+}
+
+function renderPatternBlock() {
+  const out = document.getElementById('patterns-output');
+  if (!state.showPatterns || !state.patternData) { out.innerHTML = ''; return; }
+
+  const L = LANG[state.lang];
+  const { results, growth, totalCandles, fromDate, toDate } = state.patternData;
+
+  function makeBar(pct, w) {
+    w = w || 20;
+    const filled = Math.round((pct / 100) * w);
+    const cls = pct >= 55 ? 'bar-green' : pct <= 45 ? 'bar-red' : 'yellow';
+    let b = '';
+    for (let i = 0; i < w; i++) b += i < filled ? `<span class="${cls}">█</span>` : '<span class="dim">░</span>';
+    return { bar: b, cls };
+  }
+
+  let h = '';
+  h += `\n<span class="cyan">╔══════════════════════════════════════════════════════════╗</span>\n`;
+  h += `<span class="cyan">║</span> <span class="white bold"> ${L.patternLab}</span>\n`;
+  h += `<span class="cyan">║</span> <span class="dim"> ${totalCandles.toLocaleString()} ${L.patternCandles} │ ${fromDate} → ${toDate}</span>\n`;
+  h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+
+  // Candle patterns
+  for (const p of results) {
+    const { bar, cls } = makeBar(p.pct);
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="white bold">${p.name}</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="cyan">Q:</span> ${p.question}\n`;
+    h += `<span class="cyan">║</span>  [${bar}] <span class="${cls} bold">${p.pct.toFixed(1)}%</span> <span class="dim">(${p.yes}/${p.total})</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">→</span> ${p.verdict}\n`;
+  }
+
+  // Growth & Pullback section
+  if (growth) {
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${L.patternGrowth}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+
+    // Total return
+    if (growth.totalReturn !== undefined) {
+      const retCls = growth.totalReturn > 0 ? 'bar-green' : 'bar-red';
+      const sign = growth.totalReturn > 0 ? '+' : '';
+      h += `<span class="cyan">║</span>  <span class="white bold">${L.patternAlwaysGrows}</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${growth.firstDate || '?'}: $${growth.firstPrice.toFixed(0)} → $${growth.lastPrice.toFixed(0)}</span>  <span class="${retCls} bold">${sign}${growth.totalReturn.toFixed(0)}%</span>\n`;
+    }
+
+    // Yearly returns
+    if (growth.yearlyTotal) {
+      const { bar, cls } = makeBar(growth.yearlyPct);
+      const avgSign = growth.avgReturn > 0 ? '+' : '';
+      h += `<span class="cyan">║</span>  [${bar}] <span class="${cls} bold">${growth.yearlyPct.toFixed(0)}%</span> <span class="dim">${state.lang === 'ru' ? 'лет с ростом' : 'of years profitable'} (${growth.yearlyUp}/${growth.yearlyTotal})</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${state.lang === 'ru' ? 'Средний годовой рост' : 'Avg yearly return'}:</span> <span class="${growth.avgReturn > 0 ? 'bar-green' : 'bar-red'}">${avgSign}${growth.avgReturn.toFixed(0)}%</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">→</span> ${growth.yearlyPct > 60
+        ? (state.lang === 'ru' ? 'Да — BTC растёт в большинстве годовых периодов' : 'Yes — BTC grows in most yearly periods')
+        : (state.lang === 'ru' ? 'Не всегда — зависит от точки входа' : 'Not always — depends on entry point')}\n`;
+    }
+
+    // Drawdown stats
+    if (growth.maxDrawdown) {
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${state.lang === 'ru' ? 'Макс. просадка от максимума' : 'Max drawdown from ATH'}:</span> <span class="bar-red">-${growth.maxDrawdown.toFixed(0)}%</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${state.lang === 'ru' ? 'Дней с просадкой >20%' : 'Days with >20% drawdown'}:</span> <span class="yellow">${growth.daysBelow20pct}</span><span class="dim">/${growth.totalDays} (${(growth.daysBelow20pct/growth.totalDays*100).toFixed(0)}%)</span>\n`;
+    }
+
+    // Pullback after growth
+    if (growth.pullbacks && growth.pullbacks.length > 0) {
+      h += `<span class="cyan">║</span>\n`;
+      for (const pb of growth.pullbacks) {
+        const q = L.patternAfterPeak.replace('{pct}', pb.threshold);
+        const { bar, cls } = makeBar(pb.pct);
+        h += `<span class="cyan">║</span>  <span class="white bold">${q}</span>\n`;
+        h += `<span class="cyan">║</span>  [${bar}] <span class="${cls} bold">${pb.pct.toFixed(0)}%</span> <span class="dim">(${pb.pulled}/${pb.total})</span>\n`;
+        h += `<span class="cyan">║</span>  <span class="dim">→</span> ${pb.pct > 60
+          ? (state.lang === 'ru' ? 'Да — после сильного роста обычно следует коррекция' : 'Yes — strong growth usually leads to a pullback')
+          : pb.pct > 45
+            ? (state.lang === 'ru' ? 'Часто, но не всегда' : 'Often, but not always')
+            : (state.lang === 'ru' ? 'Нет — рост чаще продолжается' : 'No — growth tends to continue')}\n`;
+      }
+    }
+
+    // Monthly seasonality
+    if (growth.months && growth.months.length > 0) {
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+      h += `<span class="cyan">║</span> <span class="yellow bold"> ${state.lang === 'ru' ? 'СЕЗОННОСТЬ ПО МЕСЯЦАМ' : 'MONTHLY SEASONALITY'}</span>\n`;
+      h += `<span class="cyan">║</span>\n`;
+      for (const m of growth.months) {
+        const { bar, cls } = makeBar(m.upPct, 12);
+        const retSign = m.avgRet > 0 ? '+' : '';
+        const retCls = m.avgRet > 0 ? 'bar-green' : 'bar-red';
+        h += `<span class="cyan">║</span>  <span class="white bold">${m.name}</span>  [${bar}] <span class="${cls}">${m.upPct.toFixed(0)}%</span> ${state.lang === 'ru' ? 'рост' : 'up'}  <span class="${retCls}">${retSign}${m.avgRet.toFixed(1)}%</span> ${state.lang === 'ru' ? 'средн.' : 'avg'}\n`;
+      }
+      // Highlight best/worst
+      const best = growth.months.reduce((a, b) => a.avgRet > b.avgRet ? a : b);
+      const worst = growth.months.reduce((a, b) => a.avgRet < b.avgRet ? a : b);
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">→</span> ${state.lang === 'ru' ? 'Лучший месяц' : 'Best month'}: <span class="bar-green bold">${best.name}</span> <span class="dim">(+${best.avgRet.toFixed(1)}%)</span>  ${state.lang === 'ru' ? 'Худший' : 'Worst'}: <span class="bar-red bold">${worst.name}</span> <span class="dim">(${worst.avgRet.toFixed(1)}%)</span>\n`;
+    }
+
+    // Recovery after crashes
+    if (growth.recoveries) {
+      const r = growth.recoveries;
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+      h += `<span class="cyan">║</span> <span class="yellow bold"> ${state.lang === 'ru' ? 'ВОССТАНОВЛЕНИЕ ПОСЛЕ ПАДЕНИЙ' : 'RECOVERY AFTER CRASHES'}</span>\n`;
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="white">${state.lang === 'ru' ? 'После падения >30% от максимума' : 'After >30% drop from ATH'}:</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${state.lang === 'ru' ? 'Случаев' : 'Occurrences'}:</span> <span class="white bold">${r.count}</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${state.lang === 'ru' ? 'Среднее восстановление' : 'Avg recovery'}:</span> <span class="yellow bold">${r.avgDays}</span> <span class="dim">${state.lang === 'ru' ? 'дней' : 'days'}</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${state.lang === 'ru' ? 'Быстрее всего' : 'Fastest'}:</span> <span class="bar-green">${r.minDays}</span> <span class="dim">${state.lang === 'ru' ? 'дней' : 'days'}</span>  <span class="dim">${state.lang === 'ru' ? 'Дольше всего' : 'Slowest'}:</span> <span class="bar-red">${r.maxDays}</span> <span class="dim">${state.lang === 'ru' ? 'дней' : 'days'}</span>\n`;
+      if (r.stillDown) {
+        h += `<span class="cyan">║</span>  <span class="yellow">⚠ ${state.lang === 'ru' ? 'Сейчас в фазе восстановления' : 'Currently in recovery phase'}</span>\n`;
+      }
+      h += `<span class="cyan">║</span>  <span class="dim">→ ${state.lang === 'ru' ? 'BTC всегда восстанавливался после падений' : 'BTC has always recovered from every crash'}</span>\n`;
+    }
+  }
+
+  // HODL Table
+  if (growth.hodl && growth.hodl.length > 0) {
+    const ru = state.lang === 'ru';
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${ru ? 'ТАБЛИЦА ХОДЛЕРА — А если просто держать?' : 'HODL TABLE — What If You Just Hold?'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${(ru ? 'Срок       Прибыль  Медиана  Худш.5%  Лучш.5%' : 'Hold       Profit   Median   Worst5%  Best5%').padEnd(56)}</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${'─'.repeat(54)}</span>\n`;
+    for (const p of growth.hodl) {
+      const { bar, cls } = makeBar(p.profitPct, 8);
+      const medSign = p.median >= 0 ? '+' : '';
+      const p5Sign = p.p5 >= 0 ? '+' : '';
+      const p95Sign = p.p95 >= 0 ? '+' : '';
+      const medCls = p.median >= 0 ? 'bar-green' : 'bar-red';
+      const p5Cls = p.p5 >= 0 ? 'bar-green' : 'bar-red';
+      h += `<span class="cyan">║</span>  <span class="white bold">${p.label.padEnd(10)}</span> [${bar}] <span class="${cls}">${p.profitPct.toFixed(0).padStart(3)}%</span>  <span class="${medCls}">${(medSign + p.median.toFixed(0) + '%').padStart(7)}</span>  <span class="${p5Cls}">${(p5Sign + p.p5.toFixed(0) + '%').padStart(7)}</span>  <span class="bar-green">${(p95Sign + p.p95.toFixed(0) + '%').padStart(7)}</span>\n`;
+    }
+    // Find the first period with 100% profit
+    const perfect = growth.hodl.find(p => p.profitPct >= 99.5);
+    if (perfect) {
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="bar-green bold">→ ${ru ? `BTC НИКОГДА не был убыточным за ${perfect.label}` : `BTC has NEVER lost money over any ${perfect.label} period`}</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">  ${ru ? 'Чем дольше держите — тем выше шансы' : 'The longer you hold, the more the odds favor you'}</span>\n`;
+    }
+  }
+
+  // Halving Cycle
+  if (growth.halving) {
+    const ru = state.lang === 'ru';
+    const hv = growth.halving;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${ru ? 'ЦИКЛ ХАЛВИНГА — Где мы сейчас?' : 'HALVING CYCLE — Where Are We Now?'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Халвинги' : 'Halvings'}: 2012 │ 2016 │ 2020 │ 2024 │ ~${hv.nextHalvingEst}</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="white">${ru ? 'Сейчас' : 'Current'}: <span class="yellow bold">${hv.currentPct}%</span> ${ru ? 'цикла' : 'into cycle'} (${hv.daysSinceLast} ${ru ? 'дней от халвинга' : 'days since halving'})</span>\n`;
+    // Timeline bar
+    const pos = Math.round(hv.currentPct / 100 * 30);
+    let timeline = '';
+    for (let i = 0; i < 30; i++) {
+      if (i === pos) timeline += '<span class="white bold">▼</span>';
+      else if (i < pos) timeline += '<span class="bar-green">█</span>';
+      else timeline += '<span class="dim">░</span>';
+    }
+    h += `<span class="cyan">║</span>  [${timeline}]\n`;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Средн. доходность за 30 дней по фазе цикла:' : 'Avg 30-day return by cycle phase:'}</span>\n`;
+    for (const b of hv.buckets) {
+      const isCurrent = hv.currentPct >= b.from && hv.currentPct < b.to;
+      const retCls = b.avgRet > 5 ? 'bar-green' : b.avgRet < -3 ? 'bar-red' : 'yellow';
+      const sign = b.avgRet >= 0 ? '+' : '';
+      const marker = isCurrent ? ' <span class="white bold">← ' + (ru ? 'ВЫ ЗДЕСЬ' : 'YOU ARE HERE') + '</span>' : '';
+      const { bar } = makeBar(Math.max(0, Math.min(100, (b.avgRet + 20) / 60 * 100)), 10);
+      h += `<span class="cyan">║</span>  <span class="dim">${String(b.from).padStart(2)}-${String(b.to).padEnd(3)}%</span> [${bar}] <span class="${retCls}">${(sign + b.avgRet.toFixed(0) + '%').padStart(5)}</span>${marker}\n`;
+    }
+    // Verdict
+    const phase = hv.currentPct < 30 ? (ru ? 'Начало цикла — исторически ЛУЧШЕЕ время для накопления' : 'Early cycle — historically the BEST time to accumulate')
+                : hv.currentPct < 60 ? (ru ? 'Середина цикла — доходность исторически слабеет' : 'Mid-cycle — returns historically weaken here')
+                : (ru ? 'Поздняя фаза — приближается следующий халвинг' : 'Late cycle — approaching next halving');
+    h += `<span class="cyan">║</span>  <span class="dim">→</span> ${phase}\n`;
+  }
+
+  // Rainbow Price
+  if (growth.rainbow) {
+    const ru = state.lang === 'ru';
+    const rb = growth.rainbow;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${ru ? 'РАДУГА ЦЕНЫ — Дёшево или дорого сейчас?' : 'RAINBOW PRICE — Cheap or Expensive Right Now?'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Тренд (лог-регрессия 16 лет)' : 'Trend (16-year log regression)'}:</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Ожидаемая цена' : 'Expected price'}:</span> <span class="white">$${Math.round(rb.expected).toLocaleString()}</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Текущая цена' : 'Current price'}:</span> <span class="white bold">$${Math.round(rb.currentPrice).toLocaleString()}</span>\n`;
+    const zCls = rb.zScore < -0.5 ? 'bar-green' : rb.zScore > 0.5 ? 'bar-red' : 'yellow';
+    h += `<span class="cyan">║</span>  <span class="dim">Z-score:</span> <span class="${zCls} bold">${rb.zScore.toFixed(2)}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    // Zone table
+    for (const z of rb.zones) {
+      const isCurrent = rb.zScore > z.min && rb.zScore <= z.max;
+      const cls = z.profitPct > 65 ? 'bar-green' : z.profitPct < 40 ? 'bar-red' : 'yellow';
+      const retSign = z.avgRet >= 0 ? '+' : '';
+      const marker = isCurrent ? '<span class="white bold"> ←</span>' : '';
+      const { bar } = makeBar(z.profitPct, 8);
+      h += `<span class="cyan">║</span>  ${isCurrent ? '<span class="white bold">→</span>' : ' '} <span class="${isCurrent ? 'white bold' : 'dim'}">${z.name.padEnd(18)}</span> [${bar}] <span class="${cls}">${z.profitPct.toFixed(0)}%</span> ${ru ? 'прибыль' : 'win'}  <span class="${z.avgRet >= 0 ? 'bar-green' : 'bar-red'}">${retSign}${z.avgRet.toFixed(0)}%</span> ${ru ? 'средн.' : 'avg'}${marker}\n`;
+    }
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Примечание: ранние данные (2010-2013) завышают тренд' : 'Note: early data (2010-2013) inflates trend estimates'}</span>\n`;
+  }
+
+  // Pain Duration
+  if (growth.pain) {
+    const ru = state.lang === 'ru';
+    const p = growth.pain;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${ru ? 'ДЛИТЕЛЬНОСТЬ БОЛИ — Как долго длится просадка?' : 'PAIN DURATION — How Long Does the Dip Last?'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'BTC проводит большую часть времени НИЖЕ своего максимума.' : 'BTC spends most of its life BELOW its all-time high.'}</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Это нормально.' : 'This is normal.'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    for (const t of p.thresholds) {
+      const { bar } = makeBar(t.pct, 14);
+      h += `<span class="cyan">║</span>  <span class="dim">>${String(t.level).padStart(2)}% ${ru ? 'ниже ATH' : 'below ATH'}:</span> [${bar}] <span class="yellow">${t.pct.toFixed(0)}%</span> <span class="dim">${ru ? 'времени' : 'of time'}</span>\n`;
+    }
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="white">${ru ? 'Сейчас' : 'Now'}: <span class="${p.currentDD > 30 ? 'bar-red' : p.currentDD > 10 ? 'yellow' : 'bar-green'} bold">-${p.currentDD.toFixed(0)}%</span> ${ru ? 'от ATH' : 'from ATH'} ($${Math.round(p.ath).toLocaleString()})</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">→ ${ru ? 'Это НОРМАЛЬНО. BTC был здесь или хуже' : 'This is NORMAL. BTC has been here or worse'} <span class="white">${p.normalPct.toFixed(0)}%</span> ${ru ? 'всего времени' : 'of all time'}</span>\n`;
+  }
+
+  // Round Numbers
+  if (growth.roundNumbers && growth.roundNumbers.length > 0) {
+    const ru = state.lang === 'ru';
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${ru ? 'КРУГЛЫЕ ЧИСЛА — Психологические барьеры' : 'ROUND NUMBERS — The Psychological Barrier Effect'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    const lastPrice = growth.lastPrice || 0;
+    for (const r of growth.roundNumbers) {
+      const isCurrent = lastPrice >= r.level * 0.85 && lastPrice <= r.level * 1.15;
+      const { bar, cls } = makeBar(r.rejectPct, 10);
+      const marker = isCurrent ? ' <span class="white bold">← ' + (ru ? 'ЗОНА' : 'ZONE') + '</span>' : '';
+      h += `<span class="cyan">║</span>  <span class="white bold">$${(r.level / 1000).toFixed(0)}k</span>  <span class="dim">${r.approaches} ${ru ? 'подходов' : 'approaches'} →</span> <span class="bar-red">${r.rejectPct.toFixed(0)}%</span> <span class="dim">${ru ? 'отскок' : 'rejected'}</span> <span class="bar-green">${r.breakPct.toFixed(0)}%</span> <span class="dim">${ru ? 'пробил' : 'broke'}${marker}</span>\n`;
+    }
+    // Find next resistance
+    const nextRes = growth.roundNumbers.find(r => r.level > lastPrice);
+    if (nextRes) {
+      h += `<span class="cyan">║</span>  <span class="dim">→ ${ru ? 'Следующий барьер' : 'Next barrier'}: <span class="yellow bold">$${(nextRes.level / 1000).toFixed(0)}k</span> (${nextRes.rejectPct.toFixed(0)}% ${ru ? 'исторических отскоков' : 'historical rejections'})</span>\n`;
+    }
+  }
+
+  // Momentum Trap
+  if (growth.momentum && growth.momentum.accelEvents > 0) {
+    const ru = state.lang === 'ru';
+    const m = growth.momentum;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">╠══════════════════════════════════════════════════════════╣</span>\n`;
+    h += `<span class="cyan">║</span> <span class="yellow bold"> ${ru ? 'ЛОВУШКА МОМЕНТУМА — Когда рост слишком быстрый' : 'MOMENTUM TRAP — When Growth Gets Too Fast'}</span>\n`;
+    h += `<span class="cyan">║</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Когда скорость роста ускоряется в 3+ раз:' : 'When growth speed accelerates 3x+:'}</span>\n`;
+    const { bar, cls } = makeBar(m.pullbackPct, 12);
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Ускорений найдено' : 'Acceleration events'}:</span> <span class="white">${m.accelEvents}</span>\n`;
+    h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Из них коррекция >10%' : 'Followed by >10% drop'}:</span> [${bar}] <span class="${cls} bold">${m.pullbackPct.toFixed(0)}%</span> <span class="dim">(${m.pullbacks}/${m.accelEvents})</span>\n`;
+    if (m.current) {
+      const ratCls = m.current.ratio > 3 ? 'bar-red' : m.current.ratio > 1.5 ? 'yellow' : 'bar-green';
+      h += `<span class="cyan">║</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="white">${ru ? 'Сейчас' : 'Now'}:</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Рост за 30д' : '30d return'}:</span> <span class="${m.current.recent > 0 ? 'bar-green' : 'bar-red'}">${m.current.recent >= 0 ? '+' : ''}${m.current.recent.toFixed(1)}%</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Рост за пред. 30д' : 'Prior 30d'}:</span> <span class="${m.current.prior > 0 ? 'bar-green' : 'bar-red'}">${m.current.prior >= 0 ? '+' : ''}${m.current.prior.toFixed(1)}%</span>\n`;
+      h += `<span class="cyan">║</span>  <span class="dim">${ru ? 'Ускорение' : 'Acceleration'}:</span> <span class="${ratCls} bold">${m.current.ratio.toFixed(1)}x</span>${m.current.ratio > 3 ? ' <span class="bar-red bold">⚠ ' + (ru ? 'ПОВЫШЕННЫЙ РИСК' : 'ELEVATED RISK') + '</span>' : ''}\n`;
+    }
+  }
+
+  h += `<span class="cyan">║</span>\n`;
+  h += `<span class="cyan">║</span>  <span class="dim">${L.patternCoinFlip} │ ${L.patternUseful}</span>\n`;
+  h += `<span class="cyan">╚══════════════════════════════════════════════════════════╝</span>\n`;
+
+  out.innerHTML = h;
+}
+
+// ============================================================
+// LIVE PATTERN ALERTS — apply proven patterns to current data
+// ============================================================
+function detectLiveAlerts(candles) {
+  const N = candles.length;
+  if (N < 10) return [];
+  const alerts = [];
+  const dir = c => c.close >= c.open ? 1 : -1;
+  const isRu = state.lang === 'ru';
+
+  // 1. Streak detection (7, 5, 3 days same color)
+  for (const len of [7, 5, 3]) {
+    if (N < len) continue;
+    const recent = candles.slice(-len);
+    const d = dir(recent[0]);
+    if (recent.every(c => dir(c) === d)) {
+      const color = d === 1 ? (isRu ? 'зелёных' : 'green') : (isRu ? 'красных' : 'red');
+      const pcts = { 7: 61, 5: 51, 3: 50 };
+      if (pcts[len] > 55) {
+        alerts.push({
+          icon: '⚡',
+          text: isRu
+            ? `${len} дней подряд ${color} — исторически ${pcts[len]}% что завтра разворот`
+            : `${len} days in a row ${color} — historically ${pcts[len]}% chance of reversal tomorrow`,
+          cls: 'yellow',
+        });
+      }
+      break; // only show longest streak
+    }
+  }
+
+  // 2. Huge candle (today's body > 2x average of last 30)
+  if (N >= 30) {
+    const bodies30 = candles.slice(-30).map(c => Math.abs(c.close - c.open));
+    const avg = bodies30.reduce((a, b) => a + b, 0) / 30;
+    const std = Math.sqrt(bodies30.reduce((s, b) => s + (b - avg) ** 2, 0) / 30);
+    const lastBody = Math.abs(candles[N - 1].close - candles[N - 1].open);
+    if (lastBody > avg + 2 * std) {
+      alerts.push({
+        icon: '💥',
+        text: isRu
+          ? `Аномально большая свеча — исторически 92% откат в течение 3 дней`
+          : `Abnormally large candle — historically 92% bounce within 3 days`,
+        cls: 'yellow',
+      });
+    }
+  }
+
+  // 3. Hammer pattern (last candle)
+  {
+    const c = candles[N - 1];
+    const body = Math.abs(c.close - c.open);
+    const lw = Math.min(c.open, c.close) - c.low;
+    const uw = c.high - Math.max(c.open, c.close);
+    if (body > 0 && lw > body * 2 && uw < body * 0.5) {
+      alerts.push({
+        icon: '🔨',
+        text: isRu
+          ? `Молот — исторически 57% что завтра рост`
+          : `Hammer pattern — historically 57% chance of green tomorrow`,
+        cls: 'bar-green',
+      });
+    }
+  }
+
+  // 4. Volume spike + red candle (panic)
+  if (N >= 20) {
+    const avgVol = candles.slice(-20).reduce((s, c) => s + c.volume, 0) / 20;
+    const last = candles[N - 1];
+    if (last.volume > avgVol * 2 && last.close < last.open) {
+      alerts.push({
+        icon: '📉',
+        text: isRu
+          ? `Распродажа на объёме — исторически 55% отскок на след. день`
+          : `High-volume sell-off — historically 55% bounce next day`,
+        cls: 'yellow',
+      });
+    }
+  }
+
+  // 5. Weekly growth check (last 7 candles)
+  if (N >= 8) {
+    const weekAgo = candles[N - 8].close;
+    const now = candles[N - 1].close;
+    const weekReturn = ((now - weekAgo) / weekAgo) * 100;
+    if (weekReturn >= 20) {
+      alerts.push({
+        icon: '⚠',
+        text: isRu
+          ? `Рост ${weekReturn.toFixed(0)}% за неделю — исторически 89% коррекция`
+          : `${weekReturn.toFixed(0)}% weekly growth — historically 89% pullback follows`,
+        cls: 'bar-red',
+      });
+    } else if (weekReturn >= 10) {
+      alerts.push({
+        icon: '⚠',
+        text: isRu
+          ? `Рост ${weekReturn.toFixed(0)}% за неделю — исторически 80% коррекция`
+          : `${weekReturn.toFixed(0)}% weekly growth — historically 80% pullback follows`,
+        cls: 'yellow',
+      });
+    }
+  }
+
+  // 6. Halving cycle alert (uses pattern data if available)
+  if (state.patternData && state.patternData.growth && state.patternData.growth.halving) {
+    const hv = state.patternData.growth.halving;
+    if (hv.currentPct < 30) {
+      alerts.push({
+        icon: '🔄',
+        text: isRu
+          ? `Ранняя фаза халвинг-цикла (${hv.currentPct}%) — исторически лучшее время`
+          : `Early halving cycle phase (${hv.currentPct}%) — historically the best time`,
+        cls: 'bar-green',
+      });
+    }
+  }
+
+  // 7. Rainbow z-score alert (uses pattern data if available)
+  if (state.patternData && state.patternData.growth && state.patternData.growth.rainbow) {
+    const z = state.patternData.growth.rainbow.zScore;
+    if (z < -1.5) {
+      alerts.push({
+        icon: '🟢',
+        text: isRu
+          ? `BTC очень дёшев по тренду (z=${z.toFixed(1)}) — исторически 100% прибыль за 90 дней`
+          : `BTC very cheap vs trend (z=${z.toFixed(1)}) — historically 100% profit within 90 days`,
+        cls: 'bar-green',
+      });
+    } else if (z > 1.5) {
+      alerts.push({
+        icon: '🔴',
+        text: isRu
+          ? `BTC очень дорог по тренду (z=${z.toFixed(1)}) — исторически только 18% прибыль`
+          : `BTC very expensive vs trend (z=${z.toFixed(1)}) — historically only 18% win rate`,
+        cls: 'bar-red',
+      });
+    }
+  }
+
+  // 8. Momentum acceleration alert
+  if (state.patternData && state.patternData.growth && state.patternData.growth.momentum) {
+    const m = state.patternData.growth.momentum;
+    if (m.current && m.current.ratio > 3 && m.current.recent > 10) {
+      alerts.push({
+        icon: '⚠',
+        text: isRu
+          ? `Моментум ускоряется ${m.current.ratio.toFixed(1)}x — повышенный риск коррекции`
+          : `Momentum accelerating ${m.current.ratio.toFixed(1)}x — elevated pullback risk`,
+        cls: 'bar-red',
+      });
+    }
+  }
+
+  return alerts;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderGauge(score) {
+  const w = 40, norm = (score+100)/200, filled = Math.round(norm*w);
+  let bar = '';
+  for (let i = 0; i < w; i++) {
+    if (i < filled) {
+      if (i < w*0.35) bar += '<span class="red">█</span>';
+      else if (i < w*0.65) bar += '<span class="yellow">█</span>';
+      else bar += '<span class="bar-green">█</span>';
+    } else bar += '<span class="dim">░</span>';
+  }
+  return `  <span class="bar-red">BEAR</span> [${bar}] <span class="bar-green">BULL</span>`;
+}
+
+function renderFactorBar(f) {
+  const bw = 20, norm = (f.score+100)/200, filled = Math.round(norm*bw);
+  const cls = f.score>=10?'bar-green':f.score<=-10?'bar-red':'bar-neutral';
+  let bar = '';
+  for (let i = 0; i < bw; i++) bar += i<filled?`<span class="${cls}">█</span>`:'<span class="dim">░</span>';
+  const sign = f.score>=0?'+':'';
+  return `  ${f.name.padEnd(12)} [${bar}] ${(sign+f.score.toFixed(0)).padStart(5)}  ${f.detail||''}`;
+}
+
+function renderMiniCandles(candles) {
+  const rec = candles.slice(-30), h = 8;
+  const mn = Math.min(...rec.map(c=>c.low)), mx = Math.max(...rec.map(c=>c.high)), rng = mx-mn||1;
+  const rows = [];
+  for (let r = h-1; r >= 0; r--) {
+    const th = mn + rng*(r+0.5)/h;
+    let line = '  ';
+    for (const c of rec) {
+      const g = c.close>=c.open, bt = Math.max(c.open,c.close), bb = Math.min(c.open,c.close);
+      if (bb<=th && th<=bt) line += g?'<span class="bar-green">█</span>':'<span class="bar-red">█</span>';
+      else if (c.low<=th && th<=c.high) line += g?'<span class="bar-green">│</span>':'<span class="bar-red">│</span>';
+      else line += ' ';
+    }
+    rows.push(line);
+  }
+  rows[0] += `  $${mx.toFixed(0)}`;
+  rows[h-1] += `  $${mn.toFixed(0)}`;
+  return rows.join('\n');
+}
+
+function render(data, pred) {
+  const { candles, price, change24h } = data;
+  const { medium, long, factors, atrPct, rsi, stats, patterns } = pred;
+  const chSign = change24h>=0?'+':'';
+  const chCls = change24h>=0?'bar-green':'bar-red';
+  const now = new Date().toISOString().slice(11,19)+' UTC';
+
+  // Track predictions — MEDIUM = tomorrow, LONG = week
+  savePrediction('tomorrow', price, medium.direction, medium.probability);
+  savePrediction('week', price, long.direction, long.probability);
+
+  const accTomorrow = getAccuracy('tomorrow');
+  const accWeek = getAccuracy('week');
+
+  // Main direction
+  const dir = medium.direction;
+  const dirCls = dir==='UP'?'bar-green':'bar-red';
+  const L = LANG[state.lang];
+  const dirWord = dir==='UP'?L.up:L.down;
+  const dirArrow = dir==='UP'?'▲':'▼';
+
+  let h = '';
+
+  // Title + price
+  h += `<span class="white" style="background:#aaaaaa;color:#0000aa;font-weight:bold"> SIGNAL </span>`;
+  h += `  <span class="cyan bold">BTC</span> <span class="white bold">$${price.toLocaleString('en',{maximumFractionDigits:0})}</span>`;
+  h += `  <span class="${chCls}">${chSign}${change24h.toFixed(2)}%</span>`;
+  h += `  <span class="dim">${now}</span>\n\n`;
+
+  // ═══ MAIN QUESTION: TOMORROW ═══
+  h += `<span class="cyan">╔══════════════════════════════════════════════════════╗</span>\n`;
+  h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
+  h += `<span class="cyan">║</span>    <span class="white">${L.tomorrow}</span>\n`;
+  h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
+  h += `<span class="cyan">║</span>            <span class="${dirCls} bold big">${dirArrow} ${dirWord}</span>                    <span class="cyan">║</span>\n`;
+  h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
+  h += `<span class="cyan">║</span>    <span class="white">${L.confidence}</span>  <span class="${dirCls} bold big">${medium.probability}%</span>                        <span class="cyan">║</span>\n`;
+  h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
+
+  // Accuracy
+  if (accTomorrow && accTomorrow.total >= 1) {
+    const aCls = accTomorrow.pct>=55?'bar-green':accTomorrow.pct<=45?'bar-red':'yellow';
+    h += `<span class="cyan">║</span>    <span class="dim">${L.accuracy}</span> <span class="${aCls} bold">${accTomorrow.pct.toFixed(0)}%</span> <span class="dim">(${accTomorrow.correct} ${L.ofTotal} ${accTomorrow.total})</span>\n`;
+  } else {
+    h += `<span class="cyan">║</span>    <span class="dim">${L.accuracy} ${L.collecting}</span>\n`;
+  }
+
+  // Countdown to UTC midnight (= when "tomorrow" starts)
+  const nowUtc = new Date();
+  const tomorrowUtc = new Date(Date.UTC(nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), nowUtc.getUTCDate() + 1));
+  const diffMs = tomorrowUtc - nowUtc;
+  const diffH = Math.floor(diffMs / 3600000);
+  const diffM = Math.floor((diffMs % 3600000) / 60000);
+  const tDay = tomorrowUtc.getUTCDate();
+  const tMonth = L.monthsShort[tomorrowUtc.getUTCMonth()];
+  h += `<span class="cyan">║</span>    <span class="dim">⏱ ${L.tomorrowIs} ${tDay} ${tMonth}, ${L.inTime} ${diffH}${state.lang==='ru'?'ч':'h'} ${String(diffM).padStart(2,'0')}${state.lang==='ru'?'м':'m'}</span>\n`;
+
+  // Week countdown
+  const weekEndUtc = new Date(Date.UTC(nowUtc.getUTCFullYear(), nowUtc.getUTCMonth(), nowUtc.getUTCDate() + (7 - nowUtc.getUTCDay())));
+  const wDiffMs = weekEndUtc - nowUtc;
+  const wDiffD = Math.floor(wDiffMs / 86400000);
+  const wDiffH = Math.floor((wDiffMs % 86400000) / 3600000);
+  const wDay = weekEndUtc.getUTCDate();
+  const wMonth = L.monthsShort[weekEndUtc.getUTCMonth()];
+  h += `<span class="cyan">║</span>    <span class="dim">⏱ ${L.weekIs} ${wDay} ${wMonth}, ${L.inTime} ${wDiffD}${state.lang==='ru'?'д':'d'} ${wDiffH}${state.lang==='ru'?'ч':'h'}</span>\n`;
+
+  h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
+  h += `<span class="cyan">╚══════════════════════════════════════════════════════╝</span>\n\n`;
+
+  // Gauge bar
+  h += renderGauge(medium.score) + '\n\n';
+
+  // ═══ LIVE PATTERN ALERTS ═══
+  const alerts = detectLiveAlerts(candles);
+  if (alerts.length > 0) {
+    for (const a of alerts) {
+      h += `  <span class="${a.cls}"> ${a.icon} ${a.text}</span>\n`;
+    }
+    h += '\n';
+  }
+
+  // ═══ WEEK OUTLOOK (compact) ═══
+  const wDir = long.direction;
+  const wCls = wDir==='UP'?'bar-green':'bar-red';
+  const wArrow = wDir==='UP'?L.weekUp:L.weekDown;
+  let wAcc = '';
+  if (accWeek && accWeek.total >= 1) {
+    const waCls = accWeek.pct>=55?'bar-green':accWeek.pct<=45?'bar-red':'yellow';
+    wAcc = `  <span class="dim">${L.accuracy}</span> <span class="${waCls}">${accWeek.pct.toFixed(0)}%</span>`;
+  }
+  h += `  <span class="dim">${L.week}</span>  <span class="${wCls} bold">${wArrow}  ${long.probability}%</span>${wAcc}\n\n`;
+
+  // Mini chart
+  const cc = Math.min(candles.length, 30);
+  h += `<span class="cyan">┌─</span> <span class="white">${L.lastCandles} ${cc} ${L.candlesWord}</span> <span class="cyan">${'─'.repeat(Math.max(1,30-String(cc).length-L.lastCandles.length))}┐</span>\n`;
+  h += renderMiniCandles(candles) + '\n';
+  h += `<span class="cyan">└${'─'.repeat(54)}┘</span>\n\n`;
+
+  // Toggle hints
+  h += `  <span class="cyan">[D] ${state.showDetails ? L.hideDetails : L.showDetails}</span>  <span class="cyan">[P] ${L.patterns}</span>  <span class="cyan">[L] EN/RU</span>\n\n`;
+
+  // Collapsible details
+  if (state.showDetails) {
+    const nFactors = factors.length;
+    h += `<span class="cyan">┌─</span> <span class="white">ANALYSIS (${nFactors} factors)</span> <span class="cyan">${'─'.repeat(33-String(nFactors).length)}┐</span>\n`;
+    for (const f of factors) h += renderFactorBar(f) + '\n';
+    h += `<span class="cyan">└${'─'.repeat(54)}┘</span>\n\n`;
+
+    h += `<span class="cyan">┌─</span> <span class="white">STATS</span> <span class="cyan">${'─'.repeat(46)}┐</span>\n`;
+    h += `  Green: <span class="bar-green">${stats.greenCount}</span>  │  Red: <span class="bar-red">${stats.redCount}</span>  │  RSI: <span class="${rsi>70?'bar-red':rsi<30?'bar-green':'white'}">${rsi.toFixed(0)}</span>  │  ATR: ${atrPct.toFixed(2)}%\n`;
+    if (patterns.length > 0) {
+      h += `  Pattern: ${patterns.map(p=>`<span class="${p.s>0?'bar-green':p.s<0?'bar-red':'yellow'}">${p.name}</span>`).join(', ')}\n`;
+    }
+    h += `<span class="cyan">└${'─'.repeat(54)}┘</span>\n\n`;
+  }
+
+  // Footer
+  if (state.autoRefresh) {
+    h += `<span class="dim">  ${L.refreshIn} ${state.countdown}s</span>  <span class="blink">_</span>\n`;
+  } else {
+    h += `<span class="dim">  ${L.autoOff}</span>  <span class="blink">_</span>\n`;
+  }
+  h += `\n<span class="dim">  ${L.disclaimer}</span>`;
+
+  document.getElementById('output').innerHTML = h;
+}
+
+// ============================================================
+// ORCHESTRATION
+// ============================================================
+async function refresh() {
+  if (state.isLoading) return;
+  state.isLoading = true;
+  const out = document.getElementById('output');
+  out.innerHTML = `<span class="loading">  Fetching ${CONFIG.symbol} data...</span><span class="blink">_</span>`;
+
+  try {
+    const data = await fetchData(state.timeframe);
+    const pred = computePrediction(data.candles, data.dailyCandles);
+    state.countdown = CONFIG.refreshIntervals[state.timeframe];
+    state.retryCount = 0;
+    render(data, pred);
+    startCountdown();
+  } catch (err) {
+    state.retryCount++;
+    if (state.retryCount <= 3) {
+      const d = state.retryCount * 10;
+      out.innerHTML = `<span class="error">  ERROR: ${err.message}\n  Retry ${state.retryCount}/3 in ${d}s...</span>`;
+      setTimeout(refresh, d * 1000);
+    } else {
+      out.innerHTML = `<span class="error">  ERROR: ${err.message}\n  All retries failed. Press [R] to try again.</span>`;
+      state.retryCount = 0;
+    }
+  } finally {
+    state.isLoading = false;
+  }
+}
+
+function startCountdown() {
+  clearInterval(state.countdownTimer);
+  if (!state.autoRefresh) return;
+  state.countdownTimer = setInterval(() => {
+    state.countdown--;
+    if (state.countdown <= 0) { clearInterval(state.countdownTimer); refresh(); }
+  }, 1000);
+}
+
+function toggleAutoRefresh() {
+  state.autoRefresh = !state.autoRefresh;
+  document.getElementById('auto-toggle').textContent = `[A] AUTO: ${state.autoRefresh ? 'ON' : 'OFF'}`;
+  if (state.autoRefresh) { state.countdown = CONFIG.refreshIntervals[state.timeframe]; startCountdown(); }
+  else clearInterval(state.countdownTimer);
+}
+
+// Events
+document.getElementById('auto-toggle').addEventListener('click', toggleAutoRefresh);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase()==='a') toggleAutoRefresh();
+  if (e.key.toLowerCase()==='r') refresh();
+  if (e.key.toLowerCase()==='d') { state.showDetails = !state.showDetails; refresh(); }
+  if (e.key.toLowerCase()==='p') loadPatterns();
+  if (e.key.toLowerCase()==='l') { state.lang = state.lang==='en'?'ru':'en'; localStorage.setItem('signal_lang', state.lang); document.getElementById('header').innerHTML = `<span class="dim">  ${LANG[state.lang].header}</span>\n`; if (state.patternRawCandles) { state.patternData = analyzePatterns(state.patternRawCandles); renderPatternBlock(); } refresh(); }
+});
+
+document.getElementById('header').innerHTML = `<span class="dim">  ${LANG[state.lang].header}</span>\n`;
+refresh();
+</script>
+</body>
+</html>
