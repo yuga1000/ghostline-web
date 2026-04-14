@@ -667,8 +667,8 @@
     <div class="manifesto-body" id="manifestoText">
         <span class="cursor-blink"></span>
     </div>
+    <div id="btcTrigger" onclick="document.getElementById('btcModal').classList.add('open')" style="width:12px;height:12px;background:#1a1a3a;border:1px solid #4466aa;position:absolute;right:-18px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:0.6;transition:opacity 0.3s,box-shadow 0.3s;" onmouseenter="this.style.opacity='1';this.style.boxShadow='0 0 6px rgba(85,85,255,0.8)'" onmouseleave="this.style.opacity='0.6';this.style.boxShadow='none'"></div>
 </div>
-<div id="btcTrigger" onclick="document.getElementById('btcModal').classList.add('open')" style="width:12px;height:12px;background:#0000AA;border:1px solid #5555ff;position:absolute;right:-18px;top:50%;transform:translateY(-50%);cursor:pointer;opacity:0.6;transition:opacity 0.3s,box-shadow 0.3s;" onmouseenter="this.style.opacity='1';this.style.boxShadow='0 0 6px rgba(85,85,255,0.8)'" onmouseleave="this.style.opacity='0.6';this.style.boxShadow='none'"></div>
 
 <!-- BTC Signal Modal -->
 <div id="btcModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.9);align-items:center;justify-content:center;cursor:pointer;" onclick="if(event.target===this)this.classList.remove('open')">
