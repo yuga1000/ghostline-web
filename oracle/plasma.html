@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BTC PLASMA REACTOR</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: transparent;
+    color: #ccc;
+    font-family: "IBM Plex Mono", "Courier New", monospace;
+    overflow: hidden;
+  }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 10px; }
+  #wrap {
+    position: relative;
+    width: min(80vmin, 560px); aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #reactor {
+    width: 100%; height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    background: transparent;
+  }
+  #hud {
+    position: absolute; top: 12px; left: 12px; right: 12px;
+    display: flex; justify-content: space-between;
+    font-size: 11px; letter-spacing: 2px; color: #888;
+    pointer-events: none;
+    text-shadow: 0 0 6px #000, 0 0 3px #000;
+    z-index: 2;
+  }
+  #hud .label { color: #555; }
+  #hud .val { color: #dcdcdc; }
+  #date { color: #f0c070; font-weight: bold; }
+  #price { color: #eaeaea; font-weight: bold; }
+  #change.up { color: #7aff7a; }
+  #change.dn { color: #ff6a6a; }
+  #bottom {
+    position: absolute; bottom: 12px; left: 12px; right: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: #888; letter-spacing: 2px;
+    text-shadow: 0 0 6px #000, 0 0 3px #000;
+    z-index: 2;
+  }
+  #scrub {
+    width: min(80vmin, 560px); height: 10px; background: rgba(40,40,40,0.6);
+    position: relative; cursor: pointer;
+    border: 1px solid #333;
+    border-radius: 0;
+  }
+  #scrub .fill { position: absolute; top: 0; left: 0; height: 100%; background: #f0c070; pointer-events: none; }
+  #scrub .knob {
+    position: absolute; top: -3px; width: 4px; height: 16px;
+    background: #fff; pointer-events: none;
+    box-shadow: 0 0 6px rgba(240,192,112,0.8);
+    transform: translateX(-2px);
+  }
+  #controls {
+    display: flex; gap: 10px; align-items: center;
+    font-size: 11px; letter-spacing: 2px; color: #888;
+  }
+  .btn {
+    background: #0a0a0a; color: #ccc; border: 1px solid #333;
+    padding: 6px 14px; cursor: pointer; font-family: inherit; font-size: 11px;
+    letter-spacing: 2px;
+  }
+  .btn:hover { background: #1a1a1a; color: #fff; border-color: #555; }
+  #speed { width: 160px; }
+  #legend {
+    position: absolute; bottom: 40px; left: 12px;
+    font-size: 9px; color: #444; letter-spacing: 2px;
+    pointer-events: none;
+    line-height: 1.5;
+  }
+  #tally {
+    position: absolute; top: 40px; right: 12px;
+    font-size: 10px; letter-spacing: 1px;
+    pointer-events: none;
+    line-height: 1.6;
+    text-align: right;
+    text-shadow: 0 0 6px #000, 0 0 3px #000;
+    z-index: 2;
+  }
+  #tally .tally-row { display: flex; gap: 6px; justify-content: flex-end; }
+  #tally .tally-lbl { color: #555; min-width: 52px; text-align: right; }
+  #tally .tally-val { color: #dcdcdc; min-width: 40px; text-align: right; font-weight: bold; }
+  #tally .tally-pct { color: #888; min-width: 44px; text-align: right; }
+  #tally .tally-up { color: #7aff7a; }
+  #tally .tally-dn { color: #ff6a6a; }
+</style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="reactor"></canvas>
+    <div id="hud">
+      <div>
+        <span class="label">DATE </span><span id="date" class="val">—</span>
+      </div>
+      <div>
+        <span class="label">BTC </span><span id="price" class="val">—</span>
+        &nbsp;<span id="change" class="val">—</span>
+      </div>
+    </div>
+    <div id="legend">
+      GREEN = UP DAY<br>
+      RED = DOWN DAY<br>
+      SIZE = LOG PRICE<br>
+      PULSE = VOLATILITY
+    </div>
+    <div id="tally">
+      <div class="tally-row"><span class="tally-lbl">GREEN</span> <span id="tGreen" class="tally-val tally-up">0</span> <span id="tGreenPct" class="tally-pct">0.0%</span></div>
+      <div class="tally-row"><span class="tally-lbl">RED</span> <span id="tRed" class="tally-val tally-dn">0</span> <span id="tRedPct" class="tally-pct">0.0%</span></div>
+      <div class="tally-row"><span class="tally-lbl">EDGE</span> <span id="tEdge" class="tally-val">0.0%</span></div>
+      <div class="tally-row"><span class="tally-lbl">STREAK</span> <span id="tStreak" class="tally-val">—</span></div>
+      <div class="tally-row"><span class="tally-lbl">MAX UP</span> <span id="tMaxUp" class="tally-val tally-up">0</span></div>
+      <div class="tally-row"><span class="tally-lbl">MAX DN</span> <span id="tMaxDn" class="tally-val tally-dn">0</span></div>
+    </div>
+    <div id="bottom">
+      <div><span class="label">FRAME </span><span id="frame" class="val">0/0</span></div>
+      <div><span class="label">ATH </span><span id="ath" class="val">—</span> <span class="label">FROM </span><span id="dd" class="val">—</span></div>
+      <div><span class="label">YEAR </span><span id="year" class="val">—</span></div>
+    </div>
+  </div>
+
+  <div id="scrub"><div class="fill"></div><div class="knob" id="knob"></div></div>
+
+  <div id="controls">
+    <button class="btn" id="btnPlay">▶ PLAY</button>
+    <button class="btn" id="btnPause">❚❚ PAUSE</button>
+    <button class="btn" id="btnReset">⟲ RESET</button>
+    <span>SPEED</span>
+    <input type="range" id="speed" min="1" max="80" value="6">
+    <span id="speedVal">6 d/s</span>
+  </div>
+
+<script>
+// ============================================================
+// BTC PLASMA REACTOR
+// ============================================================
+
+const W = 160, H = 160;
+const canvas = document.getElementById('reactor');
+canvas.width = W;
+canvas.height = H;
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const img = ctx.createImageData(W, H);
+const buf = img.data;
+
+// ============================================================
+// VALUE NOISE
+// ============================================================
+function mkNoise(size) {
+  const arr = new Float32Array(size * size);
+  for (let i = 0; i < arr.length; i++) arr[i] = Math.random();
+  return arr;
+}
+const nA = mkNoise(32), nB = mkNoise(32), nC = mkNoise(32);
+
+function sampleN(n, x, y, size) {
+  x = ((x % size) + size) % size;
+  y = ((y % size) + size) % size;
+  const x0 = Math.floor(x), y0 = Math.floor(y);
+  const x1 = (x0 + 1) % size, y1 = (y0 + 1) % size;
+  const fx = x - x0, fy = y - y0;
+  const a = n[y0 * size + x0], b = n[y0 * size + x1];
+  const c = n[y1 * size + x0], d = n[y1 * size + x1];
+  const u = a + (b - a) * fx;
+  const v = c + (d - c) * fx;
+  return u + (v - u) * fy;
+}
+function fbm(x, y) {
+  return sampleN(nA, x * 0.18, y * 0.18, 32) * 0.55
+       + sampleN(nB, x * 0.36, y * 0.36, 32) * 0.30
+       + sampleN(nC, x * 0.72, y * 0.72, 32) * 0.15;
+}
+
+// ============================================================
+// PALETTES — classic demo-scene 256-entry colour tables
+// ============================================================
+function pal(mode) {
+  // mode: 'up' | 'dn' | 'nu'
+  const p = new Uint8Array(256 * 3);
+  for (let i = 0; i < 256; i++) {
+    const t = i / 255;
+    let r, g, b;
+    if (mode === 'up') {
+      r = Math.min(255, Math.pow(t, 2.2) * 255);
+      g = Math.min(255, Math.pow(t, 0.55) * 255);
+      b = Math.min(255, Math.pow(t, 3.0) * 180);
+    } else if (mode === 'dn') {
+      r = Math.min(255, Math.pow(t, 0.5) * 255);
+      g = Math.min(255, Math.pow(t, 2.5) * 200);
+      b = Math.min(255, Math.pow(t, 5.0) * 120);
+    } else {
+      r = Math.min(255, Math.pow(t, 0.6) * 255);
+      g = Math.min(255, Math.pow(t, 1.3) * 230);
+      b = Math.min(255, Math.pow(t, 4.0) * 140);
+    }
+    p[i*3] = r; p[i*3+1] = g; p[i*3+2] = b;
+  }
+  return p;
+}
+const palUp = pal('up'), palDn = pal('dn'), palNu = pal('nu');
+
+function blendPal(a, b, t) {
+  const out = new Uint8Array(256 * 3);
+  for (let i = 0; i < out.length; i++) out[i] = a[i] * (1 - t) + b[i] * t;
+  return out;
+}
+
+// stable starfield (positions and twinkle params fixed at init)
+const stars = [];
+for (let i = 0; i < 90; i++) {
+  stars.push({
+    x: (Math.random() * W) | 0,
+    y: (Math.random() * H) | 0,
+    b: 50 + (Math.random() * 140) | 0,
+    tw: 0.3 + Math.random() * 1.2,
+    ph: Math.random() * Math.PI * 2,
+  });
+}
+
+// ============================================================
+// DATA
+// ============================================================
+let daily = [];
+let cursor = 0;
+let playing = true;
+let speed = 6;
+let subFrame = 0;
+let lastT = performance.now();
+let phase = 0;
+let flash = 0;
+
+const dateEl = document.getElementById('date');
+const priceEl = document.getElementById('price');
+const changeEl = document.getElementById('change');
+const frameEl = document.getElementById('frame');
+const yearEl = document.getElementById('year');
+const athEl = document.getElementById('ath');
+const ddEl = document.getElementById('dd');
+const tGreenEl = document.getElementById('tGreen');
+const tGreenPctEl = document.getElementById('tGreenPct');
+const tRedEl = document.getElementById('tRed');
+const tRedPctEl = document.getElementById('tRedPct');
+const tEdgeEl = document.getElementById('tEdge');
+const tStreakEl = document.getElementById('tStreak');
+const tMaxUpEl = document.getElementById('tMaxUp');
+const tMaxDnEl = document.getElementById('tMaxDn');
+const scrubFill = document.querySelector('#scrub .fill');
+const scrubKnob = document.getElementById('knob');
+const scrub = document.getElementById('scrub');
+const speedEl = document.getElementById('speed');
+const speedValEl = document.getElementById('speedVal');
+
+async function loadData() {
+  const r = await fetch('history.json');
+  const raw = await r.json();
+  const atrWin = 14;
+  const trs = [];
+  let vMax = 0;
+  for (let i = 0; i < raw.length; i++) {
+    const c = raw[i];
+    const prev = i > 0 ? raw[i-1].c : c.o;
+    const ret = (c.c - prev) / prev;
+    const tr = Math.max(c.h - c.l, Math.abs(c.h - prev), Math.abs(c.l - prev)) / prev;
+    trs.push(tr);
+    let atr = 0;
+    const n = Math.min(atrWin, trs.length);
+    for (let k = trs.length - n; k < trs.length; k++) atr += trs[k];
+    atr /= n;
+    daily.push({ ...c, ret, atr });
+    vMax = Math.max(vMax, c.v);
+  }
+  for (const d of daily) d.vNorm = Math.min(1, Math.log10(d.v + 1) / Math.log10(vMax + 1));
+  // Normalise price on a log scale — shape: 0 at $0.05, ~0.9 at $500k, gently saturating above.
+  // This keeps the range $10k..$126k meaningfully different in size.
+  const lMin = Math.log(0.05);
+  const lSat = Math.log(500000);
+  for (const d of daily) {
+    const l = Math.log(Math.max(d.c, 0.01));
+    const raw = (l - lMin) / (lSat - lMin);
+    d.pNorm = Math.tanh(raw * 1.1);
+  }
+
+  // Running ATH (kept just for HUD info)
+  let ath = 0;
+  for (const d of daily) {
+    if (d.c > ath) ath = d.c;
+    d.ath = ath;
+    d.ddFromAth = 1 - d.c / ath;
+  }
+
+  // Running tallies: green/red count, current streak, max streaks so far
+  let gCnt = 0, rCnt = 0;
+  let streak = 0;       // +ve = green run, -ve = red run
+  let maxUp = 0, maxDn = 0;
+  for (const d of daily) {
+    const up = d.c > d.o;
+    const dn = d.c < d.o;
+    if (up) gCnt++;
+    else if (dn) rCnt++;
+    if (up)      streak = streak > 0 ? streak + 1 : 1;
+    else if (dn) streak = streak < 0 ? streak - 1 : -1;
+    else         streak = 0;
+    if (streak >  maxUp) maxUp = streak;
+    if (-streak > maxDn) maxDn = -streak;
+    d.gCnt = gCnt;
+    d.rCnt = rCnt;
+    d.streak = streak;
+    d.maxUp = maxUp;
+    d.maxDn = maxDn;
+  }
+
+  frameEl.textContent = `0/${daily.length}`;
+}
+
+function fmtDate(ms) { return new Date(ms).toISOString().slice(0, 10); }
+function fmtPrice(p) {
+  if (p < 1) return `$${p.toFixed(4)}`;
+  if (p < 100) return `$${p.toFixed(2)}`;
+  return `$${Math.round(p).toLocaleString('en')}`;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function step(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000);
+  lastT = now;
+  phase += dt;
+
+  if (daily.length > 0) {
+    if (playing) {
+      subFrame += dt * speed;
+      while (subFrame >= 1) {
+        subFrame -= 1;
+        cursor = (cursor + 1) % daily.length;
+        if (Math.abs(daily[cursor].ret) > 0.10) flash = Math.max(flash, 0.5);
+      }
+    }
+    drawReactor();
+    updateHud();
+  }
+
+  flash = Math.max(0, flash - dt * 1.2);
+  requestAnimationFrame(step);
+}
+
+function drawReactor() {
+  const cur = daily[cursor];
+  const next = daily[(cursor + 1) % daily.length];
+  const t = subFrame;
+  const ret = cur.ret * (1 - t) + next.ret * t;
+  const atr = cur.atr * (1 - t) + next.atr * t;
+  const vNorm = cur.vNorm * (1 - t) + next.vNorm * t;
+  const pNorm = cur.pNorm * (1 - t) + next.pNorm * t;
+
+  // Simple binary colour: green on up day, red on down day, full saturation either way
+  const p = ret >= 0 ? palUp : palDn;
+
+  const cx = W / 2, cy = H / 2;
+  // SIZE grows with log-price. Starts as a single bright pixel at ~$0.05, tops out around $10k.
+  // Canvas is 160px; with flames max ~45px ≈ 28% of width.
+  const baseR = 1 + pNorm * 25 + vNorm * 2;
+  const pulseSpeed = 0.8 + atr * 8;         // slower breathing
+  const pulseAmt = 0.03 + Math.min(0.10, atr * 2);
+  const pulse = 1 + Math.sin(phase * pulseSpeed) * pulseAmt;
+  const R = baseR * pulse;
+  const scroll = phase * (0.2 + atr * 2);   // gentler noise drift
+
+  // clear to fully transparent
+  for (let i = 0; i < W * H * 4; i += 4) {
+    buf[i] = 0; buf[i+1] = 0; buf[i+2] = 0; buf[i+3] = 0;
+  }
+
+  // -------- plasma with rim flames ---------
+  // One unified pass: for each pixel, compute heat based on distance and noise
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const dx = x - cx, dy = y - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const angle = Math.atan2(dy, dx);
+
+      // outer fringe cutoff — keep work small
+      if (dist > R * 1.7) continue;
+
+      // base plasma noise scrolling inside
+      const n = fbm(x + scroll * 4, y - scroll * 2);
+
+      // angular noise — makes "tongues" of flame spike outward
+      const aSample = fbm(Math.cos(angle) * 14 + scroll * 5, Math.sin(angle) * 14 - scroll * 3);
+      // how far the flame tongue reaches past R at this angle (shorter now)
+      const flameLen = R * (0.2 + aSample * 0.45);
+
+      let heat = 0;
+      if (dist < R) {
+        // INSIDE core — bright, turbulent
+        const edge = 1 - dist / R;
+        heat = n * 0.9 + edge * 0.9 + 0.15;
+      } else {
+        // OUTSIDE — flame tongues fade with distance beyond R
+        const over = dist - R;
+        const fall = Math.max(0, 1 - over / flameLen);
+        if (fall <= 0) continue;
+        heat = (n * 0.5 + 0.3) * Math.pow(fall, 1.4);
+      }
+
+      heat = Math.max(0, Math.min(1, heat));
+      if (heat <= 0.05) continue;
+      // QUANTISE heat into discrete pixel-art bands (no smooth gradient)
+      const LEVELS = 7;
+      const band = Math.min(LEVELS - 1, Math.floor(heat * LEVELS));
+      let idx = Math.floor((band + 0.5) / LEVELS * 255);
+      if (flash > 0) idx = Math.min(255, idx + flash * 60);
+      const o = (y * W + x) * 4;
+      buf[o]   = p[idx*3];
+      buf[o+1] = p[idx*3+1];
+      buf[o+2] = p[idx*3+2];
+      buf[o+3] = 255;
+    }
+  }
+
+  // -------- shimmer ring outline (gentle) ---------
+  const ringR = R * (1.0 + Math.sin(phase * 1.6) * 0.01);
+  for (let a = 0; a < 360; a += 4) {
+    const ang = a * Math.PI / 180;
+    // deterministic jitter so it doesn't flicker frame-by-frame
+    const jitter = Math.sin(ang * 8 + phase * 0.6) * 0.7;
+    const rr = ringR + jitter;
+    const x = Math.round(cx + Math.cos(ang) * rr);
+    const y = Math.round(cy + Math.sin(ang) * rr);
+    if (x < 0 || x >= W || y < 0 || y >= H) continue;
+    const o = (y * W + x) * 4;
+    const bright = 140;
+    if (ret >= 0) {
+      buf[o]   = Math.min(255, buf[o]   + bright * 0.5);
+      buf[o+1] = Math.min(255, buf[o+1] + bright * 0.9);
+      buf[o+2] = Math.min(255, buf[o+2] + bright * 0.2);
+    } else {
+      buf[o]   = Math.min(255, buf[o]   + bright * 0.9);
+      buf[o+1] = Math.min(255, buf[o+1] + bright * 0.3);
+      buf[o+2] = Math.min(255, buf[o+2] + bright * 0.1);
+    }
+    buf[o+3] = 255;
+  }
+
+  ctx.putImageData(img, 0, 0);
+}
+
+function updateHud() {
+  const c = daily[cursor];
+  dateEl.textContent = fmtDate(c.t);
+  priceEl.textContent = fmtPrice(c.c);
+  const pct = c.ret * 100;
+  changeEl.textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+  changeEl.className = pct >= 0 ? 'up' : 'dn';
+  frameEl.textContent = `${cursor+1}/${daily.length}`;
+  yearEl.textContent = new Date(c.t).getUTCFullYear();
+  athEl.textContent = fmtPrice(c.ath);
+  const ddPct = c.ddFromAth * 100;
+  ddEl.textContent = `${ddPct.toFixed(1)}%`;
+  // tallies so far
+  const total = c.gCnt + c.rCnt;
+  const gPct = total > 0 ? (c.gCnt / total * 100) : 0;
+  const rPct = total > 0 ? (c.rCnt / total * 100) : 0;
+  tGreenEl.textContent = c.gCnt;
+  tGreenPctEl.textContent = `${gPct.toFixed(1)}%`;
+  tRedEl.textContent = c.rCnt;
+  tRedPctEl.textContent = `${rPct.toFixed(1)}%`;
+  const edge = gPct - rPct;
+  tEdgeEl.textContent = `${edge >= 0 ? '+' : ''}${edge.toFixed(1)}%`;
+  tEdgeEl.className = 'tally-val ' + (edge >= 0 ? 'tally-up' : 'tally-dn');
+  if (c.streak > 0) {
+    tStreakEl.textContent = `+${c.streak}`;
+    tStreakEl.className = 'tally-val tally-up';
+  } else if (c.streak < 0) {
+    tStreakEl.textContent = `${c.streak}`;
+    tStreakEl.className = 'tally-val tally-dn';
+  } else {
+    tStreakEl.textContent = '0';
+    tStreakEl.className = 'tally-val';
+  }
+  tMaxUpEl.textContent = c.maxUp;
+  tMaxDnEl.textContent = c.maxDn;
+  const progress = cursor / daily.length * 100;
+  scrubFill.style.width = progress + '%';
+  scrubKnob.style.left = progress + '%';
+}
+
+// ============================================================
+// UI
+// ============================================================
+document.getElementById('btnPlay').onclick = () => { playing = true; };
+document.getElementById('btnPause').onclick = () => { playing = false; };
+document.getElementById('btnReset').onclick = () => { cursor = 0; subFrame = 0; };
+speedEl.oninput = () => {
+  speed = parseInt(speedEl.value);
+  speedValEl.textContent = `${speed} d/s`;
+};
+let dragging = false;
+let wasPlayingBeforeDrag = false;
+function scrubTo(e) {
+  const r = scrub.getBoundingClientRect();
+  const t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  cursor = Math.max(0, Math.min(daily.length - 1, Math.floor(t * daily.length)));
+  subFrame = 0;
+}
+scrub.addEventListener('mousedown', (e) => {
+  dragging = true;
+  wasPlayingBeforeDrag = playing;
+  playing = false;
+  scrubTo(e);
+});
+window.addEventListener('mousemove', (e) => { if (dragging) scrubTo(e); });
+window.addEventListener('mouseup', () => {
+  if (dragging) {
+    dragging = false;
+    playing = wasPlayingBeforeDrag;
+  }
+});
+// touch support
+scrub.addEventListener('touchstart', (e) => {
+  dragging = true; wasPlayingBeforeDrag = playing; playing = false;
+  scrubTo(e.touches[0]); e.preventDefault();
+}, { passive: false });
+window.addEventListener('touchmove', (e) => {
+  if (dragging) { scrubTo(e.touches[0]); e.preventDefault(); }
+}, { passive: false });
+window.addEventListener('touchend', () => {
+  if (dragging) { dragging = false; playing = wasPlayingBeforeDrag; }
+});
+// keyboard arrows
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { cursor = Math.max(0, cursor - (e.shiftKey ? 100 : 1)); subFrame = 0; }
+  if (e.key === 'ArrowRight') { cursor = Math.min(daily.length - 1, cursor + (e.shiftKey ? 100 : 1)); subFrame = 0; }
+  if (e.key === ' ') { playing = !playing; e.preventDefault(); }
+});
+
+loadData().then(() => {
+  lastT = performance.now();
+  requestAnimationFrame(step);
+});
+</script>
+</body>
+</html>
