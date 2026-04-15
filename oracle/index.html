@@ -74,6 +74,9 @@ body {
 <div id="terminal">
 <pre id="header"></pre>
 <div id="controls">
+  <button class="tf-btn" data-tf="60">1H</button>
+  <button class="tf-btn active" data-tf="240">4H</button>
+  <button class="tf-btn" data-tf="D">1D</button>
   <button id="auto-toggle">[A] AUTO: ON</button>
 </div>
 <pre id="output"><span class="loading">Connecting to exchange...</span><span class="blink">_</span></pre>
@@ -2252,6 +2255,16 @@ function toggleAutoRefresh() {
 
 // Events
 document.getElementById('auto-toggle').addEventListener('click', toggleAutoRefresh);
+
+function setTimeframe(tf) {
+  if (state.timeframe === tf || state.isLoading) return;
+  state.timeframe = tf;
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-tf') === tf));
+  refresh();
+}
+document.querySelectorAll('.tf-btn').forEach(b => {
+  b.addEventListener('click', () => setTimeframe(b.getAttribute('data-tf')));
+});
 
 function doToggleDetails() { state.showDetails = !state.showDetails; refresh(); }
 function doTogglePatterns() { loadPatterns(); }
