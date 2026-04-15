@@ -259,25 +259,27 @@ const speedEl = document.getElementById('speed');
 const speedValEl = document.getElementById('speedVal');
 
 async function loadData() {
-  const r = await fetch('history.json');
-  const raw = await r.json();
+  // compact format: [[t_sec, open, close], ...]
+  const r = await fetch('history-min.json');
+  const arr = await r.json();
+  const raw = arr.map(a => ({ t: a[0] * 1000, o: a[1], c: a[2] }));
   const atrWin = 14;
   const trs = [];
-  let vMax = 0;
   for (let i = 0; i < raw.length; i++) {
     const c = raw[i];
     const prev = i > 0 ? raw[i-1].c : c.o;
     const ret = (c.c - prev) / prev;
-    const tr = Math.max(c.h - c.l, Math.abs(c.h - prev), Math.abs(c.l - prev)) / prev;
+    // no high/low in compact format — use |o-c| as a proxy for true range
+    const tr = Math.abs(c.c - prev) / prev;
     trs.push(tr);
     let atr = 0;
     const n = Math.min(atrWin, trs.length);
     for (let k = trs.length - n; k < trs.length; k++) atr += trs[k];
     atr /= n;
     daily.push({ ...c, ret, atr });
-    vMax = Math.max(vMax, c.v);
   }
-  for (const d of daily) d.vNorm = Math.min(1, Math.log10(d.v + 1) / Math.log10(vMax + 1));
+  // no volume in compact format — neutralise vNorm contribution
+  for (const d of daily) d.vNorm = 0;
   // Normalise price on a log scale — shape: 0 at $0.05, ~0.9 at $500k, gently saturating above.
   // This keeps the range $10k..$126k meaningfully different in size.
   const lMin = Math.log(0.05);

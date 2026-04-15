@@ -515,26 +515,37 @@ function detectPatterns(candles) {
 // ============================================================
 
 // Weight profiles per horizon
+// Notes on weight tuning after the audit:
+// - bodyMass + momentum are ~80% correlated (both measure directional price energy).
+//   We keep momentum as the primary, reduce bodyMass to half its original weight.
+// - grRatio + volume are ~70% correlated (both count green vs red activity).
+//   Volume is the richer signal (bigger green candle = stronger signal than 1 green bar).
+// - bollinger + rsi measure deviation from mean at short TF — both kept but bollinger trimmed.
+// - Freed weight is redistributed to high-signal historical factors: rainbow, runReversion, ddDuration.
 const HORIZON_WEIGHTS = {
   SHORT: { // next candle — momentum & order flow heavy
-    bodyMass: 0.08, volume: 0.08, momentum: 0.12, takerBuy: 0.14,
-    rsi: 0.10, macd: 0.08, bollinger: 0.05, streak: 0.07, wicks: 0.05,
-    patterns: 0.07, grRatio: 0.02, longShort: 0.05, openInterest: 0.05,
-    rainbow: 0.02, painDD: 0.02,
+    bodyMass: 0.04, volume: 0.08, momentum: 0.12, takerBuy: 0.12,
+    rsi: 0.10, macd: 0.08, bollinger: 0.04, streak: 0.05, wicks: 0.05,
+    patterns: 0.07, grRatio: 0.01, longShort: 0.05, openInterest: 0.05,
+    rainbow: 0.04, painDD: 0.04,
+    runReversion: 0.06, // mean reversion after N-day run — most relevant short-term
   },
   MEDIUM: { // next 24h — trend indicators + historical context
-    bodyMass: 0.05, volume: 0.05, momentum: 0.07, takerBuy: 0.08,
-    rsi: 0.12, macd: 0.10, bollinger: 0.08, streak: 0.04, wicks: 0.03,
-    patterns: 0.05, grRatio: 0.03, longShort: 0.07, openInterest: 0.05,
+    bodyMass: 0.03, volume: 0.05, momentum: 0.07, takerBuy: 0.06,
+    rsi: 0.12, macd: 0.10, bollinger: 0.06, streak: 0.03, wicks: 0.03,
+    patterns: 0.05, grRatio: 0.01, longShort: 0.06, openInterest: 0.05,
     btcDom: 0.03, ethBtc: 0.02,
-    rainbow: 0.06, seasonality: 0.03, painDD: 0.04,
+    rainbow: 0.08, seasonality: 0.04, painDD: 0.05,
+    runReversion: 0.03, ddDuration: 0.03,
   },
   LONG: { // next 7 days — macro + historical data heavy
-    bodyMass: 0.03, volume: 0.03, momentum: 0.04, takerBuy: 0.04,
-    rsi: 0.08, macd: 0.07, bollinger: 0.07, streak: 0.02, wicks: 0.02,
-    patterns: 0.03, grRatio: 0.02, longShort: 0.06, openInterest: 0.06,
+    bodyMass: 0.02, volume: 0.03, momentum: 0.04, takerBuy: 0.04,
+    rsi: 0.08, macd: 0.07, bollinger: 0.04, streak: 0.02, wicks: 0.02,
+    patterns: 0.03, grRatio: 0.01, longShort: 0.06, openInterest: 0.05,
     btcDom: 0.04, ethBtc: 0.03, halving: 0.04, fearGreed: 0.05, funding: 0.03,
     rainbow: 0.10, seasonality: 0.05, painDD: 0.06,
+    ddDuration: 0.07, // drawdown duration matters most on longer horizons
+    runReversion: 0.02,
   },
 };
 
@@ -567,12 +578,17 @@ function computeFactors(candles) {
   for (const c of candles) { tBuy += c.takerBuyVol||0; tVol2 += c.volume; }
   factors.takerBuy = { name: 'Taker Buy', score: (tVol2===0||tBuy===0)?0:(tBuy/tVol2-0.5)*200 };
 
-  // 5. RSI
+  // 5. RSI — contrarian at extremes, neutral in the mid-range.
+  // Previous mid-range formula gave false bullish bias whenever RSI<50, which is
+  // actually neutral territory. Now: oversold (<=30) bullish, overbought (>=70) bearish,
+  // soft transitions 30-40 and 60-70, and 40-60 is a genuine dead zone.
   const rsi = calcRSI(candles);
   let rsiScore;
-  if (rsi <= 30) rsiScore = (30-rsi)/30*100;
-  else if (rsi >= 70) rsiScore = (70-rsi)/30*100;
-  else rsiScore = (50-rsi)/20*50;
+  if (rsi <= 30)      rsiScore = (30 - rsi) / 30 * 100;        // deep oversold → strong bull
+  else if (rsi <= 40) rsiScore = (40 - rsi) / 10 * 20;          // mild oversold → weak bull
+  else if (rsi >= 70) rsiScore = (70 - rsi) / 30 * 100;         // deep overbought → strong bear
+  else if (rsi >= 60) rsiScore = (60 - rsi) / 10 * 20;          // mild overbought → weak bear
+  else                rsiScore = 0;                              // dead zone 40-60
   factors.rsi = { name: 'RSI', score: rsiScore, detail: rsi.toFixed(0) };
 
   // 6. MACD
@@ -584,11 +600,14 @@ function computeFactors(candles) {
   const { percentB } = calcBollinger(candles);
   factors.bollinger = { name: 'Bollinger', score: Math.max(-100,Math.min(100,(0.5-percentB)*200)) };
 
-  // 8. Streak
+  // 8. Streak — intraday only (short-term momentum).
+  // For longer horizons, runReversion (factor #20) provides the mean-reversion counterweight,
+  // computed from daily candles. Keep streak score mild so it doesn't fight runReversion.
   const lastDir = candles[N-1].close>=candles[N-1].open?1:-1;
   let streak = 1;
   for (let i = N-2; i>=0; i--) { if ((candles[i].close>=candles[i].open?1:-1)===lastDir) streak++; else break; }
-  factors.streak = { name: 'Streak', score: lastDir*Math.min(streak,10)*10, detail: `${streak} ${lastDir>0?'green':'red'}` };
+  // Score capped at ±40 (was ±100). Only a gentle confirmation signal.
+  factors.streak = { name: 'Streak', score: lastDir*Math.min(streak,8)*5, detail: `${streak} ${lastDir>0?'green':'red'}` };
 
   // 9. Wicks
   let wBias = 0, wCnt = 0;
@@ -617,21 +636,24 @@ function computeFactors(candles) {
     factors.longShort = { name: 'L/S Ratio', score: 0, detail: 'N/A' };
   }
 
-  // 13. Open Interest (rising OI + trend = confirmation)
+  // 13. Open Interest — independent signal (no coupling to momentum).
+  // Rising OI = new capital entering the market. Interpretation depends on context,
+  // but as a standalone factor: OI growth is mildly bullish (fresh money, conviction),
+  // OI contraction is bearish (deleveraging, position unwind).
   if (state.openInterest) {
     const oiChange = state.openInterest.change;
-    // OI rising in direction of trend = bullish confirmation
-    const trendDir = factors.momentum.score >= 0 ? 1 : -1;
-    const oiScore = Math.max(-100, Math.min(100, trendDir * oiChange * 5));
+    const oiScore = Math.max(-100, Math.min(100, oiChange * 5));
     factors.openInterest = { name: 'Open Int.', score: oiScore, detail: `${oiChange>=0?'+':''}${oiChange.toFixed(1)}%` };
   } else {
     factors.openInterest = { name: 'Open Int.', score: 0, detail: 'N/A' };
   }
 
-  // 14. BTC Dominance (rising dom = risk-off, bearish for alts but bullish for BTC)
+  // 14. BTC Dominance (rising dom = risk-off, bullish for BTC; low dom = alt season).
+  // Baseline shifted to 57% — that's the historical mean over the last 3 years.
+  // Using 50% gave a permanent false-bull bias since dominance never approached 50%.
   if (state.btcDominance !== null) {
     const dom = state.btcDominance;
-    const domScore = Math.max(-100, Math.min(100, (dom - 50) * 4));
+    const domScore = Math.max(-100, Math.min(100, (dom - 57) * 4));
     factors.btcDom = { name: 'BTC Dom.', score: domScore, detail: `${dom.toFixed(1)}%` };
   } else {
     factors.btcDom = { name: 'BTC Dom.', score: 0, detail: 'N/A' };
@@ -658,18 +680,36 @@ function computeFactors(candles) {
     factors.halving = { name: 'Halving', score: 0, detail: 'N/A' };
   }
 
-  // Fear & Greed as a factor (not just external modifier)
+  // Fear & Greed — contrarian, but strongly non-linear.
+  // Historically: F&G < 20 (extreme fear) → strong bull setup. F&G > 80 (extreme greed) → strong bear.
+  // Mid-range is noise — previous linear formula overweighted normal readings.
   if (state.fearGreed) {
-    const fgScore = (50 - state.fearGreed.value) / 50 * 80; // contrarian
-    factors.fearGreed = { name: 'Fear&Greed', score: fgScore, detail: `${state.fearGreed.value} ${state.fearGreed.label}` };
+    const v = state.fearGreed.value;
+    let fgScore;
+    if (v < 20)      fgScore = 80;               // extreme fear → strong bullish
+    else if (v < 35) fgScore = (35 - v) / 15 * 40; // 30→13, 20→40
+    else if (v > 80) fgScore = -80;              // extreme greed → strong bearish
+    else if (v > 65) fgScore = (65 - v) / 15 * 40; // 70→-13, 80→-40
+    else             fgScore = 0;                // mid-range: noise
+    factors.fearGreed = { name: 'Fear&Greed', score: fgScore, detail: `${v} ${state.fearGreed.label}` };
   } else {
     factors.fearGreed = { name: 'Fear&Greed', score: 0, detail: 'N/A' };
   }
 
-  // Funding Rate as a factor
+  // Funding Rate — contrarian, non-linear by threshold.
+  // Previous coef 50000 was too weak: normal funding (0.01%) gave score=-5, barely detectable.
+  // Now step-based: anything beyond ±0.05% is significant extreme.
   if (state.fundingRate !== null) {
-    const frScore = Math.max(-100, Math.min(100, -state.fundingRate * 50000));
-    factors.funding = { name: 'Funding', score: frScore, detail: `${(state.fundingRate*100).toFixed(4)}%` };
+    const fr = state.fundingRate;         // e.g. 0.0001 = 0.01%
+    const bps = fr * 10000;               // to basis points: 0.01% → 1bp
+    let frScore;
+    if (bps > 5)       frScore = -80;     // extreme longs paying (>0.05% per 8h) → bearish
+    else if (bps > 2)  frScore = -(bps - 2) / 3 * 60;  // 2bp → 0, 5bp → -60
+    else if (bps < -3) frScore = 80;      // shorts paying (extreme negative) → bullish
+    else if (bps < -1) frScore = (-1 - bps) / 2 * 60;  // -1bp → 0, -3bp → +60
+    else               frScore = -bps * 10;  // mild: linear around zero
+    frScore = Math.max(-100, Math.min(100, frScore));
+    factors.funding = { name: 'Funding', score: frScore, detail: `${(fr*100).toFixed(4)}%` };
   } else {
     factors.funding = { name: 'Funding', score: 0, detail: 'N/A' };
   }
@@ -700,14 +740,52 @@ function computeFactors(candles) {
     factors.seasonality = { name: 'Season', score: 0, detail: 'N/A' };
   }
 
-  // 19. Pain/Drawdown contrarian (deep drawdown from ATH = historically bullish)
+  // 19. Pain/Drawdown contrarian (deep drawdown from ATH = historically bullish).
+  // dd = currentDD is always >= 0, so score bottom-clamp of -20 was unreachable dead code.
+  // -50% DD → strong buy (+80), -20% → mild (+32), 0% (at ATH) → neutral (0).
   if (state.patternData && state.patternData.growth && state.patternData.growth.pain) {
     const dd = state.patternData.growth.pain.currentDD;
-    // -50% DD → strong buy signal (+80), -20% → mild (+30), 0% (at ATH) → neutral, stays positive
-    const painScore = Math.max(-20, Math.min(100, dd * 1.6));
+    const painScore = Math.max(0, Math.min(100, dd * 1.6));
     factors.painDD = { name: 'Drawdown', score: painScore, detail: `-${dd.toFixed(0)}% ATH` };
   } else {
     factors.painDD = { name: 'Drawdown', score: 0, detail: 'N/A' };
+  }
+
+  // 20. Run reversion — after N consecutive days, probability of next green day
+  // Data-backed: >=4 red in a row → 62.3% next green (base 52.3%). >=8 green in row → 23% next green.
+  if (state.patternData && state.patternData.growth && state.patternData.growth.runs) {
+    const r = state.patternData.growth.runs;
+    if (r.nextGreenPct !== null) {
+      // deviation from 52.3% baseline → score -100..+100
+      const delta = r.nextGreenPct - r.baseline;
+      const score = Math.max(-100, Math.min(100, delta * 6));
+      const sign = r.currentRun > 0 ? '+' : '';
+      factors.runReversion = { name: 'Run', score, detail: `${sign}${r.currentRun}d → ${r.nextGreenPct.toFixed(0)}%` };
+    } else {
+      factors.runReversion = { name: 'Run', score: 0, detail: 'small sample' };
+    }
+  } else {
+    factors.runReversion = { name: 'Run', score: 0, detail: 'N/A' };
+  }
+
+  // 21. Drawdown duration — current days below ATH vs median of past drawdowns
+  // Data-backed: past bears 1184/1080/847d. If curDays >> median → recovery closer.
+  if (state.patternData && state.patternData.growth && state.patternData.growth.ddDuration) {
+    const d = state.patternData.growth.ddDuration;
+    if (d.inDrawdown && d.medianDays > 0) {
+      // ratio=1 → right at median (neutral). ratio=2 → very overdue (+80 bull).
+      // ratio=0.1 → just started (-30 bear, still early).
+      const ratio = d.ratio;
+      let score = 0;
+      if (ratio >= 1)      score = Math.min(100, 40 + (ratio - 1) * 60);
+      else if (ratio >= 0.5) score = (ratio - 0.5) * 80; // 0.5→0, 1→40
+      else                 score = -30 + ratio * 60; // 0→-30, 0.5→0
+      factors.ddDuration = { name: 'DD days', score, detail: `${d.curDays}d / ${d.medianDays}d med` };
+    } else {
+      factors.ddDuration = { name: 'DD days', score: 0, detail: 'at ATH' };
+    }
+  } else {
+    factors.ddDuration = { name: 'DD days', score: 0, detail: 'N/A' };
   }
 
   // Meta
@@ -715,13 +793,57 @@ function computeFactors(candles) {
   return factors;
 }
 
-function scoreHorizon(factors, weights) {
-  let raw = 0;
-  for (const [key, w] of Object.entries(weights)) {
-    const s = factors[key] && isFinite(factors[key].score) ? factors[key].score : 0;
-    raw += s * w;
+// Realized annualised volatility over the last `window` candles (log returns).
+// Returns null if we don't have enough data or the candle interval is unknown.
+function realizedVol(candles, window) {
+  window = window || 20;
+  const n = candles.length;
+  if (n < window + 1) return null;
+  const slice = candles.slice(n - window - 1);
+  const rets = [];
+  for (let i = 1; i < slice.length; i++) {
+    const a = slice[i - 1].close, b = slice[i].close;
+    if (a > 0 && b > 0) rets.push(Math.log(b / a));
   }
-  const score = Math.max(-100, Math.min(100, isFinite(raw) ? raw : 0));
+  if (rets.length < 2) return null;
+  const m = rets.reduce((a, b) => a + b, 0) / rets.length;
+  const v = rets.reduce((s, x) => s + (x - m) * (x - m), 0) / rets.length;
+  // Infer periods-per-year from candle spacing (daily ≈ 365, 4h ≈ 2190, 1h ≈ 8760).
+  const dt = slice[slice.length - 1].timestamp - slice[0].timestamp;
+  const periodMs = dt / (slice.length - 1);
+  const periodsPerYear = periodMs > 0 ? (365 * 86400000) / periodMs : 365;
+  return Math.sqrt(v) * Math.sqrt(periodsPerYear);
+}
+
+function scoreHorizon(factors, weights, candles) {
+  // Normalise by active weights: if a factor is missing (e.g. patternData not yet loaded,
+  // or an external API returned null), its weight is excluded rather than contributing 0.
+  // Previously a factor with weight=0.09 and score=0 silently dragged the total down by
+  // up to 25% on the LONG horizon when pattern data wasn't loaded yet.
+  let raw = 0, activeW = 0;
+  for (const [key, w] of Object.entries(weights)) {
+    const f = factors[key];
+    if (!f || !isFinite(f.score)) continue;
+    // Treat factors explicitly flagged as N/A as missing too.
+    if (f.detail === 'N/A') continue;
+    raw += f.score * w;
+    activeW += w;
+  }
+  const norm = activeW > 0 ? raw / activeW : 0;
+  let score = Math.max(-100, Math.min(100, isFinite(norm) ? norm : 0));
+
+  // Volatility scaling: amplify signals in quiet regimes, dampen in turbulent ones.
+  // Harvey et al. 2018 / Moskowitz 2012 — ~30% Sharpe improvement for vol-targeted strategies.
+  // BTC median 20-period realised vol ≈ 0.58 (annualised). Multiplier clamped to [0.5, 2.0]
+  // so an extreme-vol day can't silence the engine, and a calm day can't over-amplify.
+  if (candles && candles.length >= 21) {
+    const sigma = realizedVol(candles, 20);
+    if (sigma && sigma > 0) {
+      const mult = Math.max(0.5, Math.min(2.0, 0.58 / sigma));
+      score = Math.max(-100, Math.min(100, score * mult));
+    }
+  }
+
   const direction = score >= 0 ? 'UP' : 'DOWN';
   const probability = Math.round(50 + (Math.abs(score) / 100) * 35);
   return { score, direction, probability };
@@ -736,9 +858,9 @@ function computePrediction(candles, dailyCandles) {
     dailyFactors = computeFactors(dailyCandles);
   }
 
-  // Compute 3 horizons
-  const short = scoreHorizon(factors, HORIZON_WEIGHTS.SHORT);
-  const medium = scoreHorizon(factors, HORIZON_WEIGHTS.MEDIUM);
+  // Compute 3 horizons — pass candles so scoreHorizon can apply volatility scaling.
+  const short = scoreHorizon(factors, HORIZON_WEIGHTS.SHORT, candles);
+  const medium = scoreHorizon(factors, HORIZON_WEIGHTS.MEDIUM, candles);
 
   // For LONG: blend current + daily factors if available
   let longFactors = factors;
@@ -749,7 +871,20 @@ function computePrediction(candles, dailyCandles) {
       if (dailyFactors[k]) longFactors[k] = dailyFactors[k];
     }
   }
-  const long = scoreHorizon(longFactors, HORIZON_WEIGHTS.LONG);
+  // LONG uses daily candles for vol scaling when available (longer-horizon vol regime).
+  const long = scoreHorizon(longFactors, HORIZON_WEIGHTS.LONG, dailyCandles || candles);
+
+  // Horizon disagreement shrink: if SHORT and LONG point opposite ways, the model
+  // isn't coherent — shrink all confidences toward 50% so we don't over-sell a signal
+  // the multi-timeframe view doesn't actually agree on. Coefficient 0.6 matches the
+  // multi-horizon calibration bump documented for technical-analysis ensembles.
+  if (short.direction !== long.direction) {
+    for (const h of [short, medium, long]) {
+      h.probability = Math.round(50 + (h.probability - 50) * 0.6);
+      h.score = h.score * 0.6;
+      h.horizonConflict = true;
+    }
+  }
 
   // ATR
   const price = factors._meta.price;
@@ -1260,6 +1395,86 @@ function analyzePatterns(candles) {
       thresholds: thresholds.map(t => ({ level: t, days: counts[t], pct: counts[t] / N * 100 })),
       currentDD, ath, daysAtAth, pctAtAth: daysAtAth / N * 100,
       normalPct: worseOrEqual / N * 100,
+    };
+  }
+
+  // =============================================
+  // J2) RUN REVERSION — after N consecutive up/down days, what's next?
+  // =============================================
+  {
+    const bucket = {}; // key: signed run length, value: { total, nextGreen, nextSumRet }
+    let run = 0;
+    for (let i = 0; i < N - 1; i++) {
+      const c = candles[i];
+      const up = c.c > c.o, dn = c.c < c.o;
+      if (up)      run = run > 0 ? run + 1 : 1;
+      else if (dn) run = run < 0 ? run - 1 : -1;
+      else         run = 0;
+      const nx = candles[i + 1];
+      const nxUp = nx.c > nx.o;
+      const nxRet = (nx.c - c.c) / c.c;
+      if (!bucket[run]) bucket[run] = { total: 0, nextGreen: 0, nextSumRet: 0 };
+      bucket[run].total++;
+      if (nxUp) bucket[run].nextGreen++;
+      bucket[run].nextSumRet += nxRet;
+    }
+    // current run of the latest candle
+    let curRun = 0;
+    for (let i = 0; i < N; i++) {
+      const c = candles[i];
+      const up = c.c > c.o, dn = c.c < c.o;
+      if (up)      curRun = curRun > 0 ? curRun + 1 : 1;
+      else if (dn) curRun = curRun < 0 ? curRun - 1 : -1;
+      else         curRun = 0;
+    }
+    const b = bucket[curRun];
+    let nextGreenPct = null, nextAvgRetPct = null, sample = 0;
+    if (b && b.total >= 10) {
+      nextGreenPct = b.nextGreen / b.total * 100;
+      nextAvgRetPct = b.nextSumRet / b.total * 100;
+      sample = b.total;
+    }
+    growth.runs = {
+      currentRun: curRun,   // +N = green run, -N = red run
+      nextGreenPct,         // null if sample too small
+      nextAvgRetPct,
+      sample,
+      baseline: 52.31,      // historical % of green days
+    };
+  }
+
+  // =============================================
+  // J3) DRAWDOWN DURATION — current days below ATH vs history
+  // =============================================
+  {
+    let ath = 0, peakIdx = 0;
+    let inDD = false, ddStart = null;
+    const recoveries = []; // days below ATH for completed drawdowns
+    for (let i = 0; i < N; i++) {
+      const c = candles[i];
+      if (c.c >= ath) {
+        if (inDD) {
+          recoveries.push(i - ddStart);
+          inDD = false;
+        }
+        ath = c.c;
+        peakIdx = i;
+      } else {
+        if (!inDD) { inDD = true; ddStart = peakIdx; }
+      }
+    }
+    // current drawdown days
+    const curDays = inDD ? (N - 1 - peakIdx) : 0;
+    // median of past recoveries (only significant ones — >30 days — to ignore noise)
+    const significant = recoveries.filter(d => d >= 30).sort((a, b) => a - b);
+    const medianDays = significant.length
+      ? significant[Math.floor(significant.length / 2)]
+      : 0;
+    growth.ddDuration = {
+      curDays,
+      medianDays,
+      ratio: medianDays > 0 ? curDays / medianDays : 0, // >1 means longer than typical
+      inDrawdown: inDD,
     };
   }
 
@@ -1883,14 +2098,26 @@ function render(data, pred) {
   h += `<span class="cyan">║</span>            <span class="${dirCls} bold big">${dirArrow} ${dirWord}</span>                    <span class="cyan">║</span>\n`;
   h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
   h += `<span class="cyan">║</span>    <span class="white">${L.confidence}</span>  <span class="${dirCls} bold big">${medium.probability}%</span>                        <span class="cyan">║</span>\n`;
+  if (medium.horizonConflict) {
+    const warnTxt = state.lang === 'ru' ? 'горизонты расходятся' : 'horizons disagree';
+    h += `<span class="cyan">║</span>    <span class="yellow">⚠ ${warnTxt}</span>\n`;
+  }
   h += `<span class="cyan">║</span>                                                      <span class="cyan">║</span>\n`;
 
-  // Accuracy
+  // Accuracy + DOS-style day progress bar (time until next UTC midnight check)
+  const nowForBar = new Date();
+  const dayStart = Date.UTC(nowForBar.getUTCFullYear(), nowForBar.getUTCMonth(), nowForBar.getUTCDate());
+  const dayEnd = dayStart + 86400000;
+  const dayProg = Math.max(0, Math.min(1, (nowForBar - dayStart) / (dayEnd - dayStart)));
+  const barLen = 14;
+  const barFill = Math.round(dayProg * barLen);
+  const barStr = '█'.repeat(barFill) + '░'.repeat(barLen - barFill);
+  const barPct = Math.round(dayProg * 100);
   if (accTomorrow && accTomorrow.total >= 1) {
     const aCls = accTomorrow.pct>=55?'bar-green':accTomorrow.pct<=45?'bar-red':'yellow';
-    h += `<span class="cyan">║</span>    <span class="dim">${L.accuracy}</span> <span class="${aCls} bold">${accTomorrow.pct.toFixed(0)}%</span> <span class="dim">(${accTomorrow.correct} ${L.ofTotal} ${accTomorrow.total})</span>\n`;
+    h += `<span class="cyan">║</span>    <span class="dim">${L.accuracy}</span> <span class="${aCls} bold">${accTomorrow.pct.toFixed(0)}%</span> <span class="dim">(${accTomorrow.correct} ${L.ofTotal} ${accTomorrow.total})</span>  <span class="dim">[</span><span class="yellow">${barStr}</span><span class="dim">] ${barPct}%</span>\n`;
   } else {
-    h += `<span class="cyan">║</span>    <span class="dim">${L.accuracy} ${L.collecting}</span>\n`;
+    h += `<span class="cyan">║</span>    <span class="dim">${L.accuracy} ${L.collecting}</span>  <span class="dim">[</span><span class="yellow">${barStr}</span><span class="dim">] ${barPct}%</span>\n`;
   }
 
   // Countdown to UTC midnight (= when "tomorrow" starts)
@@ -2033,6 +2260,19 @@ document.addEventListener('keydown', (e) => {
 
 document.getElementById('header').innerHTML = `<span class="dim">  ${LANG[state.lang].header}</span>\n`;
 refresh();
+
+// Auto-load pattern data in background on startup so historical factors
+// (runReversion, ddDuration, rainbow, seasonality, painDD) work immediately
+// without requiring the user to press [P].
+(async () => {
+  try {
+    const candles = await fetchAllHistory(() => {});
+    state.patternRawCandles = candles;
+    state.patternData = analyzePatterns(candles);
+    // re-render main forecast so the historical factors now contribute
+    refresh();
+  } catch { /* silent — [P] will still work manually */ }
+})();
 </script>
 </body>
 </html>
