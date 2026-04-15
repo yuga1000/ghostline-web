@@ -66,6 +66,8 @@ body {
 #auto-toggle { margin-left: auto; }
 .loading { color: #ffff55; }
 .error { color: #ff5555; }
+.btn-link { cursor: pointer; user-select: none; padding: 1px 2px; transition: background 0.1s; }
+.btn-link:hover { background: #55ffff; color: #0000aa; }
 </style>
 </head>
 <body>
@@ -2171,8 +2173,8 @@ function render(data, pred) {
   h += renderMiniCandles(candles) + '\n';
   h += `<span class="cyan">└${'─'.repeat(54)}┘</span>\n\n`;
 
-  // Toggle hints
-  h += `  <span class="cyan">[D] ${state.showDetails ? L.hideDetails : L.showDetails}</span>  <span class="cyan">[P] ${L.patterns}</span>  <span class="cyan">[L] EN/RU</span>\n\n`;
+  // Toggle hints (clickable)
+  h += `  <span class="cyan btn-link" data-act="toggleDetails">[D] ${state.showDetails ? L.hideDetails : L.showDetails}</span>  <span class="cyan btn-link" data-act="togglePatterns">[P] ${L.patterns}</span>  <span class="cyan btn-link" data-act="toggleLang">[L] EN/RU</span>\n\n`;
 
   // Collapsible details
   if (state.showDetails) {
@@ -2250,12 +2252,25 @@ function toggleAutoRefresh() {
 // Events
 document.getElementById('auto-toggle').addEventListener('click', toggleAutoRefresh);
 
+function doToggleDetails() { state.showDetails = !state.showDetails; refresh(); }
+function doTogglePatterns() { loadPatterns(); }
+function doToggleLang() { state.lang = state.lang==='en'?'ru':'en'; localStorage.setItem('signal_lang', state.lang); document.getElementById('header').innerHTML = `<span class="dim">  ${LANG[state.lang].header}</span>\n`; if (state.patternRawCandles) { state.patternData = analyzePatterns(state.patternRawCandles); renderPatternBlock(); } refresh(); }
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-act]');
+  if (!t) return;
+  const act = t.getAttribute('data-act');
+  if (act === 'toggleDetails') doToggleDetails();
+  else if (act === 'togglePatterns') doTogglePatterns();
+  else if (act === 'toggleLang') doToggleLang();
+});
+
 document.addEventListener('keydown', (e) => {
   if (e.key.toLowerCase()==='a') toggleAutoRefresh();
   if (e.key.toLowerCase()==='r') refresh();
-  if (e.key.toLowerCase()==='d') { state.showDetails = !state.showDetails; refresh(); }
-  if (e.key.toLowerCase()==='p') loadPatterns();
-  if (e.key.toLowerCase()==='l') { state.lang = state.lang==='en'?'ru':'en'; localStorage.setItem('signal_lang', state.lang); document.getElementById('header').innerHTML = `<span class="dim">  ${LANG[state.lang].header}</span>\n`; if (state.patternRawCandles) { state.patternData = analyzePatterns(state.patternRawCandles); renderPatternBlock(); } refresh(); }
+  if (e.key.toLowerCase()==='d') doToggleDetails();
+  if (e.key.toLowerCase()==='p') doTogglePatterns();
+  if (e.key.toLowerCase()==='l') doToggleLang();
 });
 
 document.getElementById('header').innerHTML = `<span class="dim">  ${LANG[state.lang].header}</span>\n`;
