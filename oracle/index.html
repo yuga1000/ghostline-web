@@ -77,6 +77,7 @@ body {
   <button class="tf-btn" data-tf="60">1H</button>
   <button class="tf-btn active" data-tf="240">4H</button>
   <button class="tf-btn" data-tf="D">1D</button>
+  <button class="tf-btn" data-tf="W">1W</button>
   <button id="auto-toggle">[A] AUTO: ON</button>
 </div>
 <pre id="output"><span class="loading">Connecting to exchange...</span><span class="blink">_</span></pre>
@@ -90,7 +91,7 @@ body {
 const CONFIG = {
   symbol: 'BTCUSDT',
   limit: 200,
-  refreshIntervals: { '60': 120, '240': 300, 'D': 600 },
+  refreshIntervals: { '60': 120, '240': 300, 'D': 600, 'W': 1200 },
 };
 
 let state = {
@@ -294,8 +295,8 @@ function buildCandlesFromMarketChart(prices, volumes, intervalMs) {
 
 async function fetchCoinGecko(timeframe) {
   // CoinGecko free: days=1 → ~5min data, days=7-30 → hourly, days=90+ → daily
-  const daysMap = { '60': 2, '240': 14, 'D': 90 };
-  const intervalMs = { '60': 3600000, '240': 14400000, 'D': 86400000 };
+  const daysMap = { '60': 2, '240': 14, 'D': 90, 'W': 365 };
+  const intervalMs = { '60': 3600000, '240': 14400000, 'D': 86400000, 'W': 604800000 };
   const days = daysMap[timeframe];
 
   const mcUrl = `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`;
@@ -316,7 +317,7 @@ async function fetchCoinGeckoDaily() {
 
 // ── Binance/Bybit (fallback) ──
 async function fetchBinance(timeframe) {
-  const intervalMap = { '60': '1h', '240': '4h', 'D': '1d' };
+  const intervalMap = { '60': '1h', '240': '4h', 'D': '1d', 'W': '1w' };
   const klineUrl = `https://api.binance.com/api/v3/klines?symbol=${CONFIG.symbol}&interval=${intervalMap[timeframe]}&limit=${CONFIG.limit}`;
   const tickerUrl = `https://api.binance.com/api/v3/ticker/24hr?symbol=${CONFIG.symbol}`;
   const [klineRes, tickerRes] = await Promise.all([tryFetch(klineUrl), tryFetch(tickerUrl)]);
@@ -414,11 +415,19 @@ async function fetchHalvingCycle() {
   } catch { return null; }
 }
 
-async function fetchData(timeframe) {
-  // Step 1: Main candle data (CoinGecko primary, Binance/Bybit fallback)
-  const marketData = await fetchCoinGecko(timeframe).catch(() => fetchBinance(timeframe)).catch(() => fetchBybit(timeframe));
+// Cache for TF-independent data (fetched once, reused across timeframe switches)
+const sideCache = {
+  ts: 0,
+  fearGreed: null, fundingRate: null, longShortRatio: null,
+  openInterest: null, ethBtcRatio: null, halvingCycle: null,
+  btcDominance: null, dailyCandles: null,
+};
+const SIDE_TTL_MS = 2 * 60 * 1000; // 2 min — signals don't change fast
 
-  // Step 2: Non-CoinGecko signals in parallel
+async function fetchSideSignals(force = false) {
+  const fresh = !force && (Date.now() - sideCache.ts < SIDE_TTL_MS) && sideCache.fearGreed !== null;
+  if (fresh) return;
+
   const [fg, fr, lsr, oi, ethbtc, halving] = await Promise.all([
     fetchFearGreed(),
     fetchFundingRate(),
@@ -427,24 +436,39 @@ async function fetchData(timeframe) {
     fetchEthBtcRatio(),
     fetchHalvingCycle(),
   ]);
+  sideCache.fearGreed = fg;
+  sideCache.fundingRate = fr;
+  sideCache.longShortRatio = lsr;
+  sideCache.openInterest = oi;
+  sideCache.ethBtcRatio = ethbtc;
+  sideCache.halvingCycle = halving;
 
-  state.fearGreed = fg;
-  state.fundingRate = fr;
-  state.longShortRatio = lsr;
-  state.openInterest = oi;
-  state.ethBtcRatio = ethbtc;
-  state.halvingCycle = halving;
+  // Daily candles + dominance — also TF-independent
+  const dailyResult = await fetchCoinGeckoDaily().catch(() => null);
+  if (dailyResult) sideCache.dailyCandles = dailyResult.candles;
+  sideCache.btcDominance = await fetchBtcDominance().catch(() => sideCache.btcDominance);
+  sideCache.ts = Date.now();
+}
 
-  // Step 3: More CoinGecko calls — sequential with delays to avoid rate limit
-  let dailyData = null;
-  if (timeframe !== 'D') {
-    await new Promise(r => setTimeout(r, 1500));
-    dailyData = await fetchCoinGeckoDaily().catch(() => null);
-  }
-  await new Promise(r => setTimeout(r, 1500));
-  state.btcDominance = await fetchBtcDominance().catch(() => null);
+async function fetchData(timeframe) {
+  // Candles for this TF — this is the only TF-dependent call
+  const candlesPromise = fetchCoinGecko(timeframe).catch(() => fetchBinance(timeframe)).catch(() => fetchBybit(timeframe));
 
-  marketData.dailyCandles = dailyData ? dailyData.candles : null;
+  // Kick off side-signal refresh in parallel (uses cache if fresh)
+  const sidePromise = fetchSideSignals();
+
+  const [marketData] = await Promise.all([candlesPromise, sidePromise]);
+
+  // Apply cached side signals to state
+  state.fearGreed = sideCache.fearGreed;
+  state.fundingRate = sideCache.fundingRate;
+  state.longShortRatio = sideCache.longShortRatio;
+  state.openInterest = sideCache.openInterest;
+  state.ethBtcRatio = sideCache.ethBtcRatio;
+  state.halvingCycle = sideCache.halvingCycle;
+  state.btcDominance = sideCache.btcDominance;
+
+  marketData.dailyCandles = sideCache.dailyCandles;
   return marketData;
 }
 
