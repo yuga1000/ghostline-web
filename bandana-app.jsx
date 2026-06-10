@@ -135,9 +135,10 @@ function BndCard({ b, onOpen }) {
   const [cw, setCw] = useState(0);
   const img = b.spread_url || bndPlaceholder(b.id);
   const sold = b.status === "SOLD_OUT";
+  const locked = b.status === "LOCKED";
   return (
-    <article className={"bnd-card" + (sold ? " is-sold" : "")} data-screen-label={"Card " + b.id}>
-      <button className="bnd-preview" onClick={() => onOpen(b, cw)} aria-label={"open " + b.name}>
+    <article className={"bnd-card" + (sold ? " is-sold" : "") + (locked ? " is-locked" : "")} data-screen-label={"Card " + b.id}>
+      <button className="bnd-preview" onClick={() => !locked && onOpen(b, cw)} aria-label={locked ? b.name + " locked" : "open " + b.name}>
         <span className="bnd-folded">
           <span className="bnd-img" style={{ backgroundImage: `url("${img}")` }}></span>
           <span className="bnd-tint" style={{ background: b.colorways[cw].hex }}></span>
@@ -147,6 +148,7 @@ function BndCard({ b, onOpen }) {
         </span>
         <span className="bnd-open-hint">[ UNFOLD ]</span>
         {sold && <span className="bnd-sold-stamp">SOLD_OUT</span>}
+        {locked && <span className="bnd-locked-stamp">▒ LOCKED</span>}
       </button>
       <div className="bnd-meta">
         <div className="bnd-meta-row">
@@ -155,7 +157,7 @@ function BndCard({ b, onOpen }) {
         </div>
         <h2 className="bnd-name">{b.name}</h2>
         <div className="bnd-meta-row">
-          <span className="bnd-price">{b.price} <i>{b.currency}</i></span>
+          <span className="bnd-price">{locked ? "··" : b.price} <i>{b.currency}</i></span>
           <span className="bnd-swatches">
             {b.colorways.map((c, i) => (
               <button key={c.id}
@@ -362,6 +364,28 @@ function PanelFX() {
   );
 }
 
+// ─── Fireflies: floating pixels over the order button ────
+function OrderFireflies({ n = 5 }) {
+  const flies = useMemo(() => Array.from({ length: n }, () => ({
+    left: 6 + Math.random() * 88,
+    delay: -(Math.random() * 6),
+    dur: 3.5 + Math.random() * 4,
+    size: Math.random() < 0.3 ? 3 : 2,
+  })), []);
+  return (
+    <span className="btn-flies" aria-hidden="true">
+      {flies.map((f, i) => (
+        <span key={i} className="btn-fly" style={{
+          left: f.left + "%",
+          width: f.size + "px", height: f.size + "px",
+          animationDuration: f.dur + "s",
+          animationDelay: f.delay + "s",
+        }}></span>
+      ))}
+    </span>
+  );
+}
+
 // ─── Order / payment flow ────────────────────────────────
 function OrderFlow({ b, cwIdx, size }) {
   const [step, setStep] = useState("idle");   // idle | pay
@@ -402,6 +426,7 @@ function OrderFlow({ b, cwIdx, size }) {
     <div className="order-flow">
       {step === "idle" && (
         <button className="btn-order" onClick={() => setStep("pay")}>
+          <OrderFireflies />
           ▶ ORDER — {b.price} {b.currency}
         </button>
       )}
@@ -429,6 +454,7 @@ function OrderFlow({ b, cwIdx, size }) {
           {result && <div className={"pay-result " + (result.ok ? "is-ok" : "is-err")}>{result.msg}</div>}
         </div>
       )}
+      <div className="ship-note">▸ shipping not included — calculated separately after order</div>
     </div>
   );
 }

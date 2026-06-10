@@ -248,6 +248,26 @@ input { font: inherit; }
   letter-spacing: 0.08em;
 }
 
+/* locked design — needs to be unlocked, game-style */
+.bnd-card.is-locked .bnd-img { filter: brightness(0.3) grayscale(1) contrast(0.85); }
+.bnd-card.is-locked .bnd-tint { display: none; }
+.bnd-card.is-locked .bnd-preview { cursor: default; }
+.bnd-card.is-locked .bnd-open-hint { display: none; }
+.bnd-card.is-locked .bnd-name,
+.bnd-card.is-locked .bnd-price { color: var(--text-mute); }
+.bnd-locked-stamp {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--pixel);
+  font-size: 11px;
+  color: var(--text-dim);
+  border: var(--bw) solid var(--line);
+  padding: 7px 12px;
+  background: rgba(0,0,0,0.85);
+  letter-spacing: 0.1em;
+}
+
 .bnd-meta { display: flex; flex-direction: column; gap: 7px; padding: 13px 15px 15px; }
 .bnd-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .bnd-code { color: var(--text-dim); font-size: 10px; letter-spacing: 0.16em; }
@@ -516,6 +536,8 @@ input { font: inherit; }
 /* ── Order / payment ─────────────────────────────────── */
 .order-flow { display: flex; flex-direction: column; gap: 10px; border-top: 1px dashed var(--dl); padding-top: 14px; }
 .btn-order {
+  position: relative;
+  overflow: hidden;
   border: var(--bw) solid var(--da);
   color: var(--da);
   padding: 11px 16px;
@@ -525,6 +547,25 @@ input { font: inherit; }
   transition: background .15s, box-shadow .15s;
 }
 .btn-order:hover { background: rgba(255,255,255,0.06); box-shadow: 0 0 18px var(--dg); }
+.btn-flies { position: absolute; inset: 0; pointer-events: none; display: block; }
+.btn-fly {
+  position: absolute; bottom: -4px;
+  background: rgba(255,255,255,0.8);
+  animation: btnFly linear infinite;
+  display: block;
+}
+@keyframes btnFly {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  15%  { opacity: 0.9; }
+  40%  { transform: translate(3px, -18px); }
+  70%  { transform: translate(-3px, -32px); opacity: 0.5; }
+  100% { transform: translate(2px, -48px); opacity: 0; }
+}
+.ship-note {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-mute);
+}
 .order-sold {
   border: var(--bw) solid var(--dl);
   color: var(--text-mute);
