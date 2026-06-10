@@ -273,7 +273,7 @@ input { font: inherit; }
 .detail-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); }
 .detail-panel {
   position: relative;
-  width: min(1160px, 100%);
+  width: min(1240px, 100%);
   max-height: calc(100vh - 48px);
   overflow-y: auto;
   border: var(--bw) solid var(--line-2);
@@ -308,11 +308,11 @@ input { font: inherit; }
 .gal-strip {
   display: flex; flex-wrap: wrap; gap: 6px;
   justify-content: center;
-  width: min(100%, 620px);
+  width: min(100%, 680px, calc(100vh - 270px));
   margin-top: 10px;
 }
 .gal-thumb {
-  width: 48px; height: 48px;
+  width: 54px; height: 54px;
   background-size: cover; background-position: center;
   border: 1px solid var(--line);
   background-color: transparent;
@@ -336,6 +336,7 @@ input { font: inherit; }
 
 /* ── Unfold spread ────────────────────────────────────── */
 .spread-stage {
+  width: 100%;
   display: flex; flex-direction: column; gap: 12px;
   align-items: center;
   perspective: 1300px;
@@ -343,11 +344,11 @@ input { font: inherit; }
 }
 .spread {
   position: relative;
-  width: min(100%, 620px);
+  width: min(100%, 680px, calc(100vh - 270px));
   aspect-ratio: 1 / 1;
   transform-style: preserve-3d;
 }
-.spread-caption { width: min(100%, 620px); }
+.spread-caption { width: min(100%, 680px, calc(100vh - 270px)); }
 .sq, .flap { position: absolute; }
 .sq.q-tl {
   top: 0; left: 0; width: 50%; height: 50%;
