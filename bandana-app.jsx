@@ -181,6 +181,51 @@ function UnfoldSpread({ b, cwIdx, unfoldMs }) {
   );
 }
 
+// ─── Spread viewer: unfold + photo gallery filmstrip ─────
+function SpreadViewer({ b, cwIdx, unfoldMs }) {
+  const gal = Array.isArray(b.gallery) ? b.gallery : [];
+  const [view, setView] = useState(-1);   // -1 = spread, 0..n = gallery photo
+  useEffect(() => { setView(-1); }, [b.id]);
+  useEffect(() => {
+    if (!gal.length) return;
+    const onKey = e => {
+      if (e.key === "ArrowRight") setView(v => Math.min(v + 1, gal.length - 1));
+      if (e.key === "ArrowLeft")  setView(v => Math.max(v - 1, -1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [gal.length]);
+  return (
+    <div className="spread-viewer">
+      {view < 0
+        ? <UnfoldSpread b={b} cwIdx={cwIdx} unfoldMs={unfoldMs} />
+        : (
+          <div className="gal-stage">
+            <img className="gal-photo" src={gal[view]} alt={b.id + " photo " + (view + 1)} />
+            <div className="spread-caption">
+              <span>{b.id} // photo {String(view + 1).padStart(2, "0")}/{String(gal.length).padStart(2, "0")}</span>
+              <span className="spread-state is-open">DETAIL</span>
+            </div>
+          </div>
+        )}
+      {gal.length > 0 && (
+        <div className="gal-strip">
+          <button
+            className={"gal-thumb gal-thumb-spread" + (view < 0 ? " is-on" : "")}
+            onClick={() => setView(-1)}>SPREAD</button>
+          {gal.map((u, i) => (
+            <button key={u}
+              className={"gal-thumb" + (view === i ? " is-on" : "")}
+              style={{ backgroundImage: `url("${u}")` }}
+              onClick={() => setView(i)}
+              aria-label={"photo " + (i + 1)}></button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Order / payment flow ────────────────────────────────
 function OrderFlow({ b, cwIdx }) {
   const [step, setStep] = useState("idle");   // idle | pay
@@ -265,7 +310,7 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, onClose }) {
       <div className="detail-panel">
         <button className="detail-close" onClick={onClose}>[ ESC ] CLOSE ✕</button>
         <div className="detail-cols">
-          <UnfoldSpread b={b} cwIdx={cw} unfoldMs={unfoldMs} />
+          <SpreadViewer b={b} cwIdx={cw} unfoldMs={unfoldMs} />
           <div className="detail-info">
             <div className="di-code">{b.id}</div>
             <h2 className="di-name">{b.name}</h2>

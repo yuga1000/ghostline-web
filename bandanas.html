@@ -299,6 +299,54 @@ input { font: inherit; }
   align-items: start;
 }
 
+/* ── Spread viewer: unfold + gallery filmstrip ────────── */
+.spread-viewer {
+  display: flex; flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.gal-stage {
+  display: flex; flex-direction: column; gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  width: 100%;
+}
+.gal-photo {
+  width: min(100%, 440px);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  display: block;
+}
+.gal-strip {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  justify-content: center;
+  width: min(100%, 440px);
+  margin-top: 10px;
+}
+.gal-thumb {
+  width: 48px; height: 48px;
+  background-size: cover; background-position: center;
+  border: 1px solid var(--line);
+  background-color: transparent;
+  cursor: pointer;
+  opacity: 0.55;
+  padding: 0;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.gal-thumb:hover { opacity: 0.9; }
+.gal-thumb.is-on {
+  opacity: 1;
+  border-color: var(--accent);
+  box-shadow: 0 0 7px var(--glow);
+}
+.gal-thumb-spread {
+  width: auto; padding: 0 10px;
+  font-family: inherit; font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
 /* ── Unfold spread ────────────────────────────────────── */
 .spread-stage {
   display: flex; flex-direction: column; gap: 12px;
