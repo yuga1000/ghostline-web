@@ -133,12 +133,18 @@ function PixelSparks() {
 // ─── Catalog card ────────────────────────────────────────
 function BndCard({ b, onOpen }) {
   const [cw, setCw] = useState(0);
+  const [warn, setWarn] = useState(0);
   const img = b.spread_url || bndPlaceholder(b.id);
   const sold = b.status === "SOLD_OUT";
   const locked = b.status === "LOCKED";
+  useEffect(() => {
+    if (!warn) return;
+    const t = setTimeout(() => setWarn(0), 1300);
+    return () => clearTimeout(t);
+  }, [warn]);
   return (
     <article className={"bnd-card" + (sold ? " is-sold" : "") + (locked ? " is-locked" : "")} data-screen-label={"Card " + b.id}>
-      <button className="bnd-preview" onClick={() => !locked && onOpen(b, cw)} aria-label={locked ? b.name + " locked" : "open " + b.name}>
+      <button className="bnd-preview" onClick={() => locked ? setWarn(w => w + 1) : onOpen(b, cw)} aria-label={locked ? b.name + " locked" : "open " + b.name}>
         <span className="bnd-folded">
           <span className="bnd-img" style={{ backgroundImage: `url("${img}")` }}></span>
           <span className="bnd-tint" style={{ background: b.colorways[cw].hex }}></span>
@@ -148,7 +154,12 @@ function BndCard({ b, onOpen }) {
         </span>
         <span className="bnd-open-hint">[ UNFOLD ]</span>
         {sold && <span className="bnd-sold-stamp">SOLD_OUT</span>}
-        {locked && <span className="bnd-locked-stamp">▒ LOCKED</span>}
+        {locked && warn === 0 && <span className="bnd-locked-stamp">▒ LOCKED</span>}
+        {warn > 0 && (
+          <span className="gal-warn" key={warn}>
+            <span className="gal-warn-box">▒ LOCKED // NOT ENOUGH GHOST_PTS</span>
+          </span>
+        )}
       </button>
       <div className="bnd-meta">
         <div className="bnd-meta-row">
@@ -289,18 +300,37 @@ function useDarkImgs(urls) {
 const BND_BACKING = "#6e6a62";
 function SpreadViewer({ b, cwIdx, unfoldMs }) {
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
+  const lockedIdx = Array.isArray(b.locked_gallery) ? b.locked_gallery : [];
+  const isLockedAt = i => lockedIdx.indexOf(i) !== -1;
   const [view, setView] = useState(-1);   // -1 = spread, 0..n = gallery photo
+  const [warn, setWarn] = useState(0);    // >0 = locked warning flash
   const isDark = useDarkImgs([b.spread_url].concat(gal));
   useEffect(() => { setView(-1); }, [b.id]);
   useEffect(() => {
+    if (!warn) return;
+    const t = setTimeout(() => setWarn(0), 1300);
+    return () => clearTimeout(t);
+  }, [warn]);
+  const tryView = i => {
+    if (i >= 0 && isLockedAt(i)) { setWarn(w => w + 1); return; }
+    setView(i);
+  };
+  useEffect(() => {
     if (!gal.length) return;
     const onKey = e => {
-      if (e.key === "ArrowRight") setView(v => Math.min(v + 1, gal.length - 1));
-      if (e.key === "ArrowLeft")  setView(v => Math.max(v - 1, -1));
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const dir = e.key === "ArrowRight" ? 1 : -1;
+      setView(v => {
+        let n = v + dir;
+        while (n >= 0 && n < gal.length && isLockedAt(n)) n += dir;
+        if (n < -1) n = -1;
+        if (n >= gal.length) n = v;
+        return n;
+      });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [gal.length]);
+  }, [gal.length, lockedIdx.join(",")]);
   const pad = n => String(n).padStart(2, "0");
   const img = view < 0 ? null : gal[view];
   return (
@@ -310,22 +340,32 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
         b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
         imgOverride={img}
         bgColor={isDark(img || b.spread_url) ? BND_BACKING : "#000"}
-        photoLabel={view < 0 ? null : "photo " + pad(view + 1) + "/" + pad(gal.length)} />
+        photoLabel={view < 0 ? null : "V" + pad(view + 1) + " / " + pad(gal.length)} />
       {gal.length > 0 && (
         <div className="gal-strip">
           <button
             className={"gal-thumb gal-thumb-spread" + (view < 0 ? " is-on" : "")}
-            onClick={() => setView(-1)}>SPREAD</button>
-          {gal.map((u, i) => (
-            <button key={u}
-              className={"gal-thumb" + (view === i ? " is-on" : "")}
-              style={{
-                backgroundImage: `url("${u}")`,
-                backgroundColor: isDark(u) ? BND_BACKING : undefined,
-              }}
-              onClick={() => setView(i)}
-              aria-label={"photo " + (i + 1)}></button>
-          ))}
+            onClick={() => tryView(-1)}>SPREAD</button>
+          {gal.map((u, i) => {
+            const lk = isLockedAt(i);
+            return (
+              <button key={u}
+                className={"gal-thumb" + (view === i ? " is-on" : "") + (lk ? " is-locked" : "")}
+                style={{
+                  backgroundImage: `url("${u}")`,
+                  backgroundColor: isDark(u) ? BND_BACKING : undefined,
+                }}
+                onClick={() => tryView(i)}
+                aria-label={"photo " + (i + 1) + (lk ? " locked" : "")}>
+                {lk && <span className="gal-thumb-lock">▒</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      {warn > 0 && (
+        <div className="gal-warn" key={warn}>
+          <span className="gal-warn-box">▒ LOCKED // NOT ENOUGH GHOST_PTS</span>
         </div>
       )}
     </div>
