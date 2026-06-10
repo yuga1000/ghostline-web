@@ -130,6 +130,42 @@ function PixelSparks() {
   );
 }
 
+// ─── Boot log reveal: terminal lines, then the card ──────
+function BootReveal({ index, b, children }) {
+  const locked = b.status === "LOCKED";
+  const lines = useMemo(() => [
+    "> mount /drop_01/" + b.id.toLowerCase(),
+    "> load spread.png ....... ok",
+    "> decrypt colorways ..... ok",
+    "> verify stock .......... " + (locked ? "denied" : "ok"),
+    locked ? "> access ............ LOCKED" : "> render",
+  ], [b.id, locked]);
+  const [n, setN] = useState(0);
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    const start = 140 + index * 130;
+    const ts = lines.map((_, i) => setTimeout(() => setN(i + 1), start + i * 75));
+    ts.push(setTimeout(() => setDone(true), start + lines.length * 75 + 150));
+    return () => ts.forEach(clearTimeout);
+  }, []);
+  if (done) return <div className="boot-in">{children}</div>;
+  return (
+    <article className="bnd-card is-boot" aria-hidden="true">
+      <div className="bnd-preview">
+        <div className="bootlog">
+          {lines.slice(0, n).map((l, i) => (
+            <div key={i} className={"bl-line" + (i === n - 1 ? " is-last" : "")}>{l}</div>
+          ))}
+          <span className="bl-cursor">▮</span>
+        </div>
+      </div>
+      <div className="bnd-meta">
+        <div className="bl-line">{n >= lines.length ? "> init card…" : "> …"}</div>
+      </div>
+    </article>
+  );
+}
+
 // ─── Catalog card ────────────────────────────────────────
 function BndCard({ b, onOpen }) {
   const [cw, setCw] = useState(0);
@@ -627,8 +663,10 @@ function BndApp() {
       <main className="bnd-page">
         <BndHeader />
         <div className="bnd-grid">
-          {catalog.items.map(b => (
-            <BndCard key={b.id} b={b} onOpen={(bb, cw) => setOpen({ b: bb, cw })} />
+          {catalog.items.map((b, i) => (
+            <BootReveal key={b.id} index={i} b={b}>
+              <BndCard b={b} onOpen={(bb, cw) => setOpen({ b: bb, cw })} />
+            </BootReveal>
           ))}
         </div>
         <footer className="bnd-footer">

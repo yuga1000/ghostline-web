@@ -248,6 +248,32 @@ input { font: inherit; }
   letter-spacing: 0.08em;
 }
 
+/* boot log reveal on page load */
+.bnd-card.is-boot .bnd-preview { cursor: default; }
+.bootlog {
+  position: absolute; inset: 14px;
+  font-size: 10px;
+  line-height: 1.9;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-align: left;
+  overflow: hidden;
+}
+.bl-line { white-space: pre; }
+.bl-line.is-last { color: var(--text); }
+.bl-cursor {
+  display: inline-block;
+  color: var(--accent);
+  animation: blBlink 0.7s steps(1) infinite;
+}
+@keyframes blBlink { 50% { opacity: 0; } }
+.boot-in { animation: cardIn 0.3s steps(3, jump-none); }
+@keyframes cardIn {
+  0%   { opacity: 0; filter: brightness(2.4); }
+  60%  { opacity: 1; filter: brightness(1.4); }
+  100% { opacity: 1; filter: none; }
+}
+
 /* locked design — needs to be unlocked, game-style */
 .bnd-card.is-locked .bnd-img { filter: brightness(0.3) grayscale(1) contrast(0.85); }
 .bnd-card.is-locked .bnd-tint { display: none; }
