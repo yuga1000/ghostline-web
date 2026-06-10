@@ -136,17 +136,18 @@ function BndCard({ b, onOpen }) {
 }
 
 // ─── Unfold spread (2-stage cloth unfold) ────────────────
-function UnfoldSpread({ b, cwIdx, unfoldMs }) {
+function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) {
   const [stage, setStage] = useState(0);
-  const img = b.spread_url || bndPlaceholder(b.id);
+  const img = imgOverride || b.spread_url || bndPlaceholder(b.id);
   const tint = b.colorways[cwIdx].hex;
   useEffect(() => {
     setStage(0);
     const t1 = setTimeout(() => setStage(1), 220);
     const t2 = setTimeout(() => setStage(2), 220 + unfoldMs);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [b.id, cwIdx]);
+  }, [b.id, cwIdx, img]);
   const q = (x, y) => ({
+    backgroundColor: bgColor || undefined,
     backgroundImage: `url("${img}")`,
     backgroundSize: "200% 200%",
     backgroundPosition: `${x}% ${y}%`,
@@ -164,6 +165,7 @@ function UnfoldSpread({ b, cwIdx, unfoldMs }) {
         </div>
         <div className="flap f-bottom" style={dur}>
           <span className="flap-face" style={{
+            backgroundColor: bgColor || undefined,
             backgroundImage: `url("${img}")`,
             backgroundSize: "100% 200%",
             backgroundPosition: "0 100%",
@@ -172,7 +174,7 @@ function UnfoldSpread({ b, cwIdx, unfoldMs }) {
         </div>
       </div>
       <div className="spread-caption">
-        <span>{b.id} // full spread · 550×550 mm</span>
+        <span>{b.id} // {photoLabel || "full spread · 550×550 mm"}</span>
         <span className={"spread-state " + (stage === 2 ? "is-open" : "")}>
           {stage === 0 ? "FOLDED" : stage === 1 ? "UNFOLDING…" : "OPEN"}
         </span>
@@ -181,10 +183,48 @@ function UnfoldSpread({ b, cwIdx, unfoldMs }) {
   );
 }
 
+// ─── Dark-image detection (light backing for black PNGs) ─
+const darkCache = {};
+function useDarkImgs(urls) {
+  const [, bump] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    urls.forEach(u => {
+      if (!u || darkCache[u] !== undefined) return;
+      darkCache[u] = false;
+      const im = new Image();
+      im.crossOrigin = "anonymous";
+      im.onload = () => {
+        try {
+          const c = document.createElement("canvas");
+          c.width = c.height = 16;
+          const x = c.getContext("2d");
+          x.drawImage(im, 0, 0, 16, 16);
+          const d = x.getImageData(0, 0, 16, 16).data;
+          let s = 0, n = 0, trans = 0;
+          for (let i = 0; i < d.length; i += 4) {
+            if (d[i + 3] < 128) { trans++; continue; }
+            s += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+            n++;
+          }
+          // backing only for transparent PNGs whose visible pixels are dark
+          darkCache[u] = (trans / 256) > 0.25 && n > 0 && (s / n) < 0.45;
+        } catch (e) { /* canvas blocked — keep false */ }
+        if (alive && darkCache[u]) bump(n => n + 1);
+      };
+      im.src = u;
+    });
+    return () => { alive = false; };
+  }, [urls.join("|")]);
+  return u => !!darkCache[u];
+}
+
 // ─── Spread viewer: unfold + photo gallery filmstrip ─────
+const BND_BACKING = "#d8d4c8";
 function SpreadViewer({ b, cwIdx, unfoldMs }) {
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
   const [view, setView] = useState(-1);   // -1 = spread, 0..n = gallery photo
+  const isDark = useDarkImgs([b.spread_url].concat(gal));
   useEffect(() => { setView(-1); }, [b.id]);
   useEffect(() => {
     if (!gal.length) return;
@@ -195,19 +235,16 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [gal.length]);
+  const pad = n => String(n).padStart(2, "0");
+  const img = view < 0 ? null : gal[view];
   return (
     <div className="spread-viewer">
-      {view < 0
-        ? <UnfoldSpread b={b} cwIdx={cwIdx} unfoldMs={unfoldMs} />
-        : (
-          <div className="gal-stage">
-            <img className="gal-photo" src={gal[view]} alt={b.id + " photo " + (view + 1)} />
-            <div className="spread-caption">
-              <span>{b.id} // photo {String(view + 1).padStart(2, "0")}/{String(gal.length).padStart(2, "0")}</span>
-              <span className="spread-state is-open">DETAIL</span>
-            </div>
-          </div>
-        )}
+      <UnfoldSpread
+        key={b.id + ":" + view}
+        b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
+        imgOverride={img}
+        bgColor={isDark(img || b.spread_url) ? BND_BACKING : null}
+        photoLabel={view < 0 ? null : "photo " + pad(view + 1) + "/" + pad(gal.length)} />
       {gal.length > 0 && (
         <div className="gal-strip">
           <button
@@ -216,7 +253,10 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
           {gal.map((u, i) => (
             <button key={u}
               className={"gal-thumb" + (view === i ? " is-on" : "")}
-              style={{ backgroundImage: `url("${u}")` }}
+              style={{
+                backgroundImage: `url("${u}")`,
+                backgroundColor: isDark(u) ? BND_BACKING : undefined,
+              }}
               onClick={() => setView(i)}
               aria-label={"photo " + (i + 1)}></button>
           ))}
@@ -298,7 +338,7 @@ function OrderFlow({ b, cwIdx }) {
 
 // ─── Detail overlay ──────────────────────────────────────
 function DetailOverlay({ b, cwIdx: initCw, unfoldMs, onClose }) {
-  const [cw, setCw] = useState(initCw);
+  const cw = initCw;
   useEffect(() => {
     const onKey = e => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -318,28 +358,6 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, onClose }) {
               <span className="di-price">{b.price} <i>{b.currency}</i></span>
               <span className="di-status"><BndStatusDot status={b.status} /> {b.status}</span>
             </div>
-            <div className="di-row di-stock">
-              <StockBar stock={b.stock} total={b.total} />
-              <span className="di-stock-n">{b.stock}/{b.total}</span>
-            </div>
-            <div className="di-cw">
-              <span className="di-label">COLORWAY</span>
-              <div className="di-swatches">
-                {b.colorways.map((c, i) => (
-                  <button key={c.id}
-                    className={"di-swatch" + (i === cw ? " is-on" : "")}
-                    onClick={() => setCw(i)}>
-                    <span className="di-sw-chip" style={{ background: c.hex }}></span>
-                    {c.id}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <ul className="di-specs">
-              <li><span>SIZE</span><span>550 × 550 mm</span></li>
-              <li><span>FABRIC</span><span>TBD — draft</span></li>
-              <li><span>RUN</span><span>limited · {b.total} units</span></li>
-            </ul>
             <OrderFlow b={b} cwIdx={cw} />
           </div>
         </div>
