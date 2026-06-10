@@ -14,7 +14,8 @@ const BND_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "palette": "amber",
   "scanlines": true,
   "showGrid": true,
-  "unfoldMs": 620
+  "unfoldMs": 620,
+  "detailMono": true
 }/*EDITMODE-END*/;
 
 // ─── BTC ticker (same as Lab page) ───────────────────────
@@ -136,15 +137,35 @@ function BndCard({ b, onOpen }) {
 }
 
 // ─── Unfold spread (2-stage cloth unfold) ────────────────
+// natural aspect-ratio of the scan, so non-square photos don't distort
+const aspectCache = {};
+function useImgAspect(url) {
+  const [, bump] = useState(0);
+  useEffect(() => {
+    if (!url || aspectCache[url]) return;
+    const im = new Image();
+    im.onload = () => {
+      if (im.naturalWidth && im.naturalHeight) {
+        aspectCache[url] = im.naturalWidth + " / " + im.naturalHeight;
+        bump(n => n + 1);
+      }
+    };
+    im.src = url;
+  }, [url]);
+  return url ? aspectCache[url] : null;
+}
+
 function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) {
   const [stage, setStage] = useState(0);
   const img = imgOverride || b.spread_url || bndPlaceholder(b.id);
   const tint = b.colorways[cwIdx].hex;
+  const aspect = useImgAspect(img) || "1 / 1";
   useEffect(() => {
     setStage(0);
     const t1 = setTimeout(() => setStage(1), 220);
     const t2 = setTimeout(() => setStage(2), 220 + unfoldMs);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const t3 = setTimeout(() => setStage(3), 220 + unfoldMs * 2 + 60);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [b.id, cwIdx, img]);
   const q = (x, y) => ({
     backgroundColor: bgColor || undefined,
@@ -155,7 +176,7 @@ function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) 
   const dur = { transitionDuration: unfoldMs + "ms" };
   return (
     <div className="spread-stage">
-      <div className="spread" data-stage={stage} style={{ "--tint": tint }}>
+      <div className="spread" data-stage={stage} style={{ "--tint": tint, aspectRatio: aspect }}>
         <div className="sq q-tl" style={q(0, 0)}>
           <span className="q-tint"></span>
         </div>
@@ -172,11 +193,18 @@ function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) 
           }}><span className="q-tint"></span></span>
           <span className="flap-back"></span>
         </div>
+        {/* flat full image swapped in once the unfold finishes — avoids 3D edge cases */}
+        <div className="spread-flat" style={{
+          backgroundColor: bgColor || undefined,
+          backgroundImage: `url("${img}")`,
+        }}>
+          <span className="q-tint"></span>
+        </div>
       </div>
       <div className="spread-caption">
-        <span>{b.id} // {photoLabel || "full spread · 550×550 mm"}</span>
-        <span className={"spread-state " + (stage === 2 ? "is-open" : "")}>
-          {stage === 0 ? "FOLDED" : stage === 1 ? "UNFOLDING…" : "OPEN"}
+        <span className="sc-id">{b.id} · {photoLabel || "spread"}</span>
+        <span className={"spread-state " + (stage >= 2 ? "is-open" : "")}>
+          {stage === 0 ? "FOLDED" : stage === 1 ? "…" : "OPEN"}
         </span>
       </div>
     </div>
@@ -266,8 +294,40 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
   );
 }
 
+// ─── Panel FX: film grain + pixel erosion on the top edge ─
+function PanelFX() {
+  const cells = useMemo(() => {
+    const out = [];
+    const cols = 120;
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < 3; r++) {
+        const p = r === 0 ? 0.42 : r === 1 ? 0.16 : 0.05;
+        if (Math.random() < p) {
+          out.push({ c, r, on: Math.random() < 0.12 });
+        }
+      }
+    }
+    return out;
+  }, []);
+  return (
+    <React.Fragment>
+      <div className="d-grain"></div>
+      <div className="d-erode" aria-hidden="true">
+        {cells.map((p, i) => (
+          <span key={i} className={"de-px " + (p.on ? "de-on" : "de-off")} style={{
+            left: (p.c / 120 * 100) + "%",
+            top: (p.r * 5) + "px",
+            width: "calc(100% / 120 + 0.5px)",
+            height: "5px",
+          }}></span>
+        ))}
+      </div>
+    </React.Fragment>
+  );
+}
+
 // ─── Order / payment flow ────────────────────────────────
-function OrderFlow({ b, cwIdx }) {
+function OrderFlow({ b, cwIdx, size }) {
   const [step, setStep] = useState("idle");   // idle | pay
   const [network, setNetwork] = useState("USDT-TRC20");
   const [contact, setContact] = useState("");
@@ -291,6 +351,7 @@ function OrderFlow({ b, cwIdx }) {
     const r = await submitOrder({
       product_id: b.id,
       colorway: b.colorways[cwIdx].id,
+      size: size || null,
       contact: contact.trim(),
       address: address.trim(),
       network, tx_hash: tx.trim(),
@@ -337,8 +398,12 @@ function OrderFlow({ b, cwIdx }) {
 }
 
 // ─── Detail overlay ──────────────────────────────────────
-function DetailOverlay({ b, cwIdx: initCw, unfoldMs, onClose }) {
-  const cw = initCw;
+function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
+  const [cw, setCw] = useState(initCw);
+  // sizes: from DB when added (b.sizes), placeholder chips until then
+  const sizes = Array.isArray(b.sizes) && b.sizes.length ? b.sizes : ["S", "M", "L"];
+  const sizesTbd = !(Array.isArray(b.sizes) && b.sizes.length);
+  const [size, setSize] = useState(sizes[Math.min(1, sizes.length - 1)]);
   useEffect(() => {
     const onKey = e => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -347,18 +412,47 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, onClose }) {
   return (
     <div className="detail-overlay" data-screen-label={"Detail " + b.id}>
       <div className="detail-backdrop" onClick={onClose}></div>
-      <div className="detail-panel">
+      <div className={"detail-panel" + (mono ? " is-mono" : "")}>
+        <PanelFX />
         <button className="detail-close" onClick={onClose}>[ ESC ] CLOSE ✕</button>
         <div className="detail-cols">
           <SpreadViewer b={b} cwIdx={cw} unfoldMs={unfoldMs} />
           <div className="detail-info">
-            <div className="di-code">{b.id}</div>
-            <h2 className="di-name">{b.name}</h2>
-            <div className="di-row">
-              <span className="di-price">{b.price} <i>{b.currency}</i></span>
-              <span className="di-status"><BndStatusDot status={b.status} /> {b.status}</span>
+            <div className="di-head">
+              <div className="di-code-row">
+                <span>{b.id}</span>
+                <span className="di-status"><BndStatusDot status={b.status} /> {b.status}</span>
+              </div>
+              <h2 className="di-name">{b.name}</h2>
             </div>
-            <OrderFlow b={b} cwIdx={cw} />
+            <div className="di-price">{b.price} <i>{b.currency}</i></div>
+            <div className="di-opt">
+              <span className="di-label">SIZE</span>
+              <div className="di-chips">
+                {sizes.map(s => (
+                  <button key={s}
+                    className={"di-chip" + (s === size ? " is-on" : "")}
+                    onClick={() => setSize(s)}>{s}</button>
+                ))}
+                {sizesTbd && <span className="di-note">mm — tbd</span>}
+              </div>
+            </div>
+            {b.colorways.length > 1 && (
+              <div className="di-opt">
+                <span className="di-label">COLOR</span>
+                <div className="di-chips">
+                  {b.colorways.map((c, i) => (
+                    <button key={c.id}
+                      className={"di-chip" + (i === cw ? " is-on" : "")}
+                      onClick={() => setCw(i)}>
+                      <span className="di-sw-chip" style={{ background: c.hex }}></span>
+                      {c.id}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <OrderFlow b={b} cwIdx={cw} size={size} />
           </div>
         </div>
       </div>
@@ -432,6 +526,7 @@ function BndApp() {
 
       {open && (
         <DetailOverlay b={open.b} cwIdx={open.cw} unfoldMs={t.unfoldMs}
+          mono={t.detailMono}
           onClose={() => setOpen(null)} />
       )}
 
@@ -453,6 +548,7 @@ function BndApp() {
         <TweakSection title="unfold">
           <TweakSlider label="speed ms" min={200} max={2000} step={20}
             value={t.unfoldMs} onChange={v => setTweak("unfoldMs", v)} />
+          <TweakToggle label="detail b/w" value={t.detailMono} onChange={v => setTweak("detailMono", v)} />
         </TweakSection>
         <TweakSection title="effects">
           <TweakToggle label="bg grid"   value={t.showGrid}  onChange={v => setTweak("showGrid", v)} />

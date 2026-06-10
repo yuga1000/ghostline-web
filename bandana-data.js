@@ -132,14 +132,16 @@ async function loadBandanas() {
 async function submitOrder(order) {
   if (sbConfigured()) {
     try {
+      // no "return=representation" — anon can INSERT but not SELECT orders
+      // (privacy: buyer contacts aren't readable back), so don't ask for the row
       const r = await fetch(SUPABASE_CONFIG.url + "/rest/v1/orders", {
         method: "POST",
-        headers: { ...sbHeaders(), "Prefer": "return=representation" },
+        headers: { ...sbHeaders(), "Prefer": "return=minimal" },
         body: JSON.stringify(order),
       });
       if (!r.ok) throw new Error("http " + r.status);
-      const rows = await r.json();
-      return { ok: true, id: rows[0] && rows[0].id, mode: "SUPABASE" };
+      const id = "GL-" + Date.now().toString(36).toUpperCase();
+      return { ok: true, id, mode: "SUPABASE" };
     } catch (e) {
       // fall through to local queue
     }
