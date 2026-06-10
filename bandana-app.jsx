@@ -203,7 +203,7 @@ function useImgAspect(url) {
   return url ? aspectCache[url] : null;
 }
 
-function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) {
+function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel, onImgClick }) {
   const [stage, setStage] = useState(0);
   const img = imgOverride || b.spread_url || bndPlaceholder(b.id);
   const tint = b.colorways[cwIdx].hex;
@@ -215,6 +215,7 @@ function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) 
     const t3 = setTimeout(() => setStage(3), 220 + unfoldMs * 2 + 60);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [b.id, cwIdx, img]);
+  const zoomable = stage >= 2 && onImgClick;
   const q = (x, y) => ({
     backgroundColor: bgColor || undefined,
     backgroundImage: `url("${img}")`,
@@ -224,7 +225,9 @@ function UnfoldSpread({ b, cwIdx, unfoldMs, imgOverride, bgColor, photoLabel }) 
   const dur = { transitionDuration: unfoldMs + "ms" };
   return (
     <div className="spread-stage">
-      <div className="spread" data-stage={stage} style={{ "--tint": tint, aspectRatio: aspect }}>
+      <div className="spread" data-stage={stage}
+        style={{ "--tint": tint, aspectRatio: aspect, cursor: zoomable ? "zoom-in" : undefined }}
+        onClick={zoomable ? () => onImgClick() : undefined}>
         <div className="sq q-tl" style={q(0, 0)}>
           <span className="q-tint"></span>
         </div>
@@ -333,6 +336,11 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
   }, [gal.length, lockedIdx.join(",")]);
   const pad = n => String(n).padStart(2, "0");
   const img = view < 0 ? null : gal[view];
+  const [zoom, setZoom] = useState(false);
+  useEffect(() => { setZoom(false); }, [b.id, view]);
+  // variant numbering counts unlocked photos only
+  const unlocked = gal.map((_, i) => i).filter(i => !isLockedAt(i));
+  const vPos = unlocked.indexOf(view);
   return (
     <div className="spread-viewer">
       <UnfoldSpread
@@ -340,7 +348,8 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
         b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
         imgOverride={img}
         bgColor={isDark(img || b.spread_url) ? BND_BACKING : "#000"}
-        photoLabel={view < 0 ? null : "V" + pad(view + 1) + " / " + pad(gal.length)} />
+        photoLabel={view < 0 ? null : "V" + pad(vPos + 1) + " / " + pad(unlocked.length)}
+        onImgClick={() => setZoom(true)} />
       {gal.length > 0 && (
         <div className="gal-strip">
           <button
@@ -366,6 +375,12 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
       {warn > 0 && (
         <div className="gal-warn" key={warn}>
           <span className="gal-warn-box">▒ LOCKED // NOT ENOUGH GHOST_PTS</span>
+        </div>
+      )}
+      {zoom && (
+        <div className="zoom-overlay" onClick={() => setZoom(false)}>
+          <img className="zoom-img" src={img || b.spread_url} alt={b.id + " zoom"} />
+          <span className="zoom-hint">[ CLICK ] CLOSE</span>
         </div>
       )}
     </div>
