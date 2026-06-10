@@ -283,7 +283,8 @@ function useDarkImgs(urls) {
 }
 
 // ─── Spread viewer: unfold + photo gallery filmstrip ─────
-const BND_BACKING = "#d8d4c8";
+// mid-grey: enough contrast for black linework without a bright flash
+const BND_BACKING = "#6e6a62";
 function SpreadViewer({ b, cwIdx, unfoldMs }) {
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
   const [view, setView] = useState(-1);   // -1 = spread, 0..n = gallery photo
@@ -496,16 +497,12 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
 }
 
 // ─── Page header ─────────────────────────────────────────
-function BndHeader({ count, source }) {
+function BndHeader() {
   return (
     <div className="bnd-header" data-screen-label="A Header">
       <div className="bh-title-row">
         <span className="bh-folder-id">DROP_01</span>
         <h1 className="bh-title">BANDANAS</h1>
-      </div>
-      <div className="bh-sub">
-        <span>{count} DESIGNS // LIMITED RUN // crypto only</span>
-        <span className="bh-db">DB: <b>{source || "…"}</b></span>
       </div>
     </div>
   );
@@ -547,7 +544,7 @@ function BndApp() {
     }>
       <BndTopBar />
       <main className="bnd-page">
-        <BndHeader count={catalog.items.length} source={catalog.source} />
+        <BndHeader />
         <div className="bnd-grid">
           {catalog.items.map(b => (
             <BndCard key={b.id} b={b} onOpen={(bb, cw) => setOpen({ b: bb, cw })} />
