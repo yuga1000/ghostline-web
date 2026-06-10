@@ -12,8 +12,8 @@
 <style>
 :root {
   --bg:        #000000;
-  --line:      rgba(255,180,80,0.45);
-  --line-2:    rgba(255,180,80,0.65);
+  --line:      rgba(232,226,214,0.32);
+  --line-2:    rgba(232,226,214,0.55);
   --text:      #d8d2c4;
   --text-dim:  #7c7466;
   --text-mute: #4a4538;
@@ -59,10 +59,10 @@ input { font: inherit; }
   z-index: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,200,100,0.24) 0, transparent 240px),
-    radial-gradient(circle at top left, rgba(255,200,100,0.55) 1.3px, transparent 2.4px),
-    linear-gradient(0deg,  rgba(255,140,30,0.10) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,140,30,0.10) 1px, transparent 1px);
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(232,226,214,0.16) 0, transparent 240px),
+    radial-gradient(circle at top left, rgba(232,226,214,0.4) 1.3px, transparent 2.4px),
+    linear-gradient(0deg,  rgba(232,226,214,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,226,214,0.07) 1px, transparent 1px);
   background-size: auto auto, 88px 88px, 88px 88px, 88px 88px;
 }
 .shell.has-scanlines::after {
@@ -209,6 +209,22 @@ input { font: inherit; }
 .bnd-foldline { position: absolute; background: rgba(0,0,0,0.55); display: block; }
 .bnd-fl-v { top: 0; bottom: 0; left: 50%; width: 2px; }
 .bnd-fl-h { left: 0; right: 0; top: 50%; height: 2px; }
+.bnd-sparks { position: absolute; inset: 0; pointer-events: none; display: block; }
+.bnd-spark {
+  position: absolute;
+  display: block;
+  background: rgba(255,255,255,0.7);
+  animation: bndSpark 0.5s steps(3, jump-none) forwards;
+}
+.bnd-spark.is-bright {
+  background: #fff;
+  box-shadow: 0 0 7px rgba(255,255,255,0.85);
+}
+@keyframes bndSpark {
+  0%   { opacity: 0; }
+  35%  { opacity: 1; }
+  100% { opacity: 0; }
+}
 .bnd-open-hint {
   position: absolute;
   left: 50%; bottom: 10px;

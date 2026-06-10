@@ -32,10 +32,11 @@ const SUPABASE_CONFIG = {
   anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFscWF2cmlvZXRxZnlsd2txbWFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk4MTgyNDksImV4cCI6MjA2NTM5NDI0OX0.V7cQfoAat4LFC0zvye6B8W3ELNSA2kZE0D-If_fGfdc",
 };
 
-// ── crypto wallets (REPLACE with real addresses) ─────────
+// ── crypto wallets ───────────────────────────────────────
+// BTC intentionally absent until a real address exists —
+// network buttons render from these keys
 const WALLETS = {
-  "USDT-TRC20": "TQn9Y2kh...8sQpV7Lb",
-  "BTC":        "bc1qxxxx...xxxxxxxx",
+  "USDT-TRC20": "TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU",
 };
 
 // ── striped SVG placeholder (until real scans arrive) ────

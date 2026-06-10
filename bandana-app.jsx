@@ -11,8 +11,8 @@ const BND_PALETTES = {
 };
 
 const BND_TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "palette": "amber",
-  "scanlines": true,
+  "palette": "mono",
+  "scanlines": false,
   "showGrid": true,
   "unfoldMs": 620,
   "detailMono": true
@@ -96,6 +96,40 @@ function BndTopBar() {
   );
 }
 
+// ─── Random pixel sparks over card photo ─────────────────
+function PixelSparks() {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    let t;
+    const loop = () => {
+      if (!alive) return;
+      setTick(n => n + 1);
+      t = setTimeout(loop, 320 + Math.random() * 480);
+    };
+    t = setTimeout(loop, Math.random() * 600);
+    return () => { alive = false; clearTimeout(t); };
+  }, []);
+  const px = useMemo(() => {
+    const n = 1 + Math.floor(Math.random() * 3);   // 1-3 pixels per burst
+    return Array.from({ length: n }, () => ({
+      left: 2 + Math.random() * 94,
+      top: 2 + Math.random() * 94,
+      size: [2, 3, 4][Math.floor(Math.random() * 3)],
+      bright: Math.random() < 0.3,
+    }));
+  }, [tick]);
+  return (
+    <span className="bnd-sparks" aria-hidden="true">
+      {px.map((p, i) => (
+        <span key={tick + ":" + i}
+          className={"bnd-spark" + (p.bright ? " is-bright" : "")}
+          style={{ left: p.left + "%", top: p.top + "%", width: p.size + "px", height: p.size + "px" }}></span>
+      ))}
+    </span>
+  );
+}
+
 // ─── Catalog card ────────────────────────────────────────
 function BndCard({ b, onOpen }) {
   const [cw, setCw] = useState(0);
@@ -109,6 +143,7 @@ function BndCard({ b, onOpen }) {
           <span className="bnd-tint" style={{ background: b.colorways[cw].hex }}></span>
           <span className="bnd-foldline bnd-fl-v"></span>
           <span className="bnd-foldline bnd-fl-h"></span>
+          <PixelSparks />
         </span>
         <span className="bnd-open-hint">[ UNFOLD ]</span>
         {sold && <span className="bnd-sold-stamp">SOLD_OUT</span>}
@@ -519,7 +554,7 @@ function BndApp() {
           ))}
         </div>
         <footer className="bnd-footer">
-          <span>payment: USDT TRC-20 / BTC · wallets in detail view</span>
+          <span>payment: USDT TRC-20 · wallet in detail view</span>
           <a href="MYSTRA Lab.html" className="bnd-back">◀ BACK_TO_LAB</a>
         </footer>
       </main>
