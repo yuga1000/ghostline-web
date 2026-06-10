@@ -309,7 +309,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
         key={b.id + ":" + view}
         b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
         imgOverride={img}
-        bgColor={isDark(img || b.spread_url) ? BND_BACKING : null}
+        bgColor={isDark(img || b.spread_url) ? BND_BACKING : "#000"}
         photoLabel={view < 0 ? null : "photo " + pad(view + 1) + "/" + pad(gal.length)} />
       {gal.length > 0 && (
         <div className="gal-strip">
