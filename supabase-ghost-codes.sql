@@ -34,6 +34,28 @@ end $$;
 
 grant execute on function bnd_redeem_code(text, text) to anon;
 
--- ── issuing codes (example) ─────────────────────────────
--- insert into ghost_codes (code, pts, note) values
---   ('GHOST-7F3A', 100, 'order BND-03 @somebuyer');
+-- ── code generator: one line per verified order ─────────
+-- admin-only (no grant to anon) — run in SQL editor:
+--   select bnd_issue_code(100, 'order BND-03 @somebuyer');
+-- returns e.g. 'GHOST-7F3A2C' — paste it into the reply email.
+create or replace function bnd_issue_code(p_pts int default 50, p_note text default null)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare v_code text;
+begin
+  loop
+    v_code := 'GHOST-' || upper(substr(md5(random()::text), 1, 6));
+    begin
+      insert into ghost_codes (code, pts, note) values (v_code, p_pts, p_note);
+      return v_code;
+    exception when unique_violation then
+      -- collision — retry with a fresh code
+    end;
+  end loop;
+end $$;
+
+-- batch issue (e.g. 20 codes for a drop):
+--   select bnd_issue_code(50, 'drop_01 promo') from generate_series(1, 20);

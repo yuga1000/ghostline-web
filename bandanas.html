@@ -131,6 +131,10 @@ input { font: inherit; }
   padding: 11px 18px;
   letter-spacing: 0.1em;
   z-index: 9000;
+  max-width: 88vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   animation: warnFlash 1.9s steps(2, jump-none) forwards;
 }
 .px-burst-layer {
@@ -844,6 +848,8 @@ input { font: inherit; }
 @media (max-width: 600px) {
   .topbar .tb-row-1 { flex-wrap: wrap; height: auto; padding: 8px 14px; gap: 6px; }
   .tb-right { width: 100%; flex-wrap: wrap; gap: 8px; }
+  .gal-warn-box { font-size: 9px; padding: 8px 10px; max-width: 92%; text-align: center; }
+  .bnd-open-hint { font-size: 9px; }
   .topbar .tb-row-2 { padding: 0 14px; overflow-x: auto; }
   .tb-btc { width: 100%; justify-content: space-between; padding: 6px 10px; }
   .tb-btc .btc-px { min-width: 0; }
