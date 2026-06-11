@@ -155,6 +155,28 @@ async function submitOrder(order) {
   return { ok: true, id, mode: "LOCAL_QUEUE" };
 }
 
+// Wishlist signup for locked designs — insert-only like orders.
+async function submitWishlist(productId, email) {
+  const e = (email || "").trim();
+  if (!/.+@.+\..+/.test(e)) return { ok: false, msg: "INVALID EMAIL" };
+  if (sbConfigured()) {
+    try {
+      const r = await fetch(SUPABASE_CONFIG.url + "/rest/v1/wishlist", {
+        method: "POST",
+        headers: { ...sbHeaders(), "Prefer": "return=minimal" },
+        body: JSON.stringify({ product_id: productId, email: e }),
+      });
+      if (!r.ok) throw new Error("http " + r.status);
+      return { ok: true, msg: "ADDED TO WISHLIST" };
+    } catch (err) { /* fall through to local */ }
+  }
+  const key = "bnd_wishlist_queue";
+  const q = JSON.parse(localStorage.getItem(key) || "[]");
+  q.push({ product_id: productId, email: e, queued_at: new Date().toISOString() });
+  localStorage.setItem(key, JSON.stringify(q));
+  return { ok: true, msg: "ADDED TO WISHLIST" };
+}
+
 // Rewrite a stored /bandanas/X.PNG URL to a compressed webp variant.
 // "web" (~250KB, 1400px) for everything, "full" (~550KB, 2400px) for zoom.
 // Leaves non-matching URLs (placeholders, data URIs) untouched.
@@ -169,5 +191,5 @@ function bndImg(url, variant) {
 Object.assign(window, {
   SUPABASE_CONFIG, WALLETS,
   bndPlaceholder, bndImg, LOCAL_BANDANAS,
-  sbConfigured, loadBandanas, submitOrder,
+  sbConfigured, loadBandanas, submitOrder, submitWishlist,
 });

@@ -171,11 +171,55 @@ input { font: inherit; }
   gap: 28px;
 }
 .bnd-card {
+  position: relative;
   border: var(--bw) solid var(--line);
   background: rgba(0,0,0,0.6);
   display: flex; flex-direction: column;
   transition: border-color .18s, box-shadow .18s;
 }
+.wish-over {
+  position: absolute; inset: 0;
+  z-index: 8;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.82);
+  padding: 16px;
+}
+.wish-box {
+  width: 100%; max-width: 240px;
+  display: flex; flex-direction: column; gap: 9px;
+  border: var(--bw) solid var(--line-2);
+  background: #000;
+  padding: 16px 14px;
+  box-shadow: 0 0 22px var(--glow);
+}
+.wish-title {
+  font-family: var(--pixel);
+  font-size: 9px; line-height: 1.5;
+  color: var(--text);
+  letter-spacing: 0.06em;
+}
+.wish-input {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: 11px;
+  outline: none;
+}
+.wish-input:focus { border-color: var(--line-2); }
+.wish-btn {
+  border: var(--bw) solid var(--da);
+  color: var(--da);
+  padding: 9px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em;
+  text-align: center;
+  transition: background .15s;
+}
+.wish-btn:hover { background: rgba(255,255,255,0.06); }
+.wish-res { font-size: 9px; letter-spacing: 0.08em; text-align: center; }
+.wish-res.is-ok { color: var(--c-green); }
+.wish-res.is-err { color: var(--c-red); }
 .bnd-card:hover { border-color: var(--line-2); box-shadow: 0 0 22px var(--glow); }
 .bnd-card.is-sold { opacity: 0.55; }
 

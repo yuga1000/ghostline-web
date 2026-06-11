@@ -169,7 +169,6 @@ function BootReveal({ index, b, children }) {
 // ─── Catalog card ────────────────────────────────────────
 function BndCard({ b, onOpen }) {
   const [cw, setCw] = useState(0);
-  const [warn, setWarn] = useState(0);
   const img = bndImg(b.spread_url, "web") || bndPlaceholder(b.id);
   const sold = b.status === "SOLD_OUT";
   const locked = b.status === "LOCKED";
@@ -179,14 +178,18 @@ function BndCard({ b, onOpen }) {
   const unlockedThumbs = gal.filter((_, i) => lockedIdx.indexOf(i) === -1).map(u => bndImg(u, "web"));
   const variantThumbs = unlockedThumbs.slice(0, 3);
   const variantMore = Math.max(0, unlockedThumbs.length - 3);
-  useEffect(() => {
-    if (!warn) return;
-    const t = setTimeout(() => setWarn(0), 1300);
-    return () => clearTimeout(t);
-  }, [warn]);
+  const [wish, setWish] = useState(false);   // wishlist form open
+  const [wemail, setWemail] = useState("");
+  const [wres, setWres] = useState(null);
+  const submitWish = async () => {
+    setWres({ ok: true, msg: "…" });
+    const r = await submitWishlist(b.id, wemail);
+    setWres(r);
+    if (r.ok) setTimeout(() => { setWish(false); setWemail(""); setWres(null); }, 1600);
+  };
   return (
     <article className={"bnd-card" + (sold ? " is-sold" : "") + (locked ? " is-locked" : "")} data-screen-label={"Card " + b.id}>
-      <button className="bnd-preview" onClick={() => locked ? setWarn(w => w + 1) : onOpen(b, cw)} aria-label={locked ? b.name + " locked" : "open " + b.name}>
+      <button className="bnd-preview" onClick={() => locked ? setWish(true) : onOpen(b, cw)} aria-label={locked ? b.name + " wishlist" : "open " + b.name}>
         <span className="bnd-folded">
           <img className="bnd-img" src={img} loading="lazy" decoding="async" alt="" />
           <span className="bnd-tint" style={{ background: b.colorways[cw].hex }}></span>
@@ -194,15 +197,23 @@ function BndCard({ b, onOpen }) {
           <span className="bnd-foldline bnd-fl-h"></span>
           <PixelSparks />
         </span>
-        <span className="bnd-open-hint">[ UNFOLD ]</span>
+        {!locked && <span className="bnd-open-hint">[ UNFOLD ]</span>}
+        {locked && !wish && <span className="bnd-open-hint">[ ☆ WISHLIST ]</span>}
         {sold && <span className="bnd-sold-stamp">SOLD_OUT</span>}
-        {locked && warn === 0 && <span className="bnd-locked-stamp">▒ LOCKED</span>}
-        {warn > 0 && (
-          <span className="gal-warn" key={warn}>
-            <span className="gal-warn-box">▒ LOCKED // NOT ENOUGH GHOST_PTS</span>
-          </span>
-        )}
+        {locked && !wish && <span className="bnd-locked-stamp">▒ LOCKED</span>}
       </button>
+      {wish && (
+        <div className="wish-over" onClick={e => { if (e.target === e.currentTarget) setWish(false); }}>
+          <div className="wish-box">
+            <div className="wish-title">▒ LOCKED · NOTIFY ON DROP</div>
+            <input className="wish-input" type="email" placeholder="email" autoFocus
+              value={wemail} onChange={e => setWemail(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") submitWish(); }} />
+            <button className="wish-btn" onClick={submitWish}>JOIN_WISHLIST</button>
+            {wres && <div className={"wish-res " + (wres.ok ? "is-ok" : "is-err")}>{wres.msg}</div>}
+          </div>
+        </div>
+      )}
       <div className="bnd-meta">
         <div className="bnd-meta-row">
           <span className="bnd-code">{b.id}</span>
