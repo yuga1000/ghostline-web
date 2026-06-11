@@ -4,6 +4,83 @@ const { useState, useEffect, useRef, useMemo } = React;
 
 // orders + wishlist open a prefilled email here (no backend)
 const BND_ORDER_EMAIL = "yugatxt@gmail.com";
+
+// ─── GHOST_PTS arcade score (persisted, ties into LOCKED lore) ──
+const GHOST_RANKS = [[0, "VISITOR"], [25, "SCOUT"], [75, "OPERATOR"], [150, "PHANTOM"], [300, "GHOST"]];
+function bndRank(pts) {
+  let r = GHOST_RANKS[0][1];
+  for (const [min, name] of GHOST_RANKS) if (pts >= min) r = name;
+  return r;
+}
+const ghostStore = {
+  pts: (() => { try { return parseInt(localStorage.getItem("bnd_ghost_pts") || "0", 10) || 0; } catch (e) { return 0; } })(),
+  subs: new Set(),
+  add(n) {
+    this.pts += n;
+    try { localStorage.setItem("bnd_ghost_pts", String(this.pts)); } catch (e) {}
+    this.subs.forEach(f => f(this.pts));
+  },
+};
+function GhostScore() {
+  const [pts, setPts] = useState(ghostStore.pts);
+  const [pulse, setPulse] = useState(0);
+  const [toast, setToast] = useState(null);
+  const prevRank = useRef(bndRank(ghostStore.pts));
+  useEffect(() => {
+    const f = p => {
+      setPts(p);
+      setPulse(x => x + 1);
+      const r = bndRank(p);
+      if (r !== prevRank.current) {
+        prevRank.current = r;
+        setToast(r);
+        setTimeout(() => setToast(null), 1900);
+      }
+    };
+    ghostStore.subs.add(f);
+    return () => ghostStore.subs.delete(f);
+  }, []);
+  return (
+    <React.Fragment>
+      <span className="tb-pts" key={pulse} title={"rank: " + bndRank(pts)}>
+        ✦ {String(pts).padStart(4, "0")}
+      </span>
+      {toast && <span className="rank-toast">▲ RANK UP // {toast}</span>}
+    </React.Fragment>
+  );
+}
+
+// ─── Arcade FX: pixel burst from every button press ──────
+function usePixelBursts() {
+  useEffect(() => {
+    const layer = document.createElement("div");
+    layer.className = "px-burst-layer";
+    document.body.appendChild(layer);
+    const onClick = e => {
+      const btn = e.target.closest && e.target.closest("button, .tb-link");
+      if (!btn) return;
+      const n = 7 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement("span");
+        p.className = "px-bit";
+        const ang = Math.random() * Math.PI * 2;
+        const dist = 16 + Math.random() * 36;
+        p.style.left = e.clientX + "px";
+        p.style.top = e.clientY + "px";
+        p.style.setProperty("--dx", (Math.cos(ang) * dist).toFixed(1) + "px");
+        p.style.setProperty("--dy", (Math.sin(ang) * dist - 10).toFixed(1) + "px");
+        const s = Math.random() < 0.3 ? 4 : 2;
+        p.style.width = s + "px";
+        p.style.height = s + "px";
+        p.style.animationDuration = (360 + Math.random() * 300) + "ms";
+        layer.appendChild(p);
+        setTimeout(() => p.remove(), 720);
+      }
+    };
+    document.addEventListener("click", onClick, true);
+    return () => { document.removeEventListener("click", onClick, true); layer.remove(); };
+  }, []);
+}
 const BND_MAIL_ART = [
   "░▒▓ GHOSTLINE ▓▒░",
   "   captured forces",
@@ -82,15 +159,18 @@ function BndTopBar() {
     <header className="topbar">
       <div className="tb-row tb-row-1">
         <div className="tb-brand">▣ GHOSTLINE_LAB</div>
-        <div className="tb-btc">
-          <span className="btc-lbl">BTC</span>
-          <span className="btc-px">{fmt(btc.price)}</span>
-          {chg != null && (
-            <span className={"btc-chg " + (btc.change >= 0 ? "is-up" : "is-dn")}>
-              {btc.change >= 0 ? "+" : ""}{chg}%
-            </span>
-          )}
-          <span className={"btc-dot dot " + (btc.status === "ok" ? "dot-ok" : btc.status === "err" ? "dot-bad" : "dot-warn")}></span>
+        <div className="tb-right">
+          <GhostScore />
+          <div className="tb-btc">
+            <span className="btc-lbl">BTC</span>
+            <span className="btc-px">{fmt(btc.price)}</span>
+            {chg != null && (
+              <span className={"btc-chg " + (btc.change >= 0 ? "is-up" : "is-dn")}>
+                {btc.change >= 0 ? "+" : ""}{chg}%
+              </span>
+            )}
+            <span className={"btc-dot dot " + (btc.status === "ok" ? "dot-ok" : btc.status === "err" ? "dot-bad" : "dot-warn")}></span>
+          </div>
         </div>
       </div>
       <nav className="tb-row tb-row-2">
@@ -193,6 +273,7 @@ function BndCard({ b, onOpen }) {
     if (!/.+@.+\..+/.test(wemail.trim())) { setWres({ ok: false, msg: "INVALID EMAIL" }); return; }
     const subject = `GHOSTLINE WISHLIST // ${b.id} ${b.name}`;
     const body = `${BND_MAIL_ART}\nnotify me when this drops:\n\ndesign:  ${b.id} · ${b.name}\nemail:   ${wemail.trim()}\n`;
+    ghostStore.add(5);
     window.location.href = `mailto:${BND_ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setWres({ ok: true, msg: "OPENING MAIL // SEND TO JOIN" });
     setTimeout(() => { setWish(false); setWemail(""); setWres(null); }, 2200);
@@ -400,7 +481,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
           imgOverride={img}
           bgColor={isDark(rawImg) ? BND_BACKING : "#000"}
           photoLabel={view < 0 ? "V01 / " + pad(total) + " · spread" : "V" + pad(pos) + " / " + pad(total)}
-          onImgClick={curLocked ? null : () => setZoom(true)} />
+          onImgClick={curLocked ? null : () => { ghostStore.add(3); setZoom(true); }} />
         {curLocked && (
           <div className="spread-lockover">
             <span className="bnd-locked-stamp">▒ LOCKED</span>
@@ -418,7 +499,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
               <button key={u}
                 className={"gal-thumb" + (view === i ? " is-on" : "") + (lk ? " is-locked" : "")}
                 style={{ backgroundColor: isDark(u) ? BND_BACKING : undefined }}
-                onClick={() => setView(i)}
+                onClick={() => { if (view !== i) ghostStore.add(1); setView(i); }}
                 aria-label={"photo " + (i + 1) + (lk ? " locked" : "")}>
                 <img className="gal-thumb-img" src={bndImg(u, "web")} loading="lazy" decoding="async" alt="" />
                 {lk && <span className="gal-thumb-lock">▒</span>}
@@ -506,6 +587,7 @@ function OrderFlow({ b, cwIdx, size }) {
 
   const copyWallet = () => {
     navigator.clipboard && navigator.clipboard.writeText(WALLETS[network]);
+    ghostStore.add(5);
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
   };
@@ -527,6 +609,7 @@ function OrderFlow({ b, cwIdx, size }) {
       `address:  ${address.trim() || "—"}`,
       "──────────────────────────────",
     ].join("\n");
+    ghostStore.add(10);
     window.location.href = `mailto:${BND_ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setResult({ ok: true, msg: "OPENING MAIL // SEND TO CONFIRM" });
   };
@@ -663,6 +746,7 @@ function BndHeader() {
 // ─── App ─────────────────────────────────────────────────
 function BndApp() {
   const [t, setTweak] = useTweaks(BND_TWEAK_DEFAULTS);
+  usePixelBursts();
   const pal = BND_PALETTES[t.palette] || BND_PALETTES.amber;
   const [catalog, setCatalog] = useState({ source: null, items: [] });
   const [open, setOpen] = useState(null);   // {b, cw}
@@ -700,7 +784,7 @@ function BndApp() {
         <div className="bnd-grid">
           {catalog.items.map((b, i) => (
             <BootReveal key={b.id} index={i} b={b}>
-              <BndCard b={b} onOpen={(bb, cw) => setOpen({ b: bb, cw })} />
+              <BndCard b={b} onOpen={(bb, cw) => { ghostStore.add(2); setOpen({ b: bb, cw }); }} />
             </BootReveal>
           ))}
         </div>
