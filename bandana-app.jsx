@@ -2,6 +2,9 @@
 
 const { useState, useEffect, useRef, useMemo } = React;
 
+// orders + wishlist open a prefilled email here (no backend)
+const BND_ORDER_EMAIL = "yugatxt@gmail.com";
+
 const BND_PALETTES = {
   amber:  { accent: "#ffb142", dim: "#a8731d", glow: "rgba(255,180,80,.22)",  bg: "#000000" },
   green:  { accent: "#8aff9e", dim: "#1f7a33", glow: "rgba(120,255,140,.18)", bg: "#000000" },
@@ -181,11 +184,13 @@ function BndCard({ b, onOpen }) {
   const [wish, setWish] = useState(false);   // wishlist form open
   const [wemail, setWemail] = useState("");
   const [wres, setWres] = useState(null);
-  const submitWish = async () => {
-    setWres({ ok: true, msg: "…" });
-    const r = await submitWishlist(b.id, wemail);
-    setWres(r);
-    if (r.ok) setTimeout(() => { setWish(false); setWemail(""); setWres(null); }, 1600);
+  const submitWish = () => {
+    if (!/.+@.+\..+/.test(wemail.trim())) { setWres({ ok: false, msg: "INVALID EMAIL" }); return; }
+    const subject = `GHOSTLINE WISHLIST // ${b.id} ${b.name}`;
+    const body = `notify me when this drops:\n\ndesign:  ${b.id} · ${b.name}\nemail:   ${wemail.trim()}\n`;
+    window.location.href = `mailto:${BND_ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setWres({ ok: true, msg: "OPENING MAIL // SEND TO JOIN" });
+    setTimeout(() => { setWish(false); setWemail(""); setWres(null); }, 2200);
   };
   return (
     <article className={"bnd-card" + (sold ? " is-sold" : "") + (locked ? " is-locked" : "")} data-screen-label={"Card " + b.id}>
@@ -500,19 +505,24 @@ function OrderFlow({ b, cwIdx, size }) {
     setTimeout(() => setCopied(false), 1400);
   };
 
-  const submit = async () => {
+  const submit = () => {
     if (!contact.trim()) { setResult({ ok: false, msg: "CONTACT REQUIRED" }); return; }
-    setResult({ ok: true, msg: "SENDING…" });
-    const r = await submitOrder({
-      product_id: b.id,
-      colorway: b.colorways[cwIdx].id,
-      size: size || null,
-      contact: contact.trim(),
-      address: address.trim(),
-      network, tx_hash: tx.trim(),
-      status: "PENDING",
-    });
-    setResult({ ok: r.ok, msg: r.ok ? `ORDER LOGGED // ${r.id} [${r.mode}]` : "ERROR — RETRY" });
+    const subject = `GHOSTLINE ORDER // ${b.id} ${b.name}`;
+    const body = [
+      "ORDER — please don't edit the lines below",
+      "──────────────────────────────",
+      `design:   ${b.id} · ${b.name}`,
+      `size:     ${size || "—"}`,
+      `colorway: ${b.colorways[cwIdx].id}`,
+      `price:    ${b.price} ${b.currency}`,
+      `network:  ${network}`,
+      `tx hash:  ${tx.trim() || "(will send after payment)"}`,
+      `contact:  ${contact.trim()}`,
+      `address:  ${address.trim() || "—"}`,
+      "──────────────────────────────",
+    ].join("\n");
+    window.location.href = `mailto:${BND_ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setResult({ ok: true, msg: "OPENING MAIL // SEND TO CONFIRM" });
   };
 
   if (sold) return <div className="order-sold">▢ SOLD_OUT — restock TBD</div>;
