@@ -173,6 +173,12 @@ function BndCard({ b, onOpen }) {
   const img = b.spread_url || bndPlaceholder(b.id);
   const sold = b.status === "SOLD_OUT";
   const locked = b.status === "LOCKED";
+  // mini previews of unlocked gallery variants (not color swatches)
+  const gal = Array.isArray(b.gallery) ? b.gallery : [];
+  const lockedIdx = Array.isArray(b.locked_gallery) ? b.locked_gallery : [];
+  const unlockedThumbs = gal.filter((_, i) => lockedIdx.indexOf(i) === -1);
+  const variantThumbs = unlockedThumbs.slice(0, 3);
+  const variantMore = Math.max(0, unlockedThumbs.length - 3);
   useEffect(() => {
     if (!warn) return;
     const t = setTimeout(() => setWarn(0), 1300);
@@ -205,15 +211,16 @@ function BndCard({ b, onOpen }) {
         <h2 className="bnd-name">{b.name}</h2>
         <div className="bnd-meta-row">
           <span className="bnd-price">{locked ? "··" : b.price} <i>{b.currency}</i></span>
-          <span className="bnd-swatches">
-            {b.colorways.map((c, i) => (
-              <button key={c.id}
-                className={"bnd-swatch" + (i === cw ? " is-on" : "")}
-                style={{ background: c.hex }}
-                title={c.id}
-                onClick={() => setCw(i)}></button>
-            ))}
-          </span>
+          {!locked && variantThumbs.length > 0 && (
+            <span className="bnd-swatches">
+              {variantThumbs.map((u, i) => (
+                <span key={i} className="bnd-swatch">
+                  <img src={u} loading="lazy" decoding="async" alt="" />
+                </span>
+              ))}
+              {variantMore > 0 && <span className="bnd-swatch-more">+{variantMore}</span>}
+            </span>
+          )}
         </div>
       </div>
     </article>

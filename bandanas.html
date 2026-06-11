@@ -308,13 +308,24 @@ input { font: inherit; }
 }
 .bnd-price { color: var(--accent); font-size: 14px; font-weight: 700; }
 .bnd-price i { font-style: normal; font-size: 10px; color: var(--accent-dim); letter-spacing: 0.1em; }
-.bnd-swatches { display: inline-flex; gap: 6px; }
+.bnd-swatches { display: inline-flex; align-items: center; gap: 4px; }
 .bnd-swatch {
-  width: 7px; height: 7px;
-  border: 1px solid rgba(255,255,255,0.25);
-  outline: 1px solid transparent;
+  width: 16px; height: 16px;
+  border: 1px solid rgba(255,255,255,0.2);
+  overflow: hidden;
+  display: block;
+  flex: none;
 }
-.bnd-swatch.is-on { outline: 1px solid var(--accent); outline-offset: 1px; }
+.bnd-swatch img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+}
+.bnd-swatch-more {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
 
 /* Footer strip */
 .bnd-footer {
