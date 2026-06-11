@@ -390,13 +390,24 @@ input { font: inherit; }
   align-items: center;
   width: 100%;
 }
+.spread-wrap {
+  position: relative;
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+}
+.spread-lockover {
+  position: absolute; inset: 0;
+  z-index: 5;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6);
+}
 .gal-thumb.is-locked {
   position: relative;
-  cursor: not-allowed;
   opacity: 0.6;
   filter: grayscale(1) brightness(0.35) contrast(0.8);
 }
 .gal-thumb.is-locked:hover { opacity: 0.75; }
+.gal-thumb-spread.is-locked { opacity: 0.5; filter: none; }
 .gal-thumb-lock {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;

@@ -337,60 +337,52 @@ function useDarkImgs(urls) {
 // ─── Spread viewer: unfold + photo gallery filmstrip ─────
 // mid-grey: enough contrast for black linework without a bright flash
 const BND_BACKING = "#6e6a62";
-function SpreadViewer({ b, cwIdx, unfoldMs }) {
+// view: -1 = spread, 0..n = gallery photo. Locked views still open
+// inside the unfold — they just get a LOCKED overlay on the image.
+// locked_gallery may contain -1 to lock the spread itself.
+function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
   const lockedIdx = Array.isArray(b.locked_gallery) ? b.locked_gallery : [];
   const isLockedAt = i => lockedIdx.indexOf(i) !== -1;
-  const [view, setView] = useState(-1);   // -1 = spread, 0..n = gallery photo
-  const [warn, setWarn] = useState(0);    // >0 = locked warning flash
   const isDark = useDarkImgs([b.spread_url].concat(gal));
-  useEffect(() => { setView(-1); }, [b.id]);
-  useEffect(() => {
-    if (!warn) return;
-    const t = setTimeout(() => setWarn(0), 1300);
-    return () => clearTimeout(t);
-  }, [warn]);
-  const tryView = i => {
-    if (i >= 0 && isLockedAt(i)) { setWarn(w => w + 1); return; }
-    setView(i);
-  };
   useEffect(() => {
     if (!gal.length) return;
     const onKey = e => {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       const dir = e.key === "ArrowRight" ? 1 : -1;
-      setView(v => {
-        let n = v + dir;
-        while (n >= 0 && n < gal.length && isLockedAt(n)) n += dir;
-        if (n < -1) n = -1;
-        if (n >= gal.length) n = v;
-        return n;
-      });
+      setView(v => Math.max(-1, Math.min(gal.length - 1, v + dir)));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [gal.length, lockedIdx.join(",")]);
+  }, [gal.length]);
   const pad = n => String(n).padStart(2, "0");
   const img = view < 0 ? null : gal[view];
+  const curLocked = isLockedAt(view);
+  const total = gal.length + 1;          // spread counts as position 01
+  const pos = view + 2;                  // gallery index 0 -> position 02
   const [zoom, setZoom] = useState(false);
   useEffect(() => { setZoom(false); }, [b.id, view]);
-  // variant numbering counts unlocked photos only
-  const unlocked = gal.map((_, i) => i).filter(i => !isLockedAt(i));
-  const vPos = unlocked.indexOf(view);
   return (
     <div className="spread-viewer">
-      <UnfoldSpread
-        key={b.id + ":" + view}
-        b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
-        imgOverride={img}
-        bgColor={isDark(img || b.spread_url) ? BND_BACKING : "#000"}
-        photoLabel={view < 0 ? null : "V" + pad(vPos + 1) + " / " + pad(unlocked.length)}
-        onImgClick={() => setZoom(true)} />
+      <div className="spread-wrap">
+        <UnfoldSpread
+          key={b.id + ":" + view}
+          b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
+          imgOverride={img}
+          bgColor={isDark(img || b.spread_url) ? BND_BACKING : "#000"}
+          photoLabel={view < 0 ? "V01 / " + pad(total) + " · spread" : "V" + pad(pos) + " / " + pad(total)}
+          onImgClick={curLocked ? null : () => setZoom(true)} />
+        {curLocked && (
+          <div className="spread-lockover">
+            <span className="bnd-locked-stamp">▒ LOCKED</span>
+          </div>
+        )}
+      </div>
       {gal.length > 0 && (
         <div className="gal-strip">
           <button
-            className={"gal-thumb gal-thumb-spread" + (view < 0 ? " is-on" : "")}
-            onClick={() => tryView(-1)}>SPREAD</button>
+            className={"gal-thumb gal-thumb-spread" + (view < 0 ? " is-on" : "") + (isLockedAt(-1) ? " is-locked" : "")}
+            onClick={() => setView(-1)}>SPREAD</button>
           {gal.map((u, i) => {
             const lk = isLockedAt(i);
             return (
@@ -400,7 +392,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
                   backgroundImage: `url("${u}")`,
                   backgroundColor: isDark(u) ? BND_BACKING : undefined,
                 }}
-                onClick={() => tryView(i)}
+                onClick={() => setView(i)}
                 aria-label={"photo " + (i + 1) + (lk ? " locked" : "")}>
                 {lk && <span className="gal-thumb-lock">▒</span>}
               </button>
@@ -408,12 +400,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs }) {
           })}
         </div>
       )}
-      {warn > 0 && (
-        <div className="gal-warn" key={warn}>
-          <span className="gal-warn-box">▒ LOCKED // NOT ENOUGH GHOST_PTS</span>
-        </div>
-      )}
-      {zoom && (
+      {zoom && !curLocked && (
         <div className="zoom-overlay" onClick={() => setZoom(false)}>
           <img className="zoom-img" src={img || b.spread_url} alt={b.id + " zoom"} />
           <span className="zoom-hint">[ CLICK ] CLOSE</span>
@@ -557,6 +544,21 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
   const sizes = Array.isArray(b.sizes) && b.sizes.length ? b.sizes : ["S", "M", "L"];
   const sizesTbd = !(Array.isArray(b.sizes) && b.sizes.length);
   const [size, setSize] = useState(sizes[Math.min(1, sizes.length - 1)]);
+  // viewer state lives here so the product name can follow the variant
+  const gal = Array.isArray(b.gallery) ? b.gallery : [];
+  const lockedIdx = Array.isArray(b.locked_gallery) ? b.locked_gallery : [];
+  const isLockedAt = i => lockedIdx.indexOf(i) !== -1;
+  const firstView = !isLockedAt(-1)
+    ? -1
+    : (gal.map((_, i) => i).find(i => !isLockedAt(i)) !== undefined
+        ? gal.map((_, i) => i).find(i => !isLockedAt(i)) : -1);
+  const [view, setView] = useState(firstView);
+  useEffect(() => { setView(firstView); }, [b.id]);
+  // "WIREFRAME 01" -> trailing number follows the viewed position (spread = 01)
+  const pos = view < 0 ? 1 : view + 2;
+  const dynName = /\d+\s*$/.test(b.name)
+    ? b.name.replace(/\d+\s*$/, String(pos).padStart(2, "0"))
+    : b.name;
   useEffect(() => {
     const onKey = e => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -569,14 +571,14 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
         <PanelFX />
         <button className="detail-close" onClick={onClose}>[ ESC ] CLOSE ✕</button>
         <div className="detail-cols">
-          <SpreadViewer b={b} cwIdx={cw} unfoldMs={unfoldMs} />
+          <SpreadViewer b={b} cwIdx={cw} unfoldMs={unfoldMs} view={view} setView={setView} />
           <div className="detail-info">
             <div className="di-head">
               <div className="di-code-row">
                 <span>{b.id}</span>
                 <span className="di-status"><BndStatusDot status={b.status} /> {b.status}</span>
               </div>
-              <h2 className="di-name">{b.name}</h2>
+              <h2 className="di-name">{dynName}</h2>
             </div>
             <div className="di-price">{b.price} <i>{b.currency}</i></div>
             <div className="di-opt">
