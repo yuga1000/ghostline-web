@@ -778,7 +778,7 @@ function RedeemCode() {
 }
 
 // ─── Locked preview: view-only, capture wishlist email ───
-function LockedPreviewNote({ b }) {
+function LockedPreviewNote({ b, variantOnly }) {
   const [email, setEmail] = useState("");
   const [res, setRes] = useState(null);
   const join = () => {
@@ -791,7 +791,11 @@ function LockedPreviewNote({ b }) {
   };
   return (
     <div className="order-flow">
-      <div className="preview-note">◈ PREVIEW CLEARANCE — not purchasable yet</div>
+      <div className="preview-note">
+        {variantOnly
+          ? "▒ THIS VARIANT IS LOCKED — flip to an unlocked one to order"
+          : "◈ PREVIEW CLEARANCE — not purchasable yet"}
+      </div>
       <input className="pay-input" type="email" placeholder="email — notify on drop"
         value={email} onChange={e => setEmail(e.target.value)}
         onKeyDown={e => { if (e.key === "Enter") join(); }} />
@@ -874,7 +878,9 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
                 </div>
               </div>
             )}
-            {isPreview ? <LockedPreviewNote b={b} /> : <OrderFlow b={b} cwIdx={cw} size={size} />}
+            {(isPreview || isLockedAt(view))
+              ? <LockedPreviewNote b={b} variantOnly={!isPreview} />
+              : <OrderFlow b={b} cwIdx={cw} size={size} />}
           </div>
         </div>
       </div>
