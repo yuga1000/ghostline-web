@@ -4,6 +4,11 @@ const { useState, useEffect, useRef, useMemo } = React;
 
 // orders + wishlist open a prefilled email here (no backend)
 const BND_ORDER_EMAIL = "yugatxt@gmail.com";
+const BND_MAIL_ART = [
+  "░▒▓ GHOSTLINE ▓▒░",
+  "   captured forces",
+  "",
+].join("\n");
 
 const BND_PALETTES = {
   amber:  { accent: "#ffb142", dim: "#a8731d", glow: "rgba(255,180,80,.22)",  bg: "#000000" },
@@ -187,7 +192,7 @@ function BndCard({ b, onOpen }) {
   const submitWish = () => {
     if (!/.+@.+\..+/.test(wemail.trim())) { setWres({ ok: false, msg: "INVALID EMAIL" }); return; }
     const subject = `GHOSTLINE WISHLIST // ${b.id} ${b.name}`;
-    const body = `notify me when this drops:\n\ndesign:  ${b.id} · ${b.name}\nemail:   ${wemail.trim()}\n`;
+    const body = `${BND_MAIL_ART}\nnotify me when this drops:\n\ndesign:  ${b.id} · ${b.name}\nemail:   ${wemail.trim()}\n`;
     window.location.href = `mailto:${BND_ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     setWres({ ok: true, msg: "OPENING MAIL // SEND TO JOIN" });
     setTimeout(() => { setWish(false); setWemail(""); setWres(null); }, 2200);
@@ -509,6 +514,7 @@ function OrderFlow({ b, cwIdx, size }) {
     if (!contact.trim()) { setResult({ ok: false, msg: "CONTACT REQUIRED" }); return; }
     const subject = `GHOSTLINE ORDER // ${b.id} ${b.name}`;
     const body = [
+      BND_MAIL_ART,
       "ORDER — please don't edit the lines below",
       "──────────────────────────────",
       `design:   ${b.id} · ${b.name}`,
