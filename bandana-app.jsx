@@ -182,7 +182,7 @@ function BndCard({ b, onOpen }) {
     <article className={"bnd-card" + (sold ? " is-sold" : "") + (locked ? " is-locked" : "")} data-screen-label={"Card " + b.id}>
       <button className="bnd-preview" onClick={() => locked ? setWarn(w => w + 1) : onOpen(b, cw)} aria-label={locked ? b.name + " locked" : "open " + b.name}>
         <span className="bnd-folded">
-          <span className="bnd-img" style={{ backgroundImage: `url("${img}")` }}></span>
+          <img className="bnd-img" src={img} loading="lazy" decoding="async" alt="" />
           <span className="bnd-tint" style={{ background: b.colorways[cw].hex }}></span>
           <span className="bnd-foldline bnd-fl-v"></span>
           <span className="bnd-foldline bnd-fl-h"></span>
@@ -388,12 +388,10 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
             return (
               <button key={u}
                 className={"gal-thumb" + (view === i ? " is-on" : "") + (lk ? " is-locked" : "")}
-                style={{
-                  backgroundImage: `url("${u}")`,
-                  backgroundColor: isDark(u) ? BND_BACKING : undefined,
-                }}
+                style={{ backgroundColor: isDark(u) ? BND_BACKING : undefined }}
                 onClick={() => setView(i)}
                 aria-label={"photo " + (i + 1) + (lk ? " locked" : "")}>
+                <img className="gal-thumb-img" src={u} loading="lazy" decoding="async" alt="" />
                 {lk && <span className="gal-thumb-lock">▒</span>}
               </button>
             );
