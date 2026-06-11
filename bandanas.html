@@ -109,11 +109,47 @@ input { font: inherit; }
   margin-left: auto;
   display: inline-flex; align-items: center; gap: 14px;
 }
+.tb-pts-wrap { display: inline-flex; align-items: center; gap: 8px; }
 .tb-pts {
   font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--accent);
   animation: ptsPulse 0.35s steps(2, jump-none);
+}
+.tb-rankbar { display: inline-flex; gap: 2px; }
+.rb-seg {
+  width: 4px; height: 8px;
+  display: block;
+}
+.rb-seg.on  { background: var(--accent); }
+.rb-seg.off { background: rgba(232,226,214,0.16); }
+.pts-float {
+  position: absolute;
+  font-family: var(--pixel);
+  font-size: 10px;
+  color: var(--accent);
+  text-shadow: 0 0 6px var(--glow);
+  pointer-events: none;
+  animation: ptsFloat 0.9s steps(5, jump-none) forwards;
+}
+@keyframes ptsFloat {
+  0%   { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-38px); opacity: 0; }
+}
+.ghost-bit {
+  position: fixed;
+  z-index: 8500;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--glow);
+  padding: 6px;
+  animation: ghostFlicker 0.9s steps(2, jump-none) infinite;
+}
+.ghost-bit:hover { animation-play-state: paused; }
+@keyframes ghostFlicker {
+  0%, 100% { opacity: 0.9; }
+  50%      { opacity: 0.25; }
 }
 @keyframes ptsPulse {
   0%   { transform: translateY(2px); filter: brightness(2.2); }

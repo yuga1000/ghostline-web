@@ -12,6 +12,20 @@ function bndRank(pts) {
   for (const [min, name] of GHOST_RANKS) if (pts >= min) r = name;
   return r;
 }
+// floating "+N" at the last click point — every gain is visible
+function ptsFx(n) {
+  const layer = document.querySelector(".px-burst-layer");
+  if (!layer) return;
+  const el = document.createElement("span");
+  el.className = "pts-float";
+  el.textContent = "+" + n;
+  const c = window.__bndLastClick && (Date.now() - window.__bndLastClick.t < 700) ? window.__bndLastClick : null;
+  el.style.left = (c ? c.x : window.innerWidth - 130) + "px";
+  el.style.top = (c ? c.y - 16 : 46) + "px";
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
 const ghostStore = {
   pts: (() => { try { return parseInt(localStorage.getItem("bnd_ghost_pts") || "0", 10) || 0; } catch (e) { return 0; } })(),
   subs: new Set(),
@@ -19,6 +33,7 @@ const ghostStore = {
     this.pts += n;
     try { localStorage.setItem("bnd_ghost_pts", String(this.pts)); } catch (e) {}
     this.subs.forEach(f => f(this.pts));
+    ptsFx(n);
   },
 };
 // preview clearance: from this rank locked designs open in view-only mode
@@ -52,14 +67,68 @@ function GhostScore() {
     ghostStore.subs.add(f);
     return () => ghostStore.subs.delete(f);
   }, []);
+  // progress to next rank as a tiny segmented bar
+  const next = GHOST_RANKS.find(([min]) => min > pts) || null;
+  const prevMin = GHOST_RANKS.slice().reverse().find(([min]) => min <= pts)[0];
+  const frac = next ? (pts - prevMin) / (next[0] - prevMin) : 1;
+  const SEG = 8;
+  const filled = next ? Math.min(SEG, Math.floor(frac * SEG)) : SEG;
+  const hint = next ? (next[0] - pts) + " pts to " + next[1] : "max rank";
   return (
     <React.Fragment>
-      <span className="tb-pts" key={pulse} title={"rank: " + bndRank(pts)}>
-        ✦ {String(pts).padStart(4, "0")}
+      <span className="tb-pts-wrap" title={bndRank(pts) + " · " + hint}>
+        <span className="tb-pts" key={pulse}>✦ {String(pts).padStart(4, "0")}</span>
+        <span className="tb-rankbar" aria-hidden="true">
+          {Array.from({ length: SEG }).map((_, i) => (
+            <span key={i} className={"rb-seg " + (i < filled ? "on" : "off")}></span>
+          ))}
+        </span>
       </span>
       {toast && <span className="rank-toast">▲ RANK UP // {toast}</span>}
     </React.Fragment>
   );
+}
+
+// ─── Ghost hunt: a flickering pixel ghost worth +3 ───────
+function GhostHunt() {
+  const [ghost, setGhost] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    let spawnT, hideT;
+    const schedule = () => {
+      spawnT = setTimeout(() => {
+        if (!alive) return;
+        setGhost({ x: 6 + Math.random() * 86, y: 16 + Math.random() * 66 });
+        hideT = setTimeout(() => { if (alive) setGhost(null); }, 6500);
+        schedule();
+      }, 17000 + Math.random() * 26000);
+    };
+    schedule();
+    return () => { alive = false; clearTimeout(spawnT); clearTimeout(hideT); };
+  }, []);
+  if (!ghost) return null;
+  return (
+    <button
+      className="ghost-bit"
+      style={{ left: ghost.x + "vw", top: ghost.y + "vh" }}
+      aria-label="catch the ghost"
+      onClick={() => { ghostStore.add(3); setGhost(null); }}>▚</button>
+  );
+}
+
+// generic arcade toast (daily bonus etc.)
+function ArcadeToasts() {
+  const [msg, setMsg] = useState(null);
+  useEffect(() => {
+    const f = e => {
+      setMsg(e.detail);
+      setTimeout(() => setMsg(null), 2100);
+    };
+    window.addEventListener("bnd-toast", f);
+    return () => window.removeEventListener("bnd-toast", f);
+  }, []);
+  if (!msg) return null;
+  return <span className="rank-toast">{msg}</span>;
 }
 
 // ─── Arcade FX: pixel burst from every button press ──────
@@ -69,6 +138,7 @@ function usePixelBursts() {
     layer.className = "px-burst-layer";
     document.body.appendChild(layer);
     const onClick = e => {
+      window.__bndLastClick = { x: e.clientX, y: e.clientY, t: Date.now() };
       const btn = e.target.closest && e.target.closest("button, .tb-link");
       if (!btn) return;
       const n = 7 + Math.floor(Math.random() * 4);
@@ -828,6 +898,19 @@ function BndHeader() {
 function BndApp() {
   const [t, setTweak] = useTweaks(BND_TWEAK_DEFAULTS);
   usePixelBursts();
+  // daily signal: +5 pts on first visit of the day
+  useEffect(() => {
+    try {
+      const today = new Date().toDateString();
+      if (localStorage.getItem("bnd_daily") !== today) {
+        localStorage.setItem("bnd_daily", today);
+        setTimeout(() => {
+          ghostStore.add(5);
+          window.dispatchEvent(new CustomEvent("bnd-toast", { detail: "+5 PTS // DAILY SIGNAL" }));
+        }, 2600);
+      }
+    } catch (e) {}
+  }, []);
   const pal = BND_PALETTES[t.palette] || BND_PALETTES.amber;
   const [catalog, setCatalog] = useState({ source: null, items: [] });
   const [open, setOpen] = useState(null);   // {b, cw}
@@ -881,6 +964,9 @@ function BndApp() {
           mono={t.detailMono}
           onClose={() => setOpen(null)} />
       )}
+
+      <GhostHunt />
+      <ArcadeToasts />
 
       <TweaksPanel title="Tweaks">
         <TweakSection title="palette">
