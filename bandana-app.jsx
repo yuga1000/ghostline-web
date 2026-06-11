@@ -170,13 +170,13 @@ function BootReveal({ index, b, children }) {
 function BndCard({ b, onOpen }) {
   const [cw, setCw] = useState(0);
   const [warn, setWarn] = useState(0);
-  const img = b.spread_url || bndPlaceholder(b.id);
+  const img = bndImg(b.spread_url, "web") || bndPlaceholder(b.id);
   const sold = b.status === "SOLD_OUT";
   const locked = b.status === "LOCKED";
   // mini previews of unlocked gallery variants (not color swatches)
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
   const lockedIdx = Array.isArray(b.locked_gallery) ? b.locked_gallery : [];
-  const unlockedThumbs = gal.filter((_, i) => lockedIdx.indexOf(i) === -1);
+  const unlockedThumbs = gal.filter((_, i) => lockedIdx.indexOf(i) === -1).map(u => bndImg(u, "web"));
   const variantThumbs = unlockedThumbs.slice(0, 3);
   const variantMore = Math.max(0, unlockedThumbs.length - 3);
   useEffect(() => {
@@ -363,7 +363,8 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [gal.length]);
   const pad = n => String(n).padStart(2, "0");
-  const img = view < 0 ? null : gal[view];
+  const rawImg = view < 0 ? b.spread_url : gal[view];
+  const img = bndImg(rawImg, "web");
   const curLocked = isLockedAt(view);
   const total = gal.length + 1;          // spread counts as position 01
   const pos = view + 2;                  // gallery index 0 -> position 02
@@ -376,7 +377,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
           key={b.id + ":" + view}
           b={b} cwIdx={cwIdx} unfoldMs={unfoldMs}
           imgOverride={img}
-          bgColor={isDark(img || b.spread_url) ? BND_BACKING : "#000"}
+          bgColor={isDark(rawImg) ? BND_BACKING : "#000"}
           photoLabel={view < 0 ? "V01 / " + pad(total) + " · spread" : "V" + pad(pos) + " / " + pad(total)}
           onImgClick={curLocked ? null : () => setZoom(true)} />
         {curLocked && (
@@ -398,7 +399,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
                 style={{ backgroundColor: isDark(u) ? BND_BACKING : undefined }}
                 onClick={() => setView(i)}
                 aria-label={"photo " + (i + 1) + (lk ? " locked" : "")}>
-                <img className="gal-thumb-img" src={u} loading="lazy" decoding="async" alt="" />
+                <img className="gal-thumb-img" src={bndImg(u, "web")} loading="lazy" decoding="async" alt="" />
                 {lk && <span className="gal-thumb-lock">▒</span>}
               </button>
             );
@@ -407,7 +408,7 @@ function SpreadViewer({ b, cwIdx, unfoldMs, view, setView }) {
       )}
       {zoom && !curLocked && (
         <div className="zoom-overlay" onClick={() => setZoom(false)}>
-          <img className="zoom-img" src={img || b.spread_url} alt={b.id + " zoom"} />
+          <img className="zoom-img" src={bndImg(rawImg, "full")} alt={b.id + " zoom"} />
           <span className="zoom-hint">[ CLICK ] CLOSE</span>
         </div>
       )}

@@ -155,8 +155,19 @@ async function submitOrder(order) {
   return { ok: true, id, mode: "LOCAL_QUEUE" };
 }
 
+// Rewrite a stored /bandanas/X.PNG URL to a compressed webp variant.
+// "web" (~250KB, 1400px) for everything, "full" (~550KB, 2400px) for zoom.
+// Leaves non-matching URLs (placeholders, data URIs) untouched.
+function bndImg(url, variant) {
+  if (!url || typeof url !== "string") return url;
+  const m = url.match(/\/bandanas\/([^/?]+)\.png(\?.*)?$/i);
+  if (!m) return url;
+  const folder = variant === "full" ? "bandanas-full" : "bandanas-web";
+  return url.replace(/\/bandanas\/[^/?]+\.png(\?.*)?$/i, "/" + folder + "/" + m[1] + ".webp");
+}
+
 Object.assign(window, {
   SUPABASE_CONFIG, WALLETS,
-  bndPlaceholder, LOCAL_BANDANAS,
+  bndPlaceholder, bndImg, LOCAL_BANDANAS,
   sbConfigured, loadBandanas, submitOrder,
 });
