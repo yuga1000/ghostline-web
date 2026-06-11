@@ -260,6 +260,20 @@ input { font: inherit; }
 .wish-res { font-size: 9px; letter-spacing: 0.08em; text-align: center; }
 .wish-res.is-ok { color: var(--c-green); }
 .wish-res.is-err { color: var(--c-red); }
+.redeem-link {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+.redeem-link:hover { color: var(--accent); }
+.redeem-over { position: fixed; z-index: 9100; background: rgba(0,0,0,0.88); }
+.preview-note {
+  border: var(--bw) solid var(--dl);
+  color: var(--text-dim);
+  padding: 10px 12px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
 .bnd-card:hover { border-color: var(--line-2); box-shadow: 0 0 22px var(--glow); }
 .bnd-card.is-sold { opacity: 0.55; }
 

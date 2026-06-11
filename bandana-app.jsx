@@ -21,6 +21,18 @@ const ghostStore = {
     this.subs.forEach(f => f(this.pts));
   },
 };
+// preview clearance: from this rank locked designs open in view-only mode
+const BND_PREVIEW_PTS = 75;   // OPERATOR
+function useGhostPts() {
+  const [pts, setPts] = useState(ghostStore.pts);
+  useEffect(() => {
+    const f = p => setPts(p);
+    ghostStore.subs.add(f);
+    return () => ghostStore.subs.delete(f);
+  }, []);
+  return pts;
+}
+
 function GhostScore() {
   const [pts, setPts] = useState(ghostStore.pts);
   const [pulse, setPulse] = useState(0);
@@ -260,6 +272,8 @@ function BndCard({ b, onOpen }) {
   const img = bndImg(b.spread_url, "web") || bndPlaceholder(b.id);
   const sold = b.status === "SOLD_OUT";
   const locked = b.status === "LOCKED";
+  const pts = useGhostPts();
+  const canPreview = locked && pts >= BND_PREVIEW_PTS;
   // mini previews of unlocked gallery variants (not color swatches)
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
   const lockedIdx = Array.isArray(b.locked_gallery) ? b.locked_gallery : [];
@@ -280,7 +294,7 @@ function BndCard({ b, onOpen }) {
   };
   return (
     <article className={"bnd-card" + (sold ? " is-sold" : "") + (locked ? " is-locked" : "")} data-screen-label={"Card " + b.id}>
-      <button className="bnd-preview" onClick={() => locked ? setWish(true) : onOpen(b, cw)} aria-label={locked ? b.name + " wishlist" : "open " + b.name}>
+      <button className="bnd-preview" onClick={() => locked ? (canPreview ? onOpen(b, cw) : setWish(true)) : onOpen(b, cw)} aria-label={locked ? b.name + " locked" : "open " + b.name}>
         <span className="bnd-folded">
           <img className="bnd-img" src={img} loading="lazy" decoding="async" alt="" />
           <span className="bnd-tint" style={{ background: b.colorways[cw].hex }}></span>
@@ -289,7 +303,9 @@ function BndCard({ b, onOpen }) {
           <PixelSparks />
         </span>
         {!locked && <span className="bnd-open-hint">[ UNFOLD ]</span>}
-        {locked && !wish && <span className="bnd-open-hint">[ ☆ WISHLIST ]</span>}
+        {locked && !wish && (
+          <span className="bnd-open-hint">{canPreview ? "[ ◈ PREVIEW // CLEARANCE OK ]" : "[ ☆ WISHLIST ]"}</span>
+        )}
         {sold && <span className="bnd-sold-stamp">SOLD_OUT</span>}
         {locked && !wish && <span className="bnd-locked-stamp">▒ LOCKED</span>}
       </button>
@@ -607,6 +623,7 @@ function OrderFlow({ b, cwIdx, size }) {
       `tx hash:  ${tx.trim() || "(will send after payment)"}`,
       `contact:  ${contact.trim()}`,
       `address:  ${address.trim() || "—"}`,
+      `ghost_pts: ${ghostStore.pts} (${bndRank(ghostStore.pts)})`,
       "──────────────────────────────",
     ].join("\n");
     ghostStore.add(10);
@@ -653,9 +670,71 @@ function OrderFlow({ b, cwIdx, size }) {
   );
 }
 
+// ─── Redeem a purchase code for GHOST_PTS ────────────────
+function RedeemCode() {
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState("");
+  const [res, setRes] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const go = async () => {
+    if (!code.trim() || busy) return;
+    setBusy(true);
+    setRes({ ok: true, msg: "…" });
+    const r = await redeemCode(code, null);
+    setBusy(false);
+    setRes(r);
+    if (r.ok) {
+      ghostStore.add(r.pts);
+      setTimeout(() => { setOpen(false); setCode(""); setRes(null); }, 1800);
+    }
+  };
+  return (
+    <React.Fragment>
+      <button className="redeem-link" onClick={() => setOpen(true)}>▸ REDEEM_CODE</button>
+      {open && (
+        <div className="wish-over redeem-over" onClick={e => { if (e.target === e.currentTarget) setOpen(false); }}>
+          <div className="wish-box">
+            <div className="wish-title">▒ GHOST_PTS // ENTER CODE</div>
+            <input className="wish-input" placeholder="GHOST-XXXX" autoFocus
+              value={code} onChange={e => setCode(e.target.value.toUpperCase())}
+              onKeyDown={e => { if (e.key === "Enter") go(); }} />
+            <button className="wish-btn" onClick={go}>{busy ? "…" : "REDEEM"}</button>
+            {res && <div className={"wish-res " + (res.ok ? "is-ok" : "is-err")}>{res.msg}</div>}
+          </div>
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
+// ─── Locked preview: view-only, capture wishlist email ───
+function LockedPreviewNote({ b }) {
+  const [email, setEmail] = useState("");
+  const [res, setRes] = useState(null);
+  const join = () => {
+    if (!/.+@.+\..+/.test(email.trim())) { setRes({ ok: false, msg: "INVALID EMAIL" }); return; }
+    const subject = `GHOSTLINE WISHLIST // ${b.id} ${b.name}`;
+    const body = `${BND_MAIL_ART}\nnotify me when this drops:\n\ndesign:  ${b.id} · ${b.name}\nemail:   ${email.trim()}\n`;
+    ghostStore.add(5);
+    window.location.href = `mailto:${BND_ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setRes({ ok: true, msg: "OPENING MAIL // SEND TO JOIN" });
+  };
+  return (
+    <div className="order-flow">
+      <div className="preview-note">◈ PREVIEW CLEARANCE — not purchasable yet</div>
+      <input className="pay-input" type="email" placeholder="email — notify on drop"
+        value={email} onChange={e => setEmail(e.target.value)}
+        onKeyDown={e => { if (e.key === "Enter") join(); }} />
+      <button className="btn-order" onClick={join}>JOIN_WISHLIST</button>
+      {res && <div className={"pay-result " + (res.ok ? "is-ok" : "is-err")}>{res.msg}</div>}
+    </div>
+  );
+}
+
 // ─── Detail overlay ──────────────────────────────────────
 function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
   const [cw, setCw] = useState(initCw);
+  const isPreview = b.status === "LOCKED";   // rank-gated view-only mode
   // sizes: from DB when added (b.sizes), placeholder chips until then
   const sizes = Array.isArray(b.sizes) && b.sizes.length ? b.sizes : ["S", "M", "L"];
   const sizesTbd = !(Array.isArray(b.sizes) && b.sizes.length);
@@ -696,19 +775,21 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
               </div>
               <h2 className="di-name">{dynName}</h2>
             </div>
-            <div className="di-price">{b.price} <i>{b.currency}</i></div>
-            <div className="di-opt">
-              <span className="di-label">SIZE</span>
-              <div className="di-chips">
-                {sizes.map(s => (
-                  <button key={s}
-                    className={"di-chip" + (s === size ? " is-on" : "")}
-                    onClick={() => setSize(s)}>{s}</button>
-                ))}
-                {sizesTbd && <span className="di-note">mm — tbd</span>}
+            {!isPreview && <div className="di-price">{b.price} <i>{b.currency}</i></div>}
+            {!isPreview && (
+              <div className="di-opt">
+                <span className="di-label">SIZE</span>
+                <div className="di-chips">
+                  {sizes.map(s => (
+                    <button key={s}
+                      className={"di-chip" + (s === size ? " is-on" : "")}
+                      onClick={() => setSize(s)}>{s}</button>
+                  ))}
+                  {sizesTbd && <span className="di-note">mm — tbd</span>}
+                </div>
               </div>
-            </div>
-            {b.colorways.length > 1 && (
+            )}
+            {!isPreview && b.colorways.length > 1 && (
               <div className="di-opt">
                 <span className="di-label">COLOR</span>
                 <div className="di-chips">
@@ -723,7 +804,7 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
                 </div>
               </div>
             )}
-            <OrderFlow b={b} cwIdx={cw} size={size} />
+            {isPreview ? <LockedPreviewNote b={b} /> : <OrderFlow b={b} cwIdx={cw} size={size} />}
           </div>
         </div>
       </div>
@@ -790,6 +871,7 @@ function BndApp() {
         </div>
         <footer className="bnd-footer">
           <span>payment: USDT TRC-20 · wallet in detail view</span>
+          <RedeemCode />
           <a href="MYSTRA Lab.html" className="bnd-back">◀ BACK_TO_LAB</a>
         </footer>
       </main>

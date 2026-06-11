@@ -177,6 +177,26 @@ async function submitWishlist(productId, email) {
   return { ok: true, msg: "ADDED TO WISHLIST" };
 }
 
+// Redeem a one-time GHOST_PTS code (issued manually after a verified
+// purchase). Server side: ghost_codes table + bnd_redeem_code() RPC that
+// atomically marks the code used and returns its pts (-1 = invalid/used).
+async function redeemCode(code, contact) {
+  if (!sbConfigured()) return { ok: false, msg: "CODE SYSTEM OFFLINE" };
+  try {
+    const r = await fetch(SUPABASE_CONFIG.url + "/rest/v1/rpc/bnd_redeem_code", {
+      method: "POST",
+      headers: sbHeaders(),
+      body: JSON.stringify({ p_code: code, p_contact: contact || null }),
+    });
+    if (!r.ok) throw new Error("http " + r.status);
+    const pts = await r.json();
+    if (typeof pts !== "number" || pts <= 0) return { ok: false, msg: "INVALID OR USED CODE" };
+    return { ok: true, pts, msg: "+" + pts + " GHOST_PTS" };
+  } catch (e) {
+    return { ok: false, msg: "CODE SYSTEM OFFLINE" };
+  }
+}
+
 // Rewrite a stored /bandanas/X.PNG URL to a compressed webp variant.
 // "web" (~250KB, 1400px) for everything, "full" (~550KB, 2400px) for zoom.
 // Leaves non-matching URLs (placeholders, data URIs) untouched.
@@ -191,5 +211,5 @@ function bndImg(url, variant) {
 Object.assign(window, {
   SUPABASE_CONFIG, WALLETS,
   bndPlaceholder, bndImg, LOCAL_BANDANAS,
-  sbConfigured, loadBandanas, submitOrder, submitWishlist,
+  sbConfigured, loadBandanas, submitOrder, submitWishlist, redeemCode,
 });
