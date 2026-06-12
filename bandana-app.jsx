@@ -4,6 +4,8 @@ const { useState, useEffect, useRef, useMemo } = React;
 
 // orders + wishlist open a prefilled email here (no backend)
 const BND_ORDER_EMAIL = "yugatxt@gmail.com";
+// square bandana dimensions per size
+const BND_SIZE_CM = { S: 50, M: 60, L: 70 };
 
 // ─── GHOST_PTS arcade score (persisted, ties into LOCKED lore) ──
 const GHOST_RANKS = [[0, "VISITOR"], [25, "SCOUT"], [75, "OPERATOR"], [150, "PHANTOM"], [300, "GHOST"]];
@@ -686,7 +688,7 @@ function OrderFlow({ b, cwIdx, size }) {
       "ORDER — please don't edit the lines below",
       "──────────────────────────────",
       `design:   ${b.id} · ${b.name}`,
-      `size:     ${size || "—"}`,
+      `size:     ${size ? size + (BND_SIZE_CM[size] ? " (" + BND_SIZE_CM[size] + "×" + BND_SIZE_CM[size] + " cm)" : "") : "—"}`,
       `colorway: ${b.colorways[cwIdx].id}`,
       `price:    ${b.price} ${b.currency}`,
       `network:  ${network}`,
@@ -811,7 +813,6 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
   const isPreview = b.status === "LOCKED";   // rank-gated view-only mode
   // sizes: from DB when added (b.sizes), placeholder chips until then
   const sizes = Array.isArray(b.sizes) && b.sizes.length ? b.sizes : ["S", "M", "L"];
-  const sizesTbd = !(Array.isArray(b.sizes) && b.sizes.length);
   const [size, setSize] = useState(sizes[Math.min(1, sizes.length - 1)]);
   // viewer state lives here so the product name can follow the variant
   const gal = Array.isArray(b.gallery) ? b.gallery : [];
@@ -859,7 +860,9 @@ function DetailOverlay({ b, cwIdx: initCw, unfoldMs, mono, onClose }) {
                       className={"di-chip" + (s === size ? " is-on" : "")}
                       onClick={() => setSize(s)}>{s}</button>
                   ))}
-                  {sizesTbd && <span className="di-note">mm — tbd</span>}
+                  {BND_SIZE_CM[size] && (
+                    <span className="di-note">{BND_SIZE_CM[size]} × {BND_SIZE_CM[size]} cm</span>
+                  )}
                 </div>
               </div>
             )}
