@@ -236,7 +236,7 @@ function BndTopBar() {
     ["POLAROIDS", "https://ghostline.live/polaroids.html"],
     ["ORDER", "https://ghostline.live/order.html"],
     ["MARKET", "https://ghostline.live/market.html"],
-    ["MYSTRA", "MYSTRA Lab.html"],
+    ["MYSTRA", "https://ghostline.live/lab/"],
     ["BANDANAS", "#", true],
   ];
   return (
@@ -964,7 +964,7 @@ function BndApp() {
         <footer className="bnd-footer">
           <span>payment: USDT TRC-20 · wallet in detail view</span>
           <RedeemCode />
-          <a href="MYSTRA Lab.html" className="bnd-back">◀ BACK_TO_LAB</a>
+          <a href="https://ghostline.live/lab/" className="bnd-back">◀ BACK_TO_LAB</a>
         </footer>
       </main>
 
