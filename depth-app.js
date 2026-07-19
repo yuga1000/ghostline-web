@@ -1,8 +1,9 @@
-// MYSTRA Depth Watch — price-proportional layered live candles (Binance)
+// MYSTRA Depth Watch — cinema lanes: one full-width strip per asset,
+// each lane auto-scaled to its own window range (real wave shape),
+// Δ label shows the honest % range of the visible window.
 (function () {
 "use strict";
 
-// majors: vertical position ∝ log(price). alts: one shared field at the bottom.
 const COINS = [
   { sym: "BTCUSDT",  name: "BTC",  color: "#ffb142", group: "major" },
   { sym: "ETHUSDT",  name: "ETH",  color: "#d8e05a", group: "major" },
@@ -19,9 +20,20 @@ const COINS = [
   { sym: "PEPEUSDT", name: "PEPE", color: "#a0e05a", group: "alt" },
 ];
 const SIM_BASE = { BTC: 118000, ETH: 4200, AAVE: 320, SOL: 210, HYPE: 42, XRP: 2.9, LINK: 24, AVAX: 55, SUI: 3.4, ADA: 0.8, TRX: 0.35, DOGE: 0.24, PEPE: 0.000012 };
-const CW = 6;  // candle slot width (body 4 + gap 2) — real chart proportions
-const PX = 2;  // pixel grid
-const LABELW = 200; // left terminal-box column
+
+const CW = 7;   // candle slot (body 5 + gap 2)
+const PX = 2;   // pixel grid
+const PAD = 16; // page side padding
+
+// lane heights: sized so the median 1m candle body lands ≥3px after
+// auto-fit (body_px ≈ laneH/30 for majors) — see calc in commit msg
+const MAJOR_H = { BTC: 340, ETH: 260, AAVE: 170, SOL: 170, HYPE: 170 };
+const MAJOR_ORDER = ["BTC", "ETH", "AAVE", "SOL", "HYPE"];
+const GAP = 28;        // between major lanes
+const ALT_H = 110;     // alt lane height
+const ALT_GAP = 18;    // alt grid gap
+const SEC_H = 30;      // ALT_FIELD section header height
+const LABEL_ROW = 24;  // reserved for in-lane label
 
 const REST_HOSTS = ["https://data-api.binance.vision", "https://api.binance.com"];
 const WS_HOSTS = ["wss://data-stream.binance.vision", "wss://stream.binance.com:9443"];
@@ -34,44 +46,61 @@ let layers = COINS.map(c => ({ cfg: c, candles: [], price: 0, chg: 0, live: fals
 const tank   = document.getElementById("tank");
 const ctx    = tank.getContext("2d");
 const labels = document.getElementById("labels");
+const secEl  = document.getElementById("alt-sec");
 const elWs   = document.getElementById("ws-status");
 const elBtcPx  = document.getElementById("btc-px");
 const elBtcChg = document.getElementById("btc-chg");
 
-// ── layout ────────────────────────────────────────────────
-let W = 0, H = 0, N = 60;
+// ── layout: fixed vertical lanes, page scrolls ────────────
+let W = 0, H = 0, N = 240, mobile = false;
+
+function laneH(name) {
+  const h = MAJOR_H[name] || ALT_H;
+  return mobile ? Math.round(h * 0.72) : h;
+}
+function layout() {
+  const out = new Map();
+  let y = 10;
+  for (const name of MAJOR_ORDER) {
+    const L = layers.find(l => l.cfg.name === name);
+    if (!L) continue;
+    out.set(L.cfg.sym, { top: y, h: laneH(name), x: PAD, w: W - PAD * 2 });
+    y += laneH(name) + (mobile ? 18 : GAP);
+  }
+  const altTop = y + 4;
+  y = altTop + SEC_H;
+  const alts = layers.filter(l => l.cfg.group === "alt");
+  const cols = mobile ? 1 : 2;
+  const colW = (W - PAD * 2 - (cols - 1) * ALT_GAP) / cols;
+  const ah = mobile ? Math.round(ALT_H * 0.85) : ALT_H;
+  alts.forEach((L, i) => {
+    const r = Math.floor(i / cols), c = i % cols;
+    out.set(L.cfg.sym, {
+      top: y + r * (ah + ALT_GAP),
+      h: ah,
+      x: PAD + c * (colW + ALT_GAP),
+      w: colW,
+    });
+  });
+  const rows = Math.ceil(alts.length / cols);
+  const totalH = y + rows * (ah + ALT_GAP) - ALT_GAP + 20;
+  return { out, altTop, totalH };
+}
+
 function resize() {
   const r = tank.parentElement.getBoundingClientRect();
-  W = Math.floor(r.width); H = Math.floor(r.height);
+  W = Math.floor(r.width);
+  mobile = W < 720;
+  const { totalH } = layout();
+  H = totalH;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   tank.width = W * dpr; tank.height = H * dpr;
   tank.style.width = W + "px"; tank.style.height = H + "px";
+  tank.parentElement.style.height = H + "px";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const n = Math.max(20, Math.floor((W - LABELW - 24) / CW));
-  if (n > N) fetchAll();
-  N = n;
-}
-
-// price → vertical placement: log scale between heaviest and lightest major
-function layout() {
-  const majors = layers.filter(L => L.cfg.group === "major");
-  const alts   = layers.filter(L => L.cfg.group === "alt");
-  const altH = Math.max(120, Math.round(H * 0.16));
-  const region = H - altH - 14;
-  const bandH = Math.min(150, Math.max(76, Math.round(region * 0.21)));
-  const logs = majors.map(L => Math.log10(L.price || SIM_BASE[L.cfg.name] || 1));
-  const maxL = Math.max(...logs), minL = Math.min(...logs);
-  const span = (maxL - minL) || 1;
-  const out = new Map();
-  majors.forEach((L, i) => {
-    const t = (maxL - logs[i]) / span * (region - bandH);
-    out.set(L.cfg.sym, { top: t, h: bandH });
-  });
-  // alt field: thin ribbons cascaded through a slim shared band
-  const subH = Math.max(44, Math.round(altH * 0.5));
-  const step = alts.length > 1 ? (altH - subH) / (alts.length - 1) : 0;
-  alts.forEach((L, i) => out.set(L.cfg.sym, { top: H - altH + i * step, h: subH }));
-  return { out, altTop: H - altH };
+  // fetch enough candles for the widest lane
+  const n = Math.max(60, Math.floor((W - PAD * 2 - 20) / CW) + 10);
+  if (n > N) { N = n; fetchAll(); } else { N = n; }
 }
 
 // ── data ──────────────────────────────────────────────────
@@ -183,16 +212,30 @@ function fmtPrice(p) {
 }
 
 function drawLayer(L, b) {
-  if (L.dead || !L.candles.length) return;
+  if (!b) return 0;
   const col = L.cfg.color;
-  const win = L.candles.slice(-N);
+  // lane frame
+  ctx.strokeStyle = rgba(col, 0.22);
+  ctx.lineWidth = 1;
+  ctx.strokeRect(b.x + 0.5, b.top + 0.5, b.w - 1, b.h - 1);
+  if (L.dead || !L.candles.length) return 0;
+
+  const n = Math.max(10, Math.floor((b.w - 18) / CW));
+  const win = L.candles.slice(-n);
   let lo = Infinity, hi = -Infinity;
   for (const c of win) { if (c.l < lo) lo = c.l; if (c.h > hi) hi = c.h; }
-  const pad = (hi - lo) * 0.04 || hi * 0.001 || 1;
+  const rangePct = lo > 0 ? (hi - lo) / lo * 100 : 0;
+  const pad = (hi - lo) * 0.06 || hi * 0.001 || 1;
   lo -= pad; hi += pad;
-  const inTop = b.top + 4, inH = b.h - 8;
+
+  const inTop = b.top + LABEL_ROW, inH = b.h - LABEL_ROW - 10;
   const y = v => snap(inTop + (1 - (v - lo) / (hi - lo)) * inH);
-  const x0 = W - 16 - win.length * CW;
+  const x0 = b.x + b.w - 10 - win.length * CW;
+
+  // faint midline
+  ctx.fillStyle = rgba(col, 0.08);
+  ctx.fillRect(b.x + 6, snap(inTop + inH / 2), b.w - 12, 1);
+
   for (let j = 0; j < win.length; j++) {
     const c = win[j], x = snap(x0 + j * CW);
     const up = c.c >= c.o;
@@ -200,7 +243,7 @@ function drawLayer(L, b) {
     const yO = y(c.o), yC = y(c.c);
     const bt = Math.min(yO, yC), bh = Math.max(PX, Math.abs(yC - yO));
     ctx.fillStyle = rgba(col, 0.45);
-    ctx.fillRect(x + CW / 2 - 1, yH, PX, Math.max(PX, yL - yH));
+    ctx.fillRect(x + Math.floor(CW / 2) - 1, yH, PX, Math.max(PX, yL - yH));
     if (up) {
       ctx.fillStyle = rgba(col, 0.92);
       ctx.fillRect(x + 1, bt, CW - 2, bh);
@@ -214,105 +257,55 @@ function drawLayer(L, b) {
   }
   const last = win[win.length - 1];
   ctx.fillStyle = rgba(col, 0.95);
-  ctx.fillRect(W - 10, y(last.c), 10, PX);
+  ctx.fillRect(b.x + b.w - 8, y(last.c), 8, PX);
+  return rangePct;
 }
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
   const { out, altTop } = layout();
-  // alts field first (behind), then majors deep→surface
-  const alts = layers.filter(L => L.cfg.group === "alt");
-  const majors = layers.filter(L => L.cfg.group === "major")
-    .slice().sort((a, b) => (a.price || SIM_BASE[a.cfg.name]) - (b.price || SIM_BASE[b.cfg.name]));
-  for (const L of alts) drawLayer(L, out.get(L.cfg.sym));
-  for (const L of majors) drawLayer(L, out.get(L.cfg.sym));
-  drawLabels(out, altTop);
+  const ranges = new Map();
+  for (const L of layers) {
+    const pct = drawLayer(L, out.get(L.cfg.sym));
+    ranges.set(L.cfg.sym, pct);
+  }
+  drawLabels(out, ranges, altTop);
 }
 
-function drawLabels(out, altTop) {
-  // resolve major-label collisions: sort by y, push apart to ≥18px
-  const majors = layers.filter(L => L.cfg.group === "major")
-    .map(L => ({ L, y: out.get(L.cfg.sym).top + 4 }))
-    .sort((a, b) => a.y - b.y);
-  for (let i = 1; i < majors.length; i++) {
-    if (majors[i].y < majors[i - 1].y + 28) majors[i].y = majors[i - 1].y + 28;
-  }
-  for (let i = majors.length - 1; i >= 0; i--) { // keep on screen
-    const maxY = altTop - 32 - (majors.length - 1 - i) * 28;
-    if (majors[i].y > maxY) majors[i].y = maxY;
-    if (i && majors[i - 1].y > majors[i].y - 28) majors[i - 1].y = majors[i].y - 28;
-  }
-  const yFor = new Map(majors.map(m => [m.L.cfg.sym, m.y]));
-  // alt panel occupies the bottom-left — shift any major box that would overlap it to the right
-  const panelEl = document.getElementById("alts");
-  const pTop = panelEl.offsetTop, pRight = panelEl.offsetLeft + panelEl.offsetWidth + 8;
-  layers.filter(L => L.cfg.group === "major").forEach(L => {
+function drawLabels(out, ranges, altTop) {
+  secEl.style.top = altTop + "px";
+  secEl.style.left = PAD + "px";
+  layers.forEach(L => {
+    const b = out.get(L.cfg.sym);
+    if (!b) return;
     let el = L._el;
     if (!el) {
       el = document.createElement("div");
-      el.className = "dw-label";
-      el.innerHTML = '<span class="l-dot"></span><b class="l-name"></b><span class="l-px"></span><span class="l-chg"></span><span class="l-off"></span>';
+      el.className = "dw-label" + (L.cfg.group === "alt" ? " is-alt" : "");
+      el.innerHTML = '<span class="l-dot"></span><b class="l-name"></b><span class="l-px"></span><span class="l-chg"></span><span class="l-rng"></span><span class="l-off"></span>';
       labels.appendChild(el);
       L._el = el;
     }
-    const yy = yFor.get(L.cfg.sym);
-    el.style.left = (yy + 24 > pTop ? pRight : 12) + "px";
-    el.style.top = yy + "px";
+    el.style.left = (b.x + 6) + "px";
+    el.style.top = (b.top + 4) + "px";
     el.style.color = L.cfg.color;
-    el.style.borderColor = rgba(L.cfg.color, 0.5);
     el.querySelector(".l-name").textContent = L.cfg.name;
     el.querySelector(".l-px").textContent = L.dead ? "" : fmtPrice(L.price);
     const chg = el.querySelector(".l-chg");
     chg.textContent = L.dead ? "" : (L.chg >= 0 ? "+" : "") + L.chg.toFixed(2) + "%";
     chg.className = "l-chg " + (L.chg >= 0 ? "is-up" : "is-dn");
+    const rng = ranges.get(L.cfg.sym);
+    el.querySelector(".l-rng").textContent = rng ? "Δ " + rng.toFixed(2) + "%" : "";
     el.querySelector(".l-dot").className = "l-dot" + (L.live ? " is-live" : "");
-    const off = el.querySelector(".l-off");
-    off.textContent = L.sim ? "SIM" : (L.dead ? "OFFLINE" : "");
+    el.querySelector(".l-off").textContent = L.sim ? "SIM" : (L.dead ? "OFFLINE" : "");
   });
-  drawAltPanel();
-  layers.forEach(L => {
-    if (L.cfg.name === "BTC" && !L.dead && L.price) {
-      elBtcPx.textContent = "$" + fmtPrice(L.price);
-      elBtcChg.textContent = (L.chg >= 0 ? "▲ " : "▼ ") + Math.abs(L.chg).toFixed(2) + "%";
-      elBtcChg.className = "btc-chg " + (L.chg >= 0 ? "is-up" : "is-dn");
-    }
-  });
+  const btc = layers.find(L => L.cfg.name === "BTC");
+  if (btc && !btc.dead && btc.price) {
+    elBtcPx.textContent = "$" + fmtPrice(btc.price);
+    elBtcChg.textContent = (btc.chg >= 0 ? "▲ " : "▼ ") + Math.abs(btc.chg).toFixed(2) + "%";
+    elBtcChg.className = "btc-chg " + (btc.chg >= 0 ? "is-up" : "is-dn");
+  }
 }
-
-// ── collapsible terminal panel for the alt field ──────────
-const altBody = document.getElementById("alts-body");
-const altCount = document.getElementById("alts-count");
-function drawAltPanel() {
-  const alts = layers.filter(L => L.cfg.group === "alt");
-  altCount.textContent = alts.length;
-  alts.forEach(L => {
-    let row = L._row;
-    if (!row) {
-      row = document.createElement("div");
-      row.className = "alt-row";
-      row.innerHTML = '<span class="l-dot"></span><b class="a-name"></b><span class="a-px"></span><span class="a-chg"></span>';
-      altBody.appendChild(row);
-      L._row = row;
-    }
-    row.style.color = L.cfg.color;
-    row.querySelector(".a-name").textContent = L.cfg.name;
-    row.querySelector(".a-px").textContent = L.dead ? "—" : fmtPrice(L.price);
-    const chg = row.querySelector(".a-chg");
-    chg.textContent = L.dead ? (L.sim ? "SIM" : "OFF") : (L.chg >= 0 ? "+" : "") + L.chg.toFixed(2) + "%";
-    chg.className = "a-chg " + (L.chg >= 0 ? "is-up" : "is-dn");
-    row.querySelector(".l-dot").className = "l-dot" + (L.live ? " is-live" : "");
-  });
-}
-(function initAltPanel() {
-  const panel = document.getElementById("alts");
-  const open = localStorage.getItem("dw-alts-open") !== "0";
-  panel.classList.toggle("is-open", open);
-  document.getElementById("alts-head").addEventListener("click", () => {
-    const now = !panel.classList.contains("is-open");
-    panel.classList.toggle("is-open", now);
-    localStorage.setItem("dw-alts-open", now ? "1" : "0");
-  });
-})();
 
 // ── interval chips ────────────────────────────────────────
 document.querySelectorAll(".dw-int").forEach(btn => {
