@@ -21,19 +21,32 @@ const COINS = [
 ];
 const SIM_BASE = { BTC: 118000, ETH: 4200, AAVE: 320, SOL: 210, HYPE: 42, XRP: 2.9, LINK: 24, AVAX: 55, SUI: 3.4, ADA: 0.8, TRX: 0.35, DOGE: 0.24, PEPE: 0.000012 };
 
-const CW = 7;   // candle slot (body 5 + gap 2)
+const CW = 5;   // candle slot (body 3 + gap 2) — thin candles
 const PX = 2;   // pixel grid
 const PAD = 16; // page side padding
 
-// lane heights: sized so the median 1m candle body lands ≥3px after
-// auto-fit (body_px ≈ laneH/30 for majors) — see calc in commit msg
-const MAJOR_H = { BTC: 340, ETH: 260, AAVE: 170, SOL: 170, HYPE: 170 };
-const MAJOR_ORDER = ["BTC", "ETH", "AAVE", "SOL", "HYPE"];
-const GAP = 28;        // between major lanes
-const ALT_H = 110;     // alt lane height
-const ALT_GAP = 18;    // alt grid gap
-const SEC_H = 30;      // ALT_FIELD section header height
-const LABEL_ROW = 24;  // reserved for in-lane label
+// Single overlaid field, no scroll. Each coin gets a vertical BAND
+// (its center + amplitude) but bands OVERLAP so waves cross each other —
+// crossing points reveal sync/desync. Order deep→surface:
+// BTC highest, ETH below, alts stacked toward the floor.
+// center = fraction of field height (0 = top). amp = half-height fraction.
+const BANDS = [
+  { name: "BTC",  center: 0.12, amp: 0.14 },
+  { name: "ETH",  center: 0.28, amp: 0.14 },
+  { name: "AAVE", center: 0.42, amp: 0.12 },
+  { name: "SOL",  center: 0.52, amp: 0.12 },
+  { name: "HYPE", center: 0.60, amp: 0.11 },
+  { name: "XRP",  center: 0.68, amp: 0.10 },
+  { name: "LINK", center: 0.74, amp: 0.10 },
+  { name: "AVAX", center: 0.78, amp: 0.09 },
+  { name: "SUI",  center: 0.82, amp: 0.08 },
+  { name: "ADA",  center: 0.85, amp: 0.07 },
+  { name: "TRX",  center: 0.88, amp: 0.06 },
+  { name: "DOGE", center: 0.905, amp: 0.055 },
+  { name: "PEPE", center: 0.925, amp: 0.05 },
+];
+const BAND = Object.fromEntries(BANDS.map(b => [b.name, b]));
+const TOP_PAD = 12, BOT_PAD = 12;
 
 const REST_HOSTS = ["https://data-api.binance.vision", "https://api.binance.com"];
 const WS_HOSTS = ["wss://data-stream.binance.vision", "wss://stream.binance.com:9443"];
@@ -46,70 +59,40 @@ let layers = COINS.map(c => ({ cfg: c, candles: [], price: 0, chg: 0, live: fals
 const tank   = document.getElementById("tank");
 const ctx    = tank.getContext("2d");
 const labels = document.getElementById("labels");
-const secEl  = document.getElementById("alt-sec");
 const elWs   = document.getElementById("ws-status");
 const elBtcPx  = document.getElementById("btc-px");
 const elBtcChg = document.getElementById("btc-chg");
 
-// ── layout: fixed vertical lanes, page scrolls ────────────
+// ── layout: single fixed-height field, no scroll ──────────
 let W = 0, H = 0, N = 240, mobile = false;
-
-function laneH(name) {
-  const h = MAJOR_H[name] || ALT_H;
-  return mobile ? Math.round(h * 0.72) : h;
-}
-function layout() {
-  const out = new Map();
-  let y = 10;
-  for (const name of MAJOR_ORDER) {
-    const L = layers.find(l => l.cfg.name === name);
-    if (!L) continue;
-    out.set(L.cfg.sym, { top: y, h: laneH(name), x: PAD, w: W - PAD * 2 });
-    y += laneH(name) + (mobile ? 18 : GAP);
-  }
-  const altTop = y + 4;
-  y = altTop + SEC_H;
-  const alts = layers.filter(l => l.cfg.group === "alt");
-  const cols = mobile ? 1 : 2;
-  const colW = (W - PAD * 2 - (cols - 1) * ALT_GAP) / cols;
-  const ah = mobile ? Math.round(ALT_H * 0.85) : ALT_H;
-  alts.forEach((L, i) => {
-    const r = Math.floor(i / cols), c = i % cols;
-    out.set(L.cfg.sym, {
-      top: y + r * (ah + ALT_GAP),
-      h: ah,
-      x: PAD + c * (colW + ALT_GAP),
-      w: colW,
-    });
-  });
-  const rows = Math.ceil(alts.length / cols);
-  const totalH = y + rows * (ah + ALT_GAP) - ALT_GAP + 20;
-  return { out, altTop, totalH };
-}
 
 function resize() {
   const r = tank.parentElement.getBoundingClientRect();
   W = Math.floor(r.width);
+  H = Math.floor(r.height);
   mobile = W < 720;
-  const { totalH } = layout();
-  H = totalH;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   tank.width = W * dpr; tank.height = H * dpr;
   tank.style.width = W + "px"; tank.style.height = H + "px";
-  tank.parentElement.style.height = H + "px";
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  // fetch enough candles for the widest lane
   const n = Math.max(60, Math.floor((W - PAD * 2 - 20) / CW) + 10);
   if (n > N) { N = n; fetchAll(); } else { N = n; }
 }
 
 // ── data ──────────────────────────────────────────────────
+// blocked networks (e.g. ISP blackholes Binance) leave fetches hanging
+// forever — every request gets a hard timeout, then we fall back to SIM
+function fetchT(url, ms) {
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), ms);
+  return fetch(url, { signal: ac.signal }).finally(() => clearTimeout(t));
+}
 async function fetchOne(L) {
   for (let h = 0; h < REST_HOSTS.length; h++) {
     const host = REST_HOSTS[(restHost + h) % REST_HOSTS.length];
     try {
       const u = `${host}/api/v3/klines?symbol=${L.cfg.sym}&interval=${interval}&limit=${Math.min(N + 10, 500)}`;
-      const rs = await fetch(u);
+      const rs = await fetchT(u, 6000);
       if (rs.status === 400) { L.dead = true; return; } // not listed
       if (!rs.ok) throw 0;
       const rows = await rs.json();
@@ -211,90 +194,121 @@ function fmtPrice(p) {
   return p.toFixed(8);
 }
 
-function drawLayer(L, b) {
-  if (!b) return 0;
+// each coin draws inside its band; returns per-column close Y (for crossings)
+function drawLayer(L, fieldTop, fieldH) {
+  if (L.dead || !L.candles.length) return null;
   const col = L.cfg.color;
-  // lane frame
-  ctx.strokeStyle = rgba(col, 0.22);
-  ctx.lineWidth = 1;
-  ctx.strokeRect(b.x + 0.5, b.top + 0.5, b.w - 1, b.h - 1);
-  if (L.dead || !L.candles.length) return 0;
+  const band = BAND[L.cfg.name];
+  if (!band) return null;
+  const cy = fieldTop + band.center * fieldH;     // band center (px)
+  const half = band.amp * fieldH;                 // half-height (px)
 
-  const n = Math.max(10, Math.floor((b.w - 18) / CW));
+  const n = Math.max(10, Math.floor((W - PAD * 2 - 20) / CW));
   const win = L.candles.slice(-n);
   let lo = Infinity, hi = -Infinity;
   for (const c of win) { if (c.l < lo) lo = c.l; if (c.h > hi) hi = c.h; }
   const rangePct = lo > 0 ? (hi - lo) / lo * 100 : 0;
-  const pad = (hi - lo) * 0.06 || hi * 0.001 || 1;
-  lo -= pad; hi += pad;
+  const mid = (hi + lo) / 2 || 1;
+  const span = (hi - lo) || mid * 0.001 || 1;
+  // price → Y: map [lo,hi] into [cy+half, cy-half] around the band center
+  const y = v => snap(cy - ((v - mid) / (span / 2)) * half);
+  const x0 = W - PAD - win.length * CW;
 
-  const inTop = b.top + LABEL_ROW, inH = b.h - LABEL_ROW - 10;
-  const y = v => snap(inTop + (1 - (v - lo) / (hi - lo)) * inH);
-  const x0 = b.x + b.w - 10 - win.length * CW;
-
-  // faint midline
-  ctx.fillStyle = rgba(col, 0.08);
-  ctx.fillRect(b.x + 6, snap(inTop + inH / 2), b.w - 12, 1);
-
+  const closeY = new Float32Array(win.length);
   for (let j = 0; j < win.length; j++) {
     const c = win[j], x = snap(x0 + j * CW);
     const up = c.c >= c.o;
     const yH = y(c.h), yL = y(c.l);
     const yO = y(c.o), yC = y(c.c);
     const bt = Math.min(yO, yC), bh = Math.max(PX, Math.abs(yC - yO));
-    ctx.fillStyle = rgba(col, 0.45);
-    ctx.fillRect(x + Math.floor(CW / 2) - 1, yH, PX, Math.max(PX, yL - yH));
+    closeY[j] = yC;
+    // wick
+    ctx.fillStyle = rgba(col, 0.4);
+    ctx.fillRect(x + 1, yH, PX, Math.max(PX, yL - yH));
+    // body (thin: CW-2 = 3px)
     if (up) {
-      ctx.fillStyle = rgba(col, 0.92);
-      ctx.fillRect(x + 1, bt, CW - 2, bh);
+      ctx.fillStyle = rgba(col, 0.9);
+      ctx.fillRect(x, bt, CW - 2, bh);
     } else {
-      ctx.fillStyle = rgba(col, 0.30);
-      ctx.fillRect(x + 1, bt, CW - 2, bh);
+      ctx.fillStyle = rgba(col, 0.28);
+      ctx.fillRect(x, bt, CW - 2, bh);
       ctx.fillStyle = rgba(col, 0.8);
-      ctx.fillRect(x + 1, bt, CW - 2, PX);
-      ctx.fillRect(x + 1, bt + bh - PX, CW - 2, PX);
+      ctx.fillRect(x, bt, CW - 2, PX);
+      ctx.fillRect(x, bt + bh - PX, CW - 2, PX);
     }
   }
+  // last-price marker at right edge
   const last = win[win.length - 1];
   ctx.fillStyle = rgba(col, 0.95);
-  ctx.fillRect(b.x + b.w - 8, y(last.c), 8, PX);
-  return rangePct;
+  ctx.fillRect(W - PAD, y(last.c), PAD, PX);
+  return { closeY, x0, col, rangePct, name: L.cfg.name };
 }
 
 function draw() {
   ctx.clearRect(0, 0, W, H);
-  const { out, altTop } = layout();
-  const ranges = new Map();
-  for (const L of layers) {
-    const pct = drawLayer(L, out.get(L.cfg.sym));
-    ranges.set(L.cfg.sym, pct);
+  const fieldTop = TOP_PAD;
+  const fieldH = H - TOP_PAD - BOT_PAD;
+
+  // draw deep→surface so BTC sits on top; collect close lines for crossings
+  const lines = [];
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const r = drawLayer(layers[i], fieldTop, fieldH);
+    if (r) lines.push(r);
   }
-  drawLabels(out, ranges, altTop);
+  drawCrossings(lines);
+  drawLabels(fieldTop, fieldH, lines);
 }
 
-function drawLabels(out, ranges, altTop) {
-  secEl.style.top = altTop + "px";
-  secEl.style.left = PAD + "px";
+// mark columns where two close-lines cross — the sync/desync detector
+function drawCrossings(lines) {
+  if (lines.length < 2) return;
+  const cols = Math.min(...lines.map(l => l.closeY.length));
+  for (let j = 1; j < cols; j++) {
+    // count how many pairs cross at this column
+    let hits = 0, cx = 0, cyAcc = 0;
+    for (let a = 0; a < lines.length; a++) {
+      for (let b = a + 1; b < lines.length; b++) {
+        const A = lines[a].closeY, B = lines[b].closeY;
+        const d0 = A[j - 1] - B[j - 1], d1 = A[j] - B[j];
+        if (d0 === 0 || (d0 < 0) !== (d1 < 0)) {
+          hits++;
+          cyAcc += (A[j] + B[j]) / 2;
+        }
+      }
+    }
+    if (hits >= 3) {  // a cluster of crossings — a real sync knot
+      const x = snap((lines[0].x0) + j * CW);
+      const y = snap(cyAcc / hits);
+      const s = Math.min(6, 2 + hits);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.fillRect(x - 1, y - s, PX, s * 2);
+      ctx.fillRect(x - s, y - 1, s * 2, PX);
+    }
+  }
+}
+
+function drawLabels(fieldTop, fieldH, lines) {
+  const rngBy = new Map(lines.map(l => [l.name, l.rangePct]));
   layers.forEach(L => {
-    const b = out.get(L.cfg.sym);
-    if (!b) return;
+    const band = BAND[L.cfg.name];
+    if (!band) return;
     let el = L._el;
     if (!el) {
       el = document.createElement("div");
-      el.className = "dw-label" + (L.cfg.group === "alt" ? " is-alt" : "");
+      el.className = "dw-label";
       el.innerHTML = '<span class="l-dot"></span><b class="l-name"></b><span class="l-px"></span><span class="l-chg"></span><span class="l-rng"></span><span class="l-off"></span>';
       labels.appendChild(el);
       L._el = el;
     }
-    el.style.left = (b.x + 6) + "px";
-    el.style.top = (b.top + 4) + "px";
+    el.style.left = PAD + "px";
+    el.style.top = snap(fieldTop + band.center * fieldH - band.amp * fieldH - 14) + "px";
     el.style.color = L.cfg.color;
     el.querySelector(".l-name").textContent = L.cfg.name;
     el.querySelector(".l-px").textContent = L.dead ? "" : fmtPrice(L.price);
     const chg = el.querySelector(".l-chg");
     chg.textContent = L.dead ? "" : (L.chg >= 0 ? "+" : "") + L.chg.toFixed(2) + "%";
     chg.className = "l-chg " + (L.chg >= 0 ? "is-up" : "is-dn");
-    const rng = ranges.get(L.cfg.sym);
+    const rng = rngBy.get(L.cfg.name);
     el.querySelector(".l-rng").textContent = rng ? "Δ " + rng.toFixed(2) + "%" : "";
     el.querySelector(".l-dot").className = "l-dot" + (L.live ? " is-live" : "");
     el.querySelector(".l-off").textContent = L.sim ? "SIM" : (L.dead ? "OFFLINE" : "");
