@@ -21,9 +21,13 @@ const COINS = [
 ];
 const SIM_BASE = { BTC: 118000, ETH: 4200, AAVE: 320, SOL: 210, HYPE: 42, XRP: 2.9, LINK: 24, AVAX: 55, SUI: 3.4, ADA: 0.8, TRX: 0.35, DOGE: 0.24, PEPE: 0.000012 };
 
-const CW = 5;   // candle slot (body 3 + gap 2) — thin candles
-const PX = 2;   // pixel grid
-const PAD = 16; // page side padding
+const CW = 7;      // candle slot px (body ~5 + gap 2)
+const BODYW = 5;   // body width px
+const WICKW = 1;   // wick width px (centered)
+const PX = 1;      // fine grid — crisp candles, no smearing
+const PAD = 16;    // page side padding
+const UP = "#26a17b";   // Bybit-ish green
+const DN = "#e15241";   // Bybit-ish red
 
 // Single overlaid field, no scroll. Each coin gets a vertical BAND
 // (its center + amplitude) but bands OVERLAP so waves cross each other —
@@ -187,6 +191,14 @@ function rgba(hex, a) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`;
 }
+// blend hex a toward hex b by t (0..1) — coin hue + up/down tint
+function mix(a, b, t) {
+  const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16);
+  const r = Math.round((A >> 16 & 255) * (1 - t) + (B >> 16 & 255) * t);
+  const g = Math.round((A >> 8 & 255) * (1 - t) + (B >> 8 & 255) * t);
+  const bl = Math.round((A & 255) * (1 - t) + (B & 255) * t);
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
+}
 function fmtPrice(p) {
   if (p >= 1000) return p.toLocaleString("en-US", { maximumFractionDigits: 0 });
   if (p >= 10)   return p.toFixed(2);
@@ -211,30 +223,32 @@ function drawLayer(L, fieldTop, fieldH) {
   const mid = (hi + lo) / 2 || 1;
   const span = (hi - lo) || mid * 0.001 || 1;
   // price → Y: map [lo,hi] into [cy+half, cy-half] around the band center
-  const y = v => snap(cy - ((v - mid) / (span / 2)) * half);
-  const x0 = W - PAD - win.length * CW;
+  const y = v => Math.round(cy - ((v - mid) / (span / 2)) * half);
+  const x0 = Math.round(W - PAD - win.length * CW);
+  const bodyOff = Math.floor((CW - BODYW) / 2);
+  const wickOff = Math.floor((CW - WICKW) / 2);
 
   const closeY = new Float32Array(win.length);
   for (let j = 0; j < win.length; j++) {
-    const c = win[j], x = snap(x0 + j * CW);
+    const c = win[j], x = x0 + j * CW;
     const up = c.c >= c.o;
     const yH = y(c.h), yL = y(c.l);
     const yO = y(c.o), yC = y(c.c);
-    const bt = Math.min(yO, yC), bh = Math.max(PX, Math.abs(yC - yO));
+    const bt = Math.min(yO, yC);
+    const bh = Math.max(1, Math.abs(yC - yO));  // 1px min body (doji)
     closeY[j] = yC;
-    // wick
-    ctx.fillStyle = rgba(col, 0.4);
-    ctx.fillRect(x + 1, yH, PX, Math.max(PX, yL - yH));
-    // body (thin: CW-2 = 3px)
+    // per-coin tinted green/red: keep the layer hue, up bright / down dim
+    const gc = up ? mix(col, UP, 0.55) : mix(col, DN, 0.55);
+    // wick: 1px, dead-centered
+    ctx.fillStyle = rgba(gc, 0.55);
+    ctx.fillRect(x + wickOff, yH, WICKW, Math.max(1, yL - yH));
+    // body: solid up, hollow(-ish) down — crisp edges
     if (up) {
-      ctx.fillStyle = rgba(col, 0.9);
-      ctx.fillRect(x, bt, CW - 2, bh);
+      ctx.fillStyle = rgba(gc, 0.95);
+      ctx.fillRect(x + bodyOff, bt, BODYW, bh);
     } else {
-      ctx.fillStyle = rgba(col, 0.28);
-      ctx.fillRect(x, bt, CW - 2, bh);
-      ctx.fillStyle = rgba(col, 0.8);
-      ctx.fillRect(x, bt, CW - 2, PX);
-      ctx.fillRect(x, bt + bh - PX, CW - 2, PX);
+      ctx.fillStyle = rgba(gc, 0.9);
+      ctx.fillRect(x + bodyOff, bt, BODYW, bh);
     }
   }
   // last-price marker at right edge
@@ -287,11 +301,27 @@ function drawCrossings(lines) {
   }
 }
 
+const LBL_MIN = 19;  // min vertical gap between labels (px)
 function drawLabels(fieldTop, fieldH, lines) {
   const rngBy = new Map(lines.map(l => [l.name, l.rangePct]));
-  layers.forEach(L => {
+  // 1) desired Y for each label = just above its band top
+  const items = layers.map(L => {
     const band = BAND[L.cfg.name];
-    if (!band) return;
+    if (!band) return null;
+    return { L, band, y: fieldTop + band.center * fieldH - band.amp * fieldH - 14 };
+  }).filter(Boolean).sort((a, b) => a.y - b.y);
+  // 2) push apart top→bottom so none overlap
+  for (let i = 1; i < items.length; i++) {
+    if (items[i].y < items[i - 1].y + LBL_MIN) items[i].y = items[i - 1].y + LBL_MIN;
+  }
+  // 3) clamp to field bottom, then relax upward if it overflowed
+  const maxY = fieldTop + fieldH - LBL_MIN;
+  for (let i = items.length - 1; i >= 0; i--) {
+    if (items[i].y > maxY - (items.length - 1 - i) * LBL_MIN)
+      items[i].y = maxY - (items.length - 1 - i) * LBL_MIN;
+    if (i && items[i - 1].y > items[i].y - LBL_MIN) items[i - 1].y = items[i].y - LBL_MIN;
+  }
+  items.forEach(({ L, y }) => {
     let el = L._el;
     if (!el) {
       el = document.createElement("div");
@@ -301,7 +331,7 @@ function drawLabels(fieldTop, fieldH, lines) {
       L._el = el;
     }
     el.style.left = PAD + "px";
-    el.style.top = snap(fieldTop + band.center * fieldH - band.amp * fieldH - 14) + "px";
+    el.style.top = Math.round(y) + "px";
     el.style.color = L.cfg.color;
     el.querySelector(".l-name").textContent = L.cfg.name;
     el.querySelector(".l-px").textContent = L.dead ? "" : fmtPrice(L.price);
