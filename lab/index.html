@@ -198,10 +198,28 @@ document.addEventListener('DOMContentLoaded', async function() {
           white-space: nowrap;
         }
         .mystra-reconstruction__support:hover { background: rgba(255,177,66,.11); box-shadow: 0 0 16px var(--glow); }
+        .mystra-support-modal { position: fixed; inset: 0; z-index: 10020; display: none; place-items: center; padding: 18px; }
+        .mystra-support-modal.is-open { display: grid; }
+        .mystra-support-modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.88); }
+        .mystra-support-modal__window { position: relative; width: min(610px, 100%); border: var(--bw) solid var(--line-2); background: #000; box-shadow: 0 0 34px var(--glow); }
+        .mystra-support-modal__bar { min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 8px 11px; border-bottom: 1px solid var(--line); color: var(--accent); font-size: 10px; letter-spacing: .12em; }
+        .mystra-support-modal__close { padding: 5px 8px; border: 1px solid var(--line); color: var(--text-dim); }
+        .mystra-support-modal__close:hover { color: var(--accent); border-color: var(--accent); }
+        .mystra-support-modal__body { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 18px; padding: 18px; }
+        .mystra-support-modal__qr { width: 170px; height: 170px; padding: 8px; background: #fff; image-rendering: pixelated; }
+        .mystra-support-modal__network { color: var(--accent); font-size: 10px; letter-spacing: .12em; }
+        .mystra-support-modal__address { margin: 10px 0; padding: 10px; border: 1px solid var(--line); color: var(--text); font-size: 10px; line-height: 1.55; word-break: break-all; }
+        .mystra-support-modal__warning { margin: 10px 0 0; color: var(--c-red); font-size: 9px; line-height: 1.55; letter-spacing: .06em; }
+        .mystra-support-modal__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .mystra-support-modal__action { min-height: 34px; padding: 7px 10px; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; letter-spacing: .1em; }
+        .mystra-support-modal__action:hover { background: rgba(255,177,66,.11); }
+        .mystra-support-modal__contact { border-color: var(--line); color: var(--text-dim); }
         .files-block { flex: 1; min-height: 0; }
         @media (max-width: 640px) {
           .mystra-reconstruction { grid-template-columns: 1fr; padding: 11px; }
           .mystra-reconstruction__support { justify-self: start; }
+          .mystra-support-modal__body { grid-template-columns: 1fr; }
+          .mystra-support-modal__qr { width: 150px; height: 150px; }
         }
       `;
       document.head.appendChild(style);
@@ -213,9 +231,59 @@ document.addEventListener('DOMContentLoaded', async function() {
           <div class="mystra-reconstruction__label">MYSTRA_01 / RECONSTRUCTION IN PROGRESS</div>
           <p class="mystra-reconstruction__copy">Public files are being rebuilt alongside the physical prototype. Support will go directly to development.</p>
         </div>
-        <a class="mystra-reconstruction__support" href="mailto:ghostlinesystem@gmail.com?subject=MYSTRA%20development%20support">[ SUPPORT DEVELOPMENT ]</a>
+        <button class="mystra-reconstruction__support" type="button" data-mystra-support-open>[ SUPPORT WITH USDT ]</button>
       `;
       files.parentNode.insertBefore(notice, files);
+
+      const supportModal = document.createElement('div');
+      supportModal.className = 'mystra-support-modal';
+      supportModal.setAttribute('role', 'dialog');
+      supportModal.setAttribute('aria-modal', 'true');
+      supportModal.setAttribute('aria-label', 'Support MYSTRA with USDT');
+      supportModal.innerHTML = `
+        <button class="mystra-support-modal__backdrop" type="button" aria-label="Close support window" data-mystra-support-close></button>
+        <div class="mystra-support-modal__window">
+          <div class="mystra-support-modal__bar">
+            <span>[ SUPPORT_MYSTRA.USDT ]</span>
+            <button class="mystra-support-modal__close" type="button" data-mystra-support-close>[ CLOSE ]</button>
+          </div>
+          <div class="mystra-support-modal__body">
+            <img class="mystra-support-modal__qr" src="assets/mystra-usdt-trc20.svg" alt="QR code for MYSTRA USDT TRC-20 wallet">
+            <div>
+              <div class="mystra-support-modal__network">NETWORK // TRON (TRC-20)</div>
+              <div class="mystra-support-modal__address" data-mystra-wallet>TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</div>
+              <div class="mystra-support-modal__actions">
+                <button class="mystra-support-modal__action" type="button" data-mystra-copy>[ COPY ADDRESS ]</button>
+                <a class="mystra-support-modal__action mystra-support-modal__contact" href="mailto:ghostlinesystem@gmail.com?subject=MYSTRA%20support">[ CONTACT ]</a>
+              </div>
+              <p class="mystra-support-modal__warning">WARNING: SEND ONLY USDT VIA THE TRON (TRC-20) NETWORK. OTHER ASSETS OR NETWORKS MAY BE LOST.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(supportModal);
+
+      const closeSupport = () => supportModal.classList.remove('is-open');
+      notice.querySelector('[data-mystra-support-open]').addEventListener('click', () => supportModal.classList.add('is-open'));
+      supportModal.querySelectorAll('[data-mystra-support-close]').forEach(button => button.addEventListener('click', closeSupport));
+      supportModal.querySelector('[data-mystra-copy]').addEventListener('click', async event => {
+        const address = supportModal.querySelector('[data-mystra-wallet]').textContent.trim();
+        try {
+          await navigator.clipboard.writeText(address);
+        } catch (error) {
+          const field = document.createElement('textarea');
+          field.value = address;
+          document.body.appendChild(field);
+          field.select();
+          document.execCommand('copy');
+          field.remove();
+        }
+        event.currentTarget.textContent = '[ COPIED ]';
+        setTimeout(() => { event.currentTarget.textContent = '[ COPY ADDRESS ]'; }, 1400);
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeSupport();
+      });
 
       document.querySelectorAll('.tb-link').forEach(link => {
         if (['POLAROIDS', 'ORDER', 'MARKET'].includes(link.textContent.trim().replace(/^▶\s*/, ''))) link.remove();
