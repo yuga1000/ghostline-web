@@ -162,6 +162,69 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
       window.Babel.transformScriptTags();
     }
+
+    // MYSTRA content is bundled below; keep the public reconstruction notice
+    // in the loader so it is easy to update while the archive is being built.
+    const installMystraReconstruction = () => {
+      const files = document.querySelector('.files-block');
+      if (!files || document.querySelector('.mystra-reconstruction')) return false;
+
+      const style = document.createElement('style');
+      style.textContent = `
+        .area-files { gap: 16px; }
+        .mystra-reconstruction {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 14px;
+          align-items: center;
+          padding: 13px 15px;
+          border: var(--bw) solid var(--line);
+          background: linear-gradient(90deg, rgba(255,177,66,.10), rgba(0,0,0,.72) 48%);
+          font-family: var(--mono);
+        }
+        .mystra-reconstruction__label { color: var(--accent); font-size: 10px; letter-spacing: .14em; }
+        .mystra-reconstruction__copy { margin: 5px 0 0; color: var(--text-dim); font-size: 9px; line-height: 1.55; letter-spacing: .05em; }
+        .mystra-reconstruction__support {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 34px;
+          padding: 8px 11px;
+          border: 1px solid var(--accent);
+          color: var(--accent);
+          font-size: 9px;
+          font-weight: 600;
+          letter-spacing: .11em;
+          white-space: nowrap;
+        }
+        .mystra-reconstruction__support:hover { background: rgba(255,177,66,.11); box-shadow: 0 0 16px var(--glow); }
+        .files-block { flex: 1; min-height: 0; }
+        @media (max-width: 640px) {
+          .mystra-reconstruction { grid-template-columns: 1fr; padding: 11px; }
+          .mystra-reconstruction__support { justify-self: start; }
+        }
+      `;
+      document.head.appendChild(style);
+
+      const notice = document.createElement('section');
+      notice.className = 'mystra-reconstruction';
+      notice.innerHTML = `
+        <div>
+          <div class="mystra-reconstruction__label">MYSTRA_01 / RECONSTRUCTION IN PROGRESS</div>
+          <p class="mystra-reconstruction__copy">Public files are being rebuilt alongside the physical prototype. Support will go directly to development.</p>
+        </div>
+        <a class="mystra-reconstruction__support" href="mailto:ghostlinesystem@gmail.com?subject=MYSTRA%20development%20support">[ SUPPORT DEVELOPMENT ]</a>
+      `;
+      files.parentNode.insertBefore(notice, files);
+
+      document.querySelectorAll('.tb-link').forEach(link => {
+        if (['POLAROIDS', 'ORDER', 'MARKET'].includes(link.textContent.trim().replace(/^▶\s*/, ''))) link.remove();
+      });
+      return true;
+    };
+    const mystraInstallTimer = setInterval(() => {
+      if (installMystraReconstruction()) clearInterval(mystraInstallTimer);
+    }, 80);
   } catch (err) {
     setStatus('Error unpacking: ' + err.message);
     console.error('Bundle unpack error:', err);
