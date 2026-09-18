@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="description" content="GHOSTLINE framed LED panels and display-ready signal files." />
 <title>GHOSTLINE — LED PANELS</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -185,6 +186,33 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
 .delivery-note { margin: 0 0 14px; padding: 8px 10px; border: 1px solid rgba(255,177,66,.34); border-top: 0; color: var(--text-dim); font-size: 9px; line-height: 1.6; letter-spacing: .08em; }
 .delivery-note strong { color: var(--accent); font-weight: 500; }
 .contact-email { margin-top: 10px; color: var(--text-mute); font-size: 9px; letter-spacing: .07em; text-align: center; word-break: break-all; }
+.payment-modal { position: fixed; inset: 0; z-index: 600; display: none; place-items: center; padding: 18px; }
+.payment-modal.is-open { display: grid; }
+.payment-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.91); }
+.payment-window { position: relative; width: min(760px, 100%); max-height: calc(100vh - 36px); overflow: auto; border: var(--bw) solid var(--line-2); background: #000; box-shadow: 0 0 36px var(--glow); }
+.payment-bar { min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 8px 12px; border-bottom: 1px solid var(--line); color: var(--accent); font-size: 10px; letter-spacing: .12em; }
+.payment-close { padding: 5px 8px; border: 1px solid var(--line); color: var(--text-dim); }
+.payment-close:hover { color: var(--accent); border-color: var(--accent); }
+.payment-body { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 20px; padding: 20px; }
+.payment-qr { width: 190px; height: 190px; padding: 9px; background: #fff; image-rendering: pixelated; }
+.payment-amount { margin: 0 0 8px; color: var(--accent); font: 16px/1.3 var(--pixel); }
+.payment-product { color: var(--text-dim); font-size: 9px; line-height: 1.7; letter-spacing: .08em; }
+.payment-network { margin-top: 14px; color: var(--accent); font-size: 10px; letter-spacing: .12em; }
+.payment-address { margin: 8px 0; padding: 9px; border: 1px solid var(--line); color: var(--text); font-size: 9px; line-height: 1.6; word-break: break-all; }
+.payment-copy { min-height: 32px; padding: 6px 9px; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; letter-spacing: .1em; }
+.payment-copy:hover { background: rgba(255,177,66,.10); }
+.payment-warning { margin: 12px 0; padding: 9px; border: 1px solid rgba(255,94,94,.55); color: #ff7777; font-size: 9px; line-height: 1.65; letter-spacing: .05em; }
+.payment-form { display: grid; gap: 8px; margin-top: 14px; }
+.payment-form label { color: var(--text-mute); font-size: 8px; letter-spacing: .12em; }
+.payment-input { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 0; outline: 0; background: #030303; color: var(--text); font: 10px/1.4 var(--mono); }
+.payment-input:focus { border-color: var(--accent); box-shadow: 0 0 12px var(--glow); }
+.payment-input.is-invalid { border-color: #ff5e5e; }
+.payment-submit { margin-top: 5px; }
+.payment-submit:disabled { opacity: .5; cursor: wait; }
+.payment-feedback { min-height: 16px; margin: 2px 0 0; color: var(--text-dim); font-size: 9px; line-height: 1.55; }
+.payment-feedback.is-error { color: #ff7777; }
+.payment-feedback.is-success { color: var(--green); }
+body.has-payment-open { overflow: hidden; }
 .cmd-btn {
   position: relative;
   display: inline-flex;
@@ -287,6 +315,10 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
   .modal-media { min-height: 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .modal-media video { width: 100%; }
   .modal-info { min-height: 260px; }
+  .payment-modal { padding: 8px; }
+  .payment-window { max-height: calc(100vh - 16px); }
+  .payment-body { grid-template-columns: 1fr; padding: 14px; }
+  .payment-qr { width: 150px; height: 150px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -363,7 +395,7 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
             <p class="spec-copy">Longer playback and custom animation work are quoted separately.</p>
             <div class="price-line"><span>BASE PRICE</span><strong>USD 659</strong></div>
             <p class="delivery-note"><strong>DELIVERY NOT INCLUDED.</strong><br>Calculated separately for your location.</p>
-            <a class="cmd-btn" id="orderEmail" href="mailto:ghostlinesystem@gmail.com">[ ORDER / USD 659 ]</a>
+            <button class="cmd-btn" id="payPanel" type="button">[ PAY 659 USDT ]</button>
             <a class="contact-email" href="mailto:ghostlinesystem@gmail.com">ghostlinesystem@gmail.com</a>
           </div>
         </aside>
@@ -375,6 +407,35 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
       <a href="index.html">◀ HOME</a>
     </footer>
   </main>
+</div>
+
+<div class="payment-modal" id="paymentModal" aria-hidden="true">
+  <button class="payment-backdrop" type="button" aria-label="Close payment window" data-payment-close></button>
+  <section class="payment-window" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+    <div class="payment-bar">
+      <span id="paymentTitle">[ PANEL_PAYMENT.USDT ]</span>
+      <button class="payment-close" type="button" data-payment-close>[ CLOSE ]</button>
+    </div>
+    <div class="payment-body">
+      <img class="payment-qr" src="assets/led-panels/usdt-trc20.svg" alt="QR code for USDT TRC-20 payment">
+      <div>
+        <h2 class="payment-amount">659 USDT</h2>
+        <div class="payment-product" id="paymentProduct">LED PANEL 42 // METAL // CAPTURE_01</div>
+        <div class="payment-network">NETWORK // TRON (TRC-20)</div>
+        <div class="payment-address" id="panelWallet">TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</div>
+        <button class="payment-copy" id="copyPanelWallet" type="button">[ COPY ADDRESS ]</button>
+        <p class="payment-warning">SEND EXACTLY 659 USDT VIA TRON (TRC-20). DELIVERY IS NOT INCLUDED AND WILL BE CALCULATED SEPARATELY. DO NOT USE ANOTHER NETWORK.</p>
+        <form class="payment-form" id="panelPaymentForm" novalidate>
+          <label for="paymentEmail">YOUR EMAIL</label>
+          <input class="payment-input" id="paymentEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <label for="paymentTxid">TRON TRANSACTION ID</label>
+          <input class="payment-input" id="paymentTxid" name="txid" type="text" maxlength="66" spellcheck="false" placeholder="64 hexadecimal characters" required>
+          <button class="cmd-btn payment-submit" id="submitPanelPayment" type="submit">[ SUBMIT PAYMENT ]</button>
+          <p class="payment-feedback" id="paymentFeedback">After sending USDT, paste the transaction ID to register your order.</p>
+        </form>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
@@ -391,24 +452,19 @@ const capturePlayer = document.getElementById("capturePlayer");
 const captureLabel = document.getElementById("captureLabel");
 const captureControls = [...document.querySelectorAll("[data-capture]")];
 const frameControls = [...document.querySelectorAll("[data-frame]")];
-const orderEmail = document.getElementById("orderEmail");
+const payPanel = document.getElementById("payPanel");
+const paymentModal = document.getElementById("paymentModal");
+const paymentProduct = document.getElementById("paymentProduct");
+const paymentForm = document.getElementById("panelPaymentForm");
+const paymentEmail = document.getElementById("paymentEmail");
+const paymentTxid = document.getElementById("paymentTxid");
+const paymentFeedback = document.getElementById("paymentFeedback");
+const submitPanelPayment = document.getElementById("submitPanelPayment");
 let selectedCapture = 0;
 let selectedFrame = "METAL";
 
-function updateOrderEmail() {
-  const subject = "LED PANEL 42 — order request";
-  const body = [
-    "Hello GHOSTLINE,",
-    "",
-    "I would like to order LED PANEL 42.",
-    `Frame: ${selectedFrame}`,
-    `Animation: ${captures[selectedCapture].name} (CAP_0${selectedCapture + 1})`,
-    "",
-    "Base price: USD 659. Delivery is calculated separately.",
-    "",
-    "Please send your country, city and postal code for a delivery quote."
-  ].join("\n");
-  orderEmail.href = `mailto:ghostlinesystem@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+function updatePaymentSummary() {
+  paymentProduct.textContent = `LED PANEL 42 // ${selectedFrame} // CAPTURE_0${selectedCapture + 1} / ${captures[selectedCapture].name}`;
 }
 
 function loadCapture(index) {
@@ -422,16 +478,122 @@ function loadCapture(index) {
   captureControls.forEach(control => control.classList.toggle("is-on", Number(control.dataset.capture) === index));
   capturePlayer.load();
   capturePlayer.play().catch(() => {});
-  updateOrderEmail();
+  updatePaymentSummary();
 }
 
 captureControls.forEach(control => control.addEventListener("click", () => loadCapture(Number(control.dataset.capture))));
 frameControls.forEach(control => control.addEventListener("click", () => {
   selectedFrame = control.dataset.frame;
   frameControls.forEach(option => option.classList.toggle("is-on", option === control));
-  updateOrderEmail();
+  updatePaymentSummary();
 }));
-updateOrderEmail();
+
+function setPaymentOpen(open) {
+  paymentModal.classList.toggle("is-open", open);
+  paymentModal.setAttribute("aria-hidden", String(!open));
+  document.body.classList.toggle("has-payment-open", open);
+  if (open) {
+    updatePaymentSummary();
+    setTimeout(() => paymentEmail.focus(), 0);
+  }
+}
+
+async function copyPanelWallet() {
+  const address = document.getElementById("panelWallet").textContent.trim();
+  const button = document.getElementById("copyPanelWallet");
+  try {
+    await navigator.clipboard.writeText(address);
+  } catch (error) {
+    const field = document.createElement("textarea");
+    field.value = address;
+    document.body.appendChild(field);
+    field.select();
+    document.execCommand("copy");
+    field.remove();
+  }
+  button.textContent = "[ COPIED ]";
+  setTimeout(() => { button.textContent = "[ COPY ADDRESS ]"; }, 1400);
+}
+
+function isValidTronTxid(value) {
+  return /^(?:0x)?[0-9a-fA-F]{64}$/.test(value.trim());
+}
+
+payPanel.addEventListener("click", () => setPaymentOpen(true));
+document.querySelectorAll("[data-payment-close]").forEach(button => button.addEventListener("click", () => setPaymentOpen(false)));
+document.getElementById("copyPanelWallet").addEventListener("click", copyPanelWallet);
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") setPaymentOpen(false);
+});
+
+paymentForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const email = paymentEmail.value.trim();
+  const txid = paymentTxid.value.trim().replace(/^0x/i, "");
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const txidValid = isValidTronTxid(paymentTxid.value);
+  paymentEmail.classList.toggle("is-invalid", !emailValid);
+  paymentTxid.classList.toggle("is-invalid", !txidValid);
+  paymentFeedback.className = "payment-feedback";
+
+  if (!emailValid || !txidValid) {
+    paymentFeedback.textContent = !emailValid ? "Enter a valid email address." : "TRON transaction ID must contain 64 hexadecimal characters.";
+    paymentFeedback.classList.add("is-error");
+    return;
+  }
+
+  submitPanelPayment.disabled = true;
+  submitPanelPayment.textContent = "[ REGISTERING... ]";
+  const orderId = `GLP-${Date.now().toString(36).toUpperCase()}`;
+  const timestamp = new Date().toISOString();
+  const animation = `${captures[selectedCapture].name} (CAP_0${selectedCapture + 1})`;
+  const emailParams = {
+    order_id: orderId,
+    timestamp,
+    size: "42 × 42 CM / DISPLAY 31 × 31 CM",
+    custom_width: "N/A",
+    custom_height: "N/A",
+    vibes: animation,
+    format: `LED PANEL / ${selectedFrame}`,
+    total_price: "659 USDT + DELIVERY",
+    customer_email: email,
+    tx_hash: txid
+  };
+
+  try {
+    if (window.emailjs) {
+      emailjs.init("1JlW1oH_5J37ZtpDV");
+      await emailjs.send("service_1ni4wkp", "template_5vvlo2b", emailParams);
+    }
+    await fetch("https://script.google.com/macros/s/AKfycbymDrsIlwgHzC_nkEO2KDqzGB-0w-6EbbyMnOS4FqAsgUF1VQ0B8Zs7GqkoWsE8JDtJiw/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId,
+        timestamp,
+        size: "42 × 42 CM",
+        vibes: animation,
+        format: `LED PANEL / ${selectedFrame}`,
+        totalPrice: "659 USDT + DELIVERY",
+        email,
+        txHash: txid,
+        status: "Pending verification"
+      })
+    });
+    paymentFeedback.textContent = `ORDER ${orderId} REGISTERED. PAYMENT AWAITS NETWORK VERIFICATION. DELIVERY WILL BE QUOTED SEPARATELY.`;
+    paymentFeedback.classList.add("is-success");
+    paymentForm.reset();
+  } catch (error) {
+    paymentFeedback.textContent = "PAYMENT SENT BUT ORDER REGISTRATION FAILED. CONTACT GHOSTLINESYSTEM@GMAIL.COM WITH YOUR TRANSACTION ID.";
+    paymentFeedback.classList.add("is-error");
+  } finally {
+    submitPanelPayment.disabled = false;
+    submitPanelPayment.textContent = "[ SUBMIT PAYMENT ]";
+  }
+});
+
+updatePaymentSummary();
 </script>
 </body>
 </html>
