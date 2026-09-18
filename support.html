@@ -8,7 +8,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=VT323&amp;family=Press+Start+2P&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=VT323&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
 
 <style>
 :root {
@@ -33,7 +33,7 @@
 
   --bw: 2px;
   --mono: "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-  --pixel: "Press Start 2P", monospace;
+  --terminal: "VT323", "JetBrains Mono", monospace;
 }
 
 * { box-sizing: border-box; }
@@ -125,13 +125,14 @@ img { display: block; max-width: 100%; }
 }
 
 .page-head { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-/* Hand-drawn 7x8 pixel wordmark, lit on an unlit LED lattice like the panels */
-h1 { margin: 0; width: min(520px, 86vw); line-height: 0; }
-.wm { display: block; width: 100%; height: auto; }
-.wm-off { fill: rgba(85,85,255,.10); }
-.wm-on { fill: var(--accent); filter: drop-shadow(0 0 5px var(--glow)); }
-h1:hover .wm-on { fill: var(--dos-cyan); filter: drop-shadow(0 0 6px rgba(85,255,255,.45)); }
-.wm-on, h1:hover .wm-on { transition: fill .18s steps(2); }
+/* small, grey, terminal: a DOS screen title, not a logo */
+h1 {
+  margin: 0;
+  color: var(--dos-gray);
+  font: 30px/1 var(--terminal);
+  letter-spacing: .42em;
+  text-indent: .42em;
+}
 .head-sub { color: var(--dos-cyan); font-size: 10px; letter-spacing: .2em; }
 .caret { display: inline-block; width: 7px; height: 11px; margin-left: 5px; background: var(--dos-cyan); vertical-align: -1px; animation: caret 1s steps(1) infinite; }
 @keyframes caret { 50% { opacity: 0; } }
@@ -222,7 +223,7 @@ h1:hover .wm-on { fill: var(--dos-cyan); filter: drop-shadow(0 0 6px rgba(85,255
   .tb-right { width: 100%; margin-left: 0; }
   .tb-link { padding: 0 10px; font-size: 9px; }
   .page { width: calc(100% - 22px); padding: 30px 0 44px; gap: 20px; }
-  h1 { width: min(340px, 88vw); }
+  h1 { font-size: 26px; letter-spacing: .3em; text-indent: .3em; }
   .head-sub { font-size: 9px; letter-spacing: .14em; text-align: center; }
   .dos-cols { display: none; }
   /* every cell needs an explicit slot here: an implicit one gets placed before
@@ -262,7 +263,7 @@ h1:hover .wm-on { fill: var(--dos-cyan); filter: drop-shadow(0 0 6px rgba(85,255
 
   <main class="page">
     <header class="page-head">
-      <h1><svg class="wm" viewBox="0 0 602 126" role="img" aria-label="SUPPORT" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><defs><pattern id="wmGrid" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="11" height="11" class="wm-off"/></pattern></defs><rect width="602" height="126" fill="url(#wmGrid)"/><path class="wm-on" d="M28 14h11v11h-11ZM42 14h11v11h-11ZM56 14h11v11h-11ZM14 28h11v11h-11ZM70 28h11v11h-11ZM14 42h11v11h-11ZM28 56h11v11h-11ZM42 56h11v11h-11ZM56 56h11v11h-11ZM70 70h11v11h-11ZM14 84h11v11h-11ZM70 84h11v11h-11ZM28 98h11v11h-11ZM42 98h11v11h-11ZM56 98h11v11h-11ZM98 14h11v11h-11ZM154 14h11v11h-11ZM98 28h11v11h-11ZM154 28h11v11h-11ZM98 42h11v11h-11ZM154 42h11v11h-11ZM98 56h11v11h-11ZM154 56h11v11h-11ZM98 70h11v11h-11ZM154 70h11v11h-11ZM98 84h11v11h-11ZM154 84h11v11h-11ZM112 98h11v11h-11ZM126 98h11v11h-11ZM140 98h11v11h-11ZM182 14h11v11h-11ZM196 14h11v11h-11ZM210 14h11v11h-11ZM224 14h11v11h-11ZM182 28h11v11h-11ZM238 28h11v11h-11ZM182 42h11v11h-11ZM238 42h11v11h-11ZM182 56h11v11h-11ZM196 56h11v11h-11ZM210 56h11v11h-11ZM224 56h11v11h-11ZM182 70h11v11h-11ZM182 84h11v11h-11ZM182 98h11v11h-11ZM266 14h11v11h-11ZM280 14h11v11h-11ZM294 14h11v11h-11ZM308 14h11v11h-11ZM266 28h11v11h-11ZM322 28h11v11h-11ZM266 42h11v11h-11ZM322 42h11v11h-11ZM266 56h11v11h-11ZM280 56h11v11h-11ZM294 56h11v11h-11ZM308 56h11v11h-11ZM266 70h11v11h-11ZM266 84h11v11h-11ZM266 98h11v11h-11ZM364 14h11v11h-11ZM378 14h11v11h-11ZM392 14h11v11h-11ZM350 28h11v11h-11ZM406 28h11v11h-11ZM350 42h11v11h-11ZM406 42h11v11h-11ZM350 56h11v11h-11ZM406 56h11v11h-11ZM350 70h11v11h-11ZM406 70h11v11h-11ZM350 84h11v11h-11ZM406 84h11v11h-11ZM364 98h11v11h-11ZM378 98h11v11h-11ZM392 98h11v11h-11ZM434 14h11v11h-11ZM448 14h11v11h-11ZM462 14h11v11h-11ZM476 14h11v11h-11ZM434 28h11v11h-11ZM490 28h11v11h-11ZM434 42h11v11h-11ZM490 42h11v11h-11ZM434 56h11v11h-11ZM448 56h11v11h-11ZM462 56h11v11h-11ZM476 56h11v11h-11ZM434 70h11v11h-11ZM476 70h11v11h-11ZM434 84h11v11h-11ZM490 84h11v11h-11ZM434 98h11v11h-11ZM490 98h11v11h-11ZM518 14h11v11h-11ZM532 14h11v11h-11ZM546 14h11v11h-11ZM560 14h11v11h-11ZM574 14h11v11h-11ZM546 28h11v11h-11ZM546 42h11v11h-11ZM546 56h11v11h-11ZM546 70h11v11h-11ZM546 84h11v11h-11ZM546 98h11v11h-11Z"/></svg></h1>
+      <h1>SUPPORT</h1>
       <div class="head-sub">PANELS BUY PARTS. TIERS BUY TIME.<i class="caret"></i></div>
     </header>
 
