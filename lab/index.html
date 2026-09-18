@@ -186,10 +186,35 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
         .mystra-reconstruction { grid-area: notice; }
 
-        /* Every public folder is a placeholder until the archive is rebuilt. */
-        .folder-tab::after { content: " · IN DEVELOPMENT"; color: var(--text-mute); letter-spacing: .1em; }
-        .folder-body { opacity: .72; }
-        .folder-list li::after { content: " — wip"; color: var(--text-mute); }
+        /* ABOUT says the one thing worth saying; the rest are honestly empty. */
+        .folder.is-empty .folder-tab::after { content: " · NO FILES YET"; color: var(--text-mute); letter-spacing: .1em; }
+        .folder.is-empty .folder-body { border-style: dashed; }
+        .folder-hold {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 9px;
+          min-height: 62px;
+          padding: 12px 10px;
+          background-image: repeating-linear-gradient(
+            -45deg,
+            rgba(255,177,66,.07) 0 6px,
+            transparent 6px 14px
+          );
+        }
+        .folder-hold__line { color: var(--text-mute); font-size: 9px; letter-spacing: .18em; }
+        .folder-hold__bar { display: flex; align-items: center; gap: 8px; color: var(--accent-dim); font-size: 9px; letter-spacing: .1em; }
+        .folder-hold__bar b { font-weight: 400; letter-spacing: 0; }
+        .folder-hold__cursor {
+          display: inline-block;
+          width: 6px; height: 10px;
+          background: var(--accent);
+          animation: holdBlink .9s steps(1) infinite;
+        }
+        @keyframes holdBlink { 50% { opacity: 0; } }
+        .folder-about .folder-list { color: var(--text-dim); }
+        .folder-about .folder-list b { color: var(--text); font-weight: 500; }
 
         .mystra-reconstruction__actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .mystra-reconstruction {
@@ -291,7 +316,8 @@ document.addEventListener('DOMContentLoaded', async function() {
           }
           .folder-body { min-height: 96px; padding: 11px; }
           .folder-tab { font-size: 9px; padding: 3px 7px; left: 10px; }
-          .folder-tab::after { content: " · WIP"; }
+          .folder.is-empty .folder-tab::after { content: " · EMPTY"; }
+          .folder-hold { min-height: 52px; padding: 10px 9px; gap: 7px; }
           .folder-title { font-size: 9px; }
           .folder-list { font-size: 9px; }
           .mystra-reconstruction { grid-template-columns: 1fr; padding: 12px; }
@@ -375,6 +401,38 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
       document.addEventListener('keydown', event => {
         if (event.key === 'Escape') closeSupport();
+      });
+
+      // Folder contents. The bundled FilesGrid renders placeholder words; ABOUT gets
+      // the one fact worth stating, the rest get an honest empty state. Safe to write
+      // into React's DOM: FilesGrid takes no props and no state, so its vdom output
+      // never changes and the reconciler never touches these nodes again.
+      const FOLDERS = {
+        'A.01': {
+          lines: ['<b>hexapod</b> · 6 legs · 18 actuators', 'IMU BNO085 · camera cluster', 'built and documented in the open']
+        },
+        'B.02': { hold: 'SPECS NOT PUBLISHED', eta: 'MEASURING' },
+        'C.03': { hold: 'NO DATASETS UPLOADED', eta: 'RECORDING' },
+        'D.04': { hold: 'NO DRAFT RELEASED', eta: 'WRITING' }
+      };
+      files.querySelectorAll('.folder').forEach(folder => {
+        const id = folder.querySelector('.folder-tab')?.textContent.trim();
+        const spec = FOLDERS[id];
+        const list = folder.querySelector('.folder-list');
+        if (!spec || !list) return;
+        if (spec.lines) {
+          folder.classList.add('folder-about');
+          list.innerHTML = spec.lines.map(line => `<li>· ${line}</li>`).join('');
+          return;
+        }
+        folder.classList.add('is-empty');
+        const hold = document.createElement('div');
+        hold.className = 'folder-hold';
+        hold.innerHTML = `
+          <div class="folder-hold__line">${spec.hold}</div>
+          <div class="folder-hold__bar"><b>▓▒░</b> ${spec.eta}<span class="folder-hold__cursor"></span></div>
+        `;
+        list.replaceWith(hold);
       });
 
       const hidden = ['POLAROIDS', 'ORDER', 'MARKET', 'STREAM'];

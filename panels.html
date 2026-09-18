@@ -265,19 +265,20 @@ body.has-payment-open { overflow: hidden; }
 .payment-copy { margin-top: 7px; color: var(--text-dim); font-size: 10px; }
 .payment-state { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid var(--line); color: var(--green); font-size: 9px; letter-spacing: .11em; white-space: nowrap; }
 
-/* Real object / in-situ capture */
-.situ-grid { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 0; }
-.situ-stage { position: relative; border-right: 1px solid var(--line); background: #050505; }
-.situ-stage video { width: 100%; height: 100%; max-height: 620px; object-fit: cover; background: #000; }
-.situ-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 46px rgba(0,0,0,.58); }
-.situ-body { display: flex; flex-direction: column; gap: 16px; padding: 22px; }
-.situ-body h2 { margin: 0; color: var(--text); font: 13px/1.55 var(--pixel); }
-.situ-body p { margin: 0; color: var(--text-dim); font-size: 10px; line-height: 1.8; }
-.situ-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin-top: auto; background: var(--line); border: 1px solid var(--line); }
-.situ-fact { padding: 12px 13px; background: #000; }
-.situ-fact dt { margin: 0 0 5px; color: var(--text-mute); font-size: 8px; letter-spacing: .14em; }
-.situ-fact dd { margin: 0; color: var(--accent); font-size: 10px; letter-spacing: .1em; }
-.situ-mute { color: var(--text-mute); font-size: 9px; letter-spacing: .08em; }
+/* Real object / in-situ capture — the footage is 9:16, so the window is narrow
+   and centred like a contact print rather than stretched across the page. */
+.situ-window { width: min(760px, 100%); margin: 0 auto; }
+.situ-stage { position: relative; display: grid; place-items: center; padding: 20px 0; background: #030303; border-bottom: 1px solid var(--line); }
+.situ-stage video { width: min(480px, 84%); height: auto; background: #000; }
+.situ-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 60px rgba(0,0,0,.72); }
+.situ-stage .video-badge { left: 50%; transform: translateX(-50%); bottom: 34px; }
+.situ-body { display: flex; flex-direction: column; gap: 14px; padding: 20px 22px 22px; }
+.situ-body h2 { margin: 0; color: var(--text); font: 12px/1.6 var(--pixel); text-align: center; }
+.situ-body p { margin: 0; color: var(--text-dim); font-size: 10px; line-height: 1.85; }
+.situ-mute { color: var(--text-mute); font-size: 9px; line-height: 1.75; letter-spacing: .06em; }
+.situ-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding-top: 4px; }
+.situ-chip { padding: 5px 9px; border: 1px solid var(--line); color: var(--text-mute); font-size: 8px; letter-spacing: .14em; white-space: nowrap; }
+.situ-chip.is-key { border-color: rgba(255,177,66,.42); color: var(--accent-dim); }
 
 /* Support / monetization strip */
 .support-grid { display: grid; grid-template-columns: repeat(var(--support-cols, 4), minmax(0, 1fr)); gap: 1px; border: 1px solid var(--line); background: var(--line); }
@@ -310,9 +311,6 @@ body.has-payment-open { overflow: hidden; }
 
 @media (max-width: 920px) {
   .object-grid { grid-template-columns: 1fr; }
-  .situ-grid { grid-template-columns: 1fr; }
-  .situ-stage { border-right: 0; border-bottom: 1px solid var(--line); }
-  .situ-stage video { max-height: 70vh; object-fit: contain; }
   .spec-ascii { display: none; }
   .capture-grid { grid-template-columns: repeat(2, 1fr); }
   .signal-grid { grid-template-columns: repeat(2, 1fr); }
@@ -342,8 +340,11 @@ body.has-payment-open { overflow: hidden; }
   .payment-state { justify-self: start; }
   .frame-options { grid-template-columns: 1fr 1fr; }
   .frame-options .frame-option:last-child { grid-column: 1 / -1; }
+  .situ-stage { padding: 12px 0; }
+  .situ-stage video { width: min(320px, 88%); }
+  .situ-stage .video-badge { bottom: 22px; }
   .situ-body { padding: 14px; gap: 12px; }
-  .situ-facts { grid-template-columns: 1fr 1fr; }
+  .situ-chip { font-size: 7px; padding: 4px 7px; letter-spacing: .1em; }
   .support-grid { grid-template-columns: 1fr; }
   .support-cell { min-height: 0; }
   .footer { align-items: flex-start; flex-direction: column; }
@@ -448,25 +449,23 @@ body.has-payment-open { overflow: hidden; }
         <div class="section-title">REAL OBJECT / IN SITU</div>
         <div class="section-meta">UNCUT CAPTURE · NO RENDER · HORNED FRAME</div>
       </div>
-      <div class="window">
+      <div class="window situ-window">
         <div class="window-bar"><span>[ IN_SITU.CAPTURE ]</span><strong>PANEL_42 / HORNED</strong></div>
-        <div class="situ-grid">
-          <div class="situ-stage">
-            <video id="situPlayer" poster="assets/led-panels/posters/panel-in-situ.jpg" muted loop playsinline preload="none">
-              <source src="assets/led-panels/video/panel-in-situ.mp4" type="video/mp4" />
-            </video>
-            <span class="video-badge">HORNED FRAME / LIVE</span>
-          </div>
-          <div class="situ-body">
-            <h2>THE PANEL IS A PHYSICAL OBJECT</h2>
-            <p>Shot in the workshop, no post-processing. The HORNED frame is carved as one full shape around the matrix — the silhouette is part of the piece, not a border. Every panel is built to order and looks like this in a room: matte black body, the signal doing all the light.</p>
-            <p class="situ-mute">Animation in this capture: from the CAPTURE_01–06 set above. Your panel ships with the loop you pick, or a custom one.</p>
-            <dl class="situ-facts">
-              <div class="situ-fact"><dt>OBJECT</dt><dd>42 × 42 CM</dd></div>
-              <div class="situ-fact"><dt>DISPLAY</dt><dd>31 × 31 CM</dd></div>
-              <div class="situ-fact"><dt>FRAME</dt><dd>METAL / WOOD / HORNED</dd></div>
-              <div class="situ-fact"><dt>PRICE</dt><dd>659 USDT</dd></div>
-            </dl>
+        <div class="situ-stage">
+          <video id="situPlayer" poster="assets/led-panels/posters/panel-in-situ.jpg?v=2" muted loop playsinline preload="none">
+            <source src="assets/led-panels/video/panel-in-situ.mp4?v=2" type="video/mp4" />
+          </video>
+          <span class="video-badge">HORNED FRAME / LIVE</span>
+        </div>
+        <div class="situ-body">
+          <h2>THE PANEL IS A PHYSICAL OBJECT</h2>
+          <p>Shot in the workshop on the bench it was built on. No post, no render, no set — the cable is where the cable was. The HORNED frame is carved as one full shape around the matrix, so the silhouette is part of the piece rather than a border around it.</p>
+          <p class="situ-mute">Loop in this capture comes from the CAPTURE_01–06 set above. Yours ships with the one you pick, or one made for you.</p>
+          <div class="situ-chips">
+            <span class="situ-chip is-key">HORNED / FULL SHAPE</span>
+            <span class="situ-chip">WORKSHOP CAPTURE</span>
+            <span class="situ-chip">NO POST-PROCESSING</span>
+            <span class="situ-chip">BUILT TO ORDER</span>
           </div>
         </div>
       </div>
@@ -697,6 +696,8 @@ new IntersectionObserver((entries, observer) => {
     if (!entry.isIntersecting) return;
     situPlayer.preload = "auto";
     situPlayer.load();
+    // preload="none" means readyState is 0 here, so also retry once there are frames
+    situPlayer.addEventListener("canplay", () => situPlayer.play().catch(() => {}), { once: true });
     situPlayer.play().catch(() => {});
     observer.disconnect();
   });
