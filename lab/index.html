@@ -172,6 +172,26 @@ document.addEventListener('DOMContentLoaded', async function() {
       const style = document.createElement('style');
       style.textContent = `
         .area-files { gap: 16px; }
+
+        /* The notice is injected here, so the bundled grid has no area for it and
+           it used to fall into an implicit row. Give it a real slot above the folders. */
+        .dashboard {
+          grid-template-rows: 110px 110px 380px auto 440px;
+          grid-template-areas:
+            "photo  photo  wm"
+            "photo  photo  ."
+            "photo  photo  model"
+            "echo   notice ."
+            "echo   files  .";
+        }
+        .mystra-reconstruction { grid-area: notice; }
+
+        /* Every public folder is a placeholder until the archive is rebuilt. */
+        .folder-tab::after { content: " · IN DEVELOPMENT"; color: var(--text-mute); letter-spacing: .1em; }
+        .folder-body { opacity: .72; }
+        .folder-list li::after { content: " — wip"; color: var(--text-mute); }
+
+        .mystra-reconstruction__actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .mystra-reconstruction {
           display: grid;
           grid-template-columns: minmax(0, 1fr) auto;
@@ -215,11 +235,78 @@ document.addEventListener('DOMContentLoaded', async function() {
         .mystra-support-modal__action:hover { background: rgba(255,177,66,.11); }
         .mystra-support-modal__contact { border-color: var(--line); color: var(--text-dim); }
         .files-block { flex: 1; min-height: 0; }
-        @media (max-width: 640px) {
-          .mystra-reconstruction { grid-template-columns: 1fr; padding: 11px; }
-          .mystra-reconstruction__support { justify-self: start; }
-          .mystra-support-modal__body { grid-template-columns: 1fr; }
-          .mystra-support-modal__qr { width: 150px; height: 150px; }
+
+        @media (max-width: 1100px) {
+          .dashboard {
+            grid-template-rows: auto;
+            grid-template-areas:
+              "wm    wm"
+              "photo photo"
+              "echo  model"
+              "echo  notice"
+              "echo  files";
+          }
+        }
+
+        /* Below 760px the three-column composition stops working: the echo strip
+           stretches to match the folder column and everything else gets crushed.
+           Drop the grid and stack it instead. */
+        @media (max-width: 760px) {
+          .topbar .tb-row-1 { flex-wrap: wrap; height: auto; padding: 8px 14px; gap: 6px; }
+          .topbar .tb-row-2 { padding: 0 14px; overflow-x: auto; scrollbar-width: none; }
+          .topbar .tb-row-2::-webkit-scrollbar { display: none; }
+          .tb-link { padding: 0 10px; white-space: nowrap; }
+          .tb-brand { font-size: 11px; }
+          .tb-btc { width: 100%; justify-content: space-between; padding: 6px 10px; }
+          .tb-btc .btc-px { min-width: 0; }
+          .boot { padding: 20px; font-size: 16px; }
+          .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 14px 14px 32px;
+          }
+          .area-wm { order: 1; justify-content: flex-start; }
+          .area-photo { order: 2; }
+          .area-model { order: 3; }
+          .area-echo { order: 4; flex: none; }
+          .mystra-reconstruction { order: 5; }
+          .area-files { order: 6; }
+          .wb-gif { max-height: 64px; object-position: left center; }
+          .proto-stage { aspect-ratio: 1448 / 1086; min-height: 0; }
+          .model-stage { aspect-ratio: 16 / 9; }
+          .model-gif { max-width: 62%; max-height: 82%; }
+          .echo-matrix {
+            grid-template-columns: repeat(14, 1fr) !important;
+            height: 76px;
+            flex: none;
+            align-content: stretch;
+          }
+          .files-block {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 26px 12px;
+            height: auto;
+            flex: none;
+          }
+          .folder-body { min-height: 96px; padding: 11px; }
+          .folder-tab { font-size: 9px; padding: 3px 7px; left: 10px; }
+          .folder-tab::after { content: " · WIP"; }
+          .folder-title { font-size: 9px; }
+          .folder-list { font-size: 9px; }
+          .mystra-reconstruction { grid-template-columns: 1fr; padding: 12px; }
+          .mystra-reconstruction__actions { display: grid; grid-template-columns: 1fr; gap: 7px; }
+          .mystra-reconstruction__support { min-height: 40px; }
+          .mystra-support-modal { padding: 10px; }
+          .mystra-support-modal__window { max-height: calc(100vh - 20px); overflow: auto; }
+          .mystra-support-modal__body { grid-template-columns: 1fr; padding: 14px; }
+          .mystra-support-modal__qr { width: 100%; max-width: 210px; height: auto; aspect-ratio: 1; }
+          .mystra-support-modal__action { flex: 1 1 auto; justify-content: center; text-align: center; }
+        }
+
+        @media (max-width: 420px) {
+          .files-block { grid-template-columns: 1fr; }
+          .echo-matrix { grid-template-columns: repeat(10, 1fr) !important; height: 60px; }
         }
       `;
       document.head.appendChild(style);
@@ -231,7 +318,10 @@ document.addEventListener('DOMContentLoaded', async function() {
           <div class="mystra-reconstruction__label">MYSTRA_01 / RECONSTRUCTION IN PROGRESS</div>
           <p class="mystra-reconstruction__copy">Public files are being rebuilt alongside the physical prototype. Support will go directly to development.</p>
         </div>
-        <button class="mystra-reconstruction__support" type="button" data-mystra-support-open>[ SUPPORT WITH USDT ]</button>
+        <div class="mystra-reconstruction__actions">
+          <a class="mystra-reconstruction__support" href="https://www.patreon.com/c/Yuga1000" target="_blank" rel="noopener noreferrer">[ PATREON ]</a>
+          <button class="mystra-reconstruction__support" type="button" data-mystra-support-open>[ SUPPORT WITH USDT ]</button>
+        </div>
       `;
       files.parentNode.insertBefore(notice, files);
 
@@ -254,6 +344,8 @@ document.addEventListener('DOMContentLoaded', async function() {
               <div class="mystra-support-modal__address" data-mystra-wallet>TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</div>
               <div class="mystra-support-modal__actions">
                 <button class="mystra-support-modal__action" type="button" data-mystra-copy>[ COPY ADDRESS ]</button>
+                <a class="mystra-support-modal__action" href="https://www.patreon.com/c/Yuga1000" target="_blank" rel="noopener noreferrer">[ PATREON ]</a>
+                <a class="mystra-support-modal__action mystra-support-modal__contact" href="https://ghostline.live/support.html">[ ALL WAYS TO SUPPORT ]</a>
                 <a class="mystra-support-modal__action mystra-support-modal__contact" href="mailto:ghostlinesystem@gmail.com?subject=MYSTRA%20support">[ CONTACT ]</a>
               </div>
               <p class="mystra-support-modal__warning">WARNING: SEND ONLY USDT VIA THE TRON (TRC-20) NETWORK. OTHER ASSETS OR NETWORKS MAY BE LOST.</p>
@@ -285,9 +377,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (event.key === 'Escape') closeSupport();
       });
 
+      const hidden = ['POLAROIDS', 'ORDER', 'MARKET', 'STREAM'];
       document.querySelectorAll('.tb-link').forEach(link => {
-        if (['POLAROIDS', 'ORDER', 'MARKET'].includes(link.textContent.trim().replace(/^▶\s*/, ''))) link.remove();
+        if (hidden.includes(link.textContent.trim().replace(/^▶\s*/, ''))) link.remove();
       });
+
+      // The bundled topbar predates these pages; append them to the live nav.
+      const nav = document.querySelector('.tb-row-2');
+      if (nav) {
+        [['PANELS', 'https://ghostline.live/panels.html'], ['SUPPORT', 'https://ghostline.live/support.html']].forEach(([label, href]) => {
+          const link = document.createElement('a');
+          link.className = 'tb-link';
+          link.href = href;
+          link.textContent = label;
+          nav.appendChild(link);
+        });
+      }
       return true;
     };
     const mystraInstallTimer = setInterval(() => {
