@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="Support GHOSTLINE — subscriptions, one-off tips and direct USDT that fund the LED panels and the MYSTRA lab." />
+<meta name="description" content="Support GHOSTLINE. Subscriptions, tips and direct USDT that fund the LED panels and the MYSTRA lab." />
 <title>GHOSTLINE — SUPPORT</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,9 +13,7 @@
 <style>
 :root {
   --bg: #000;
-  --panel: rgba(0,0,0,.72);
-  --line: rgba(232,226,214,.32);
-  --line-2: rgba(232,226,214,.58);
+  --line: rgba(232,226,214,.30);
   --text: #d8d2c4;
   --text-dim: #7c7466;
   --text-mute: #4a4538;
@@ -23,14 +21,20 @@
   --accent-dim: #a8731d;
   --glow: rgba(255,180,80,.22);
   --green: #6cd97e;
+
+  /* DOS blue: panel ground, chrome and selection */
+  --blue: #5d8fff;
+  --blue-dim: #2d4c96;
+  --blue-bg: #060f26;
+  --blue-bar: #14295c;
+
   --bw: 2px;
   --mono: "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-  --terminal: "VT323", "JetBrains Mono", monospace;
   --pixel: "Press Start 2P", monospace;
 }
 
 * { box-sizing: border-box; }
-html { background: var(--bg); scroll-behavior: smooth; }
+html { background: var(--bg); }
 body {
   margin: 0;
   min-height: 100vh;
@@ -45,18 +49,6 @@ button { padding: 0; border: 0; background: transparent; color: inherit; font: i
 img { display: block; max-width: 100%; }
 
 .shell { position: relative; min-height: 100vh; }
-.shell::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle at top left, rgba(232,226,214,.40) 1.3px, transparent 2.4px),
-    linear-gradient(0deg, rgba(232,226,214,.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(232,226,214,.07) 1px, transparent 1px);
-  background-size: 88px 88px, 88px 88px, 88px 88px;
-}
 .shell::after {
   content: "";
   position: fixed;
@@ -65,7 +57,7 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
   background:
     repeating-linear-gradient(to bottom, rgba(255,255,255,.02) 0, rgba(255,255,255,.02) 1px, transparent 1px, transparent 3px),
-    radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,.46) 100%);
+    radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,.50) 100%);
 }
 
 .topbar {
@@ -73,8 +65,7 @@ img { display: block; max-width: 100%; }
   top: 0;
   z-index: 100;
   border-bottom: var(--bw) solid var(--line);
-  background: rgba(0,0,0,.90);
-  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,.92);
 }
 .tb-row { display: flex; align-items: center; padding: 0 24px; }
 .tb-row-1 { height: 44px; gap: 14px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .1em; }
@@ -82,8 +73,8 @@ img { display: block; max-width: 100%; }
 .tb-row-2::-webkit-scrollbar { display: none; }
 .tb-brand { color: var(--accent); font-weight: 700; letter-spacing: .16em; font-size: 12px; white-space: nowrap; }
 .tb-status { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); white-space: nowrap; }
-.tb-right { margin-left: auto; display: inline-flex; align-items: center; gap: 14px; white-space: nowrap; }
-.tb-node { padding: 4px 11px; border: 1px solid var(--line); color: var(--text-dim); letter-spacing: .11em; }
+.tb-right { margin-left: auto; white-space: nowrap; }
+.tb-node { padding: 4px 11px; border: 1px solid var(--blue-dim); color: var(--blue); letter-spacing: .11em; }
 .tb-link {
   height: 100%;
   display: inline-flex;
@@ -97,108 +88,123 @@ img { display: block; max-width: 100%; }
 .tb-link:first-child { padding-left: 0; }
 .tb-link:hover, .tb-link.is-current { color: var(--accent); }
 
-.dot { display: inline-block; width: 7px; height: 7px; vertical-align: middle; background: var(--text-mute); }
-.dot-ok { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot { display: inline-block; width: 7px; height: 7px; vertical-align: middle; background: var(--green); box-shadow: 0 0 6px var(--green); }
 
 .page {
   position: relative;
   z-index: 1;
-  width: min(1240px, calc(100% - 48px));
+  width: min(880px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 30px 0 64px;
+  padding: 48px 0 60px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 26px;
 }
-.page-head { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-.title-row { display: flex; align-items: baseline; justify-content: center; gap: 16px; }
-.folder-id { padding: 5px 12px; border: var(--bw) solid var(--line); color: var(--accent); font-size: 11px; letter-spacing: .18em; }
-h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacing: .06em; text-shadow: 0 0 14px var(--glow); }
-.head-subline { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--text-dim); font-size: 10px; letter-spacing: .14em; text-align: center; }
 
-.section-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
-.section-title { display: flex; align-items: center; gap: 10px; color: var(--accent); font-size: 11px; letter-spacing: .16em; }
-.section-title::before { content: ""; width: 24px; height: 1px; background: var(--accent); }
-.section-meta { color: var(--text-mute); font-size: 9px; letter-spacing: .12em; text-align: right; }
+.page-head { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+h1 { margin: 0; color: var(--accent); font: 28px/1.2 var(--pixel); letter-spacing: .06em; text-shadow: 0 0 16px var(--glow); }
+.head-sub { color: var(--blue); font-size: 10px; letter-spacing: .2em; }
+.caret { display: inline-block; width: 7px; height: 11px; margin-left: 5px; background: var(--blue); vertical-align: -1px; animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
 
-.window { border: var(--bw) solid var(--line); background: var(--panel); }
-.window-bar {
-  min-height: 38px;
+/* DOS panel */
+.dos { border: var(--bw) solid var(--blue-dim); background: var(--blue-bg); }
+.dos-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--line);
-  color: var(--text-dim);
+  gap: 12px;
+  padding: 9px 12px;
+  background: var(--blue-bar);
+  color: var(--blue);
   font-size: 10px;
+  letter-spacing: .14em;
+}
+.dos-bar b { color: var(--text); font-weight: 400; }
+.dos-cols {
+  display: grid;
+  grid-template-columns: 1fr 88px 132px;
+  gap: 12px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--blue-dim);
+  color: var(--blue-dim);
+  font-size: 8px;
+  letter-spacing: .18em;
+}
+.dos-list { margin: 0; padding: 0; list-style: none; }
+.dos-row {
+  display: grid;
+  grid-template-columns: 1fr 88px 132px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(45,76,150,.4);
+}
+.dos-row:last-child { border-bottom: 0; }
+.dos-name { color: var(--accent); font-size: 11px; letter-spacing: .1em; }
+.dos-note { display: block; margin-top: 5px; color: var(--text-dim); font-size: 9px; letter-spacing: .03em; }
+.dos-type { color: var(--blue); font-size: 9px; letter-spacing: .12em; }
+.dos-go { justify-self: end; color: var(--text-dim); font-size: 9px; letter-spacing: .1em; white-space: nowrap; }
+.dos-key {
+  display: inline-block;
+  min-width: 16px;
+  margin-right: 9px;
+  padding: 1px 0;
+  background: var(--blue-dim);
+  color: #000;
+  font-size: 9px;
+  text-align: center;
+}
+/* inverse video on select, the way a DOS file manager highlights a row */
+.dos-row:hover, .dos-row:focus-visible { background: var(--blue); outline: 0; }
+.dos-row:hover .dos-name,
+.dos-row:hover .dos-note,
+.dos-row:hover .dos-type,
+.dos-row:hover .dos-go { color: #000; }
+.dos-row:hover .dos-key { background: #000; color: var(--blue); }
+.dos-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 14px;
+  background: var(--blue-bar);
+  color: var(--blue-dim);
+  font-size: 9px;
   letter-spacing: .12em;
 }
-.window-bar strong { color: var(--accent); font-weight: 500; }
+.dos-status b { color: var(--blue); font-weight: 400; }
 
-.intro { padding: 20px; color: var(--text-dim); font-size: 11px; line-height: 1.9; }
-.intro strong { color: var(--text); font-weight: 500; }
-.intro p { margin: 0 0 12px; }
-.intro p:last-child { margin-bottom: 0; }
+/* Wallet */
+.wallet { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 18px; padding: 18px; border: var(--bw) solid var(--line); }
+.wallet-qr { width: 132px; height: 132px; padding: 7px; background: #fff; image-rendering: pixelated; }
+.wallet-label { color: var(--blue); font-size: 9px; letter-spacing: .16em; }
+.wallet-address { margin: 9px 0 12px; padding: 9px; border: 1px solid var(--blue-dim); color: var(--text); font-size: 10px; line-height: 1.6; word-break: break-all; }
+.wallet-copy { min-height: 34px; padding: 8px 12px; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; letter-spacing: .1em; }
+.wallet-copy:hover { background: var(--accent); color: #000; }
+.wallet-warn { margin: 12px 0 0; color: var(--text-mute); font-size: 9px; line-height: 1.7; letter-spacing: .04em; }
 
-.support-grid { display: grid; grid-template-columns: repeat(var(--support-cols, 4), minmax(0, 1fr)); gap: 1px; border: 1px solid var(--line); background: var(--line); }
-.support-cell { display: flex; flex-direction: column; gap: 7px; min-height: 176px; padding: 18px; background: #000; }
-.support-cell:hover { background: rgba(255,177,66,.05); }
-.support-code { color: var(--accent); font-size: 9px; letter-spacing: .15em; }
-.support-cell h3 { margin: 6px 0 0; color: var(--text); font: 11px/1.5 var(--pixel); }
-.support-cell p { margin: 0; color: var(--text-dim); font-size: 9px; line-height: 1.75; }
-.support-go { margin-top: auto; padding-top: 14px; color: var(--accent-dim); font-size: 9px; letter-spacing: .12em; }
-.support-cell:hover .support-go { color: var(--accent); }
-
-.wallet-body { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 20px; padding: 20px; }
-.wallet-qr { width: 190px; height: 190px; padding: 9px; background: #fff; image-rendering: pixelated; }
-.wallet-network { color: var(--accent); font-size: 10px; letter-spacing: .12em; }
-.wallet-address { margin: 10px 0; padding: 10px; border: 1px solid var(--line); color: var(--text); font-size: 10px; line-height: 1.6; word-break: break-all; }
-.wallet-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.wallet-action { min-height: 36px; padding: 8px 11px; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; letter-spacing: .1em; }
-.wallet-action:hover { background: rgba(255,177,66,.10); }
-.wallet-action.is-muted { border-color: var(--line); color: var(--text-dim); }
-.wallet-action.is-muted:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
-.wallet-warning { margin: 14px 0 0; padding: 10px; border: 1px solid rgba(255,94,94,.55); color: #ff7777; font-size: 9px; line-height: 1.7; letter-spacing: .05em; }
-
-.ledger { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border: 1px solid var(--line); background: var(--line); }
-.ledger-cell { display: flex; flex-direction: column; gap: 10px; min-height: 180px; padding: 20px; background: #000; }
-.ledger-code { color: var(--accent); font-size: 9px; letter-spacing: .15em; }
-.ledger-cell h3 { margin: 4px 0 0; color: var(--text); font: 11px/1.5 var(--pixel); }
-.ledger-cell ul { margin: 0; padding-left: 15px; color: var(--text-dim); font-size: 9px; line-height: 1.9; }
-.ledger-state { margin-top: auto; padding-top: 14px; color: var(--text-mute); font-size: 9px; letter-spacing: .12em; }
-.ledger-state.is-live { color: var(--green); }
-
-.footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--text-mute); font-size: 10px; letter-spacing: .13em; }
-.footer a { color: var(--text-dim); }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; color: var(--text-mute); font-size: 10px; letter-spacing: .13em; }
 .footer a:hover { color: var(--accent); }
 
-@media (max-width: 920px) {
-  .ledger { grid-template-columns: 1fr; }
-}
 @media (max-width: 620px) {
   .tb-row { padding: 0 12px; }
   .tb-row-1 { height: auto; min-height: 44px; gap: 8px; flex-wrap: wrap; padding-top: 7px; padding-bottom: 7px; }
-  .tb-right { width: 100%; margin-left: 0; justify-content: space-between; }
-  .tb-node { padding: 3px 7px; }
+  .tb-right { width: 100%; margin-left: 0; }
   .tb-link { padding: 0 10px; font-size: 9px; }
-  .page { width: calc(100% - 24px); padding-top: 20px; gap: 24px; }
-  .title-row { align-items: center; gap: 10px; }
-  .folder-id { font-size: 9px; padding: 4px 7px; }
-  h1 { font-size: clamp(19px, 6.4vw, 27px); }
-  .section-head { align-items: flex-start; flex-direction: column; gap: 6px; }
-  .section-meta { text-align: left; }
-  .intro { padding: 14px; font-size: 10px; }
-  .support-grid { grid-template-columns: 1fr; }
-  .support-cell { min-height: 0; padding: 14px; }
-  .wallet-body { grid-template-columns: 1fr; padding: 14px; }
-  .wallet-qr { width: 100%; max-width: 230px; height: auto; aspect-ratio: 1; }
-  .ledger-cell { min-height: 0; padding: 14px; }
-  .footer { align-items: flex-start; flex-direction: column; }
+  .page { width: calc(100% - 22px); padding: 30px 0 44px; gap: 20px; }
+  h1 { font-size: clamp(19px, 6.6vw, 26px); }
+  .head-sub { font-size: 9px; letter-spacing: .14em; text-align: center; }
+  .dos-cols { display: none; }
+  .dos-row { grid-template-columns: 1fr auto; gap: 4px 10px; padding: 12px; }
+  .dos-type { grid-row: 1; justify-self: end; }
+  .dos-go { grid-column: 1 / -1; justify-self: start; }
+  .wallet { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 14px; }
+  .wallet-address { text-align: left; }
+  .wallet-warn { text-align: left; }
+  .footer { flex-direction: column; align-items: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 </style>
@@ -208,10 +214,8 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
   <header class="topbar">
     <div class="tb-row tb-row-1">
       <a class="tb-brand" href="index.html">▣ GHOSTLINE_OS</a>
-      <span class="tb-status"><i class="dot dot-ok"></i> FUND_NODE ONLINE</span>
-      <span class="tb-right">
-        <span class="tb-node">INDEPENDENT / NO PUBLISHER</span>
-      </span>
+      <span class="tb-status"><i class="dot"></i> FUND_NODE ONLINE</span>
+      <span class="tb-right"><span class="tb-node">NO PUBLISHER</span></span>
     </div>
     <nav class="tb-row tb-row-2" aria-label="Main navigation">
       <a class="tb-link" href="index.html">HOME</a>
@@ -224,94 +228,24 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
 
   <main class="page">
     <header class="page-head">
-      <div class="title-row">
-        <span class="folder-id">FUND_01</span>
-        <h1>SUPPORT</h1>
-      </div>
-      <div class="head-subline"><i class="dot dot-ok"></i> PANELS · MYSTRA · THE ARCHIVE</div>
+      <h1>SUPPORT</h1>
+      <div class="head-sub">PANELS BUY PARTS. TIERS BUY TIME.<i class="caret"></i></div>
     </header>
 
-    <section>
-      <div class="section-head">
-        <div class="section-title">WHERE IT GOES</div>
-        <div class="section-meta">NO STUDIO · NO PUBLISHER · NO INVESTORS</div>
-      </div>
-      <div class="window">
-        <div class="window-bar"><span>[ FUND_README.TXT ]</span><strong>OPEN</strong></div>
-        <div class="intro">
-          <p>GHOSTLINE is one person making <strong>physical objects that run pixel signal</strong> — framed LED panels — and <strong>MYSTRA</strong>, a robotics prototype being rebuilt in the open.</p>
-          <p>Panels pay for the parts. Subscriptions pay for the time between panels: the animation work, the frame prototypes, the MYSTRA build logs and the files that get published back to the archive.</p>
-          <p>Every channel below lands in the same place. Pick whichever is easiest for you — the cheapest for me is <strong>USDT direct</strong>, the most useful is a <strong>monthly tier</strong>, because it is the only one I can plan against.</p>
-        </div>
-      </div>
+    <section class="dos">
+      <div class="dos-bar"><span>C:\GHOSTLINE\SUPPORT</span><b id="dosCount"></b></div>
+      <div class="dos-cols"><span>NAME</span><span>TYPE</span><span>ACTION</span></div>
+      <ul class="dos-list" id="channelList"></ul>
+      <div class="dos-status" id="dosStatus"></div>
     </section>
 
-    <section>
-      <div class="section-head">
-        <div class="section-title">CHANNELS</div>
-        <div class="section-meta">SUBSCRIPTION · ONE-OFF · DIRECT</div>
-      </div>
-      <div class="support-grid" id="supportGrid"></div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <div class="section-title">USDT DIRECT</div>
-        <div class="section-meta">TRON (TRC-20) · NO PLATFORM CUT</div>
-      </div>
-      <div class="window">
-        <div class="window-bar"><span>[ WALLET.TRC20 ]</span><strong id="walletAsset">USDT</strong></div>
-        <div class="wallet-body">
-          <img class="wallet-qr" id="walletQr" src="assets/led-panels/usdt-trc20.svg" alt="QR code for the GHOSTLINE USDT TRC-20 wallet">
-          <div>
-            <div class="wallet-network" id="walletNetwork">NETWORK // TRON (TRC-20)</div>
-            <div class="wallet-address" id="walletAddress">TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</div>
-            <div class="wallet-actions">
-              <button class="wallet-action" id="copyWallet" type="button">[ COPY ADDRESS ]</button>
-              <a class="wallet-action is-muted" id="walletContact" href="mailto:ghostlinesystem@gmail.com?subject=GHOSTLINE%20support">[ CONTACT ]</a>
-            </div>
-            <p class="wallet-warning">SEND ONLY USDT VIA THE TRON (TRC-20) NETWORK. ANOTHER ASSET OR ANOTHER NETWORK WILL BE LOST. FOR A PANEL ORDER USE THE PANELS PAGE INSTEAD — IT REGISTERS YOUR BUILD SLOT.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <div class="section-title">WHAT IT UNLOCKS</div>
-        <div class="section-meta">CURRENT BUILD QUEUE</div>
-      </div>
-      <div class="ledger">
-        <div class="ledger-cell">
-          <span class="ledger-code">Q.01</span>
-          <h3>LED PANELS</h3>
-          <ul>
-            <li>new animation loops for the capture set</li>
-            <li>frame prototypes — metal, wood, horned</li>
-            <li>larger formats</li>
-          </ul>
-          <span class="ledger-state is-live">▸ SHIPPING NOW</span>
-        </div>
-        <div class="ledger-cell">
-          <span class="ledger-code">Q.02</span>
-          <h3>MYSTRA 01</h3>
-          <ul>
-            <li>the physical prototype</li>
-            <li>hex data, datasets, whitepaper</li>
-            <li>public build logs</li>
-          </ul>
-          <span class="ledger-state">▸ IN DEVELOPMENT</span>
-        </div>
-        <div class="ledger-cell">
-          <span class="ledger-code">Q.03</span>
-          <h3>THE ARCHIVE</h3>
-          <ul>
-            <li>gallery restoration</li>
-            <li>polaroids, stream, lost archive back online</li>
-            <li>source files released to subscribers</li>
-          </ul>
-          <span class="ledger-state">▸ IN DEVELOPMENT</span>
-        </div>
+    <section class="wallet">
+      <img class="wallet-qr" id="walletQr" src="assets/led-panels/usdt-trc20.svg" alt="QR code for the GHOSTLINE USDT wallet">
+      <div>
+        <div class="wallet-label" id="walletLabel">USDT / TRON (TRC-20)</div>
+        <div class="wallet-address" id="walletAddress">TTUboZ6F42TKZYWDiuKzMuchVsd2R3rAsU</div>
+        <button class="wallet-copy" id="copyWallet" type="button">[ COPY ADDRESS ]</button>
+        <p class="wallet-warn">USDT on TRON only. Another asset or another network is lost. Ordering a panel? Use the panels page, it books your build slot.</p>
       </div>
     </section>
 
@@ -325,32 +259,36 @@ h1 { margin: 0; color: var(--accent); font: 30px/1.3 var(--pixel); letter-spacin
 <script src="js/support-links.js"></script>
 <script>
 const config = window.GHOSTLINE_SUPPORT || {};
+const live = (config.channels || []).filter(channel => channel.url);
 
-// Channels with no URL yet are hidden — see js/support-links.js.
-const supportGrid = document.getElementById("supportGrid");
-const supportChannels = (config.channels || []).filter(channel => channel.url);
-supportGrid.innerHTML = supportChannels
-  .map(channel => {
-    const external = /^https?:/.test(channel.url);
-    return `<a class="support-cell" href="${channel.url}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>
-      <span class="support-code">${channel.code}</span>
-      <h3>${channel.name}</h3>
-      <p>${channel.copy}</p>
-      <span class="support-go">${channel.go} ▸</span>
-    </a>`;
-  }).join("");
-// Keep the track count equal to what actually rendered, so unfilled channels
-// leave no collapsed columns behind.
-supportGrid.style.setProperty("--support-cols", Math.min(supportChannels.length, 4));
+document.getElementById("channelList").innerHTML = live.map((channel, index) => {
+  const external = /^https?:/.test(channel.url);
+  return `<li><a class="dos-row" href="${channel.url}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>
+    <span class="dos-name"><i class="dos-key">${index + 1}</i>${channel.name}<b class="dos-note">${channel.copy}</b></span>
+    <span class="dos-type">${channel.type}</span>
+    <span class="dos-go">${channel.go}</span>
+  </a></li>`;
+}).join("");
+
+document.getElementById("dosCount").textContent = `${live.length} FILE${live.length === 1 ? "" : "S"}`;
+document.getElementById("dosStatus").innerHTML =
+  live.map((channel, index) => `<span><b>${index + 1}</b> ${channel.name.split(".")[0]}</span>`).join("") +
+  "<span><b>0</b> HOME</span>";
+
+// Number keys pick a row, the way an old file manager would.
+document.addEventListener("keydown", event => {
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  if (event.key === "0") { window.location.href = "index.html"; return; }
+  const row = live[Number(event.key) - 1];
+  if (!row) return;
+  if (/^https?:/.test(row.url)) window.open(row.url, "_blank", "noopener");
+  else window.location.href = row.url;
+});
 
 if (config.wallet) {
-  document.getElementById("walletAsset").textContent = config.wallet.asset;
-  document.getElementById("walletNetwork").textContent = `NETWORK // ${config.wallet.network}`;
+  document.getElementById("walletLabel").textContent = `${config.wallet.asset} / ${config.wallet.network}`;
   document.getElementById("walletAddress").textContent = config.wallet.address;
   document.getElementById("walletQr").src = config.wallet.qr;
-}
-if (config.email) {
-  document.getElementById("walletContact").href = `mailto:${config.email}?subject=GHOSTLINE%20support`;
 }
 
 document.getElementById("copyWallet").addEventListener("click", async event => {
