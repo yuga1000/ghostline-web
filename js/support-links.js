@@ -12,6 +12,18 @@ window.GHOSTLINE_SUPPORT = {
     qr: "assets/led-panels/usdt-trc20.svg"
   },
   email: "ghostlinesystem@gmail.com",
+
+  /* Front-page partner slots. Fill `name` + `url` (and `logo` if you have one)
+   * and the slot turns into a live link on index.html and reads TAKEN on
+   * support.html. Leave them empty and both pages show the slot as OPEN. */
+  partners: {
+    slots: [
+      { id: "SLOT_01", placement: "Logo and link on the front page", name: "", url: "", logo: "" },
+      { id: "SLOT_02", placement: "Logo and link on the front page", name: "", url: "", logo: "" },
+      { id: "SLOT_03", placement: "Logo and link on the front page", name: "", url: "", logo: "" }
+    ]
+  },
+
   channels: [
     {
       id: "patreon",

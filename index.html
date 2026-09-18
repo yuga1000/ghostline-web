@@ -278,10 +278,6 @@
             <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
             <span class="text-green-400" id="asciiGhost" style="font-size:11px;transition:opacity 0.15s;display:inline-block;width:8em;overflow:hidden;text-align:center;white-space:nowrap;vertical-align:middle">&#3665;(&#3665;&#9679;&#785;&#9697;&#9679;&#785;&#3665;)&#3665;</span>
         </div>
-        <div class="flex items-center space-x-2">
-            <span class="pixel-hearts" id="pixelHearts">◊◊◊</span>
-            <span class="glow-text pixel-text text-xs" id="userCounter">USERS: 0</span>
-        </div>
         <div class="flex items-center space-x-4">
             <span class="blink">â</span>
             <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
@@ -903,36 +899,6 @@ let currentManifestoSlide = 0;
         }
     }
 
-    // Real server-side visitor counter
-    async function updateUserCounter() {
-        const element = safeGetElement('userCounter');
-        if (element) {
-            try {
-                const res = await fetch('/api/visitors');
-                const data = await res.json();
-                element.textContent = `VISITORS: ${data.online}`;
-                updatePixelHearts(data.online);
-            } catch (e) {
-                element.textContent = 'VISITORS: --';
-            }
-        }
-    }
-    
-    // Update pixel hearts based on user count
-    function updatePixelHearts(userCount) {
-        const heartsElement = safeGetElement('pixelHearts');
-        if (heartsElement) {
-            try {
-                // More users = more hearts (max 3 hearts)
-                const heartCount = Math.min(3, Math.max(1, Math.floor(userCount / 15) + 1));
-                const hearts = '◊'.repeat(heartCount);
-                heartsElement.textContent = hearts;
-            } catch (e) {
-                console.log('Hearts update error:', e);
-            }
-        }
-    }
-    
     // Add button click effects
     function addButtonEffects() {
         const galleryBtn = safeGetElement('galleryBtn');
@@ -1262,10 +1228,6 @@ let currentManifestoSlide = 0;
             // Rotate ASCII creature every 3 seconds
             setInterval(rotateAsciiCreature, 3000);
 
-            // User counter every 30 seconds
-            setInterval(updateUserCounter, 30000);
-            updateUserCounter();
-            
             
             // Command change every 8 seconds
             setInterval(changeCommand, 8000);
@@ -1318,12 +1280,9 @@ let currentManifestoSlide = 0;
       <div class="ata-sponsor-label" id="partners-label">[ PARTNERS ]</div>
     </div>
 
-    <!-- Sponsor slots -->
-    <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:120px;">
-      <div style="width:100px;height:48px;border:1px solid rgba(0,255,0,0.12);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(0,255,0,0.15);letter-spacing:1px;cursor:default;background:rgba(0,255,0,0.02);transition:all 0.4s;" onmouseover="this.style.borderColor='rgba(0,255,0,0.4)';this.style.color='rgba(0,255,0,0.5)';this.style.background='rgba(0,255,0,0.05)'" onmouseout="this.style.borderColor='rgba(0,255,0,0.12)';this.style.color='rgba(0,255,0,0.15)';this.style.background='rgba(0,255,0,0.02)'">SLOT_01</div>
-      <div style="width:100px;height:48px;border:1px solid rgba(0,255,0,0.12);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(0,255,0,0.15);letter-spacing:1px;cursor:default;background:rgba(0,255,0,0.02);transition:all 0.4s;" onmouseover="this.style.borderColor='rgba(0,255,0,0.4)';this.style.color='rgba(0,255,0,0.5)';this.style.background='rgba(0,255,0,0.05)'" onmouseout="this.style.borderColor='rgba(0,255,0,0.12)';this.style.color='rgba(0,255,0,0.15)';this.style.background='rgba(0,255,0,0.02)'">SLOT_02</div>
-      <div style="width:100px;height:48px;border:1px solid rgba(0,255,0,0.12);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(0,255,0,0.15);letter-spacing:1px;cursor:default;background:rgba(0,255,0,0.02);transition:all 0.4s;" onmouseover="this.style.borderColor='rgba(0,255,0,0.4)';this.style.color='rgba(0,255,0,0.5)';this.style.background='rgba(0,255,0,0.05)'" onmouseout="this.style.borderColor='rgba(0,255,0,0.12)';this.style.color='rgba(0,255,0,0.15)';this.style.background='rgba(0,255,0,0.02)'">SLOT_03</div>
-    </div>
+    <!-- Sponsor slots: rendered from js/support-links.js -->
+    <div id="partnerSlots" style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:14px;"></div>
+    <a href="support.html#partners" style="display:block; text-align:center; margin-bottom:120px; font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:2px; color:rgba(0,255,0,0.3);" onmouseover="this.style.color='rgba(0,255,0,0.7)'" onmouseout="this.style.color='rgba(0,255,0,0.3)'">[ BECOME A PARTNER ]</a>
 
     <!-- Portfolio -->
     <div style="text-align:center; margin-bottom:120px;">
@@ -1609,5 +1568,39 @@ initATASquare();
 <!-- Sun timelapse — 200 frames sliding window from NASA SDO -->
 <script src="js/sun-timelapse.js"></script>
 
-  </body>
+  <script src="js/support-links.js"></script>
+<script>
+// Partner slots on the front page. Filling a slot in js/support-links.js turns it
+// into a live link here and marks it TAKEN on support.html.
+(() => {
+  const host = document.getElementById('partnerSlots');
+  if (!host) return;
+  const slots = (window.GHOSTLINE_SUPPORT?.partners?.slots) || [];
+  const base = "width:100px;height:48px;border:1px solid rgba(0,255,0,0.12);display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(0,255,0,0.15);letter-spacing:1px;background:rgba(0,255,0,0.02);transition:all 0.4s;overflow:hidden;";
+  host.innerHTML = slots.map(slot => {
+    const taken = Boolean(slot.name && slot.url);
+    const inner = taken
+      ? (slot.logo ? `<img src="${slot.logo}" alt="${slot.name}" style="max-width:88px;max-height:40px;object-fit:contain;">` : slot.name)
+      : slot.id;
+    return taken
+      ? `<a href="${slot.url}" target="_blank" rel="noopener noreferrer" style="${base}cursor:pointer;">${inner}</a>`
+      : `<div style="${base}cursor:default;">${inner}</div>`;
+  }).join('');
+  host.querySelectorAll('a,div').forEach(cell => {
+    cell.addEventListener('mouseover', () => {
+      cell.style.borderColor = 'rgba(0,255,0,0.4)';
+      cell.style.color = 'rgba(0,255,0,0.5)';
+      cell.style.background = 'rgba(0,255,0,0.05)';
+    });
+    cell.addEventListener('mouseout', () => {
+      cell.style.borderColor = 'rgba(0,255,0,0.12)';
+      cell.style.color = 'rgba(0,255,0,0.15)';
+      cell.style.background = 'rgba(0,255,0,0.02)';
+    });
+  });
+})();
+</script>
+
+
+</body>
   </html>

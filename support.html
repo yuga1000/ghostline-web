@@ -22,11 +22,14 @@
   --glow: rgba(255,180,80,.22);
   --green: #6cd97e;
 
-  /* DOS blue: panel ground, chrome and selection */
-  --blue: #5d8fff;
-  --blue-dim: #2d4c96;
-  --blue-bg: #060f26;
-  --blue-bar: #14295c;
+  /* CGA/EGA palette, straight off a DOS file manager */
+  --dos-bg:     #0000aa;  /* panel ground */
+  --dos-bright: #5555ff;  /* bright blue, borders */
+  --dos-cyan:   #55ffff;  /* headings and directory names */
+  --dos-teal:   #00aaaa;  /* function-key bar */
+  --dos-gray:   #aaaaaa;  /* body text on blue */
+  --dos-white:  #ffffff;
+  --blue: var(--dos-bright);
 
   --bw: 2px;
   --mono: "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
@@ -34,7 +37,7 @@
 }
 
 * { box-sizing: border-box; }
-html { background: var(--bg); }
+html { background: var(--bg); scroll-behavior: smooth; }
 body {
   margin: 0;
   min-height: 100vh;
@@ -49,6 +52,26 @@ button { padding: 0; border: 0; background: transparent; color: inherit; font: i
 img { display: block; max-width: 100%; }
 
 .shell { position: relative; min-height: 100vh; }
+.shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at top left, rgba(232,226,214,.40) 1.3px, transparent 2.4px),
+    linear-gradient(0deg, rgba(232,226,214,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,226,214,.07) 1px, transparent 1px);
+  background-size: 88px 88px, 88px 88px, 88px 88px;
+}
+/* pixel shimmer, drawn on a chunky 4px lattice above everything */
+#shimmer {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
 .shell::after {
   content: "";
   position: fixed;
@@ -74,7 +97,7 @@ img { display: block; max-width: 100%; }
 .tb-brand { color: var(--accent); font-weight: 700; letter-spacing: .16em; font-size: 12px; white-space: nowrap; }
 .tb-status { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); white-space: nowrap; }
 .tb-right { margin-left: auto; white-space: nowrap; }
-.tb-node { padding: 4px 11px; border: 1px solid var(--blue-dim); color: var(--blue); letter-spacing: .11em; }
+.tb-node { padding: 4px 11px; border: 1px solid var(--dos-bright); color: var(--dos-cyan); letter-spacing: .11em; }
 .tb-link {
   height: 100%;
   display: inline-flex;
@@ -103,31 +126,31 @@ img { display: block; max-width: 100%; }
 
 .page-head { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 h1 { margin: 0; color: var(--accent); font: 28px/1.2 var(--pixel); letter-spacing: .06em; text-shadow: 0 0 16px var(--glow); }
-.head-sub { color: var(--blue); font-size: 10px; letter-spacing: .2em; }
-.caret { display: inline-block; width: 7px; height: 11px; margin-left: 5px; background: var(--blue); vertical-align: -1px; animation: caret 1s steps(1) infinite; }
+.head-sub { color: var(--dos-cyan); font-size: 10px; letter-spacing: .2em; }
+.caret { display: inline-block; width: 7px; height: 11px; margin-left: 5px; background: var(--dos-cyan); vertical-align: -1px; animation: caret 1s steps(1) infinite; }
 @keyframes caret { 50% { opacity: 0; } }
 
 /* DOS panel */
-.dos { border: var(--bw) solid var(--blue-dim); background: var(--blue-bg); }
+.dos { border: var(--bw) solid var(--dos-bright); background: var(--dos-bg); }
 .dos-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 9px 12px;
-  background: var(--blue-bar);
-  color: var(--blue);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--dos-bright);
+  color: var(--dos-cyan);
   font-size: 10px;
   letter-spacing: .14em;
 }
-.dos-bar b { color: var(--text); font-weight: 400; }
+.dos-bar b { color: var(--dos-white); font-weight: 400; }
 .dos-cols {
   display: grid;
   grid-template-columns: 1fr 88px 132px;
   gap: 12px;
-  padding: 9px 14px;
-  border-bottom: 1px solid var(--blue-dim);
-  color: var(--blue-dim);
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--dos-bright);
+  color: var(--dos-bright);
   font-size: 8px;
   letter-spacing: .18em;
 }
@@ -137,48 +160,49 @@ h1 { margin: 0; color: var(--accent); font: 28px/1.2 var(--pixel); letter-spacin
   grid-template-columns: 1fr 88px 132px;
   align-items: center;
   gap: 12px;
-  padding: 13px 14px;
-  border-bottom: 1px solid rgba(45,76,150,.4);
+  padding: 12px 14px;
 }
-.dos-row:last-child { border-bottom: 0; }
-.dos-name { color: var(--accent); font-size: 11px; letter-spacing: .1em; }
-.dos-note { display: block; margin-top: 5px; color: var(--text-dim); font-size: 9px; letter-spacing: .03em; }
-.dos-type { color: var(--blue); font-size: 9px; letter-spacing: .12em; }
-.dos-go { justify-self: end; color: var(--text-dim); font-size: 9px; letter-spacing: .1em; white-space: nowrap; }
+.dos-name { color: var(--dos-white); font-size: 11px; letter-spacing: .1em; }
+.dos-note { display: block; margin-top: 5px; color: var(--dos-gray); font-size: 9px; letter-spacing: .03em; }
+.dos-type { color: var(--dos-cyan); font-size: 9px; letter-spacing: .12em; }
+.dos-go { justify-self: end; color: var(--dos-cyan); font-size: 9px; letter-spacing: .1em; white-space: nowrap; }
+.dos-open { color: var(--dos-gray); }
 .dos-key {
   display: inline-block;
   min-width: 16px;
   margin-right: 9px;
   padding: 1px 0;
-  background: var(--blue-dim);
-  color: #000;
+  background: var(--dos-gray);
+  color: var(--dos-bg);
   font-size: 9px;
   text-align: center;
 }
-/* inverse video on select, the way a DOS file manager highlights a row */
-.dos-row:hover, .dos-row:focus-visible { background: var(--blue); outline: 0; }
+/* the cursor bar: cyan ground, black text, exactly like a DOS file manager */
+.dos-row:hover, .dos-row:focus-visible { background: var(--dos-teal); outline: 0; }
 .dos-row:hover .dos-name,
 .dos-row:hover .dos-note,
 .dos-row:hover .dos-type,
-.dos-row:hover .dos-go { color: #000; }
-.dos-row:hover .dos-key { background: #000; color: var(--blue); }
+.dos-row:hover .dos-go,
+.dos-row:hover .dos-open { color: #000; }
+.dos-row:hover .dos-key { background: #000; color: var(--dos-cyan); }
+/* function-key bar */
 .dos-status {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  padding: 8px 14px;
-  background: var(--blue-bar);
-  color: var(--blue-dim);
+  gap: 1px;
+  padding: 0;
+  background: var(--dos-teal);
   font-size: 9px;
   letter-spacing: .12em;
 }
-.dos-status b { color: var(--blue); font-weight: 400; }
+.dos-status span { display: inline-flex; align-items: center; gap: 5px; padding: 7px 10px; color: #000; }
+.dos-status b { padding: 1px 4px; background: #000; color: var(--dos-gray); font-weight: 400; }
 
 /* Wallet */
 .wallet { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 18px; padding: 18px; border: var(--bw) solid var(--line); }
 .wallet-qr { width: 132px; height: 132px; padding: 7px; background: #fff; image-rendering: pixelated; }
-.wallet-label { color: var(--blue); font-size: 9px; letter-spacing: .16em; }
-.wallet-address { margin: 9px 0 12px; padding: 9px; border: 1px solid var(--blue-dim); color: var(--text); font-size: 10px; line-height: 1.6; word-break: break-all; }
+.wallet-label { color: var(--dos-cyan); font-size: 9px; letter-spacing: .16em; }
+.wallet-address { margin: 9px 0 12px; padding: 9px; border: 1px solid var(--dos-bright); color: var(--text); font-size: 10px; line-height: 1.6; word-break: break-all; }
 .wallet-copy { min-height: 34px; padding: 8px 12px; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; letter-spacing: .1em; }
 .wallet-copy:hover { background: var(--accent); color: #000; }
 .wallet-warn { margin: 12px 0 0; color: var(--text-mute); font-size: 9px; line-height: 1.7; letter-spacing: .04em; }
@@ -210,6 +234,7 @@ h1 { margin: 0; color: var(--accent); font: 28px/1.2 var(--pixel); letter-spacin
 </style>
 </head>
 <body>
+<canvas id="shimmer" aria-hidden="true"></canvas>
 <div class="shell">
   <header class="topbar">
     <div class="tb-row tb-row-1">
@@ -237,6 +262,13 @@ h1 { margin: 0; color: var(--accent); font: 28px/1.2 var(--pixel); letter-spacin
       <div class="dos-cols"><span>NAME</span><span>TYPE</span><span>ACTION</span></div>
       <ul class="dos-list" id="channelList"></ul>
       <div class="dos-status" id="dosStatus"></div>
+    </section>
+
+    <section class="dos" id="partners">
+      <div class="dos-bar"><span>C:\GHOSTLINE\PARTNERS</span><b id="partnerCount"></b></div>
+      <div class="dos-cols"><span>SLOT</span><span>STATE</span><span>ACTION</span></div>
+      <ul class="dos-list" id="partnerList"></ul>
+      <div class="dos-status"><span><b>i</b> A TAKEN SLOT SHOWS ITS LOGO AND LINK ON THE FRONT PAGE</span></div>
     </section>
 
     <section class="wallet">
@@ -290,6 +322,68 @@ if (config.wallet) {
   document.getElementById("walletAddress").textContent = config.wallet.address;
   document.getElementById("walletQr").src = config.wallet.qr;
 }
+
+// Partner slots. A filled slot links out; an open one opens a mail draft.
+const slots = (config.partners && config.partners.slots) || [];
+const contact = config.email || "";
+document.getElementById("partnerList").innerHTML = slots.map(slot => {
+  const taken = Boolean(slot.name && slot.url);
+  const href = taken ? slot.url : `mailto:${contact}?subject=GHOSTLINE%20partner%20${slot.id}`;
+  return `<li><a class="dos-row" href="${href}"${taken ? ' target="_blank" rel="noopener noreferrer"' : ""}>
+    <span class="dos-name">${slot.id}<b class="dos-note">${taken ? slot.name : slot.placement}</b></span>
+    <span class="dos-type">${taken ? "TAKEN" : "OPEN"}</span>
+    <span class="${taken ? "dos-go" : "dos-go dos-open"}">${taken ? "[ VISIT ]" : "[ CLAIM SLOT ]"}</span>
+  </a></li>`;
+}).join("");
+const open = slots.filter(slot => !(slot.name && slot.url)).length;
+document.getElementById("partnerCount").textContent = `${open} OPEN / ${slots.length}`;
+
+// Pixel shimmer: a sparse lattice of cells that flash and decay, 12fps for a
+// chunky CRT feel rather than a smooth glow.
+(() => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const canvas = document.getElementById("shimmer");
+  const ctx = canvas.getContext("2d");
+  const CELL = 4;
+  const TINTS = ["85,255,255", "255,177,66", "85,85,255"];
+  let cells = [];
+  let last = 0;
+
+  const resize = () => {
+    canvas.width = Math.floor(innerWidth / CELL) * CELL;
+    canvas.height = Math.floor(innerHeight / CELL) * CELL;
+    canvas.style.width = innerWidth + "px";
+    canvas.style.height = innerHeight + "px";
+  };
+  resize();
+  addEventListener("resize", resize);
+
+  const tick = now => {
+    requestAnimationFrame(tick);
+    if (now - last < 80) return;
+    last = now;
+
+    for (let i = 0; i < 7; i++) {
+      cells.push({
+        x: Math.floor(Math.random() * canvas.width / CELL) * CELL,
+        y: Math.floor(Math.random() * canvas.height / CELL) * CELL,
+        tint: TINTS[Math.floor(Math.random() * TINTS.length)],
+        life: 1,
+        size: Math.random() < .22 ? CELL * 2 : CELL
+      });
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    cells = cells.filter(cell => {
+      cell.life -= .16;
+      if (cell.life <= 0) return false;
+      ctx.fillStyle = `rgba(${cell.tint},${(cell.life * .55).toFixed(3)})`;
+      ctx.fillRect(cell.x, cell.y, cell.size, cell.size);
+      return true;
+    });
+  };
+  requestAnimationFrame(tick);
+})();
 
 document.getElementById("copyWallet").addEventListener("click", async event => {
   const address = document.getElementById("walletAddress").textContent.trim();
