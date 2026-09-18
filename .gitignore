@@ -44,6 +44,10 @@ coverage/
 tmp/
 temp/
 
+# Large source footage (web-ready exports live beside this folder)
+assets/led-panels/source/*
+!assets/led-panels/source/README.md
+
 # Editor directories and files
 .vscode/
 .idea/
