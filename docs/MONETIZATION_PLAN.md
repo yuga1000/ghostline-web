@@ -49,7 +49,7 @@ nothing half-finished ever ships.
 
 ---
 
-## 2. Patreon — https://www.patreon.com/c/Yuga1000
+## 2. Patreon — https://www.patreon.com/cw/Yuga1000
 
 The account exists but is dormant. It is the highest-leverage thing to fix,
 because it is the only channel that produces **predictable** money, and because

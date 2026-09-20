@@ -1,6 +1,6 @@
 # Patreon launch pack — copy/paste ready
 
-Page: https://www.patreon.com/c/Yuga1000
+Page: https://www.patreon.com/cw/Yuga1000
 
 Claude cannot open Patreon (the extension blocks the domain — see
 `MONETIZATION_PLAN.md` §2), so everything here is written to be pasted by hand.
@@ -176,7 +176,7 @@ The panels have a Patreon now.
 
 Tiers from $3. Loops as downloadable files at $10. MYSTRA build logs at $25. At $50 it accrues as credit toward an actual panel.
 
-patreon.com/c/Yuga1000
+patreon.com/cw/Yuga1000
 
 All the ways to support, wallet included: ghostline.live/support.html
 ```
