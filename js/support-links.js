@@ -30,7 +30,7 @@ window.GHOSTLINE_SUPPORT = {
       code: "S.01",
       name: "PATREON.SUB",
       type: "MONTHLY",
-      url: "https://www.patreon.com/cw/Yuga1000",
+      url: "https://www.patreon.com/Yuga1000",
       copy: "Build logs, captures, files before they go public.",
       go: "[ SUBSCRIBE ]"
     },
