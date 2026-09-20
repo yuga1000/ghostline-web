@@ -61,17 +61,18 @@ Patreon is the price point for those people. And the work already generates the
 content a tier needs: every panel build produces footage, every animation
 produces frames, every MYSTRA step produces a log.
 
-### Proposed tiers
+### Tiers
 
-| Tier | Price | What the patron gets | Cost to produce |
-|---|---|---|---|
-| **SIGNAL** | $3/mo | Monthly post: the raw captures from whatever got built that month. Access to the archive as pages come back online. | Zero — you already shoot this |
-| **PANEL** | $10/mo | Everything above + the animation loops as downloadable files (MP4 + frame sequence) for personal screens. Vote on the next loop in the capture set. | Low — export what exists |
-| **LAB** | $25/mo | Everything above + MYSTRA build logs, hex data, the whitepaper drafts as they are written, datasets. Name in the site credits. | Low — this is the documentation you owe the project anyway |
-| **OBJECT** | $50/mo | Everything above + $50/mo accrues as credit against a panel order. Twelve months = $600 off a $659 panel. | Real cost, but it converts subscribers into buyers |
+Superseded by `PATREON_LAUNCH.md`. The short version: **three tiers, none of
+them promising anything.** SIGNAL $3, WITNESS $10, PATRON $25, all seeing the
+same page. The pitch is patronage, not a content subscription: no bonus content,
+no members-only vault, no posting schedule. You are funding the development of
+art, and of a new form of life.
 
-The OBJECT tier is the important one: it turns Patreon from a tip jar into a
-**layaway plan for the panels**, which is the actual product.
+The earlier draft here proposed four deliverable-heavy tiers including a $50
+layaway against a panel. It converts better on paper and it is a monthly debt in
+practice, for one person who is already drawing, welding, soldering, cutting
+frames, writing code and shooting the footage. Dropped deliberately.
 
 ### Starting condition
 Do not launch tiers into an empty page. Before announcing: three posts up
