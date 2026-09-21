@@ -225,7 +225,7 @@ art that runs on light, and a new form of life
 
 **Short intro under the banner**
 ```
-Hand-drawn animation on LED panels, and a walking robot I am building in the open. One person, no studio. Thank you for looking.
+Eighteen years of drawing by hand, now on LED panels. And a walking robot I am building in the open. One person, no studio.
 ```
 
 ---
@@ -237,11 +237,15 @@ Hey. Thank you for being here, genuinely.
 
 I will keep this short, you have things to do.
 
-I make art objects that run on light. LED panels in hand-made frames, playing animation I draw frame by frame, pixel by pixel. Every one is built by hand, one at a time, in a workshop full of cable.
+I have been drawing by hand for eighteen years. I went through a lot of directions and got decent at oil, acrylic and watercolour, and I spent a long stretch on frame by frame animation, drawing every frame the slow way. Then I started experimenting with robots. Then with screens, and that is mostly where I am now.
 
-And I am building a robot. MYSTRA. Six legs, eighteen actuators. It is nowhere near done, and I am building it in the open, so you will see it while it is still wrong.
+So it comes down to two things, and they are what this page is for.
 
-Why I am making it, I honestly cannot tell you for certain. Discoveries tend to come out of the process itself, and especially out of a process with no commercial pressure on it and no audience to please. I make art, and I treat this as art. If it does not sit right, it is not done.
+The first is the LED panels. A hand-made frame with a matrix behind it, playing animation I draw pixel by pixel. Every one is built by hand, one at a time, in a workshop full of cable. The video up there is the real thing in the room where it was made.
+
+The second is MYSTRA. A walking robot. Six legs, eighteen actuators. It is nowhere near done, and I am building it in the open, so you will see it while it is still wrong.
+
+Why I am making it, I honestly cannot tell you for certain. Discoveries tend to come out of the process itself, and especially out of a process with no commercial pressure on it and no audience to please. I make art, and I treat this as art too. If it does not sit right, it is not done.
 
 Nature is already full of insects, and everything comes out of nature anyway. I think machines like this will surprise people the way the first train did.
 
