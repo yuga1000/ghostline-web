@@ -225,7 +225,7 @@ art that runs on light, and a new form of life
 
 **Short intro under the banner**
 ```
-One person, no studio. LED panels that play animation I draw by hand, and a walking robot I am building in the open.
+Hand-drawn animation on LED panels, and a walking robot I am building in the open. One person, no studio. Thank you for looking.
 ```
 
 ---
@@ -233,27 +233,30 @@ One person, no studio. LED panels that play animation I draw by hand, and a walk
 ## B2. About page
 
 ```
-I make art objects that run on light.
+Hey. Thank you for being here, genuinely.
 
-The main one is an LED panel in a hand-made frame. It hangs on a wall and plays an animation I drew frame by frame, pixel by pixel. Every panel is built by hand, one at a time. The video on this page is the real thing in the room where it was made.
+I will keep this short, you have things to do.
 
-The other one is MYSTRA. A walking robot. Six legs, eighteen actuators. It is nowhere near done. I am building it in the open, so you get to see it while it is still wrong.
+I make art objects that run on light. LED panels in hand-made frames, playing animation I draw frame by frame, pixel by pixel. Every one is built by hand, one at a time, in a workshop full of cable.
 
-I work alone and there is a lot of it. Drawing, welding, soldering, cutting frames, writing the code, shooting the footage, answering the mail. No studio, no team, nobody paying for any of it.
+And I am building a robot. MYSTRA. Six legs, eighteen actuators. It is nowhere near done, and I am building it in the open, so you will see it while it is still wrong.
 
-So here is what this page is, and it is short.
+Why I am making it, I honestly cannot tell you for certain. Discoveries tend to come out of the process itself, and especially out of a process with no commercial pressure on it and no audience to please. I make art, and I treat this as art. If it does not sit right, it is not done.
 
-There is no bonus content. No hidden extras, no members-only vault, no post every Tuesday. I would rather put that time into the work.
+Nature is already full of insects, and everything comes out of nature anyway. I think machines like this will surprise people the way the first train did.
 
-What you are backing is art, and a new form of life.
+I work alone, and there is a lot of it. Drawing, welding, soldering, cutting frames, writing the code, shooting the footage, answering the mail. No studio, no team, nobody funding any of this.
 
-If that sounds worth something to you, put in whatever feels right. Three dollars and twenty-five dollars get you the same page. Both keep the same thing running.
+So this page is simple, and I want to be straight with you about what it is.
 
-I post when there is something to show. Some months that is a lot. Some months I am just welding.
+There is no bonus content here. No hidden vault, no post every Tuesday, no rewards invented to justify a price. I would rather put that time into the work itself.
 
-Panels are at ghostline.live/panels.html if you want an actual object.
+What you are backing is the art, and a new form of life.
 
-Thank you for being here.
+I know it is a lot to ask. There are plenty of people making good things who probably deserve your support more than I do. Whatever you decide, and whether you decide anything at all, thank you for looking at this.
+
+If you want an actual object, the panels are at ghostline.live/panels.html.
+If you just want this to keep going, you are already in the right place.
 ```
 
 ---
@@ -262,27 +265,27 @@ Thank you for being here.
 
 ### Tier 1. **SIGNAL** · $3/month
 ```
-You are in.
+You are in, and that is the whole thing.
 
-No bonus content, no schedule, nothing owed. There is nothing here you are buying.
+No bonus content, no schedule, nothing you have to keep up with. You are keeping the work running, and honestly that is enough.
 
-You are keeping the work running, and that is enough.
+Thank you.
 ```
 
 ### Tier 2. **WITNESS** · $10/month
 ```
 Same page, same posts, same nothing owed.
 
-The difference is size. Ten dollars is a real piece of a month, so your name goes in the credits on ghostline.live where people can see it.
+The difference is size. Ten dollars is a real piece of a month here, so your name goes into the credits on ghostline.live. I would like people to see who is holding this up.
 ```
 
 ### Tier 3. **PATRON** · $25/month
 ```
-The size that actually moves a build along.
+This is the size that actually moves a build along.
 
-A month here is a frame, or a run of LED strip, or the actuators that were not in the budget. Your name in the credits, and my thanks.
+A month at this tier is a frame, or a run of LED strip, or the actuators that were not in the budget. Your name in the credits, and my thanks.
 
-Still no bonus content, still nothing asked of you.
+Still no bonus content, still nothing asked of you. I am just very glad you are here.
 ```
 
 ---
