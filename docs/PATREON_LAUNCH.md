@@ -109,10 +109,14 @@ For each tier set:
 - **Tier image**: `tier-1-signal.jpg`, `tier-2-witness.jpg`, `tier-3-patron.jpg`.
   Three different loops on the real panel, so the tier row is three pieces of
   work rather than three price labels.
-- **Benefits**: if Patreon insists on a benefits list, keep it to one short line
-  per tier, pulled from the block. Do not let the form talk you into inventing
-  deliverables to fill the field. An empty benefits list is better than a
-  dishonest one.
+- **Benefits**: fill these in, they matter more than I first said. The bullets
+  under "What's included" on the membership cards come from this field, not from
+  the description. A card with an empty list next to other creators' full ones
+  reads as unfinished. The lines are in **Part B, section B3a**, and none of
+  them promise anything that is not already true.
+- **Recommended**: Patreon lets you flag one tier as recommended, which puts a
+  badge on it and makes it the middle card people look at first. Put it on
+  WITNESS.
 
 Leave member limits empty. No reason to cap anything.
 
@@ -297,6 +301,41 @@ A month here is a frame, or a run of LED strip, or the actuators that weren't in
 
 Still no bonus content, still nothing asked of you. I'm just really glad you're here.
 ```
+
+---
+
+## B3a. Tier benefits
+
+These are the bullets on the membership cards. Short lines, one per benefit.
+Patreon keeps a shared list, so once a line exists you can attach it to more
+than one tier rather than retyping it.
+
+**SIGNAL, $3**
+```
+Everything I post, as I post it
+No schedule, nothing owed
+You keep the work running
+```
+
+**WITNESS, $10**
+```
+Everything I post, as I post it
+No schedule, nothing owed
+Your name in the credits on ghostline.live
+A real piece of a month of work
+```
+
+**PATRON, $25**
+```
+Everything I post, as I post it
+No schedule, nothing owed
+Your name in the credits on ghostline.live
+Covers real parts: a frame, LED strip, actuators
+```
+
+Two of these lines say what the page does not do, on purpose. Sitting inside a
+list of benefits, "no schedule, nothing owed" reads as the offer rather than as
+a gap, which is the whole positioning in five words.
 
 ---
 
