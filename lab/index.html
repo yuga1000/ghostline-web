@@ -257,7 +257,34 @@ document.addEventListener('DOMContentLoaded', async function() {
         .folder-about .folder-list { color: var(--text-dim); }
         .folder-about .folder-list b { color: var(--text); font-weight: 500; }
         /* ABOUT is the one folder with something behind it, so it opens */
-        .folder-about .folder-body { cursor: pointer; }
+        .folder-about .folder-body,
+        .folder.is-empty .folder-body { cursor: pointer; }
+        .folder.is-empty .folder-body:hover { border-color: var(--line-2); }
+        .folder.is-empty .folder-body.is-denied { animation: denyFlash .22s steps(1) 2; }
+        @keyframes denyFlash { 50% { background: rgba(255,85,255,.20); } }
+
+        /* clicking an empty folder gets the answer DOS would give */
+        .dos-error {
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 10040;
+          display: none;
+          min-width: 300px;
+          border: var(--bw) solid var(--accent);
+          background: #000;
+          box-shadow: 6px 6px 0 rgba(0,0,0,.85), 0 0 26px var(--glow);
+          font-family: var(--mono);
+        }
+        .dos-error.is-open { display: block; animation: errIn .12s steps(2); }
+        @keyframes errIn { from { opacity: 0; transform: translate(-50%, -50%) scaleY(.6); } }
+        .dos-error__bar { padding: 7px 11px; background: var(--accent); color: #000; font-size: 10px; letter-spacing: .16em; }
+        .dos-error__body { padding: 14px 16px 15px; }
+        .dos-error__path { color: var(--c-blue); font-size: 10px; letter-spacing: .12em; }
+        .dos-error__stat { margin-top: 5px; color: var(--text-mute); font-size: 9px; letter-spacing: .1em; }
+        .dos-error__msg { margin-top: 12px; color: var(--text); font-size: 11px; line-height: 1.6; }
+        .dos-error__keys { margin-top: 14px; color: var(--text-mute); font-size: 9px; letter-spacing: .14em; }
         .folder-about .folder-body:hover { background: rgba(255,85,255,.10); border-color: var(--line-2); }
         .folder-open {
           margin-top: auto;
@@ -383,6 +410,8 @@ document.addEventListener('DOMContentLoaded', async function() {
            stretches to match the folder column and everything else gets crushed.
            Drop the grid and stack it instead. */
         @media (max-width: 760px) {
+          .dos-error { min-width: 0; width: calc(100vw - 28px); }
+          .dos-error__msg { font-size: 10px; }
           .mystra-statement { padding: 10px; }
           .mystra-statement__window { max-height: calc(100vh - 20px); }
           .mystra-statement__body { padding: 15px; }
@@ -461,6 +490,33 @@ document.addEventListener('DOMContentLoaded', async function() {
         </div>
       `;
       files.parentNode.insertBefore(notice, files);
+
+      // Empty folders answer the way a DOS box would, then get out of the way.
+      const errorBox = document.createElement('div');
+      errorBox.className = 'dos-error';
+      errorBox.setAttribute('role', 'alert');
+      errorBox.innerHTML = `
+        <div class="dos-error__bar">READ ERROR</div>
+        <div class="dos-error__body">
+          <div class="dos-error__path" data-err-path></div>
+          <div class="dos-error__stat">0 FILES, 0 BYTES</div>
+          <p class="dos-error__msg" data-err-msg></p>
+          <div class="dos-error__keys">(A)BORT  (R)ETRY  (F)AIL</div>
+        </div>
+      `;
+      document.body.appendChild(errorBox);
+      let errorTimer;
+      const hideError = () => { clearTimeout(errorTimer); errorBox.classList.remove('is-open'); };
+      const showError = (code, title, message) => {
+        errorBox.querySelector('[data-err-path]').textContent = `MYSTRA:\\${code}\\${title}`;
+        errorBox.querySelector('[data-err-msg]').textContent = message;
+        errorBox.classList.remove('is-open');
+        void errorBox.offsetWidth;
+        errorBox.classList.add('is-open');
+        clearTimeout(errorTimer);
+        errorTimer = setTimeout(hideError, 2400);
+      };
+      errorBox.addEventListener('click', hideError);
 
       // ABOUT opens this. It is the only folder with anything behind it.
       const statement = document.createElement('div');
@@ -542,7 +598,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         setTimeout(() => { event.currentTarget.textContent = '[ COPY ADDRESS ]'; }, 1400);
       });
       document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') { closeSupport(); closeStatement(); }
+        if (event.key === 'Escape') { closeSupport(); closeStatement(); hideError(); }
       });
 
       // Folder contents. The bundled FilesGrid renders placeholder words; ABOUT gets
@@ -554,9 +610,9 @@ document.addEventListener('DOMContentLoaded', async function() {
           lines: ['<b>hexapod</b> · 6 legs · 18 actuators', 'IMU BNO085 · camera cluster', 'funding still being collected'],
           open: true
         },
-        'B.02': { hold: 'SPECS NOT PUBLISHED', eta: 'MEASURING' },
-        'C.03': { hold: 'NO DATASETS UPLOADED', eta: 'RECORDING' },
-        'D.04': { hold: 'NO DRAFT RELEASED', eta: 'WRITING' }
+        'B.02': { hold: 'SPECS NOT PUBLISHED', eta: 'MEASURING', err: 'Nothing written to this folder yet. I am still measuring the thing.' },
+        'C.03': { hold: 'NO DATASETS UPLOADED', eta: 'RECORDING', err: 'No datasets on disk. Nothing has walked far enough to record.' },
+        'D.04': { hold: 'NO DRAFT RELEASED', eta: 'WRITING', err: 'No draft on disk. It gets written once there is something to write about.' }
       };
       files.querySelectorAll('.folder').forEach(folder => {
         const id = folder.querySelector('.folder-tab')?.textContent.trim();
@@ -582,6 +638,20 @@ document.addEventListener('DOMContentLoaded', async function() {
           return;
         }
         folder.classList.add('is-empty');
+        const body = folder.querySelector('.folder-body');
+        const title = folder.querySelector('.folder-title')?.textContent.trim() || '';
+        body.setAttribute('role', 'button');
+        body.setAttribute('tabindex', '0');
+        const deny = () => {
+          body.classList.remove('is-denied');
+          void body.offsetWidth;
+          body.classList.add('is-denied');
+          showError(id, title, spec.err);
+        };
+        body.addEventListener('click', deny);
+        body.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); deny(); }
+        });
         const hold = document.createElement('div');
         hold.className = 'folder-hold';
         hold.innerHTML = `
