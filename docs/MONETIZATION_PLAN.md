@@ -162,6 +162,55 @@ fit of anything in this table.
 
 ---
 
+## 5b. NEXT AFTER PATREON: selling the animations
+
+Parked here deliberately. Do not start it until the Patreon page is published,
+but come straight back to it after, because it is the closest thing to money
+sitting unclaimed.
+
+**The situation.** Yuga already draws animations for Threads and Instagram
+continuously. They are made, posted once, and then they are gone. They cost
+nothing extra to sell, and there is no shop for them anywhere.
+
+**Open questions to settle first, before building anything:**
+
+1. **What is a unit?** A single looping GIF? A pack of five? A pack by theme?
+   Selling one loop at a time and selling a set of ten are different products
+   with different pages.
+2. **What does it cost?** Yuga's own instinct was a dollar for simple GIFs,
+   maybe five, maybe ten for the bigger ones. All three are defensible and they
+   imply different businesses:
+   - **$1 to $3.** Impulse. Needs volume and a storefront that can carry a
+     hundred items without looking empty.
+   - **$5 to $10.** The normal price for a pixel-art asset pack. Fewer sales,
+     less bookkeeping, and it does not cheapen the panels.
+   - **Pay what you want, $3 minimum.** Gumroad and itch both support it. Lets
+     the people who want to pay more do it, which on small art shops is a real
+     share of revenue.
+   Leaning toward the middle one for packs, with a couple of single loops at $1
+   as the way in. Decide with Yuga, do not assume.
+3. **What is the buyer actually getting?** Resolution, format (GIF, MP4, frame
+   sequence, sprite sheet), and crucially **what they are allowed to do with
+   it**. Personal use only, or can they put it on a stream, a shirt, a game?
+   That line decides the price more than the file size does.
+
+**What to build, in order:**
+
+1. **A page on ghostline.live.** Same DOS treatment as the panels page, a grid
+   of loops, each playing. The site already has everything needed: the video
+   handling from `panels.html`, the CGA skin, the support-links config.
+2. **Checkout.** Gumroad or Lemon Squeezy, one product per pack, link from each
+   tile. Same decision that is already pending for the panel card checkout, so
+   settle it once and use it for both.
+3. **A back catalogue.** Pull what already exists off Threads and Instagram,
+   re-export clean, and fill the page. A shop with six items reads as abandoned.
+
+**Why it fits.** It is the missing middle of the whole plan: the panels are $659
+and Patreon is $3 a month, and there is nothing in between for someone who likes
+the work and wants to own a piece of it for the price of a coffee.
+
+---
+
 ## 6. Sequence
 
 **Next 30 days — remove friction, start the recurring layer**

@@ -24,21 +24,21 @@ paid. A8 is publishing.
 > are looking for and what it does, not a pixel-perfect path. If a label reads
 > differently on your screen, go by the description.
 
-Everything the page needs is in `docs/patreon-assets/`, drawn in the same DOS
-face as the site so the Patreon and ghostline.live read as one thing:
+Everything the page needs is in `docs/patreon-assets/`. All of it is the actual
+work, shot on the panel. Nothing here is drawn to stand in for it:
 
 | File | Where it goes |
 |---|---|
-| `patreon-cover-dos-1600x400.png` | **Page cover.** CGA plate: `C:\GHOSTLINE` above the dot-matrix wordmark, `LED PANELS . MYSTRA . ART` under it |
+| `patreon-banner-1600x400.jpg` | **Page cover.** The horned frame with the horned figure lit on the matrix, cable on the left, workshop wall on the right |
 | `patreon-avatar-512.jpg` | Profile picture, the lit panel |
-| `tier-1-signal.png` | SIGNAL tier image |
-| `tier-2-witness.png` | WITNESS tier image |
-| `tier-3-patron.png` | PATRON tier image |
-| `patreon-banner-1600x400.jpg` | The photo cover, if you ever want the panel itself up there instead |
+| `tier-1-signal.jpg` | SIGNAL image: SANSARA 2 |
+| `tier-2-witness.jpg` | WITNESS image: NIGHT WALKER |
+| `tier-3-patron.jpg` | PATRON image: ORCA |
 
-The avatar stays photographic on purpose. Patreon shrinks it to a small circle
-in feeds and comment threads, and the lit panel survives that; pixel type at
-40px does not.
+The first pass at these was generated: black plates with the site's pixel face,
+TIER 1 / SIGNAL / $3, three of them identical bar the word. It looked like what
+it was. Your own frames carry LED grain, real colour and a visible matrix, and
+no drawn substitute beats that on a page asking people to fund the work.
 
 ---
 
@@ -86,7 +86,7 @@ From **Part B, section B1**:
 - Page name
 - The "is creating" line
 - Profile picture: `patreon-avatar-512.jpg`
-- Cover image: `patreon-cover-dos-1600x400.png`
+- Cover image: `patreon-banner-1600x400.jpg`
 - About section: the long text in **B2**
 
 If the uploader crops the images differently than you like, say so and I will
@@ -105,9 +105,9 @@ For each tier set:
 
 - **Name** and **monthly price** (3, 10, 25 USD)
 - **Description**: paste the block
-- **Tier image**: `tier-1-signal.png`, `tier-2-witness.png`, `tier-3-patron.png`.
-  Same CGA plates as the cover, so the tier row reads as three screens of one
-  machine.
+- **Tier image**: `tier-1-signal.jpg`, `tier-2-witness.jpg`, `tier-3-patron.jpg`.
+  Three different loops on the real panel, so the tier row is three pieces of
+  work rather than three price labels.
 - **Benefits**: if Patreon insists on a benefits list, keep it to one short line
   per tier, pulled from the block. Do not let the form talk you into inventing
   deliverables to fill the field. An empty benefits list is better than a
@@ -339,6 +339,12 @@ Panels and every other way to help: ghostline.live/support.html
 ---
 
 ## B6. After Patreon is live
+
+**First thing once it is published:** go to `MONETIZATION_PLAN.md` section 5b,
+selling the animations. That is the parked one, and it is the nearest money.
+
+Then:
+
 
 1. Mirror the same three tiers on **Boosty** for cards Patreon will not take. Ask
    me for the Russian copy, it should not be a literal translation.
