@@ -237,13 +237,21 @@ Hey. Thank you for being here, genuinely.
 
 I will keep this short, you have things to do.
 
-I have been drawing by hand for eighteen years. I went through a lot of directions and got decent at oil, acrylic and watercolour, and I spent a long stretch on frame by frame animation, drawing every frame the slow way. Then I started experimenting with robots. Then with screens, and that is mostly where I am now.
+I have been drawing by hand for eighteen years. I went through a lot of directions and got decent at oil, acrylic and watercolour, and I spent a long stretch on frame by frame animation, drawing every frame the slow way.
 
-So it comes down to two things, and they are what this page is for.
+And then I burned out. Badly. For a while I thought I was done making art at all.
 
-The first is the LED panels. A hand-made frame with a matrix behind it, playing animation I draw pixel by pixel. Every one is built by hand, one at a time, in a workshop full of cable. The video up there is the real thing in the room where it was made.
+Nothing was moving. Social media did not work for me, commissions did not come. I tried everything I could think of: tattoos, videography, animation, paintings, hand-customised clothing, one direction after another, and all of it stalled.
 
-The second is MYSTRA. A walking robot. Six legs, eighteen actuators. It is nowhere near done, and I am building it in the open, so you will see it while it is still wrong.
+Then one thing came alive on its own, and it was not the one I expected. Threads. I started posting animation there and people actually looked. But a post there is animation on a phone screen, and I wanted to see it as an object in a room.
+
+So I put the animation on a P2.5 LED panel. Something about it landed in a way nothing else had.
+
+That is what this page is for now, and there are two halves to it.
+
+The panels. A hand-made frame with a matrix behind it, playing animation I draw pixel by pixel. Every one built by hand, one at a time, in a workshop full of cable. The video up there is the real thing in the room where it was made.
+
+And MYSTRA. A walking robot. Six legs, eighteen actuators. It is nowhere near done, and I am building it in the open, so you will see it while it is still wrong.
 
 Why I am making it, I honestly cannot tell you for certain. Discoveries tend to come out of the process itself, and especially out of a process with no commercial pressure on it and no audience to please. I make art, and I treat this as art too. If it does not sit right, it is not done.
 
@@ -296,20 +304,20 @@ Still no bonus content, still nothing asked of you. I am just very glad you are 
 
 ## B4. The two launch posts
 
-**Post 1, public.** Attach `assets/led-panels/video/panel-in-situ.mp4`.
+**Post 1, public.** The P2.5 panel clip.
 
 ```
-Title: THE PANEL
+Title: P2.5 PANEL
 
-Here is the object.
+After eighteen years of art I burned out completely. For a while I thought I was done making things at all.
 
-42 by 42 centimetres. A frame carved as one full shape, an LED matrix behind it playing an animation I drew frame by frame.
+Nothing was moving. Social media did not work for me, commissions did not come. I tried everything I could think of: tattoos, videography, animation, paintings, hand-customised clothing, one direction after another, and all of it stalled.
 
-Shot on the bench it was built on. No post, no render, no set. The cable is where the cable was.
+Then one thing came alive on its own, and it was not the one I expected. Threads. I started posting animation there and people actually looked. But a post there is animation on a phone screen, and I wanted to see it as an object in a room.
 
-It hangs on a wall and does this all day.
+So I put the animation on a P2.5 LED panel.
 
-If you want one: ghostline.live/panels.html
+This is it. Something about it landed in a way nothing else had, so this is the direction I am going now.
 ```
 
 **Post 2, public.** Attach `lab/assets/mystra-rotate.gif`, or better, a photo of
