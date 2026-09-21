@@ -273,7 +273,7 @@ The size that actually moves a build forward.
 
 A month at this tier is a frame, or a run of LED strip, or a set of actuators that were not in the budget. Your name in the credits, and my genuine thanks.
 
-Still no bonus content. Still nothing asked of you. You are funding art, and a new form of life, and that is the point.
+Still no bonus content. Still nothing asked of you. You are funding art, and a new form of life.
 ```
 
 ---
