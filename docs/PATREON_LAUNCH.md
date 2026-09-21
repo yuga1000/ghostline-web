@@ -62,19 +62,20 @@ Find the **custom URL / vanity URL / page address** field in the page settings.
 Right now `patreon.com/Yuga1000` bounces to `/profile?u=184759122`, the fallback
 for a page with no published address of its own.
 
-Set it to match the site:
+**`ghostline` is already taken** by someone else, checked 2026-09-21. Free as of
+that check:
 
 ```
-ghostline
-```
-
-If taken, in order of preference:
-
-```
-ghostlinesystem
-ghostline_os
+ghostlineos        <- matches the GHOSTLINE_OS in the site header
+ghostlinesystem    <- matches the contact address
 yugaghostline
 ```
+
+`ghostlineos` over `ghostline_os`: underscores are not reliably allowed in
+vanity URLs, and it reads the same.
+
+Set it once, now, before the address is announced anywhere. Changing it later
+breaks every link already in the wild.
 
 **Send me whichever one you get.** One line changes in `js/support-links.js` and
 it propagates across the whole site by itself.
