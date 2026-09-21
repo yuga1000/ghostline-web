@@ -31,7 +31,7 @@ window.GHOSTLINE_SUPPORT = {
       name: "PATREON.SUB",
       type: "MONTHLY",
       url: "https://www.patreon.com/Yuga1000",
-      copy: "Patronage. No bonus content, no schedule. You fund the work itself.",
+      copy: "Patronage. No bonus content, no schedule. The money goes into the work.",
       go: "[ SUBSCRIBE ]"
     },
     {

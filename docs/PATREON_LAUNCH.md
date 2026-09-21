@@ -199,7 +199,7 @@ Not launch day:
 
 Ready to paste. English, to match the site and the socials it gets announced on.
 Say the word and I will write the Russian version for Boosty, which wants a
-different tone anyway rather than a literal translation.
+different tone, not a straight translation.
 
 ## B1. Page identity
 
@@ -215,7 +215,7 @@ art that runs on light, and a new form of life
 
 **Short intro under the banner**
 ```
-One person, no studio. LED panels that play hand-drawn animation, and a walking robot being built in the open. No bonus content, no schedule. You are funding the work itself.
+One person, no studio. LED panels that play animation I draw by hand, and a walking robot I am building in the open.
 ```
 
 ---
@@ -225,26 +225,25 @@ One person, no studio. LED panels that play hand-drawn animation, and a walking 
 ```
 I make art objects that run on light.
 
-The main one is an LED panel in a hand-made frame. It hangs on a wall and plays an animation I drew frame by frame, pixel by pixel. Every panel is built by hand, one at a time. The video on this page is the real object in the room it was built in, not a render.
+The main one is an LED panel in a hand-made frame. It hangs on a wall and plays an animation I drew frame by frame, pixel by pixel. Every panel is built by hand, one at a time. The video on this page is the real thing in the room where it was made.
 
-The other one is MYSTRA. A walking robot. Six legs, eighteen actuators. It is not finished. I am building it in the open, which means you get to see it while it is still wrong.
+The other one is MYSTRA. A walking robot. Six legs, eighteen actuators. It is nowhere near done. I am building it in the open, so you get to see it while it is still wrong.
 
-I work alone and there is a great deal of it. Drawing, welding, soldering, cutting frames, writing the code, shooting the footage, answering the mail. No studio, no team, no publisher, no investor.
+I work alone and there is a lot of it. Drawing, welding, soldering, cutting frames, writing the code, shooting the footage, answering the mail. No studio, no team, nobody paying for any of it.
 
-So here is the honest offer, and it is the whole offer:
+So here is what this page is, and it is short.
 
-There is no bonus content. No hidden extras, no members-only vault, no post every Tuesday. I do not think that is what this should be, and I would rather spend that time on the work.
+There is no bonus content. No hidden extras, no members-only vault, no post every Tuesday. I would rather put that time into the work.
 
-What you are supporting is the development of art, and of a new form of life.
+What you are backing is art, and a new form of life.
 
-That is it. If it sounds worth something to you, put in whatever feels right. A patron at three dollars and a patron at twenty-five see exactly the same page, and both keep the same thing alive.
+If that sounds worth something to you, put in whatever feels right. Three dollars and twenty-five dollars get you the same page. Both keep the same thing running.
 
-I post when there is something worth showing. Some months that is a lot. Some months I am just welding.
+I post when there is something to show. Some months that is a lot. Some months I am just welding.
 
-If you want an actual object, the panels are at ghostline.live/panels.html.
-If you just want this to keep existing, you are already in the right place.
+Panels are at ghostline.live/panels.html if you want an actual object.
 
-Thank you for being here. I mean that.
+Thank you for being here.
 ```
 
 ---
@@ -257,23 +256,23 @@ You are in.
 
 No bonus content, no schedule, nothing owed. There is nothing here you are buying.
 
-You are keeping the work alive, and that is the entire tier.
+You are keeping the work running, and that is enough.
 ```
 
 ### Tier 2. **WITNESS** · $10/month
 ```
-The same page, the same posts, the same nothing owed.
+Same page, same posts, same nothing owed.
 
-The difference is size. This is a real contribution to a month of work, and your name goes in the credits on ghostline.live so it is not invisible.
+The difference is size. Ten dollars is a real piece of a month, so your name goes in the credits on ghostline.live where people can see it.
 ```
 
 ### Tier 3. **PATRON** · $25/month
 ```
-The size that actually moves a build forward.
+The size that actually moves a build along.
 
-A month at this tier is a frame, or a run of LED strip, or a set of actuators that were not in the budget. Your name in the credits, and my genuine thanks.
+A month here is a frame, or a run of LED strip, or the actuators that were not in the budget. Your name in the credits, and my thanks.
 
-Still no bonus content. Still nothing asked of you. You are funding art, and a new form of life.
+Still no bonus content, still nothing asked of you.
 ```
 
 ---
@@ -285,11 +284,11 @@ Still no bonus content. Still nothing asked of you. You are funding art, and a n
 ```
 Title: THE PANEL
 
-This is the object.
+Here is the object.
 
 42 by 42 centimetres. A frame carved as one full shape, an LED matrix behind it playing an animation I drew frame by frame.
 
-Shot in the workshop where it was made. No post, no render, no set. The cable on the floor is where the cable was.
+Shot on the bench it was built on. No post, no render, no set. The cable is where the cable was.
 
 It hangs on a wall and does this all day.
 
@@ -304,7 +303,7 @@ Title: MYSTRA
 
 This is MYSTRA. A walking robot. Six legs, eighteen actuators, an IMU and a camera cluster.
 
-It is not finished, and I am not going to pretend otherwise. I am building it in the open, so the failures go up here too.
+It is nowhere near done and I am not going to pretend otherwise. I am building it in the open, so the failures go up here too.
 
 I do not know when it will walk. I am going to keep going until it does.
 ```
@@ -319,13 +318,13 @@ Telegram, YouTube community, Pinterest, Zora.
 ```
 I opened a Patreon.
 
-I make LED panels that play animations I draw by hand, and I am building a walking robot. One person, no studio, no publisher, and a lot of work.
+I make LED panels that play animation I draw by hand, and I am building a walking robot. One person, no studio, and a lot of work.
 
-No bonus content, no tiers full of promises, no posting schedule. It is patronage, plain: you are funding the development of art, and of a new form of life.
+No bonus content, no tiers full of promises, no posting schedule. If you want the work to keep running you can back it, and that is the whole thing.
 
 patreon.com/<your url>
 
-Panels, and every other way to support: ghostline.live/support.html
+Panels and every other way to help: ghostline.live/support.html
 ```
 
 ---
