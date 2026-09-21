@@ -233,42 +233,40 @@ Eighteen years of drawing by hand, now on LED panels. And a walking robot I am b
 ## B2. About page
 
 ```
-Hey. Thank you for being here, genuinely.
+Hey. Thanks for being here.
 
-I will keep this short, you have things to do.
+I'll keep it short.
 
-I have been drawing by hand for eighteen years. I went through a lot of directions and got decent at oil, acrylic and watercolour, and I spent a long stretch on frame by frame animation, drawing every frame the slow way.
+I've been drawing by hand for 18 years. Oil, acrylic, watercolour, and a long stretch of frame by frame animation, drawing every single frame.
 
-And then I burned out. Badly. For a while I thought I was done making art at all.
+Then I burned out. I thought I was done with art.
 
-Nothing was moving. Social media did not work for me, commissions did not come. I tried everything I could think of: tattoos, videography, animation, paintings, hand-customised clothing, one direction after another, and all of it stalled.
+Nothing worked. Social media didn't work for me, commissions didn't come. I tried tattoos, videography, animation, paintings, custom clothing by hand. None of it went anywhere.
 
-Then one thing came alive on its own, and it was not the one I expected. Threads. I started posting animation there and people actually looked. But a post there is animation on a phone screen, and I wanted to see it as an object in a room.
+Then Threads started working. I have no idea why. I posted animation there and people watched. But it's animation on a phone, and I wanted to see it for real. So I put it on a P2.5 LED panel, and it clicked.
 
-So I put the animation on a P2.5 LED panel. Something about it landed in a way nothing else had.
+That's what this page is about. Two things.
 
-That is what this page is for now, and there are two halves to it.
+The panels. A frame I make by hand with an LED matrix in it, playing animation I draw pixel by pixel. One at a time, in a room full of cable. The video up there is the real thing, where it was made.
 
-The panels. A hand-made frame with a matrix behind it, playing animation I draw pixel by pixel. Every one built by hand, one at a time, in a workshop full of cable. The video up there is the real thing in the room where it was made.
+And MYSTRA. A walking robot. Six legs, eighteen actuators. Nowhere near done. I'm building it out in the open so you'll see it while it's still wrong.
 
-And MYSTRA. A walking robot. Six legs, eighteen actuators. It is nowhere near done, and I am building it in the open, so you will see it while it is still wrong.
+Why I'm making it I can't really say. Things tend to come out of the process itself, especially when there's no money pressure and nobody to please. I make art and I treat this as art too. If it doesn't sit right it's not done.
 
-Why I am making it, I honestly cannot tell you for certain. Discoveries tend to come out of the process itself, and especially out of a process with no commercial pressure on it and no audience to please. I make art, and I treat this as art too. If it does not sit right, it is not done.
+Nature is full of insects and everything comes out of nature anyway. I think these machines will surprise people the way the first train did.
 
-Nature is already full of insects, and everything comes out of nature anyway. I think machines like this will surprise people the way the first train did.
+I work alone and there's a lot of it. Drawing, welding, soldering, cutting frames, writing the code, shooting the video, answering mail. No studio, no team, nobody paying for any of it.
 
-I work alone, and there is a lot of it. Drawing, welding, soldering, cutting frames, writing the code, shooting the footage, answering the mail. No studio, no team, nobody funding any of this.
+So this page is simple and I'll be straight with you.
 
-So this page is simple, and I want to be straight with you about what it is.
+There's no bonus content. No hidden vault, no post every Tuesday, no rewards made up to justify a price. I'd rather put that time into the work.
 
-There is no bonus content here. No hidden vault, no post every Tuesday, no rewards invented to justify a price. I would rather put that time into the work itself.
+What you're backing is the art, and a new form of life.
 
-What you are backing is the art, and a new form of life.
+I know it's a lot to ask. There are plenty of people making good things who probably deserve it more than me. Whatever you decide, or if you decide nothing, thanks for looking.
 
-I know it is a lot to ask. There are plenty of people making good things who probably deserve your support more than I do. Whatever you decide, and whether you decide anything at all, thank you for looking at this.
-
-If you want an actual object, the panels are at ghostline.live/panels.html.
-If you just want this to keep going, you are already in the right place.
+Panels are at ghostline.live/panels.html if you want an actual object.
+If you just want this to keep going, you're already in the right place.
 ```
 
 ---
@@ -277,9 +275,9 @@ If you just want this to keep going, you are already in the right place.
 
 ### Tier 1. **SIGNAL** · $3/month
 ```
-You are in, and that is the whole thing.
+You're in. That's it.
 
-No bonus content, no schedule, nothing you have to keep up with. You are keeping the work running, and honestly that is enough.
+No bonus content, no schedule, nothing you have to keep up with. You're keeping the work going, and that's enough.
 
 Thank you.
 ```
@@ -288,16 +286,16 @@ Thank you.
 ```
 Same page, same posts, same nothing owed.
 
-The difference is size. Ten dollars is a real piece of a month here, so your name goes into the credits on ghostline.live. I would like people to see who is holding this up.
+Just bigger. Ten dollars is a real piece of a month here, so your name goes in the credits on ghostline.live. I want people to see who's holding this up.
 ```
 
 ### Tier 3. **PATRON** · $25/month
 ```
 This is the size that actually moves a build along.
 
-A month at this tier is a frame, or a run of LED strip, or the actuators that were not in the budget. Your name in the credits, and my thanks.
+A month here is a frame, or a run of LED strip, or the actuators that weren't in the budget. Your name in the credits, and my thanks.
 
-Still no bonus content, still nothing asked of you. I am just very glad you are here.
+Still no bonus content, still nothing asked of you. I'm just really glad you're here.
 ```
 
 ---
@@ -309,15 +307,15 @@ Still no bonus content, still nothing asked of you. I am just very glad you are 
 ```
 Title: P2.5 PANEL
 
-After eighteen years of art I burned out completely. For a while I thought I was done making things at all.
+After 18 years of art I burned out. Properly. I thought I was done with it.
 
-Nothing was moving. Social media did not work for me, commissions did not come. I tried everything I could think of: tattoos, videography, animation, paintings, hand-customised clothing, one direction after another, and all of it stalled.
+Nothing worked. Social media didn't work for me, commissions didn't come. I tried tattoos, videography, animation, paintings, custom clothing by hand. Everything I could think of. None of it went anywhere.
 
-Then one thing came alive on its own, and it was not the one I expected. Threads. I started posting animation there and people actually looked. But a post there is animation on a phone screen, and I wanted to see it as an object in a room.
+Then Threads started working. I have no idea why. I posted animation there and people watched.
 
-So I put the animation on a P2.5 LED panel.
+But it's animation on a phone. I wanted to see it for real, so I put it on a P2.5 panel.
 
-This is it. Something about it landed in a way nothing else had, so this is the direction I am going now.
+This is that. It clicked, so this is what I'm doing now.
 ```
 
 **Post 2, public.** Attach `lab/assets/mystra-rotate.gif`, or better, a photo of
@@ -328,9 +326,9 @@ Title: MYSTRA
 
 This is MYSTRA. A walking robot. Six legs, eighteen actuators, an IMU and a camera cluster.
 
-It is nowhere near done and I am not going to pretend otherwise. I am building it in the open, so the failures go up here too.
+It's nowhere near done and I'm not going to pretend otherwise. I'm building it out in the open, so the failures go up here too.
 
-I do not know when it will walk. I am going to keep going until it does.
+I don't know when it'll walk. I'm going to keep going until it does.
 ```
 
 ---
