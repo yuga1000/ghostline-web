@@ -24,12 +24,21 @@ paid. A8 is publishing.
 > are looking for and what it does, not a pixel-perfect path. If a label reads
 > differently on your screen, go by the description.
 
-Images are already cut from the workshop capture, in `docs/patreon-assets/`:
+Everything the page needs is in `docs/patreon-assets/`, drawn in the same DOS
+face as the site so the Patreon and ghostline.live read as one thing:
 
 | File | Where it goes |
 |---|---|
-| `patreon-banner-1600x400.jpg` | Page cover / banner |
-| `patreon-avatar-512.jpg` | Profile picture |
+| `patreon-cover-dos-1600x400.png` | **Page cover.** CGA plate: `C:\GHOSTLINE` above the dot-matrix wordmark, `LED PANELS . MYSTRA . ART` under it |
+| `patreon-avatar-512.jpg` | Profile picture, the lit panel |
+| `tier-1-signal.png` | SIGNAL tier image |
+| `tier-2-witness.png` | WITNESS tier image |
+| `tier-3-patron.png` | PATRON tier image |
+| `patreon-banner-1600x400.jpg` | The photo cover, if you ever want the panel itself up there instead |
+
+The avatar stays photographic on purpose. Patreon shrinks it to a small circle
+in feeds and comment threads, and the lit panel survives that; pixel type at
+40px does not.
 
 ---
 
@@ -77,7 +86,7 @@ From **Part B, section B1**:
 - Page name
 - The "is creating" line
 - Profile picture: `patreon-avatar-512.jpg`
-- Cover image: `patreon-banner-1600x400.jpg`
+- Cover image: `patreon-cover-dos-1600x400.png`
 - About section: the long text in **B2**
 
 If the uploader crops the images differently than you like, say so and I will
@@ -96,9 +105,9 @@ For each tier set:
 
 - **Name** and **monthly price** (3, 10, 25 USD)
 - **Description**: paste the block
-- **Tier image**: a still from a different loop for each, so the three read as
-  three different objects. Tell me which loop for which tier and I will export
-  the stills.
+- **Tier image**: `tier-1-signal.png`, `tier-2-witness.png`, `tier-3-patron.png`.
+  Same CGA plates as the cover, so the tier row reads as three screens of one
+  machine.
 - **Benefits**: if Patreon insists on a benefits list, keep it to one short line
   per tier, pulled from the block. Do not let the form talk you into inventing
   deliverables to fill the field. An empty benefits list is better than a
