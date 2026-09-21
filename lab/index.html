@@ -163,6 +163,47 @@ document.addEventListener('DOMContentLoaded', async function() {
       window.Babel.transformScriptTags();
     }
 
+    // Repaint first, before the boot sequence draws: the install below waits on
+    // .files-block, which does not exist until the boot finishes.
+    const palette = document.createElement('style');
+    palette.textContent = `
+        /* CGA mode 1 repaint. The bundled theme is amber; this overrides the
+           variables it is built on, so every part of the dashboard follows.
+           Blue belongs to the support and panels pages, so MYSTRA gets the
+           other iconic DOS palette: black, magenta, cyan, white. */
+        :root {
+          --accent:     #ff55ff;
+          --accent-dim: #aa00aa;
+          --glow:       rgba(255,85,255,.28);
+          --line:       rgba(255,85,255,.45);
+          --line-2:     rgba(255,85,255,.70);
+          --text:       #ffffff;
+          --text-dim:   #aaaaaa;
+          --text-mute:  #aa00aa;
+          --c-blue:     #55ffff;
+          --c-green:    #ffffff;
+          --c-red:      #ff55ff;
+          --c-amber-bright: #ff99ff;
+        }
+        .shell.has-grid::before {
+          background-image:
+            radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,85,255,.20) 0, transparent 240px),
+            radial-gradient(circle at top left, rgba(255,85,255,.50) 1.3px, transparent 2.4px),
+            linear-gradient(0deg,  rgba(255,85,255,.10) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,85,255,.10) 1px, transparent 1px);
+        }
+        .model-grid {
+          background:
+            linear-gradient(to right, rgba(85,255,255,.30) 1px, transparent 1px) 0 0 / 28px 28px,
+            linear-gradient(to bottom, rgba(85,255,255,.30) 1px, transparent 1px) 0 0 / 28px 28px;
+        }
+        .tb-btc .btc-chg.is-up { color: var(--c-blue); }
+        .tb-btc .btc-chg.is-dn { color: #ff55ff; }
+        /* the rotation GIF is baked green; CGA mode 1 has no green, so shift it to cyan */
+        .model-gif { filter: brightness(1.3) contrast(1.1) hue-rotate(62deg); }
+    `;
+    document.head.appendChild(palette);
+
     // MYSTRA content is bundled below; keep the public reconstruction notice
     // in the loader so it is easy to update while the archive is being built.
     const installMystraReconstruction = () => {
@@ -199,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           padding: 12px 10px;
           background-image: repeating-linear-gradient(
             -45deg,
-            rgba(255,177,66,.07) 0 6px,
+            rgba(255,85,255,.09) 0 6px,
             transparent 6px 14px
           );
         }
@@ -215,6 +256,71 @@ document.addEventListener('DOMContentLoaded', async function() {
         @keyframes holdBlink { 50% { opacity: 0; } }
         .folder-about .folder-list { color: var(--text-dim); }
         .folder-about .folder-list b { color: var(--text); font-weight: 500; }
+        /* ABOUT is the one folder with something behind it, so it opens */
+        .folder-about .folder-body { cursor: pointer; }
+        .folder-about .folder-body:hover { background: rgba(255,85,255,.10); border-color: var(--line-2); }
+        .folder-open {
+          margin-top: auto;
+          padding-top: 10px;
+          color: var(--accent);
+          font-size: 9px;
+          letter-spacing: .16em;
+        }
+        .folder-about .folder-body:hover .folder-open { color: #000; background: var(--accent); align-self: flex-start; padding: 2px 6px; }
+
+        .mystra-statement { position: fixed; inset: 0; z-index: 10030; display: none; place-items: center; padding: 20px; }
+        .mystra-statement.is-open { display: grid; }
+        .mystra-statement__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.90); }
+        .mystra-statement__window {
+          position: relative;
+          width: min(680px, 100%);
+          max-height: calc(100vh - 40px);
+          overflow: auto;
+          border: var(--bw) solid var(--accent);
+          background: #000;
+          box-shadow: 8px 8px 0 rgba(0,0,0,.8), 0 0 34px var(--glow);
+        }
+        .mystra-statement__bar {
+          position: sticky;
+          top: 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 9px 12px;
+          background: var(--accent);
+          color: #000;
+          font-family: var(--mono);
+          font-size: 10px;
+          letter-spacing: .14em;
+        }
+        .mystra-statement__close { padding: 3px 8px; background: #000; color: var(--accent); font-size: 9px; }
+        .mystra-statement__close:hover { background: var(--c-blue); color: #000; }
+        .mystra-statement__body { padding: 22px; font-family: var(--mono); }
+        .mystra-statement__status {
+          margin-bottom: 18px;
+          padding: 9px 11px;
+          border: 1px solid var(--c-blue);
+          color: var(--c-blue);
+          font-size: 9px;
+          line-height: 1.7;
+          letter-spacing: .1em;
+        }
+        .mystra-statement__body p { margin: 0 0 15px; color: var(--text-dim); font-size: 11px; line-height: 1.95; }
+        .mystra-statement__body p:last-of-type { margin-bottom: 0; }
+        .mystra-statement__body p.lead { color: #fff; }
+        .mystra-statement__foot {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px solid var(--line);
+        }
+        .mystra-statement__action { min-height: 34px; padding: 8px 11px; background: var(--accent); color: #000; font-size: 9px; letter-spacing: .1em; }
+        .mystra-statement__action:hover { background: var(--c-blue); }
+        .mystra-statement__action.is-muted { background: transparent; border: 1px solid var(--line); color: var(--text-dim); }
+        .mystra-statement__action.is-muted:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
 
         .mystra-reconstruction__actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .mystra-reconstruction {
@@ -224,7 +330,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           align-items: center;
           padding: 13px 15px;
           border: var(--bw) solid var(--line);
-          background: linear-gradient(90deg, rgba(255,177,66,.10), rgba(0,0,0,.72) 48%);
+          background: linear-gradient(90deg, rgba(255,85,255,.13), rgba(0,0,0,.72) 48%);
           font-family: var(--mono);
         }
         .mystra-reconstruction__label { color: var(--accent); font-size: 10px; letter-spacing: .14em; }
@@ -242,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           letter-spacing: .11em;
           white-space: nowrap;
         }
-        .mystra-reconstruction__support:hover { background: rgba(255,177,66,.11); box-shadow: 0 0 16px var(--glow); }
+        .mystra-reconstruction__support:hover { background: rgba(255,85,255,.14); box-shadow: 0 0 16px var(--glow); }
         .mystra-support-modal { position: fixed; inset: 0; z-index: 10020; display: none; place-items: center; padding: 18px; }
         .mystra-support-modal.is-open { display: grid; }
         .mystra-support-modal__backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.88); }
@@ -257,7 +363,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         .mystra-support-modal__warning { margin: 10px 0 0; color: var(--c-red); font-size: 9px; line-height: 1.55; letter-spacing: .06em; }
         .mystra-support-modal__actions { display: flex; flex-wrap: wrap; gap: 8px; }
         .mystra-support-modal__action { min-height: 34px; padding: 7px 10px; border: 1px solid var(--accent); color: var(--accent); font-size: 9px; letter-spacing: .1em; }
-        .mystra-support-modal__action:hover { background: rgba(255,177,66,.11); }
+        .mystra-support-modal__action:hover { background: rgba(255,85,255,.14); }
         .mystra-support-modal__contact { border-color: var(--line); color: var(--text-dim); }
         .files-block { flex: 1; min-height: 0; }
 
@@ -277,6 +383,11 @@ document.addEventListener('DOMContentLoaded', async function() {
            stretches to match the folder column and everything else gets crushed.
            Drop the grid and stack it instead. */
         @media (max-width: 760px) {
+          .mystra-statement { padding: 10px; }
+          .mystra-statement__window { max-height: calc(100vh - 20px); }
+          .mystra-statement__body { padding: 15px; }
+          .mystra-statement__body p { font-size: 10px; line-height: 1.85; }
+          .mystra-statement__action { flex: 1 1 auto; text-align: center; }
           .topbar .tb-row-1 { flex-wrap: wrap; height: auto; padding: 8px 14px; gap: 6px; }
           .topbar .tb-row-2 { padding: 0 14px; overflow-x: auto; scrollbar-width: none; }
           .topbar .tb-row-2::-webkit-scrollbar { display: none; }
@@ -351,6 +462,37 @@ document.addEventListener('DOMContentLoaded', async function() {
       `;
       files.parentNode.insertBefore(notice, files);
 
+      // ABOUT opens this. It is the only folder with anything behind it.
+      const statement = document.createElement('div');
+      statement.className = 'mystra-statement';
+      statement.setAttribute('role', 'dialog');
+      statement.setAttribute('aria-modal', 'true');
+      statement.setAttribute('aria-label', 'About MYSTRA');
+      statement.innerHTML = `
+        <button class="mystra-statement__backdrop" type="button" aria-label="Close" data-statement-close></button>
+        <div class="mystra-statement__window">
+          <div class="mystra-statement__bar">
+            <span>A.01 \\ ABOUT.TXT</span>
+            <button class="mystra-statement__close" type="button" data-statement-close>[ CLOSE ]</button>
+          </div>
+          <div class="mystra-statement__body">
+            <div class="mystra-statement__status">STATUS // FUNDING STILL BEING COLLECTED. THE BUILD MOVES AT THE SPEED OF THE MONEY.</div>
+            <p class="lead">The idea is a hexapod on actuators. Six legs, eighteen of them, an IMU and a camera cluster.</p>
+            <p>What it is for, I cannot tell you for certain. That is not evasion, it is the method. Discoveries tend to arrive out of the process itself, and especially out of a process that is not commercial and is not trying to please an audience.</p>
+            <p>I make art, and I treat this the same way. Everything has to sit in harmony or it is not finished.</p>
+            <p>Nature is already full of insects, and everything comes out of nature in the end. I think machines like this will surprise us the way the first train surprised the people who watched it arrive.</p>
+            <div class="mystra-statement__foot">
+              <a class="mystra-statement__action" href="https://ghostline.live/support.html">[ SUPPORT THE BUILD ]</a>
+              <button class="mystra-statement__action is-muted" type="button" data-statement-close>[ CLOSE ]</button>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(statement);
+      const openStatement = () => statement.classList.add('is-open');
+      const closeStatement = () => statement.classList.remove('is-open');
+      statement.querySelectorAll('[data-statement-close]').forEach(button => button.addEventListener('click', closeStatement));
+
       const supportModal = document.createElement('div');
       supportModal.className = 'mystra-support-modal';
       supportModal.setAttribute('role', 'dialog');
@@ -400,7 +542,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         setTimeout(() => { event.currentTarget.textContent = '[ COPY ADDRESS ]'; }, 1400);
       });
       document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') closeSupport();
+        if (event.key === 'Escape') { closeSupport(); closeStatement(); }
       });
 
       // Folder contents. The bundled FilesGrid renders placeholder words; ABOUT gets
@@ -409,7 +551,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       // never changes and the reconciler never touches these nodes again.
       const FOLDERS = {
         'A.01': {
-          lines: ['<b>hexapod</b> · 6 legs · 18 actuators', 'IMU BNO085 · camera cluster', 'built and documented in the open']
+          lines: ['<b>hexapod</b> · 6 legs · 18 actuators', 'IMU BNO085 · camera cluster', 'funding still being collected'],
+          open: true
         },
         'B.02': { hold: 'SPECS NOT PUBLISHED', eta: 'MEASURING' },
         'C.03': { hold: 'NO DATASETS UPLOADED', eta: 'RECORDING' },
@@ -423,6 +566,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (spec.lines) {
           folder.classList.add('folder-about');
           list.innerHTML = spec.lines.map(line => `<li>· ${line}</li>`).join('');
+          if (spec.open) {
+            const body = folder.querySelector('.folder-body');
+            const hint = document.createElement('div');
+            hint.className = 'folder-open';
+            hint.textContent = '[ OPEN ]';
+            body.appendChild(hint);
+            body.setAttribute('role', 'button');
+            body.setAttribute('tabindex', '0');
+            body.addEventListener('click', () => openStatement());
+            body.addEventListener('keydown', event => {
+              if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openStatement(); }
+            });
+          }
           return;
         }
         folder.classList.add('is-empty');
@@ -434,6 +590,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         `;
         list.replaceWith(hold);
       });
+
+      // The bundled app writes --accent, --accent-dim, --glow and --bg inline on
+      // <html> from its own PALETTES map, and an inline declaration beats the
+      // stylesheet above no matter how late it is appended. Assert the CGA values
+      // here, and put them back if a re-render reapplies amber.
+      const CGA = {
+        '--accent': '#ff55ff',
+        '--accent-dim': '#aa00aa',
+        '--glow': 'rgba(255,85,255,.28)',
+        '--bg': '#000000'
+      };
+      const applyCGA = () => {
+        Object.entries(CGA).forEach(([name, value]) => {
+          if (document.documentElement.style.getPropertyValue(name) !== value) {
+            document.documentElement.style.setProperty(name, value);
+          }
+        });
+      };
+      applyCGA();
+      new MutationObserver(applyCGA).observe(document.documentElement, { attributeFilter: ['style'] });
 
       const hidden = ['POLAROIDS', 'ORDER', 'MARKET', 'STREAM'];
       document.querySelectorAll('.tb-link').forEach(link => {
