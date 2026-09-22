@@ -31,9 +31,12 @@ work, shot on the panel. Nothing here is drawn to stand in for it:
 |---|---|
 | `patreon-banner-1600x400.jpg` | **Page cover.** The horned frame with the horned figure lit on the matrix, cable on the left, workshop wall on the right |
 | `patreon-avatar-512.jpg` | Profile picture, the lit panel |
-| `tier-1-signal.jpg` | SIGNAL image: SANSARA 2 |
-| `tier-2-witness.jpg` | WITNESS image: NIGHT WALKER |
-| `tier-3-patron.jpg` | PATRON image: ORCA |
+| `tier-cover-1-sansara.jpg` | Tier cover, 920x400 for Patreon's 460x200 slot |
+| `tier-cover-2-nightwalker.jpg` | Tier cover |
+| `tier-cover-3-orca.jpg` | Tier cover |
+| `tier-1-signal.jpg` | Square versions, if a square slot turns up |
+| `tier-2-witness.jpg` | |
+| `tier-3-patron.jpg` | |
 
 The first pass at these was generated: black plates with the site's pixel face,
 TIER 1 / SIGNAL / $3, three of them identical bar the word. It looked like what
@@ -108,7 +111,14 @@ For each tier set:
 - **Description**: paste the block
 - **Tier image**: `tier-1-signal.jpg`, `tier-2-witness.jpg`, `tier-3-patron.jpg`.
   Three different loops on the real panel, so the tier row is three pieces of
-  work rather than three price labels.
+  work rather than three price labels. **The tier editor asks for 460x200, not
+  a square**, so use the `tier-cover-*.jpg` files. They are 920x400, double
+  size, which keeps them sharp on a retina screen.
+
+> **Free trials lock the price.** The tier editor shows the monthly price greyed
+> out with "Tier price can't be changed while free trials are enabled and while
+> any free trial is still active." Turn free trials off first if the number is
+> wrong, then set it.
 - **Benefits**: fill these in, they matter more than I first said. The bullets
   under "What's included" on the membership cards come from this field, not from
   the description. A card with an empty list next to other creators' full ones
