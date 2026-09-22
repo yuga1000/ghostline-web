@@ -306,36 +306,31 @@ Still no bonus content, still nothing asked of you. I'm just really glad you're 
 
 ## B3a. Tier benefits
 
-These are the bullets on the membership cards. Short lines, one per benefit.
-Patreon keeps a shared list, so once a line exists you can attach it to more
-than one tier rather than retyping it.
+The bullets on the membership cards. Flat and plain, the way a list reads.
 
 **SIGNAL, $3**
 ```
-Everything I post, as I post it
-No schedule, nothing owed
-You keep the work running
+All posts
+No schedule, I post when there is something
 ```
 
 **WITNESS, $10**
 ```
-Everything I post, as I post it
-No schedule, nothing owed
+All posts
+No schedule, I post when there is something
 Your name in the credits on ghostline.live
-A real piece of a month of work
 ```
 
 **PATRON, $25**
 ```
-Everything I post, as I post it
-No schedule, nothing owed
+All posts
+No schedule, I post when there is something
 Your name in the credits on ghostline.live
-Covers real parts: a frame, LED strip, actuators
+Buys actual parts: frames, LED strip, actuators
 ```
 
-Two of these lines say what the page does not do, on purpose. Sitting inside a
-list of benefits, "no schedule, nothing owed" reads as the offer rather than as
-a gap, which is the whole positioning in five words.
+Patreon keeps a shared list, so a line written once can be attached to several
+tiers instead of retyped.
 
 ---
 
