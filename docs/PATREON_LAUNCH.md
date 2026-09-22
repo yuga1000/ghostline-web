@@ -287,30 +287,23 @@ If you just want this to keep going, you're already in the right place.
 
 ## B3. Tiers
 
-### Tier 1. **SIGNAL** · $3/month
-```
-You're in. That's it.
+Lead with the patronage, not with what the page does not do. The honest note
+about no bonuses belongs second, where it reads as a condition rather than an
+apology.
 
-No bonus content, no schedule, nothing you have to keep up with. You're keeping the work going, and that's enough.
+### **SUPPORT** · $5/month
+```
+This is patronage. The old kind, where someone pays so the art gets made.
+
+I draw the animation by hand, build the panels by hand, and I am building a walking robot. On my own. Your money goes into materials and time.
+
+Nothing is locked behind this, and there is no schedule. You are supporting the art itself.
 
 Thank you.
 ```
 
-### Tier 2. **WITNESS** · $10/month
-```
-Same page, same posts, same nothing owed.
-
-Just bigger. Ten dollars is a real piece of a month here, so your name goes in the credits on ghostline.live. I want people to see who's holding this up.
-```
-
-### Tier 3. **PATRON** · $25/month
-```
-This is the size that actually moves a build along.
-
-A month here is a frame, or a run of LED strip, or the actuators that weren't in the budget. Your name in the credits, and my thanks.
-
-Still no bonus content, still nothing asked of you. I'm just really glad you're here.
-```
+If a second and third tier go up later, the text is the same and only the size
+changes. Nothing is being sold, so there is nothing to differentiate.
 
 ---
 
