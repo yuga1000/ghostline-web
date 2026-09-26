@@ -272,35 +272,13 @@
     <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
 
 <!-- Header Terminal Bar -->
-<style>
-.cross-strip { display: flex; gap: 7px; align-items: center; }
-.cross-strip i {
-    font-style: normal;
-    font-size: 10px;
-    line-height: 1;
-    color: #00ff00;
-    opacity: .12;
-    animation-name: crossFlicker;
-    animation-iteration-count: infinite;
-    animation-timing-function: steps(1);
-}
-@keyframes crossFlicker {
-    0%, 62%  { opacity: .10; }
-    66%      { opacity: .85; text-shadow: 0 0 6px #00ff00; }
-    70%      { opacity: .22; }
-    74%      { opacity: .70; }
-    78%, 100%{ opacity: .10; }
-}
-@media (prefers-reduced-motion: reduce) { .cross-strip i { animation: none; opacity: .18; } }
-@media (max-width: 640px) { .cross-strip i:nth-child(n+13) { display: none; } }
-</style>
-<header class="terminal-border bg-black p-3 m-6 mb-8">
+<header class="terminal-border bg-black p-3 m-6 mb-8" style="position:relative">
+    <div id="crossStrip" aria-hidden="true"></div>
     <div class="flex justify-between items-center text-xs">
         <div class="flex items-center space-x-4">
             <span class="glow-text pixel-text text-xs">&#9635; GHOSTLINE_OS</span>
             <span class="text-green-400" id="asciiGhost" style="font-size:11px;transition:opacity 0.15s;display:inline-block;width:8em;overflow:hidden;text-align:center;white-space:nowrap;vertical-align:middle">&#3665;(&#3665;&#9679;&#785;&#9697;&#9679;&#785;&#3665;)&#3665;</span>
         </div>
-        <div class="cross-strip" id="crossStrip" aria-hidden="true"></div>
     </div>
 </header>
 
@@ -952,23 +930,6 @@ let currentManifestoSlide = 0;
         
     }
     
-    // A strip of crosses that flicker on their own. It says nothing, which is
-    // the point: the slot used to hold invented telemetry.
-    function buildCrossStrip() {
-        const host = safeGetElement('crossStrip');
-        if (!host) return;
-        const GLYPHS = ['+', '+', '+', '\u00d7', '\u2726'];
-        const count = 26;
-        let html = '';
-        for (let i = 0; i < count; i++) {
-            const glyph = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-            const delay = (Math.random() * 4).toFixed(2);
-            const dur = (1.6 + Math.random() * 3.4).toFixed(2);
-            html += `<i style="animation-delay:${delay}s;animation-duration:${dur}s">${glyph}</i>`;
-        }
-        host.innerHTML = html;
-    }
-
     // Logo hover effects
     function addLogoEffects() {
         const logo = safeQuerySelector('.enlarged-logo');
@@ -1241,7 +1202,7 @@ let currentManifestoSlide = 0;
             setInterval(rotateAsciiCreature, 3000);
 
             
-            buildCrossStrip();
+            if (window.renderCrossField) renderCrossField(safeGetElement('crossStrip'), { count: 34 });
             
             // Add button effects
             addButtonEffects();
@@ -1579,7 +1540,8 @@ initATASquare();
 <!-- Sun timelapse — 200 frames sliding window from NASA SDO -->
 <script src="js/sun-timelapse.js"></script>
 
-  <script src="js/support-links.js"></script>
+  <script src="js/cross-field.js"></script>
+<script src="js/support-links.js"></script>
 <script>
 // Partner slots on the front page. Filling a slot in js/support-links.js turns it
 // into a live link here and marks it TAKEN on support.html.

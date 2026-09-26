@@ -65,14 +65,8 @@ img, video { display: block; max-width: 100%; }
     linear-gradient(90deg, rgba(232,226,214,.07) 1px, transparent 1px);
   background-size: 88px 88px, 88px 88px, 88px 88px;
 }
-/* pixel shimmer, drawn on a chunky 4px lattice above everything */
-#shimmer {
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  pointer-events: none;
-  mix-blend-mode: screen;
-}
+/* scattered crosses, blinking rarely and out of step with each other */
+#shimmer { position: fixed; inset: 0; z-index: 9997; pointer-events: none; }
 .shell::after {
   content: "";
   position: fixed;
@@ -306,7 +300,7 @@ body.has-payment-open { overflow: hidden; }
 </style>
 </head>
 <body>
-<canvas id="shimmer" aria-hidden="true"></canvas>
+<div id="shimmer" aria-hidden="true"></div>
 <div class="shell">
   <header class="topbar">
     <div class="tb-row tb-row-1">
@@ -448,6 +442,7 @@ body.has-payment-open { overflow: hidden; }
   </section>
 </div>
 
+<script src="js/cross-field.js"></script>
 <script src="js/support-links.js"></script>
 <script>
 const captures = [
@@ -616,50 +611,7 @@ paymentForm.addEventListener("submit", async event => {
 
 updatePaymentSummary();
 
-// Pixel shimmer: cells flash and decay on a 4px lattice, 12fps for a chunky
-// CRT feel rather than a smooth glow.
-(() => {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const canvas = document.getElementById("shimmer");
-  const ctx = canvas.getContext("2d");
-  const CELL = 4;
-  const TINTS = ["85,255,255", "255,177,66", "85,85,255"];
-  let cells = [];
-  let last = 0;
-
-  const resize = () => {
-    canvas.width = Math.floor(innerWidth / CELL) * CELL;
-    canvas.height = Math.floor(innerHeight / CELL) * CELL;
-    canvas.style.width = innerWidth + "px";
-    canvas.style.height = innerHeight + "px";
-  };
-  resize();
-  addEventListener("resize", resize);
-
-  const tick = now => {
-    requestAnimationFrame(tick);
-    if (now - last < 80) return;
-    last = now;
-    for (let i = 0; i < 7; i++) {
-      cells.push({
-        x: Math.floor(Math.random() * canvas.width / CELL) * CELL,
-        y: Math.floor(Math.random() * canvas.height / CELL) * CELL,
-        tint: TINTS[Math.floor(Math.random() * TINTS.length)],
-        life: 1,
-        size: Math.random() < .22 ? CELL * 2 : CELL
-      });
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    cells = cells.filter(cell => {
-      cell.life -= .16;
-      if (cell.life <= 0) return false;
-      ctx.fillStyle = `rgba(${cell.tint},${(cell.life * .55).toFixed(3)})`;
-      ctx.fillRect(cell.x, cell.y, cell.size, cell.size);
-      return true;
-    });
-  };
-  requestAnimationFrame(tick);
-})();
+renderCrossField(document.getElementById("shimmer"), { count: 70, minPeriod: 9, maxPeriod: 20 });
 
 // Support strip — hides any channel that has no URL yet (see js/support-links.js).
 const supportGrid = document.getElementById("supportGrid");
