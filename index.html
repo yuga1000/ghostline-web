@@ -275,12 +275,13 @@
 <header class="terminal-border bg-black p-3 m-6 mb-8">
     <div class="flex justify-between items-center text-xs">
         <div class="flex items-center space-x-4">
-            <span class="glow-text pixel-text text-xs">>>> SYSTEM STATUS: ONLINE</span>
+            <span class="glow-text pixel-text text-xs">&#9635; GHOSTLINE_OS</span>
             <span class="text-green-400" id="asciiGhost" style="font-size:11px;transition:opacity 0.15s;display:inline-block;width:8em;overflow:hidden;text-align:center;white-space:nowrap;vertical-align:middle">&#3665;(&#3665;&#9679;&#785;&#9697;&#9679;&#785;&#3665;)&#3665;</span>
         </div>
         <div class="flex items-center space-x-4">
-            <span class="blink">â</span>
-            <span class="glow-text pixel-text text-xs">GHOSTLINE v14.5.7</span>
+            <span class="blink">&#9646;</span>
+            <span class="pixel-text text-xs" id="statusFact" style="color:#00ff00;opacity:.75;transition:opacity .25s"></span>
+            <span class="pixel-text text-xs" id="statusClock" style="color:#00ff00;opacity:.45"></span>
         </div>
     </div>
 </header>
@@ -933,30 +934,37 @@ let currentManifestoSlide = 0;
         
     }
     
-    // Command changer - fixed error
+    // Status line. Every line below is true and none of it needs maintaining,
+    // which is the difference from the invented telemetry that used to sit here.
+    const STATUS_FACTS = [
+        '6 ANIMATION LOOPS',
+        '3 FRAME TYPES',
+        '1 HEXAPOD, NOT WALKING YET',
+        '18 YEARS BY HAND',
+        'NO STUDIO, NO TEAM',
+        'BUILT TO ORDER, ONE AT A TIME'
+    ];
+    let statusIndex = 0;
+
     function changeCommand() {
-        const commands = [
-            'initiate_art_sequence',
-            'loading_neural_networks',
-            'processing_creativity_data',
-            'analyzing_color_patterns',
-            'generating_art_matrix'
-        ];
-        
-        const commandElements = document.querySelectorAll('.glow-text');
-        // Get last element (in footer)
-        const commandElement = commandElements[commandElements.length - 1];
-        
-        if (commandElement) {
-            try {
-                const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-                commandElement.textContent = randomCommand;
-            } catch (e) {
-                console.log('Command change error:', e);
-            }
-        }
+        const el = safeGetElement('statusFact');
+        if (!el) return;
+        el.style.opacity = '0';
+        setTimeout(() => {
+            statusIndex = (statusIndex + 1) % STATUS_FACTS.length;
+            el.textContent = STATUS_FACTS[statusIndex];
+            el.style.opacity = '.75';
+        }, 250);
     }
-    
+
+    function tickClock() {
+        const el = safeGetElement('statusClock');
+        if (!el) return;
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        el.textContent = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())} UTC`;
+    }
+
     // Logo hover effects
     function addLogoEffects() {
         const logo = safeQuerySelector('.enlarged-logo');
@@ -1229,8 +1237,12 @@ let currentManifestoSlide = 0;
             setInterval(rotateAsciiCreature, 3000);
 
             
-            // Command change every 8 seconds
+            // Status line: one true fact at a time, and a real clock
+            const factEl = safeGetElement('statusFact');
+            if (factEl) factEl.textContent = STATUS_FACTS[0];
             setInterval(changeCommand, 8000);
+            tickClock();
+            setInterval(tickClock, 1000);
             
             // Add button effects
             addButtonEffects();
