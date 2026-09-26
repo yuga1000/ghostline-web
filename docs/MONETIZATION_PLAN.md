@@ -12,7 +12,7 @@ every item below is something already built, half-built, or sitting in `assets/`
 
 | Asset | Where | State | Sellable as |
 |---|---|---|---|
-| LED panel 42×42, METAL / WOOD / HORNED frame | `panels.html` | **Shipping** — 659 USDT, made to order | Physical object |
+| LED panel 42×42, METAL / WOOD / HORNED frame | `panels.html` | **Shipping** — 1199 USDT, made to order | Physical object |
 | 6 animation loops (CAPTURE_01–06) | `assets/led-panels/video/` | Done | Panel content, and as standalone loop files |
 | In-situ capture of the real panel | `assets/led-panels/video/panel-in-situ.mp4` | Done | Proof shot — the single best conversion asset on the site |
 | MYSTRA 01 robotics prototype | `lab/` | **In development** — folders are placeholders | Build logs, whitepaper, datasets |
@@ -34,8 +34,8 @@ Money should arrive through four channels with different sizes and different job
 ```
   LAYER          CHANNEL                  TICKET      JOB
   ──────────────────────────────────────────────────────────────────────
-  DIRECT         panels.html (USDT)       $659        pays for parts
-                 card checkout            $659        removes the crypto wall
+  DIRECT         panels.html (USDT)       $1199        pays for parts
+                 card checkout            $1199        removes the crypto wall
   RECURRING      Patreon / Boosty         $3–$50/mo   pays for the time between panels
   MICRO          Ko-fi                    $3–$20      converts a passing viewer
   CATALOGUE      itch.io / Gumroad        $0–$15      sells what is already made
@@ -56,7 +56,7 @@ because it is the only channel that produces **predictable** money, and because
 panel buyers are a tiny audience while panel *watchers* are a large one.
 
 ### Why it fits this project specifically
-Panels are a $659 object — most people who like the work will never buy one.
+Panels are a $1199 object — most people who like the work will never buy one.
 Patreon is the price point for those people. And the work already generates the
 content a tier needs: every panel build produces footage, every animation
 produces frames, every MYSTRA step produces a log.
@@ -154,7 +154,7 @@ fit of anything in this table.
 **Consider later:**
 - **Zora** — already linked in the site's social panel. Mint the loops as editions. Fits the existing crypto-native audience, near-zero setup.
 - **Twitch/YouTube** — `stream.html` and `stream_server/` already exist for a 24/7 generative stream. Revenue is thin until the audience is there, but it is a *discovery* channel that feeds Patreon.
-- **Etsy** — panels would sell there, but the fee structure and shipping rules on a $659 made-to-order electronic object are painful. Only if direct sales stall.
+- **Etsy** — panels would sell there, but the fee structure and shipping rules on a $1199 made-to-order electronic object are painful. Only if direct sales stall.
 
 **Skip:**
 - NFT drops as a primary strategy. The old doc leans on this; the market no longer supports it as a base layer. Zora as a side channel, fine. As the plan, no.
@@ -205,7 +205,7 @@ nothing extra to sell, and there is no shop for them anywhere.
 3. **A back catalogue.** Pull what already exists off Threads and Instagram,
    re-export clean, and fill the page. A shop with six items reads as abandoned.
 
-**Why it fits.** It is the missing middle of the whole plan: the panels are $659
+**Why it fits.** It is the missing middle of the whole plan: the panels are $1199
 and Patreon is $3 a month, and there is nothing in between for someone who likes
 the work and wants to own a piece of it for the price of a coffee.
 

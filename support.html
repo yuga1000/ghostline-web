@@ -281,7 +281,7 @@ h1 {
       <div class="dos-status"><span><b>i</b> A TAKEN SLOT SHOWS ITS LOGO AND LINK ON THE FRONT PAGE</span></div>
     </section>
 
-    <section class="wallet">
+    <section class="wallet" id="wallet">
       <img class="wallet-qr" id="walletQr" src="assets/led-panels/usdt-trc20.svg" alt="QR code for the GHOSTLINE USDT wallet">
       <div>
         <div class="wallet-label" id="walletLabel">USDT / TRON (TRC-20)</div>
@@ -303,9 +303,14 @@ h1 {
 const config = window.GHOSTLINE_SUPPORT || {};
 const live = (config.channels || []).filter(channel => channel.url);
 
+// The shared config spells same-page targets as "support.html#wallet" so they
+// also work from panels.html. Here that is a navigation, not a jump, so trim it.
+const here = url => url.startsWith("support.html#") ? url.slice("support.html".length) : url;
+
 document.getElementById("channelList").innerHTML = live.map((channel, index) => {
-  const external = /^https?:/.test(channel.url);
-  return `<li><a class="dos-row" href="${channel.url}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>
+  const url = here(channel.url);
+  const external = /^https?:/.test(url);
+  return `<li><a class="dos-row" href="${url}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}>
     <span class="dos-name"><i class="dos-key">${index + 1}</i>${channel.name}<b class="dos-note">${channel.copy}</b></span>
     <span class="dos-type">${channel.type}</span>
     <span class="dos-go">${channel.go}</span>
@@ -324,7 +329,7 @@ document.addEventListener("keydown", event => {
   const row = live[Number(event.key) - 1];
   if (!row) return;
   if (/^https?:/.test(row.url)) window.open(row.url, "_blank", "noopener");
-  else window.location.href = row.url;
+  else window.location.href = here(row.url);
 });
 
 if (config.wallet) {

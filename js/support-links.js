@@ -66,7 +66,7 @@ window.GHOSTLINE_SUPPORT = {
       code: "S.05",
       name: "USDT.TRC20",
       type: "DIRECT",
-      url: "panels.html#panel-object",
+      url: "support.html#wallet",
       copy: "Straight to the build fund. Nothing takes a cut.",
       go: "[ SEND USDT ]"
     }
