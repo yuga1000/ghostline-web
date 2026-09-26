@@ -1,9 +1,13 @@
 /* GHOSTLINE — a scattered field of crosses that blink rarely.
  *
- * Not a row and not a strobe. Each cross sits at a random point inside its
- * container, stays dark most of the time, and blinks twice in a long cycle of
- * its own. With every cross on a different period and phase they never fall
- * into step, so what you see is the odd one lighting up, the way a star does.
+ * Not a row and not a strobe. The field is always faintly there, the way a
+ * sky is, and now and then one cross flares for a third of a second.
+ *
+ * What makes it read as calm is the rate of flares, not their length. Short
+ * flashes on short cycles still sparkle: sixty crosses on a fifteen second
+ * cycle fire four times a second no matter how brief each one is. So the
+ * cycles are long, thirty to seventy seconds, which puts the whole field at
+ * about one flare per second with every cross on its own phase.
  *
  * Injects its own stylesheet once. No timers: it is CSS from the moment it is
  * built, and prefers-reduced-motion switches it to a still field.
@@ -24,19 +28,17 @@
         font-style: normal;
         line-height: 1;
         color: #fff;
-        opacity: 0;
+        opacity: .09;
         transform: translate(-50%, -50%);
         animation-name: crossTwinkle;
         animation-iteration-count: infinite;
         animation-timing-function: steps(1);
       }
-      /* dark for most of the cycle, then two short beats */
+      /* one flare per cycle, everything else is the resting field */
       @keyframes crossTwinkle {
-        0%, 91%   { opacity: 0; }
-        92%       { opacity: .85; }
-        93.5%     { opacity: .12; }
-        95%       { opacity: .55; }
-        96.5%,100%{ opacity: 0; }
+        0%, 98.2%   { opacity: .09; }
+        98.6%       { opacity: .90; }
+        99.2%, 100% { opacity: .09; }
       }
       @media (prefers-reduced-motion: reduce) {
         .cross-field b { animation: none; opacity: .14; }
@@ -52,7 +54,7 @@
   window.renderCrossField = function (host, options) {
     if (!host) return;
     injectStyle();
-    const config = Object.assign({ count: 46, minPeriod: 7, maxPeriod: 17 }, options);
+    const config = Object.assign({ count: 46, minPeriod: 30, maxPeriod: 70 }, options);
 
     host.classList.add("cross-field");
     let html = "";
