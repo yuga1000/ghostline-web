@@ -9,9 +9,10 @@
  * arms switch on in sequence off one shared cycle. steps(1) throughout: a cell
  * is either on at full white or not there at all.
  *
- * The cycle runs 30 to 70 seconds per cross with a random phase, so the field
- * sits dark and about one cross a second draws itself somewhere. What keeps it
- * calm is the rate of those events, not their length.
+ * Cycles run 14 to 32 seconds per cross with a random phase. The draw occupies
+ * 3.6 percent of a cycle, which is roughly 0.8 seconds however long the cycle
+ * is, so at any moment three or four crosses are part-drawn somewhere and the
+ * field twinkles instead of blinking once and waiting.
  *
  * No timers. It is CSS from the moment it is built, and prefers-reduced-motion
  * leaves a still field.
@@ -27,10 +28,10 @@
     // one keyframe set per ring: the further out, the later it arrives and the
     // sooner it leaves, which is what makes the cross grow and shrink
     const steps = [
-      [98.4, 99.8],
-      [98.6, 99.6],
-      [98.8, 99.4],
-      [99.0, 99.2]
+      [96.00, 99.60],
+      [96.45, 99.15],
+      [96.90, 98.70],
+      [97.35, 98.25]
     ];
     const frames = steps
       .map(([on, off], i) =>
@@ -71,14 +72,14 @@
   window.renderCrossField = function (host, options) {
     if (!host) return;
     injectStyle();
-    const config = Object.assign({ count: 40, minPeriod: 30, maxPeriod: 70 }, options);
+    const config = Object.assign({ count: 90, minPeriod: 14, maxPeriod: 32 }, options);
 
     host.classList.add("cross-field");
 
     let html = "";
     for (let n = 0; n < config.count; n++) {
       const px = Math.random() < 0.25 ? 3 : 2;       // pixel size
-      const arms = Math.random() < 0.35 ? 2 : RINGS; // some crosses stay small
+      const arms = Math.random() < 0.55 ? 2 : RINGS; // most stay small, a few reach full span
       const period = (config.minPeriod + Math.random() * (config.maxPeriod - config.minPeriod)).toFixed(2);
       const phase = (Math.random() * period).toFixed(2);
       const timing = `animation-duration:${period}s;animation-delay:-${phase}s`;

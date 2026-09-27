@@ -348,7 +348,7 @@ document.getElementById("partnerList").innerHTML = slots.map(slot => {
 const open = slots.filter(slot => !(slot.name && slot.url)).length;
 document.getElementById("partnerCount").textContent = `${open} OPEN / ${slots.length}`;
 
-renderCrossField(document.getElementById("shimmer"), { count: 45, minPeriod: 30, maxPeriod: 70 });
+renderCrossField(document.getElementById("shimmer"), { count: 110, minPeriod: 14, maxPeriod: 32 });
 
 document.getElementById("copyWallet").addEventListener("click", async event => {
   const address = document.getElementById("walletAddress").textContent.trim();
