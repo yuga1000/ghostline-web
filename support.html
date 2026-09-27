@@ -64,8 +64,8 @@ img { display: block; max-width: 100%; }
     linear-gradient(90deg, rgba(232,226,214,.07) 1px, transparent 1px);
   background-size: 88px 88px, 88px 88px, 88px 88px;
 }
-/* scattered crosses, blinking rarely and out of step with each other */
-#shimmer { position: fixed; inset: 0; z-index: 9997; pointer-events: none; }
+/* a band of crosses sitting in the page, so it scrolls with everything else */
+#shimmer { position: relative; height: 68px; margin: -6px 0 -4px; }
 .shell::after {
   content: "";
   position: fixed;
@@ -238,7 +238,6 @@ h1 {
 </style>
 </head>
 <body>
-<div id="shimmer" aria-hidden="true"></div>
 <div class="shell">
   <header class="topbar">
     <div class="tb-row tb-row-1">
@@ -260,6 +259,8 @@ h1 {
       <h1>SUPPORT</h1>
       <div class="head-sub">PANELS BUY PARTS. TIERS BUY TIME.<i class="caret"></i></div>
     </header>
+
+    <div id="shimmer" aria-hidden="true"></div>
 
     <section class="dos">
       <div class="dos-bar"><span>C:\GHOSTLINE\SUPPORT</span><b id="dosCount"></b></div>
@@ -348,7 +349,7 @@ document.getElementById("partnerList").innerHTML = slots.map(slot => {
 const open = slots.filter(slot => !(slot.name && slot.url)).length;
 document.getElementById("partnerCount").textContent = `${open} OPEN / ${slots.length}`;
 
-renderCrossField(document.getElementById("shimmer"), { count: 110, minPeriod: 14, maxPeriod: 32 });
+renderCrossField(document.getElementById("shimmer"), { count: 44, minPeriod: 14, maxPeriod: 32 });
 
 document.getElementById("copyWallet").addEventListener("click", async event => {
   const address = document.getElementById("walletAddress").textContent.trim();
