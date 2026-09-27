@@ -9,6 +9,9 @@
  * cycles are long, thirty to seventy seconds, which puts the whole field at
  * about one flare per second with every cross on its own phase.
  *
+ * Brightness is two knobs, `rest` and `flare`, passed through as CSS variables
+ * so a page can dim or lift its own field without touching this file.
+ *
  * Injects its own stylesheet once. No timers: it is CSS from the moment it is
  * built, and prefers-reduced-motion switches it to a still field.
  */
@@ -28,7 +31,7 @@
         font-style: normal;
         line-height: 1;
         color: #fff;
-        opacity: .09;
+        opacity: var(--cross-rest, .24);
         transform: translate(-50%, -50%);
         animation-name: crossTwinkle;
         animation-iteration-count: infinite;
@@ -36,12 +39,12 @@
       }
       /* one flare per cycle, everything else is the resting field */
       @keyframes crossTwinkle {
-        0%, 98.2%   { opacity: .09; }
-        98.6%       { opacity: .90; }
-        99.2%, 100% { opacity: .09; }
+        0%, 98.2%   { opacity: var(--cross-rest, .24); }
+        98.6%       { opacity: var(--cross-flare, 1); }
+        99.2%, 100% { opacity: var(--cross-rest, .24); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .cross-field b { animation: none; opacity: .14; }
+        .cross-field b { animation: none; opacity: var(--cross-rest, .24); }
       }
     `;
     document.head.appendChild(style);
@@ -54,13 +57,19 @@
   window.renderCrossField = function (host, options) {
     if (!host) return;
     injectStyle();
-    const config = Object.assign({ count: 46, minPeriod: 30, maxPeriod: 70 }, options);
+    const config = Object.assign(
+      { count: 46, minPeriod: 30, maxPeriod: 70, rest: 0.24, flare: 1 },
+      options
+    );
 
     host.classList.add("cross-field");
+    host.style.setProperty("--cross-rest", config.rest);
+    host.style.setProperty("--cross-flare", config.flare);
+
     let html = "";
     for (let i = 0; i < config.count; i++) {
       const glyph = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-      const size = (7 + Math.random() * 6).toFixed(1);
+      const size = (8 + Math.random() * 6).toFixed(1);
       const period = (config.minPeriod + Math.random() * (config.maxPeriod - config.minPeriod)).toFixed(2);
       html +=
         `<b style="left:${(Math.random() * 100).toFixed(2)}%;` +

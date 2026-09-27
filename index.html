@@ -272,7 +272,7 @@
     <div id="matrix-container" class="absolute inset-0 pointer-events-none"></div>
 
 <!-- Header Terminal Bar -->
-<header class="terminal-border bg-black p-3 m-6 mb-8" style="position:relative">
+<header class="p-3 m-6 mb-8" style="position:relative">
     <div id="crossStrip" aria-hidden="true"></div>
     <div class="flex justify-between items-center text-xs">
         <div class="flex items-center space-x-4">
@@ -1201,7 +1201,7 @@ let currentManifestoSlide = 0;
             setInterval(rotateAsciiCreature, 3000);
 
             
-            if (window.renderCrossField) renderCrossField(safeGetElement('crossStrip'), { count: 26 });
+            if (window.renderCrossField) renderCrossField(safeGetElement('crossStrip'), { count: 40, rest: .3 });
             
             // Add button effects
             addButtonEffects();
