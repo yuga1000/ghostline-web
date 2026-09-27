@@ -1,50 +1,64 @@
-/* GHOSTLINE — a scattered field of crosses that blink rarely.
+/* GHOSTLINE — a scattered field of crosses that draw themselves and rub out.
  *
- * Not a row and not a strobe. The field is always faintly there, the way a
- * sky is, and now and then one cross flares for a third of a second.
+ * Nothing fades. A cross is invisible until its turn, then it gets drawn the
+ * way you would draw it by hand: one pixel in the middle, then a cell added to
+ * each arm, then another, then another. Then it comes off the same way, tip
+ * first. Eight frames out and back, hard cuts, no tweening.
  *
- * What makes it read as calm is the rate of flares, not their length. Short
- * flashes on short cycles still sparkle: sixty crosses on a fifteen second
- * cycle fire four times a second no matter how brief each one is. So the
- * cycles are long, thirty to seventy seconds, which puts the whole field at
- * about one flare per second with every cross on its own phase.
+ * Every cell is its own pixel div and every ring has its own keyframes, so the
+ * arms switch on in sequence off one shared cycle. steps(1) throughout: a cell
+ * is either on at full white or not there at all.
  *
- * Brightness is two knobs, `rest` and `flare`, passed through as CSS variables
- * so a page can dim or lift its own field without touching this file.
+ * The cycle runs 30 to 70 seconds per cross with a random phase, so the field
+ * sits dark and about one cross a second draws itself somewhere. What keeps it
+ * calm is the rate of those events, not their length.
  *
- * Injects its own stylesheet once. No timers: it is CSS from the moment it is
- * built, and prefers-reduced-motion switches it to a still field.
+ * No timers. It is CSS from the moment it is built, and prefers-reduced-motion
+ * leaves a still field.
  */
 (function () {
-  const GLYPHS = ["+", "+", "+", "+", "×", "✦"];
+  const RINGS = 3; // cells per arm
   let styled = false;
 
   function injectStyle() {
     if (styled) return;
     styled = true;
+
+    // one keyframe set per ring: the further out, the later it arrives and the
+    // sooner it leaves, which is what makes the cross grow and shrink
+    const steps = [
+      [98.4, 99.8],
+      [98.6, 99.6],
+      [98.8, 99.4],
+      [99.0, 99.2]
+    ];
+    const frames = steps
+      .map(([on, off], i) =>
+        `@keyframes crossRing${i} {` +
+        `0%, ${(on - 0.01).toFixed(2)}% { opacity: 0; }` +
+        `${on}% { opacity: 1; }` +
+        `${off}%, 100% { opacity: 0; }` +
+        `}`
+      )
+      .join("\n      ");
+
     const style = document.createElement("style");
     style.textContent = `
       .cross-field { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-      .cross-field b {
+      .cross-field span { position: absolute; display: block; }
+      .cross-field i {
         position: absolute;
-        font-weight: 400;
-        font-style: normal;
-        line-height: 1;
-        color: #fff;
-        opacity: var(--cross-rest, .24);
-        transform: translate(-50%, -50%);
-        animation-name: crossTwinkle;
+        display: block;
+        background: #fff;
+        opacity: 0;
         animation-iteration-count: infinite;
         animation-timing-function: steps(1);
       }
-      /* one flare per cycle, everything else is the resting field */
-      @keyframes crossTwinkle {
-        0%, 98.2%   { opacity: var(--cross-rest, .24); }
-        98.6%       { opacity: var(--cross-flare, 1); }
-        99.2%, 100% { opacity: var(--cross-rest, .24); }
-      }
+      ${steps.map((_, i) => `.cross-field i.r${i} { animation-name: crossRing${i}; }`).join("\n      ")}
+      ${frames}
       @media (prefers-reduced-motion: reduce) {
-        .cross-field b { animation: none; opacity: var(--cross-rest, .24); }
+        .cross-field i { animation: none; }
+        .cross-field i.r0, .cross-field i.r1 { opacity: .5; }
       }
     `;
     document.head.appendChild(style);
@@ -57,26 +71,30 @@
   window.renderCrossField = function (host, options) {
     if (!host) return;
     injectStyle();
-    const config = Object.assign(
-      { count: 46, minPeriod: 30, maxPeriod: 70, rest: 0.24, flare: 1 },
-      options
-    );
+    const config = Object.assign({ count: 40, minPeriod: 30, maxPeriod: 70 }, options);
 
     host.classList.add("cross-field");
-    host.style.setProperty("--cross-rest", config.rest);
-    host.style.setProperty("--cross-flare", config.flare);
 
     let html = "";
-    for (let i = 0; i < config.count; i++) {
-      const glyph = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-      const size = (8 + Math.random() * 6).toFixed(1);
+    for (let n = 0; n < config.count; n++) {
+      const px = Math.random() < 0.25 ? 3 : 2;       // pixel size
+      const arms = Math.random() < 0.35 ? 2 : RINGS; // some crosses stay small
       const period = (config.minPeriod + Math.random() * (config.maxPeriod - config.minPeriod)).toFixed(2);
+      const phase = (Math.random() * period).toFixed(2);
+      const timing = `animation-duration:${period}s;animation-delay:-${phase}s`;
+
+      let cells = `<i class="r0" style="left:0;top:0;width:${px}px;height:${px}px;${timing}"></i>`;
+      for (let k = 1; k <= arms; k++) {
+        for (const d of [[k, 0], [-k, 0], [0, k], [0, -k]]) {
+          cells +=
+            `<i class="r${k}" style="left:${d[0] * px}px;top:${d[1] * px}px;` +
+            `width:${px}px;height:${px}px;${timing}"></i>`;
+        }
+      }
+
       html +=
-        `<b style="left:${(Math.random() * 100).toFixed(2)}%;` +
-        `top:${(clustered() * 100).toFixed(2)}%;` +
-        `font-size:${size}px;` +
-        `animation-duration:${period}s;` +
-        `animation-delay:-${(Math.random() * period).toFixed(2)}s">${glyph}</b>`;
+        `<span style="left:${(Math.random() * 100).toFixed(2)}%;` +
+        `top:${(clustered() * 100).toFixed(2)}%">${cells}</span>`;
     }
     host.innerHTML = html;
   };
