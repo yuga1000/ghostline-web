@@ -61,6 +61,7 @@
 /* three windows stepping down the screen, 36 columns by 6 rows each. Every one
    lands on the bottom row of the one before, the way overlapping windows do,
    and hidden ones still hold their place so nothing shifts when the next pops. */
+.boot-kick { position: absolute; left: 0; top: 0; width: 48px; height: 48px; } /* see the markup */
 .boot-stack { display: flex; flex-direction: column; align-items: flex-start; width: 17.2em; }
 .boot-win {
     position: relative;
@@ -136,6 +137,13 @@
 .boot-green .boot-fill, .boot-green .boot-pct { color: var(--w-strong); }
 </style>
 <div id="boot-overlay">
+    <!-- WebKit, which is every browser on an iPhone, holds back a page's first
+         paint until it has seen 200 visible characters or an image larger than
+         32 by 32. Three small windows are neither, so on an iPhone the whole
+         sequence played out behind a blank white screen while the stylesheets
+         were still on their way. This black square on the black ground is the
+         image that gets the page painted at once. -->
+    <img class="boot-kick" alt="" aria-hidden="true" width="48" height="48" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAAAAAByaaZbAAAAGUlEQVR42u3BgQAAAADDoPlT3+AEVQEA8AwJMAABf9HCkwAAAABJRU5ErkJggg==">
     <div class="boot-stack" role="status" aria-label="Loading">
         <div class="boot-win boot-blue is-up">
             <span class="boot-title">C:\GHOSTLINE\PANELS</span>
