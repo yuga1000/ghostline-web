@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" style="background:#000">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Dark canvas from the first byte. The stylesheets below block rendering
+         while they download, and without this the browser shows its default
+         white page for that whole stretch. -->
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#000000">
     <title>GHOSTLINE: Art of Life</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/agent-pet-roaming.css?v=2">
     <meta property="og:title" content="GhostLine — Art & Info Ecosystem">
     <meta property="og:description" content="Official GhostLine site: projects, visual experiments, art bots, automation, and more.">
     <meta property="og:image" content="https://ghostline.live/og-image.png">
@@ -18,8 +19,6 @@
     <meta name="twitter:description" content="Official GhostLine site: projects, visual experiments, art bots, automation, and more.">
     <meta name="twitter:image" content="https://ghostline.live/og-image.png">
 
-    <!-- Supabase env vars (sets window.SUPABASE_URL / window.SUPABASE_ANON_KEY) -->
-    <script src="supabase-env.js"></script>
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLQ7L6XQ6J"></script>
@@ -30,43 +29,194 @@
         gtag('config', 'G-SLQ7L6XQ6J');
     </script>
 
-    <style>
-      /* Mobile: sun smaller, Lost Archive below sun */
-      @media (max-width: 768px) {
-        #sun-bg {
-          right: 50% !important;
-          bottom: 20px !important;
-        }
-        #sun-img {
-          width: 220px !important;
-          height: 220px !important;
-        }
-      }
-      #terminal-popup {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        height: 60%;
-        background: #000;
-        border: 2px solid #00ff00;
-        color: #00ff00;
-        font-family: 'Share Tech Mono', monospace;
-        z-index: 10000;
-        padding: 20px;
-      }
-      #terminal-close {
-        position: absolute;
-        top: 5px;
-        right: 10px;
-        cursor: pointer;
-      }
-    </style>
 
 </head>
 <body>
+
+<style>
+/* This block has to stand on its own: when it first paints, neither Tailwind's
+   reset nor style.css has arrived. Hence the explicit box-sizing, and the
+   overlay's own id so the old loader's leftover rules in style.css miss it. */
+#boot-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
+    transition: opacity .24s steps(3);
+}
+#boot-overlay, #boot-overlay * { box-sizing: border-box; }
+/* three windows stepping down the screen. They overlap by a sliver, enough for
+   the shadows to land on each other, but every bar stays in view. Hidden ones
+   still hold their place, so nothing shifts when the next one pops. */
+.boot-stack { display: flex; flex-direction: column; align-items: flex-start; width: min(360px, 90vw); }
+.boot-win {
+    position: relative;
+    width: calc(100% - 46px);
+    margin-top: -7px;
+    visibility: hidden;
+    border: 2px solid var(--w-line);
+    background: var(--w-bg);
+    color: var(--w-text);
+    box-shadow: 6px 6px 0 var(--w-shadow);
+    font: 14px/1.4 'Share Tech Mono', ui-monospace, Menlo, Consolas, monospace;
+    text-align: left;
+}
+.boot-win.is-up { visibility: visible; }
+.boot-bar { padding: 4px 9px; background: var(--w-bar); color: var(--w-bar-text); letter-spacing: .06em; }
+.boot-body { padding: 8px 9px 10px; }
+.boot-what { color: var(--w-strong); }
+.boot-progress { position: relative; height: 22px; margin-top: 7px; border: 1px solid var(--w-line); overflow: hidden; }
+.boot-pct { position: absolute; left: 7px; top: 0; line-height: 20px; white-space: nowrap; }
+/* the fill carries its own copy of the number in the opposite colour, so the
+   label inverts as the bar passes under it */
+.boot-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--w-fill); overflow: hidden; }
+.boot-fill .boot-pct { color: var(--w-fill-text); }
+
+/* panels and support: the blue file manager */
+.boot-blue {
+    margin-top: 0;
+    --w-bg: #0000aa; --w-line: #5555ff; --w-shadow: #00004d;
+    --w-bar: #00aaaa; --w-bar-text: #000;
+    --w-text: #aaaaaa; --w-strong: #ffffff;
+    --w-fill: #55ffff; --w-fill-text: #0000aa;
+}
+/* MYSTRA: CGA mode 1 */
+.boot-magenta {
+    margin-left: 46px;
+    --w-bg: #000; --w-line: #ff55ff; --w-shadow: #4d004d;
+    --w-bar: #ff55ff; --w-bar-text: #000;
+    --w-text: #aaaaaa; --w-strong: #55ffff;
+    --w-fill: #ff55ff; --w-fill-text: #000;
+}
+/* this page: green phosphor */
+.boot-green {
+    margin-left: 16px;
+    --w-bg: #000; --w-line: #00ff00; --w-shadow: #004d00;
+    --w-bar: #00ff00; --w-bar-text: #000;
+    --w-text: #00aa00; --w-strong: #00ff00;
+    --w-fill: #00ff00; --w-fill-text: #000;
+}
+</style>
+<div id="boot-overlay">
+    <div class="boot-stack" role="status" aria-label="Loading">
+        <div class="boot-win boot-blue is-up">
+            <div class="boot-bar">C:\GHOSTLINE\PANELS</div>
+            <div class="boot-body">
+                <div>Loading ...</div>
+                <div class="boot-what">Animation Loops</div>
+                <div class="boot-progress"><span class="boot-pct">0%</span><div class="boot-fill"><span class="boot-pct">0%</span></div></div>
+            </div>
+        </div>
+        <div class="boot-win boot-magenta">
+            <div class="boot-bar">C:\GHOSTLINE\MYSTRA</div>
+            <div class="boot-body">
+                <div>Loading ...</div>
+                <div class="boot-what">Servo Bus x18</div>
+                <div class="boot-progress"><span class="boot-pct">0%</span><div class="boot-fill"><span class="boot-pct">0%</span></div></div>
+            </div>
+        </div>
+        <div class="boot-win boot-green">
+            <div class="boot-bar">GHOSTLINE 14.5.7</div>
+            <div class="boot-body">
+                <div>Loading ...</div>
+                <div class="boot-what" id="bootWhat">Image Assets</div>
+                <div class="boot-progress"><span class="boot-pct">0%</span><div class="boot-fill"><span class="boot-pct">0%</span></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// Loading windows. Theatre on a fixed clock, started the moment this markup is
+// parsed. The page behind is revealed once the sequence has played AND the
+// document has finished loading its scripts, whichever comes last.
+(function () {
+    const overlay = document.getElementById('boot-overlay');
+    const wins = [...overlay.querySelectorAll('.boot-win')];
+
+    const STAGGER = 430;                   // gap between windows appearing
+    const TICK = 130;                      // gap between bar steps
+    const HOLD = 650;                      // pause on the finished frame
+    const STEPS = [14, 38, 63, 86, 100];
+
+    const setBar = (win, pct) => {
+        win.querySelector('.boot-fill').style.width = pct + '%';
+        win.querySelectorAll('.boot-pct').forEach(label => { label.textContent = pct + '%'; });
+    };
+
+    wins.forEach((win, w) => {
+        setTimeout(() => {
+            win.classList.add('is-up');
+            STEPS.forEach((pct, k) => setTimeout(() => setBar(win, pct), k * TICK));
+        }, w * STAGGER);
+    });
+
+    const doneAt = (wins.length - 1) * STAGGER + (STEPS.length - 1) * TICK;
+    let played = false;
+    let ready = document.readyState !== 'loading';
+
+    const leave = () => {
+        if (!played || !ready) return;
+        const main = document.getElementById('main-content');
+        overlay.style.opacity = '0';
+        if (main) main.style.opacity = '1';
+        setTimeout(() => { overlay.style.display = 'none'; }, 260);
+    };
+
+    setTimeout(() => { document.getElementById('bootWhat').textContent = 'What is life?'; }, doneAt);
+    setTimeout(() => { played = true; leave(); }, doneAt + HOLD);
+    document.addEventListener('DOMContentLoaded', () => { ready = true; leave(); });
+})();
+</script>
+
+<!-- Stylesheets live here, after the loader, instead of in <head>. In the head
+     they blocked the parser (through the script that follows them) until every
+     one had downloaded, so the body was not even parsed and the screen stayed
+     blank. Here the loader above is already painted and running. Their order,
+     and their order relative to the styles and scripts below, is unchanged, and
+     scripts further down still wait for them exactly as before. -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/agent-pet-roaming.css?v=2">
+
+<!-- Supabase env vars (sets window.SUPABASE_URL / window.SUPABASE_ANON_KEY) -->
+<script src="supabase-env.js"></script>
+
+<style>
+  /* Mobile: sun smaller, Lost Archive below sun */
+  @media (max-width: 768px) {
+    #sun-bg {
+      right: 50% !important;
+      bottom: 20px !important;
+    }
+    #sun-img {
+      width: 220px !important;
+      height: 220px !important;
+    }
+  }
+  #terminal-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 60%;
+    background: #000;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    font-family: 'Share Tech Mono', monospace;
+    z-index: 10000;
+    padding: 20px;
+  }
+  #terminal-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+  }
+</style>
+
+
 
 <!-- Real-time Sun from NASA SDO + shimmer pixels at grid crossings -->
 <div id="sun-bg" style="position:fixed;z-index:0;bottom:-250px;right:16%;display:flex;flex-direction:column;align-items:center;">
@@ -219,94 +369,6 @@
 </script>
 
 <!-- Terminal Loading Screen -->
-
-<style>
-#terminal-loading {
-    position: fixed; inset: 0; z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    background: #000;
-    transition: opacity .24s steps(3);
-}
-/* three windows stepping down the screen. They overlap by a sliver, enough for
-   the shadows to land on each other, but every bar stays in view. Hidden ones
-   still hold their place, so nothing shifts when the next one pops. */
-.boot-stack { display: flex; flex-direction: column; align-items: flex-start; width: min(360px, 90vw); }
-.boot-win {
-    position: relative;
-    width: calc(100% - 46px);
-    margin-top: -7px;
-    visibility: hidden;
-    border: 2px solid var(--w-line);
-    background: var(--w-bg);
-    color: var(--w-text);
-    box-shadow: 6px 6px 0 var(--w-shadow);
-    font: 14px/1.4 'Share Tech Mono', ui-monospace, Menlo, Consolas, monospace;
-    text-align: left;
-}
-.boot-win.is-up { visibility: visible; }
-.boot-bar { padding: 4px 9px; background: var(--w-bar); color: var(--w-bar-text); letter-spacing: .06em; }
-.boot-body { padding: 8px 9px 10px; }
-.boot-what { color: var(--w-strong); }
-.boot-progress { position: relative; height: 22px; margin-top: 7px; border: 1px solid var(--w-line); overflow: hidden; }
-.boot-pct { position: absolute; left: 7px; top: 0; line-height: 20px; white-space: nowrap; }
-/* the fill carries its own copy of the number in the opposite colour, so the
-   label inverts as the bar passes under it */
-.boot-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--w-fill); overflow: hidden; }
-.boot-fill .boot-pct { color: var(--w-fill-text); }
-
-/* panels and support: the blue file manager */
-.boot-blue {
-    margin-top: 0;
-    --w-bg: #0000aa; --w-line: #5555ff; --w-shadow: #00004d;
-    --w-bar: #00aaaa; --w-bar-text: #000;
-    --w-text: #aaaaaa; --w-strong: #ffffff;
-    --w-fill: #55ffff; --w-fill-text: #0000aa;
-}
-/* MYSTRA: CGA mode 1 */
-.boot-magenta {
-    margin-left: 46px;
-    --w-bg: #000; --w-line: #ff55ff; --w-shadow: #4d004d;
-    --w-bar: #ff55ff; --w-bar-text: #000;
-    --w-text: #aaaaaa; --w-strong: #55ffff;
-    --w-fill: #ff55ff; --w-fill-text: #000;
-}
-/* this page: green phosphor */
-.boot-green {
-    margin-left: 16px;
-    --w-bg: #000; --w-line: #00ff00; --w-shadow: #004d00;
-    --w-bar: #00ff00; --w-bar-text: #000;
-    --w-text: #00aa00; --w-strong: #00ff00;
-    --w-fill: #00ff00; --w-fill-text: #000;
-}
-</style>
-<div id="terminal-loading">
-    <div class="boot-stack" role="status" aria-label="Loading">
-        <div class="boot-win boot-blue">
-            <div class="boot-bar">C:\GHOSTLINE\PANELS</div>
-            <div class="boot-body">
-                <div>Loading ...</div>
-                <div class="boot-what">Animation Loops</div>
-                <div class="boot-progress"><span class="boot-pct">0%</span><div class="boot-fill"><span class="boot-pct">0%</span></div></div>
-            </div>
-        </div>
-        <div class="boot-win boot-magenta">
-            <div class="boot-bar">C:\GHOSTLINE\MYSTRA</div>
-            <div class="boot-body">
-                <div>Loading ...</div>
-                <div class="boot-what">Servo Bus x18</div>
-                <div class="boot-progress"><span class="boot-pct">0%</span><div class="boot-fill"><span class="boot-pct">0%</span></div></div>
-            </div>
-        </div>
-        <div class="boot-win boot-green">
-            <div class="boot-bar">GHOSTLINE 14.5.7</div>
-            <div class="boot-body">
-                <div>Loading ...</div>
-                <div class="boot-what" id="bootWhat">Image Assets</div>
-                <div class="boot-progress"><span class="boot-pct">0%</span><div class="boot-fill"><span class="boot-pct">0%</span></div></div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="slide-container scanlines" id="main-content" style="opacity: 0; transition: opacity 1s ease;">
     <!-- Matrix Rain Effect -->
@@ -1049,39 +1111,6 @@ let currentManifestoSlide = 0;
         }, 1000);
     }
     
-    // Loading windows. Theatre on a fixed clock: three dialogs pop up one under
-    // another, each runs its bar to the end in five hard steps, and the whole
-    // thing is over in about 1.3 seconds, the same as the loader it replaced.
-    function startTerminalLoading() {
-        const overlay = document.getElementById('terminal-loading');
-        const main = document.getElementById('main-content');
-        const wins = [...overlay.querySelectorAll('.boot-win')];
-
-        const STAGGER = 200;                   // gap between windows appearing
-        const TICK = 80;                       // gap between bar steps
-        const STEPS = [14, 38, 63, 86, 100];
-
-        const setBar = (win, pct) => {
-            win.querySelector('.boot-fill').style.width = pct + '%';
-            win.querySelectorAll('.boot-pct').forEach(label => { label.textContent = pct + '%'; });
-        };
-
-        wins.forEach((win, w) => {
-            setTimeout(() => {
-                win.classList.add('is-up');
-                STEPS.forEach((pct, k) => setTimeout(() => setBar(win, pct), k * TICK));
-            }, w * STAGGER);
-        });
-
-        const doneAt = (wins.length - 1) * STAGGER + (STEPS.length - 1) * TICK;
-        setTimeout(() => { document.getElementById('bootWhat').textContent = 'What is life?'; }, doneAt);
-        setTimeout(() => {
-            overlay.style.opacity = '0';
-            main.style.opacity = '1';
-            setTimeout(() => { overlay.style.display = 'none'; }, 260);
-        }, doneAt + 380);
-    }
-
     // Create real TV pixel noise effect
     function createTVNoise() {
         const label = safeGetElement('partners-label');
@@ -1176,8 +1205,6 @@ let currentManifestoSlide = 0;
 
     // Initialize everything when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        // Start terminal loading
-        startTerminalLoading();
         
         // Hide scroll hint on scroll (with delay to ensure element exists)
         setTimeout(() => {
