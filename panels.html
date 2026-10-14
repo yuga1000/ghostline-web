@@ -244,6 +244,13 @@ body.has-payment-open { overflow: hidden; }
 .situ-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding-top: 4px; }
 .situ-chip { padding: 5px 9px; border: 1px solid var(--dos-bright); color: var(--dos-bright); font-size: 8px; letter-spacing: .14em; white-space: nowrap; }
 .situ-chip.is-key { background: var(--dos-teal); border-color: var(--dos-teal); color: #000; }
+/* PANEL_64: the panel stands upright and the capture is 9:16, so the video
+   column stays narrow and the order window sits beside it. */
+.tall-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(300px, 400px); justify-content: center; align-items: start; gap: 22px; }
+.tall-stage { position: relative; background: #000; }
+.tall-stage video { width: 100%; height: auto; aspect-ratio: 9 / 16; background: #000; }
+.tall-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 60px rgba(0,0,0,.72); }
+.tall-ask { margin-top: 14px; }
 /* Support / monetization strip */
 .support-grid { display: grid; grid-template-columns: repeat(var(--support-cols, 4), minmax(0, 1fr)); gap: 1px; border: var(--bw) solid var(--dos-bright); background: var(--dos-bright); }
 .support-cell { display: flex; flex-direction: column; gap: 7px; min-height: 132px; padding: 16px; background: var(--dos-bg); }
@@ -261,6 +268,7 @@ body.has-payment-open { overflow: hidden; }
 .footer a:hover { color: var(--accent); }
 @media (max-width: 920px) {
   .object-grid { grid-template-columns: 1fr; }
+  .tall-grid { grid-template-columns: minmax(0, 440px); }
 }
 @media (max-width: 620px) {
   .tb-row { padding: 0 12px; }
@@ -396,6 +404,42 @@ body.has-payment-open { overflow: hidden; }
             <span class="situ-chip">BUILT TO ORDER</span>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section id="panel-64">
+      <div class="section-head">
+        <div class="section-title">PANEL_64 / 32 × 64 CM</div>
+        <div class="section-meta">CUSTOM FRAME · YOUR OWN DESIGN · MADE TO ORDER</div>
+      </div>
+      <div class="tall-grid">
+        <div class="window">
+          <div class="window-bar"><span>[ PANEL_64.CAPTURE ]</span><strong>SPIKED FRAME / LIVE</strong></div>
+          <div class="tall-stage">
+            <video id="tallPlayer" poster="assets/led-panels/posters/panel-32x64.jpg?v=1" muted loop playsinline preload="none">
+              <source src="assets/led-panels/video/panel-32x64.mp4?v=1" type="video/mp4" />
+            </video>
+            <span class="video-badge">DISPLAY 32×64 CM</span>
+          </div>
+        </div>
+
+        <aside class="window spec-window">
+          <div class="window-bar"><span>[ ORDER_PANEL_64.CMD ]</span><strong>MADE TO ORDER</strong></div>
+          <div class="spec-body">
+            <h2 class="product-name">LED PANEL 64</h2>
+            <dl class="spec-list">
+              <dt>DISPLAY</dt><dd>32 × 64 CM</dd>
+              <dt>FRAME</dt><dd>CUSTOM SIZE</dd>
+              <dt>THIS ONE</dt><dd>15 CM + SPIKES</dd>
+              <dt>DESIGN</dt><dd>YOUR OWN, ON REQUEST</dd>
+              <dt>STATUS</dt><dd class="ok">MADE TO ORDER</dd>
+            </dl>
+            <p class="spec-copy">Frame size is custom. The one in the video is 15 cm plus the spikes. The frame can be made to your own design.</p>
+            <div class="price-line"><span>PRICE</span><strong>ON REQUEST</strong></div>
+            <a class="cmd-btn tall-ask" href="mailto:ghostlinesystem@gmail.com?subject=LED%20PANEL%2064">[ ASK ABOUT THIS PANEL ]</a>
+            <a class="contact-email" href="mailto:ghostlinesystem@gmail.com">ghostlinesystem@gmail.com</a>
+          </div>
+        </aside>
       </div>
     </section>
 
@@ -630,19 +674,23 @@ supportGrid.innerHTML = supportChannels.map(channel => {
 // couple of channels are live, so size the track count to what actually rendered.
 supportGrid.style.setProperty("--support-cols", Math.min(supportChannels.length, 4));
 
-// The in-situ capture is 3 MB — only load and play it once it is actually on screen.
-const situPlayer = document.getElementById("situPlayer");
-new IntersectionObserver((entries, observer) => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-    situPlayer.preload = "auto";
-    situPlayer.load();
-    // preload="none" means readyState is 0 here, so also retry once there are frames
-    situPlayer.addEventListener("canplay", () => situPlayer.play().catch(() => {}), { once: true });
-    situPlayer.play().catch(() => {});
-    observer.disconnect();
-  });
-}, { rootMargin: "200px" }).observe(situPlayer);
+// The captures below the fold are 2 to 4 MB each, so each one only loads and
+// plays once it is actually on screen.
+function playWhenSeen(player) {
+  new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      player.preload = "auto";
+      player.load();
+      // preload="none" means readyState is 0 here, so also retry once there are frames
+      player.addEventListener("canplay", () => player.play().catch(() => {}), { once: true });
+      player.play().catch(() => {});
+      observer.disconnect();
+    });
+  }, { rootMargin: "200px" }).observe(player);
+}
+playWhenSeen(document.getElementById("situPlayer"));
+playWhenSeen(document.getElementById("tallPlayer"));
 </script>
 </body>
 </html>
