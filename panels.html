@@ -132,7 +132,7 @@ h1 { margin: 0; color: var(--dos-gray); font: 30px/1 var(--terminal); letter-spa
 .section-title { display: flex; align-items: center; gap: 10px; color: var(--dos-cyan); font-size: 11px; letter-spacing: .16em; }
 .section-title::before { content: ""; width: 24px; height: 1px; background: var(--dos-bright); }
 .section-meta { color: var(--text-mute); font-size: 9px; letter-spacing: .12em; text-align: right; }
-.object-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .55fr); gap: 22px; }
+.object-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 400px); justify-content: center; align-items: start; gap: 22px; }
 .window { border: var(--bw) solid var(--dos-bright); background: var(--dos-bg); }
 .window-bar {
   min-height: 38px;
@@ -147,12 +147,12 @@ h1 { margin: 0; color: var(--dos-gray); font: 30px/1 var(--terminal); letter-spa
   letter-spacing: .12em;
 }
 .window-bar strong { color: var(--dos-white); font-weight: 400; }
-.capture-stage { position: relative; aspect-ratio: 1 / .72; overflow: hidden; background: #000; }
-.capture-stage video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+.capture-stage { position: relative; overflow: hidden; background: #000; }
+.capture-stage video { display: block; width: 100%; height: auto; background: #000; }
 .capture-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 46px rgba(0,0,0,.58); }
 .video-badge { position: absolute; z-index: 2; left: 12px; bottom: 12px; padding: 5px 8px; border: 1px solid var(--dos-bright); background: rgba(0,0,0,.86); color: var(--dos-cyan); font-size: 9px; letter-spacing: .12em; }
 /* function-key bar across the foot of the preview */
-.capture-controls { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--dos-bright); border-top: 1px solid var(--dos-bright); }
+.capture-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--dos-bright); border-top: 1px solid var(--dos-bright); }
 .capture-key { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 8px 9px; background: var(--dos-teal); color: #000; font-size: 9px; letter-spacing: .06em; text-align: left; }
 .capture-key i { flex: none; padding: 1px 4px; background: #000; color: var(--dos-gray); font-style: normal; font-size: 9px; }
 .capture-key span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -283,7 +283,7 @@ body.has-payment-open { overflow: hidden; }
 .footer a { color: var(--text-dim); }
 .footer a:hover { color: var(--accent); }
 @media (max-width: 920px) {
-  .object-grid { grid-template-columns: 1fr; }
+  .object-grid { grid-template-columns: minmax(0, 440px); }
   .tall-grid { grid-template-columns: minmax(0, 440px); }
 }
 @media (max-width: 620px) {
@@ -301,7 +301,6 @@ body.has-payment-open { overflow: hidden; }
   .section-head { align-items: flex-start; flex-direction: column; gap: 6px; }
   .section-meta { text-align: left; }
   .window-bar { font-size: 9px; letter-spacing: .08em; }
-  .capture-stage { aspect-ratio: 1; }
   .capture-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .capture-key { padding: 7px; font-size: 8px; }
   .frame-options { grid-template-columns: 1fr 1fr; }
