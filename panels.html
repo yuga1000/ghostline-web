@@ -66,7 +66,7 @@ img, video { display: block; max-width: 100%; }
   background-size: 88px 88px, 88px 88px, 88px 88px;
 }
 /* a band of crosses sitting in the page, so it scrolls with everything else */
-#shimmer { position: relative; height: 68px; margin: -6px 0 -4px; }
+#shimmer { position: relative; height: 24px; margin: -6px 0 -4px; }
 .shell::after {
   content: "";
   position: fixed;
@@ -120,6 +120,8 @@ img, video { display: block; max-width: 100%; }
   gap: 30px;
 }
 .page-head { display: flex; flex-direction: column; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.panel-cover { margin: 0 0 8px; }
+.panel-cover img { width: 100%; height: auto; aspect-ratio: 4 / 1; object-fit: cover; }
 .title-row { display: flex; align-items: center; justify-content: center; gap: 14px; }
 .folder-id { padding: 4px 10px; border: 1px solid var(--dos-bright); color: var(--dos-cyan); font-size: 10px; letter-spacing: .16em; }
 /* small, grey, terminal: a DOS screen title, not a logo */
@@ -170,6 +172,20 @@ h1 { margin: 0; color: var(--dos-gray); font: 30px/1 var(--terminal); letter-spa
 .frame-hint a:hover { background: var(--dos-cyan); color: #000; border-color: var(--dos-cyan); }
 .spec-copy { margin: 18px 0; color: var(--dos-gray); font-size: 10px; line-height: 1.7; }
 .product-name { margin: 2px 0 18px; color: var(--dos-white); font: 22px/1 var(--terminal); letter-spacing: .24em; }
+.product-format { margin: -6px 0 18px; color: var(--dos-gray); font-size: 10px; line-height: 1.7; }
+.panel-details { margin-top: 18px; border-top: 1px solid var(--dos-bright); }
+.panel-details > summary, .archive-section > summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 42px; cursor: pointer; list-style: none; }
+.panel-details > summary { color: var(--dos-cyan); font-size: 9px; letter-spacing: .08em; }
+.panel-details > summary::-webkit-details-marker, .archive-section > summary::-webkit-details-marker { display: none; }
+.panel-details > summary::after, .archive-section > summary::after { content: "[ + ]"; flex: none; color: var(--dos-cyan); }
+.panel-details[open] > summary::after, .archive-section[open] > summary::after { content: "[ - ]"; }
+.panel-details > summary:hover, .archive-section > summary:hover { color: var(--dos-white); }
+.panel-details > summary:focus-visible, .archive-section > summary:focus-visible { outline: 2px solid var(--dos-cyan); outline-offset: 4px; }
+.detail-body { padding: 8px 0 2px; }
+.archive-section { scroll-margin-top: 110px; }
+.archive-section > summary { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.archive-section > summary .section-title { margin: 0; line-height: 1.7; }
+.archive-section[open] > summary { margin-bottom: 18px; }
 .frame-label { margin: 18px 0 8px; color: var(--dos-bright); font-size: 9px; letter-spacing: .12em; }
 .frame-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--dos-bright); border: 1px solid var(--dos-bright); }
 .frame-option { min-height: 46px; padding: 7px 4px; background: var(--dos-bg); color: var(--dos-gray); font-size: 9px; letter-spacing: .1em; line-height: 1.35; }
@@ -277,6 +293,8 @@ body.has-payment-open { overflow: hidden; }
   .tb-node { padding: 3px 7px; }
   .tb-link { padding: 0 10px; font-size: 9px; }
   .page { width: calc(100% - 24px); padding-top: 20px; gap: 24px; }
+  .panel-cover img { aspect-ratio: 2 / 1; }
+  .panel-cover .window-bar { font-size: 8px; letter-spacing: .04em; }
   .title-row { align-items: center; gap: 10px; }
   .folder-id { font-size: 9px; padding: 4px 7px; }
   h1 { font-size: 24px; letter-spacing: .26em; text-indent: .26em; }
@@ -314,7 +332,7 @@ body.has-payment-open { overflow: hidden; }
       <a class="tb-brand" href="index.html">▣ GHOSTLINE_OS</a>
       <span class="tb-status"><i class="dot dot-ok"></i> LED_NODE ONLINE</span>
       <span class="tb-right">
-        <span class="tb-node">PANEL_42 / AVAILABLE</span>
+        <span class="tb-node">MADE TO ORDER</span>
       </span>
     </div>
     <nav class="tb-row tb-row-2" aria-label="Main navigation">
@@ -328,9 +346,13 @@ body.has-payment-open { overflow: hidden; }
 
   <main class="page">
     <header class="page-head">
+      <figure class="window panel-cover">
+        <div class="window-bar"><span>[ MATERIAL_STUDIES.JPG ]</span><strong>GHOSTLINE</strong></div>
+        <img src="assets/led-panels/material-studies.jpg" width="2172" height="724" alt="Material studies of a metal frame, LED pixels and panel circuitry" fetchpriority="high" />
+      </figure>
       <div class="title-row">
-        <span class="folder-id">PANEL_42</span>
-        <h1>LED PANEL</h1>
+        <span class="folder-id">OBJECTS</span>
+        <h1>LED PANELS</h1>
       </div>
       <div class="head-subline"><i class="dot dot-ok"></i> CUSTOM OBJECT / MADE TO ORDER</div>
     </header>
@@ -351,16 +373,10 @@ body.has-payment-open { overflow: hidden; }
         </div>
 
         <aside class="window spec-window">
-          <div class="window-bar"><span>[ ORDER_PANEL.CMD ]</span><strong>AVAILABLE</strong></div>
+          <div class="window-bar"><span>[ ORDER_PANEL.CMD ]</span><strong>MADE TO ORDER</strong></div>
           <div class="spec-body">
             <h2 class="product-name">LED PANEL 42</h2>
-            <dl class="spec-list">
-              <dt>OBJECT</dt><dd>42 × 42 CM</dd>
-              <dt>DISPLAY</dt><dd>31 × 31 CM</dd>
-              <dt>FRAME</dt><dd>CUSTOM MADE</dd>
-              <dt>INCLUDED</dt><dd>01 LOOP / UP TO 20 SEC</dd>
-              <dt>STATUS</dt><dd class="ok">MADE TO ORDER</dd>
-            </dl>
+            <p class="product-format">42 × 42 CM / DISPLAY 31 × 31 CM</p>
 
             <div class="frame-label">SELECT FRAME</div>
             <div class="frame-options" role="group" aria-label="Frame material">
@@ -368,9 +384,20 @@ body.has-payment-open { overflow: hidden; }
               <button class="frame-option" type="button" data-frame="WOOD">[ WOOD ]<small>FLAT EDGE</small></button>
               <button class="frame-option" type="button" data-frame="HORNED">[ HORNED ]<small>FULL SHAPE</small></button>
             </div>
-            <p class="frame-hint">HORNED is the full-shape carved frame, same price. See it running in <a href="#in-situ">REAL OBJECT</a> below.</p>
-
-            <p class="spec-copy">Longer playback and custom animation work are quoted separately.</p>
+            <details class="panel-details">
+              <summary>SPECIFICATIONS / PLAYBACK</summary>
+              <div class="detail-body">
+                <dl class="spec-list">
+                  <dt>OBJECT</dt><dd>42 × 42 CM</dd>
+                  <dt>DISPLAY</dt><dd>31 × 31 CM</dd>
+                  <dt>FRAME</dt><dd>CUSTOM MADE</dd>
+                  <dt>INCLUDED</dt><dd>01 LOOP / UP TO 20 SEC</dd>
+                  <dt>STATUS</dt><dd class="ok">MADE TO ORDER</dd>
+                </dl>
+                <p class="frame-hint">HORNED is the full-shape carved frame, same price. See it running in the <a href="#in-situ">WORKSHOP CAPTURE</a> below.</p>
+                <p class="spec-copy">Longer playback and custom animation work are quoted separately.</p>
+              </div>
+            </details>
             <div class="price-line"><span>BASE PRICE</span><strong>USD 1199</strong></div>
             <p class="delivery-note"><strong>DELIVERY NOT INCLUDED.</strong><br>Calculated separately for your location.</p>
             <button class="cmd-btn" id="payPanel" type="button">[ PAY 1199 USDT ]</button>
@@ -380,11 +407,8 @@ body.has-payment-open { overflow: hidden; }
       </div>
     </section>
 
-    <section id="in-situ">
-      <div class="section-head">
-        <div class="section-title">REAL OBJECT / IN SITU</div>
-        <div class="section-meta">UNCUT CAPTURE · NO RENDER · HORNED FRAME</div>
-      </div>
+    <details class="archive-section" id="in-situ">
+      <summary><span class="section-title">WORKSHOP CAPTURE / HORNED FRAME</span></summary>
       <div class="window situ-window">
         <div class="window-bar"><span>[ IN_SITU.CAPTURE ]</span><strong>PANEL_42 / HORNED</strong></div>
         <div class="situ-stage">
@@ -405,7 +429,7 @@ body.has-payment-open { overflow: hidden; }
           </div>
         </div>
       </div>
-    </section>
+    </details>
 
     <section id="panel-64">
       <div class="section-head">
@@ -427,14 +451,20 @@ body.has-payment-open { overflow: hidden; }
           <div class="window-bar"><span>[ ORDER_PANEL_64.CMD ]</span><strong>MADE TO ORDER</strong></div>
           <div class="spec-body">
             <h2 class="product-name">LED PANEL 64</h2>
-            <dl class="spec-list">
-              <dt>DISPLAY</dt><dd>32 × 64 CM</dd>
-              <dt>FRAME</dt><dd>CUSTOM SIZE</dd>
-              <dt>THIS ONE</dt><dd>15 CM + SPIKES</dd>
-              <dt>DESIGN</dt><dd>YOUR OWN, ON REQUEST</dd>
-              <dt>STATUS</dt><dd class="ok">MADE TO ORDER</dd>
-            </dl>
-            <p class="spec-copy">Frame size is custom. The one in the video is 15 cm plus the spikes. The frame can be made to your own design.</p>
+            <p class="product-format">DISPLAY 32 × 64 CM / CUSTOM FRAME</p>
+            <details class="panel-details">
+              <summary>SPECIFICATIONS / FRAME</summary>
+              <div class="detail-body">
+                <dl class="spec-list">
+                  <dt>DISPLAY</dt><dd>32 × 64 CM</dd>
+                  <dt>FRAME</dt><dd>CUSTOM SIZE</dd>
+                  <dt>THIS ONE</dt><dd>15 CM + SPIKES</dd>
+                  <dt>DESIGN</dt><dd>YOUR OWN, ON REQUEST</dd>
+                  <dt>STATUS</dt><dd class="ok">MADE TO ORDER</dd>
+                </dl>
+                <p class="spec-copy">Frame size is custom. The one in the video is 15 cm plus the spikes. The frame can be made to your own design.</p>
+              </div>
+            </details>
             <div class="price-line"><span>PRICE</span><strong>ON REQUEST</strong></div>
             <a class="cmd-btn tall-ask" href="mailto:ghostlinesystem@gmail.com?subject=LED%20PANEL%2064">[ ASK ABOUT THIS PANEL ]</a>
             <a class="contact-email" href="mailto:ghostlinesystem@gmail.com">ghostlinesystem@gmail.com</a>
@@ -443,16 +473,13 @@ body.has-payment-open { overflow: hidden; }
       </div>
     </section>
 
-    <section id="support">
-      <div class="section-head">
-        <div class="section-title">SUPPORT THE LINE</div>
-        <div class="section-meta">PANELS FUND THE LAB · SUBSCRIPTIONS KEEP IT RUNNING</div>
-      </div>
+    <details class="archive-section" id="support">
+      <summary><span class="section-title">SUPPORT THE LINE</span></summary>
       <div class="support-grid" id="supportGrid"></div>
-    </section>
+    </details>
 
     <footer class="footer">
-      <span>GHOSTLINE // PANEL_42</span>
+      <span>GHOSTLINE // PANELS</span>
       <a href="index.html">◀ HOME</a>
     </footer>
   </main>
