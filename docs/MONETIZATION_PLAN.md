@@ -10,6 +10,13 @@ voluntary support through the existing `js/support-links.js` channels. The
 owner explicitly chose this first page over the older animation-store gate
 below. No paid access, delivery promises or new subscription benefits are added.
 
+Presentation: a borderless, irregular composition with all visible works playing
+together. No carousel. Add an entry to `works` in `js/temple.js` to extend the
+collection; each four works form another constellation further down the page.
+Add matching MP4, GIF and poster PNG files under `assets/temple/`. Offscreen
+videos pause automatically. GIF/MP4 are loop downloads; device-specific live
+wallpaper setup is not included.
+
 Next discussions: physical P2 stained-glass objects, installations, and small
 lenticular print samples before committing to a production run. Prices,
 commercial licenses and production quantities remain undecided.

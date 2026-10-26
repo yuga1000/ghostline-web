@@ -1,3 +1,25 @@
+const works = [
+  { id: "49", file: "49_05", description: "A red-faced crowned figure surrounded by colored lights and mechanical forms." },
+  { id: "50", file: "50_05", description: "A pale mechanical figure in red, green and gold ceremonial clothing." },
+  { id: "51", file: "51_05", description: "A dark crowned figure inside a red ring, green ornament and floating computer windows." },
+  { id: "52", file: "52_05", description: "A seated mechanical figure with a red halo and red robes in a dark chamber." }
+];
+const windows = document.getElementById("windows");
+for (let index = 0; index < works.length; index += 4) {
+  const group = document.createElement("div");
+  group.className = "constellation";
+  group.innerHTML = works.slice(index, index + 4).map(work => `
+    <figure class="window" data-name="WINDOW ${work.id}">
+      <button class="window-view" type="button" aria-label="Open Window ${work.id}" aria-describedby="description${work.id}">
+        <video class="window-player" src="assets/temple/${work.file}.mp4" poster="assets/temple/${work.file}.png" width="896" height="1344" muted loop playsinline preload="none" aria-hidden="true"></video>
+        <span class="view-hint">[ ENTER ${work.id} ]</span>
+      </button>
+      <figcaption class="sr-only" id="description${work.id}">${work.description}</figcaption>
+    </figure>
+  `).join("");
+  windows.appendChild(group);
+}
+
 const players = Array.from(document.querySelectorAll(".window-player"));
 const visiblePlayers = new Set();
 const motionToggle = document.getElementById("motionToggle");
@@ -47,11 +69,11 @@ document.querySelectorAll(".window-view").forEach(button => {
     document.getElementById("viewerTitle").textContent = card.dataset.name;
     viewerPlayer.poster = player.poster;
     viewerPlayer.src = player.getAttribute("src");
+    const work = works.find(work => card.dataset.name === `WINDOW ${work.id}`);
     ["gif", "mp4"].forEach(format => {
-      const source = card.querySelector(`a[download$=".${format}"]`);
       const target = document.getElementById(format === "gif" ? "viewerGif" : "viewerMp4");
-      target.href = source.href;
-      target.download = source.download;
+      target.href = `assets/temple/${work.file}.${format}`;
+      target.download = `ghostline-window-${work.id}.${format}`;
     });
     viewer.showModal();
     updatePlayback();
@@ -74,7 +96,7 @@ if (channels.length) {
   document.getElementById("supportLinks").innerHTML = channels.map(channel => {
     const url = channel.url === "support.html#wallet" ? "#wallet" : channel.url;
     const external = /^https?:/.test(url);
-    return `<a href="${url}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}><span>${channel.name}</span><span>${channel.go}</span></a>`;
+    return `<a href="${url}"${external ? ' target="_blank" rel="noopener noreferrer"' : ""}><span>${channel.name}</span><span class="channel-type">${channel.type}</span><span class="channel-open">[ OPEN ]</span></a>`;
   }).join("");
 }
 if (config.wallet) {
