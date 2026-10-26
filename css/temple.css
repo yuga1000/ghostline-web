@@ -40,7 +40,7 @@ h1 { position: relative; color: var(--text); font: 88px/1 var(--terminal); lette
 .text-key { min-height: 36px; color: var(--dim); font-size: 10px; letter-spacing: .08em; }
 .sanctuary { max-width: 1120px; margin: 0 auto; }
 .windows { padding-top: 12px; }
-.constellation { position: relative; aspect-ratio: 1.48; margin-bottom: 70px; }
+.constellation { position: relative; aspect-ratio: 1.48; margin-bottom: -15%; }
 .constellation:last-child { margin-bottom: 0; }
 .window { position: absolute; width: 31%; left: 0; top: 14%; mix-blend-mode: screen; }
 .window:nth-child(2) { width: 32%; left: 25%; top: 0; }
@@ -112,7 +112,7 @@ body:has(.viewer[open]) { overflow: hidden; }
 @media (max-width: 800px) {
   .page-head { --portal-pixel: 3px; min-height: 200px; padding-top: 54px; }
   h1 { font-size: 72px; }
-  .constellation { aspect-ratio: .63; margin-bottom: 65px; }
+  .constellation { aspect-ratio: .63; margin-bottom: -18%; }
   .window:nth-child(1), .constellation:nth-child(even) .window:nth-child(1) { width: 53%; left: 0; top: 8%; }
   .window:nth-child(2), .constellation:nth-child(even) .window:nth-child(2) { width: 55%; left: 45%; top: 0; }
   .window:nth-child(3), .constellation:nth-child(even) .window:nth-child(3) { width: 48%; left: 5%; top: 54%; }
@@ -130,12 +130,21 @@ body:has(.viewer[open]) { overflow: hidden; }
   .sanctuary-tools .text-key { font-size: 9px; }
   .view-note { margin-top: 16px; font-size: 20px; }
   .support { margin: 64px auto 38px; }
-  .support-intro { padding: 17px 8px; }
+  .support-title { gap: 4px; margin-left: 2px; margin-right: 2px; }
+  .support-title > * { padding: 0 4px; }
+  .support-title h2 { font-size: 17px; white-space: nowrap; }
+  .support-intro { padding: 15px 10px; font-size: 17px; }
   .support-columns, .support-links a { grid-template-columns: minmax(0, 1fr) 66px 65px; gap: 6px; padding-left: 8px; padding-right: 8px; }
-  .wallet { grid-template-columns: 1fr; justify-items: center; gap: 16px; margin: 0 6px; padding: 18px 2px; }
-  .wallet-body { width: 100%; }
-  .wallet-address { font-size: 10px; }
-  .copy-status { display: block; min-height: 20px; margin: 0; }
+  .wallet { grid-template-columns: 1fr; justify-items: center; gap: 12px; margin: 0 6px; padding: 16px 2px; }
+  .wallet-body { width: 100%; text-align: center; }
+  .wallet .eyebrow { font-size: 16px; }
+  .wallet-address { margin: 10px 0 6px; font-size: 11px; }
+  .wallet .text-key { min-height: 40px; }
+  .wallet-note { margin-top: 4px; font-size: 15px; }
+  .copy-status { display: block; margin: 0; }
+  .copy-status:empty { display: none; }
+  .support-status { gap: 8px; padding: 9px 8px; font-size: 15px; }
+  .support-status a { white-space: nowrap; }
   .footer { align-items: flex-start; flex-direction: column; }
   .footer div { width: 100%; justify-content: space-between; gap: 10px; }
 }
