@@ -78,10 +78,19 @@
 </div>
 
 <dialog class="viewer" id="viewer" aria-labelledby="viewerTitle">
+  <span class="viewer-finial finial-nw" aria-hidden="true"></span>
+  <span class="viewer-finial finial-ne" aria-hidden="true"></span>
+  <span class="viewer-finial finial-sw" aria-hidden="true"></span>
+  <span class="viewer-finial finial-se" aria-hidden="true"></span>
   <div class="viewer-window">
-    <div class="viewer-bar"><h2 id="viewerTitle">WINDOW</h2><form method="dialog"><button class="text-key" type="submit" autofocus>[ CLOSE / ESC ]</button></form></div>
-    <video id="viewerPlayer" width="896" height="1344" muted loop playsinline controls preload="none"></video>
-    <div class="viewer-downloads"><a id="viewerGif" download>[ DOWNLOAD GIF ]</a><a id="viewerMp4" download>[ DOWNLOAD MP4 ]</a></div>
+    <div class="viewer-bar">
+      <span class="viewer-icon" aria-hidden="true">14</span>
+      <h2 id="viewerTitle">WINDOW</h2>
+      <form method="dialog"><button class="win-key viewer-close" type="submit" aria-label="Close window" autofocus><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" shape-rendering="crispEdges"><path d="M1 1h2v2H1zM9 1h2v2H9zM3 3h2v2H3zM7 3h2v2H7zM5 5h2v2H5zM3 7h2v2H3zM7 7h2v2H7zM1 9h2v2H1zM9 9h2v2H9z" fill="currentColor"/></svg></button></form>
+    </div>
+    <div class="viewer-image"><video id="viewerPlayer" width="896" height="1344" muted loop playsinline preload="none"></video></div>
+    <div class="viewer-downloads"><button class="win-key" id="viewerPause" type="button" aria-label="Play animation">Play</button><a class="win-key" id="viewerGif" aria-label="Download GIF" download>GIF</a><a class="win-key" id="viewerMp4" aria-label="Download MP4" download>MP4</a></div>
+    <div class="viewer-status"><span>14 / LOOP</span><span>ESC TO CLOSE</span></div>
   </div>
 </dialog>
 

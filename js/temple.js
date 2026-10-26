@@ -25,6 +25,7 @@ const visiblePlayers = new Set();
 const motionToggle = document.getElementById("motionToggle");
 const viewer = document.getElementById("viewer");
 const viewerPlayer = document.getElementById("viewerPlayer");
+const viewerPause = document.getElementById("viewerPause");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let paused = reducedMotion.matches;
 
@@ -80,8 +81,17 @@ document.querySelectorAll(".window-view").forEach(button => {
     if (!paused) viewerPlayer.play().catch(() => {});
   });
 });
+viewerPause.addEventListener("click", () => {
+  if (viewerPlayer.paused) viewerPlayer.play().catch(() => {});
+  else viewerPlayer.pause();
+});
+["play", "pause", "emptied"].forEach(event => viewerPlayer.addEventListener(event, () => {
+  viewerPause.textContent = viewerPlayer.paused ? "Play" : "Pause";
+  viewerPause.setAttribute("aria-label", viewerPlayer.paused ? "Play animation" : "Pause animation");
+}));
 viewer.addEventListener("click", event => {
-  if (event.target === viewer) viewer.close();
+  const bounds = viewer.getBoundingClientRect();
+  if (event.target === viewer && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) viewer.close();
 });
 viewer.addEventListener("close", () => {
   viewerPlayer.pause();
