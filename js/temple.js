@@ -64,6 +64,7 @@ const viewerPlayer = document.getElementById("viewerPlayer");
 const viewerPause = document.getElementById("viewerPause");
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let paused = reducedMotion.matches;
+let currentIndex = 0;
 
 function updatePlayback() {
   players.forEach(player => {
@@ -99,32 +100,49 @@ document.addEventListener("visibilitychange", () => {
   updatePlayback();
 });
 
-document.querySelectorAll(".window-view").forEach(button => {
-  button.addEventListener("click", () => {
-    const card = button.closest(".window");
-    const player = card.querySelector("video");
-    document.getElementById("viewerTitle").textContent = card.dataset.name;
-    viewerPlayer.poster = player.poster;
-    viewerPlayer.src = player.getAttribute("src");
-    const work = works.find(work => card.dataset.name === `WINDOW ${work.id}`);
-    viewer.style.setProperty("--viewer-aspect", (work.width || 896) / (work.height || 1344));
-    viewerPlayer.width = work.width || 896;
-    viewerPlayer.height = work.height || 1344;
-    ["gif", "mp4"].forEach(format => {
-      const target = document.getElementById(format === "gif" ? "viewerGif" : "viewerMp4");
-      target.hidden = format === "gif" && !work.gif;
-      if (target.hidden) {
-        target.removeAttribute("href");
-        target.removeAttribute("download");
-        return;
-      }
-      target.href = `assets/temple/${format === "mp4" ? work.download || work.file : work.file}.${format}`;
-      target.download = `ghostline-window-${work.id}.${format}`;
-    });
-    viewer.showModal();
-    updatePlayback();
-    if (!paused) viewerPlayer.play().catch(() => {});
+function showWork(index, shouldPlay) {
+  currentIndex = (index + works.length) % works.length;
+  const work = works[currentIndex];
+  const player = players[currentIndex];
+  document.getElementById("viewerTitle").textContent = `WINDOW ${work.id}`;
+  document.getElementById("viewerPosition").textContent = `${String(currentIndex + 1).padStart(2, "0")} / ${String(works.length).padStart(2, "0")}`;
+  viewerPlayer.poster = player.poster;
+  viewerPlayer.src = player.getAttribute("src");
+  viewer.style.setProperty("--viewer-aspect", (work.width || 896) / (work.height || 1344));
+  viewerPlayer.width = work.width || 896;
+  viewerPlayer.height = work.height || 1344;
+  ["gif", "mp4"].forEach(format => {
+    const target = document.getElementById(format === "gif" ? "viewerGif" : "viewerMp4");
+    target.hidden = format === "gif" && !work.gif;
+    if (target.hidden) {
+      target.removeAttribute("href");
+      target.removeAttribute("download");
+      return;
+    }
+    target.href = `assets/temple/${format === "mp4" ? work.download || work.file : work.file}.${format}`;
+    target.download = `ghostline-window-${work.id}.${format}`;
   });
+  if (shouldPlay && !document.hidden) viewerPlayer.play().catch(() => {});
+}
+
+function stepWork(step) {
+  showWork(currentIndex + step, !viewerPlayer.paused);
+}
+
+document.querySelectorAll(".window-view").forEach((button, index) => {
+  button.addEventListener("click", () => {
+    viewer.showModal();
+    showWork(index, !paused);
+    updatePlayback();
+  });
+});
+document.getElementById("viewerPrev").addEventListener("click", () => stepWork(-1));
+document.getElementById("viewerNext").addEventListener("click", () => stepWork(1));
+viewer.addEventListener("keydown", event => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+  event.preventDefault();
+  stepWork(event.key === "ArrowLeft" ? -1 : 1);
 });
 viewerPause.addEventListener("click", () => {
   if (viewerPlayer.paused) viewerPlayer.play().catch(() => {});
