@@ -1,17 +1,27 @@
 const works = [
-  { id: "49", file: "49_05", description: "A red-faced crowned figure surrounded by colored lights and mechanical forms." },
-  { id: "50", file: "50_05", description: "A pale mechanical figure in red, green and gold ceremonial clothing." },
-  { id: "51", file: "51_05", description: "A dark crowned figure inside a red ring, green ornament and floating computer windows." },
-  { id: "52", file: "52_05", description: "A seated mechanical figure with a red halo and red robes in a dark chamber." }
+  { id: "49", file: "49_05", gif: true, description: "A red-faced crowned figure surrounded by colored lights and mechanical forms." },
+  { id: "50", file: "50_05", gif: true, description: "A pale mechanical figure in red, green and gold ceremonial clothing." },
+  { id: "51", file: "51_05", gif: true, description: "A dark crowned figure inside a red ring, green ornament and floating computer windows." },
+  { id: "52", file: "52_05", gif: true, description: "A seated mechanical figure with a red halo and red robes in a dark chamber." },
+  { id: "53", file: "53", width: 720, height: 1068, download: "53-original", description: "A crowned face drawn in magenta pixels against black." },
+  { id: "54", file: "54", width: 720, height: 720, download: "54-original", description: "A blue many-armed figure with a green flower." },
+  { id: "55", file: "55", width: 720, height: 1068, download: "55-original", description: "A green tower with blue water flowing from its doorway." },
+  { id: "56", file: "56", width: 720, height: 720, download: "56-original", description: "A red seated figure inside a pixel game editor." },
+  { id: "57", file: "57", width: 1068, height: 1068, download: "57-original", description: "A green shrine beneath a terminal window." },
+  { id: "58", file: "58", width: 720, height: 1068, download: "58-original", description: "A red many-armed figure below computer diagnostics." },
+  { id: "59", file: "59", width: 720, height: 720, download: "59-original", description: "A red face surrounded by repeating Paint windows." },
+  { id: "60", file: "60", width: 1068, height: 1068, download: "60-original", description: "A red crowned figure with a geometric diagram and stacked icons." },
+  { id: "61", file: "61", width: 720, height: 1068, download: "61-original", description: "A green cross with a Paint toolbar and old computer dialogs." }
 ];
 const windows = document.getElementById("windows");
 for (let index = 0; index < works.length; index += 4) {
   const group = document.createElement("div");
   group.className = "constellation";
+  group.dataset.count = works.slice(index, index + 4).length;
   group.innerHTML = works.slice(index, index + 4).map(work => `
-    <figure class="window" data-name="WINDOW ${work.id}">
+    <figure class="window" data-name="WINDOW ${work.id}" style="--work-aspect: ${work.width || 896} / ${work.height || 1344}">
       <button class="window-view" type="button" aria-label="Open Window ${work.id}" aria-describedby="description${work.id}">
-        <video class="window-player" src="assets/temple/${work.file}.mp4" poster="assets/temple/${work.file}.png" width="896" height="1344" muted loop playsinline preload="none" aria-hidden="true"></video>
+        <video class="window-player" src="assets/temple/${work.file}.mp4" poster="assets/temple/${work.file}.png" width="${work.width || 896}" height="${work.height || 1344}" muted loop playsinline preload="none" aria-hidden="true"></video>
         <span class="view-hint">[ ENTER ${work.id} ]</span>
       </button>
       <figcaption class="sr-only" id="description${work.id}">${work.description}</figcaption>
@@ -71,9 +81,18 @@ document.querySelectorAll(".window-view").forEach(button => {
     viewerPlayer.poster = player.poster;
     viewerPlayer.src = player.getAttribute("src");
     const work = works.find(work => card.dataset.name === `WINDOW ${work.id}`);
+    viewer.style.setProperty("--viewer-aspect", (work.width || 896) / (work.height || 1344));
+    viewerPlayer.width = work.width || 896;
+    viewerPlayer.height = work.height || 1344;
     ["gif", "mp4"].forEach(format => {
       const target = document.getElementById(format === "gif" ? "viewerGif" : "viewerMp4");
-      target.href = `assets/temple/${work.file}.${format}`;
+      target.hidden = format === "gif" && !work.gif;
+      if (target.hidden) {
+        target.removeAttribute("href");
+        target.removeAttribute("download");
+        return;
+      }
+      target.href = `assets/temple/${format === "mp4" ? work.download || work.file : work.file}.${format}`;
       target.download = `ghostline-window-${work.id}.${format}`;
     });
     viewer.showModal();

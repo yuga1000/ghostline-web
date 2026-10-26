@@ -50,9 +50,11 @@ h1 { position: relative; color: var(--text); font: 88px/1 var(--terminal); lette
 .constellation:nth-child(even) .window:nth-child(2) { top: 31%; }
 .constellation:nth-child(even) .window:nth-child(3) { top: 0; }
 .constellation:nth-child(even) .window:nth-child(4) { top: 26%; }
+.constellation[data-count="1"] { aspect-ratio: 2; }
+.constellation[data-count="1"] .window:only-child { width: 33%; left: 33.5%; top: 0; }
 .window:focus-within { z-index: 2; }
 .window-view { display: block; position: relative; width: 100%; }
-.window-player { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: contain; image-rendering: pixelated; }
+.window-player { width: 100%; height: auto; aspect-ratio: var(--work-aspect, 2 / 3); object-fit: contain; image-rendering: pixelated; }
 .view-hint { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); color: var(--text); font: 18px/1 var(--terminal); white-space: nowrap; opacity: 0; }
 .window-view:hover .view-hint, .window-view:focus-visible .view-hint { opacity: 1; }
 .sanctuary-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: 650px; margin: 20px auto 0; color: var(--dim); font-size: 8px; letter-spacing: .12em; }
@@ -82,7 +84,7 @@ h1 { position: relative; color: var(--text); font: 88px/1 var(--terminal); lette
 .support-status a { color: #55ffff; }
 .footer { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--dim); font-size: 8px; letter-spacing: .1em; }
 .footer div { display: flex; align-items: center; gap: 26px; }
-.viewer { --image-height: min(70dvh, calc(100dvh - 186px), 850px); width: min(610px, calc(100% - 40px), max(270px, calc(var(--image-height) * 2 / 3 + 24px))); max-width: none; max-height: calc(100dvh - 40px); overflow: visible; padding: 6px; border: 3px solid; border-color: #eee #333 #333 #eee; color: #111; background: #aaa; box-shadow: inset 1px 1px #d4d4d4, inset -1px -1px #666, 8px 8px 0 rgba(0,0,0,.7); font: 20px/1 var(--terminal); }
+.viewer { --image-height: min(70dvh, calc(100dvh - 186px), 850px); width: min(610px, calc(100% - 40px), max(270px, calc(var(--image-height) * var(--viewer-aspect, .666667) + 24px))); max-width: none; max-height: calc(100dvh - 40px); overflow: visible; padding: 6px; border: 3px solid; border-color: #eee #333 #333 #eee; color: #111; background: #aaa; box-shadow: inset 1px 1px #d4d4d4, inset -1px -1px #666, 8px 8px 0 rgba(0,0,0,.7); font: 20px/1 var(--terminal); }
 .viewer::backdrop { background: rgba(5,2,9,.88); }
 .viewer-finial { position: absolute; z-index: 1; width: 24px; height: 24px; background: url("../assets/temple/window-corner.svg") center / 24px 24px no-repeat; image-rendering: pixelated; pointer-events: none; }
 .finial-nw { top: -13px; left: -13px; }
@@ -101,7 +103,7 @@ h1 { position: relative; color: var(--text); font: 88px/1 var(--terminal); lette
 .viewer .viewer-close:active { padding: 4px 2px 2px 4px; }
 .viewer-close svg { flex-shrink: 0; }
 .viewer-image { margin-top: 6px; border: 3px solid; border-color: #555 #ddd #ddd #555; background: #000; }
-.viewer video { width: 100%; height: var(--image-height); object-fit: contain; image-rendering: pixelated; }
+.viewer video { width: 100%; height: auto; max-height: var(--image-height); aspect-ratio: var(--viewer-aspect, 2 / 3); object-fit: contain; image-rendering: pixelated; }
 .viewer-downloads { display: flex; justify-content: center; gap: 8px; padding: 10px 4px; }
 .viewer-downloads .win-key { flex: 1; min-width: 0; max-width: 80px; }
 .viewer-status { display: flex; justify-content: space-between; gap: 10px; padding: 5px 7px; border: 1px solid; border-color: #666 #ddd #ddd #666; color: #333; font-size: 16px; }
@@ -115,6 +117,8 @@ body:has(.viewer[open]) { overflow: hidden; }
   .window:nth-child(2), .constellation:nth-child(even) .window:nth-child(2) { width: 55%; left: 45%; top: 0; }
   .window:nth-child(3), .constellation:nth-child(even) .window:nth-child(3) { width: 48%; left: 5%; top: 54%; }
   .window:nth-child(4), .constellation:nth-child(even) .window:nth-child(4) { width: 51%; left: 49%; top: 49%; }
+  .constellation[data-count="1"] { aspect-ratio: .9; }
+  .constellation[data-count="1"] .window:only-child { width: 72%; left: 14%; top: 0; }
 }
 @media (max-width: 600px) {
   .tb-row { padding: 0 16px; }

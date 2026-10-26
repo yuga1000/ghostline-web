@@ -13,9 +13,15 @@ below. No paid access, delivery promises or new subscription benefits are added.
 Presentation: a borderless, irregular composition with all visible works playing
 together. No carousel. Add an entry to `works` in `js/temple.js` to extend the
 collection; each four works form another constellation further down the page.
-Add matching MP4, GIF and poster PNG files under `assets/temple/`. Offscreen
-videos pause automatically. GIF/MP4 are loop downloads; device-specific live
-wallpaper setup is not included.
+Add MP4 and poster PNG files under `assets/temple/`, and set `gif: true` only
+when a matching GIF exists. `width` and `height` preserve each work's proportions;
+`download` optionally points to an original MP4 instead of the web preview.
+Offscreen videos pause automatically. Loop downloads do not include device-specific
+live wallpaper setup.
+
+The collection now includes nine MP4 works from the owner's `123` export folder,
+assigned windows 53–61 after the initial 49–52. Source MP4 files are preserved as
+`*-original.mp4` downloads; separate web previews and PNG posters serve the gallery.
 
 Next discussions: physical P2 stained-glass objects, installations, and small
 lenticular print samples before committing to a production run. Prices,
