@@ -35,6 +35,15 @@ Licensing datasets for AI is another unvalidated idea; confirm buyer requirement
 and permission from the data owner before collecting material. No confidential
 third-party records are authorized for collection or resale.
 
+Next-session checkpoint — robotics outreach: start with Unitree. The owner
+assembled and programmed a hexapod with inverse kinematics using AI-assisted
+coding, and used a plotter for drawing, including watercolor. English is
+intermediate; relocation to China is possible for a suitable offer. Present the
+existing ghostline.live portfolio and LED panels honestly, with hexapod footage
+if available. Unitree lists hr@unitree.com on its official contact page. Prepare
+a short inquiry about suitable roles or paid project work; no email has been
+sent. Education, hardware details and footage availability remain unconfirmed.
+
 The older plan below is retained as historical context; its revenue claims,
 platform assumptions and proposed sequencing are not validated by this update.
 
