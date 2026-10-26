@@ -39,19 +39,8 @@ h1 { position: relative; color: var(--text); font: 88px/1 var(--terminal); lette
 .eyebrow { color: var(--dim); font-size: 9px; letter-spacing: .1em; }
 .text-key { min-height: 36px; color: var(--dim); font-size: 10px; letter-spacing: .08em; }
 .sanctuary { max-width: 1120px; margin: 0 auto; }
-.windows { padding-top: 12px; }
-.constellation { position: relative; aspect-ratio: 1.48; margin-bottom: -15%; }
-.constellation:last-child { margin-bottom: 0; }
-.window { position: absolute; width: 31%; left: 0; top: 14%; mix-blend-mode: screen; }
-.window:nth-child(2) { width: 32%; left: 25%; top: 0; }
-.window:nth-child(3) { width: 29%; left: 48%; top: 35%; }
-.window:nth-child(4) { width: 30%; left: 70%; top: 9%; }
-.constellation:nth-child(even) .window:nth-child(1) { top: 3%; }
-.constellation:nth-child(even) .window:nth-child(2) { top: 31%; }
-.constellation:nth-child(even) .window:nth-child(3) { top: 0; }
-.constellation:nth-child(even) .window:nth-child(4) { top: 26%; }
-.constellation[data-count="1"] { aspect-ratio: 2; }
-.constellation[data-count="1"] .window:only-child { width: 33%; left: 33.5%; top: 0; }
+.windows { position: relative; }
+.window { position: absolute; mix-blend-mode: screen; }
 .window:focus-within { z-index: 2; }
 .window-view { display: block; position: relative; width: 100%; }
 .window-player { width: 100%; height: auto; aspect-ratio: var(--work-aspect, 2 / 3); object-fit: contain; image-rendering: pixelated; }
@@ -112,13 +101,6 @@ body:has(.viewer[open]) { overflow: hidden; }
 @media (max-width: 800px) {
   .page-head { --portal-pixel: 3px; min-height: 200px; padding-top: 54px; }
   h1 { font-size: 72px; }
-  .constellation { aspect-ratio: .63; margin-bottom: -18%; }
-  .window:nth-child(1), .constellation:nth-child(even) .window:nth-child(1) { width: 53%; left: 0; top: 8%; }
-  .window:nth-child(2), .constellation:nth-child(even) .window:nth-child(2) { width: 55%; left: 45%; top: 0; }
-  .window:nth-child(3), .constellation:nth-child(even) .window:nth-child(3) { width: 48%; left: 5%; top: 54%; }
-  .window:nth-child(4), .constellation:nth-child(even) .window:nth-child(4) { width: 51%; left: 49%; top: 49%; }
-  .constellation[data-count="1"] { aspect-ratio: .9; }
-  .constellation[data-count="1"] .window:only-child { width: 72%; left: 14%; top: 0; }
 }
 @media (max-width: 600px) {
   .tb-row { padding: 0 16px; }

@@ -10,9 +10,9 @@ voluntary support through the existing `js/support-links.js` channels. The
 owner explicitly chose this first page over the older animation-store gate
 below. No paid access, delivery promises or new subscription benefits are added.
 
-Presentation: a borderless, irregular composition with all visible works playing
-together. No carousel. Add an entry to `works` in `js/temple.js` to extend the
-collection; each four works form another constellation further down the page.
+Presentation: one borderless, overlapping collage with all visible works playing
+together. No carousel or groups. Add an entry to `works` in `js/temple.js` to
+extend the collection; the responsive layout packs each work into the same mass.
 Add MP4 and poster PNG files under `assets/temple/`, and set `gif: true` only
 when a matching GIF exists. `width` and `height` preserve each work's proportions;
 `download` optionally points to an original MP4 instead of the web preview.

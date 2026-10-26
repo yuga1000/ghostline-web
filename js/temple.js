@@ -14,11 +14,7 @@ const works = [
   { id: "61", file: "61", width: 720, height: 1068, download: "61-original", description: "A green cross with a Paint toolbar and old computer dialogs." }
 ];
 const windows = document.getElementById("windows");
-for (let index = 0; index < works.length; index += 4) {
-  const group = document.createElement("div");
-  group.className = "constellation";
-  group.dataset.count = works.slice(index, index + 4).length;
-  group.innerHTML = works.slice(index, index + 4).map(work => `
+windows.innerHTML = works.map(work => `
     <figure class="window" data-name="WINDOW ${work.id}" style="--work-aspect: ${work.width || 896} / ${work.height || 1344}">
       <button class="window-view" type="button" aria-label="Open Window ${work.id}" aria-describedby="description${work.id}">
         <video class="window-player" src="assets/temple/${work.file}.mp4" poster="assets/temple/${work.file}.png" width="${work.width || 896}" height="${work.height || 1344}" muted loop playsinline preload="none" aria-hidden="true"></video>
@@ -26,9 +22,39 @@ for (let index = 0; index < works.length; index += 4) {
       </button>
       <figcaption class="sr-only" id="description${work.id}">${work.description}</figcaption>
     </figure>
-  `).join("");
-  windows.appendChild(group);
+`).join("");
+
+const figures = Array.from(windows.children);
+let layoutWidth = 0;
+
+function layoutWorks() {
+  const width = windows.clientWidth;
+  if (!width || width === layoutWidth) return;
+  layoutWidth = width;
+  const compact = window.matchMedia("(max-width: 800px)").matches;
+  const columns = compact ? 2 : 4;
+  const sizes = [1, .96, 1.04, .98, 1.02, .94, 1];
+  const shifts = [0, .012, -.01, .006, -.008];
+  const levels = (compact ? [.04, 0] : [.08, 0, .14, .04]).map(level => level * width);
+  let bottom = 0;
+
+  figures.forEach((figure, index) => {
+    const lane = index < columns ? index : levels.indexOf(Math.min(...levels));
+    const work = works[index];
+    const size = Math.round(width * (compact ? .6 : .34) * sizes[index % sizes.length]);
+    const height = size * (work.height || 1344) / (work.width || 896);
+    const left = Math.round(Math.max(0, Math.min(width - size, width * (lane * (compact ? .4 : .22) + shifts[index % shifts.length]))));
+    const top = Math.round(levels[lane]);
+    figure.style.width = `${size}px`;
+    figure.style.left = `${left}px`;
+    figure.style.top = `${top}px`;
+    levels[lane] = top + height * (.56 + index % 3 * .025);
+    bottom = Math.max(bottom, top + height);
+  });
+  windows.style.height = `${Math.ceil(bottom)}px`;
 }
+new ResizeObserver(layoutWorks).observe(windows);
+layoutWorks();
 
 const players = Array.from(document.querySelectorAll(".window-player"));
 const visiblePlayers = new Set();
