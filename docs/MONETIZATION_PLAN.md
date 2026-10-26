@@ -1,6 +1,31 @@
 # GHOSTLINE — Monetization & Crowdfunding Plan
 
-Last updated: 2026-09-18
+Last updated: 2026-10-26
+
+## Owner update — 2026-10-26
+
+Current priority: living stained glass and a virtual temple on `temple.html`.
+Start with the four approved loops, 49_05–52_05, free GIF/MP4 downloads and
+voluntary support through the existing `js/support-links.js` channels. The
+owner explicitly chose this first page over the older animation-store gate
+below. No paid access, delivery promises or new subscription benefits are added.
+
+Next discussions: physical P2 stained-glass objects, installations, and small
+lenticular print samples before committing to a production run. Prices,
+commercial licenses and production quantities remain undecided.
+
+Deferred idea: a narrow information-monitoring service, scraper or Telegram
+delivery bot for a specific paying customer. Candidate problems include
+equipment prices/availability, relevant tenders and paid opportunities.
+Validate the buyer's need with a small manual report before building a platform.
+Licensing datasets for AI is another unvalidated idea; confirm buyer requirements
+and permission from the data owner before collecting material. No confidential
+third-party records are authorized for collection or resale.
+
+The older plan below is retained as historical context; its revenue claims,
+platform assumptions and proposed sequencing are not validated by this update.
+
+---
 
 This replaces the idea-dump in `monetization-strategies.md` with a plan tied to
 what actually exists in this repo today. Nothing here assumes new product lines —
