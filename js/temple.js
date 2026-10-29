@@ -13,7 +13,8 @@ const works = [
   { id: "60", file: "60", width: 1068, height: 1068, download: "60-original", description: "A red crowned figure with a geometric diagram and stacked icons." },
   { id: "61", file: "61", width: 720, height: 1068, download: "61-original", description: "A green cross with a Paint toolbar and old computer dialogs." },
   { id: "62", file: "62", width: 1088, height: 1088, scale: .74, gif: true, description: "A red rose in a blue and gold stained-glass roundel." },
-  { id: "63", file: "54_01", width: 800, height: 1504, scale: .74, gif: true, download: "54_01-original", description: "A green seated figure on a blue lotus beside a terminal window." }
+  { id: "63", file: "54_01", width: 800, height: 1504, scale: .74, gif: true, download: "54_01-original", description: "A green seated figure on a blue lotus beside a terminal window." },
+  { id: "64", file: "64", width: 512, height: 64, scale: 2.2, gif: true, description: "A narrow stained-glass band with a red rosebud and green vines." }
 ];
 const windows = document.getElementById("windows");
 windows.innerHTML = works.map(work => `
@@ -43,7 +44,7 @@ function layoutWorks() {
   figures.forEach((figure, index) => {
     const lane = index < columns ? index : levels.indexOf(Math.min(...levels));
     const work = works[index];
-    const size = Math.round(width * (compact ? .6 : .34) * sizes[index % sizes.length] * (work.scale || 1));
+    const size = Math.min(width, Math.round(width * (compact ? .6 : .34) * sizes[index % sizes.length] * (work.scale || 1)));
     const height = size * (work.height || 1344) / (work.width || 896);
     const left = Math.round(Math.max(0, Math.min(width - size, width * (lane * (compact ? .4 : .22) + shifts[index % shifts.length]))));
     const top = Math.round(levels[lane]);
