@@ -11,7 +11,9 @@ const works = [
   { id: "58", file: "58", width: 720, height: 1068, download: "58-original", description: "A red many-armed figure below computer diagnostics." },
   { id: "59", file: "59", width: 720, height: 720, download: "59-original", description: "A red face surrounded by repeating Paint windows." },
   { id: "60", file: "60", width: 1068, height: 1068, download: "60-original", description: "A red crowned figure with a geometric diagram and stacked icons." },
-  { id: "61", file: "61", width: 720, height: 1068, download: "61-original", description: "A green cross with a Paint toolbar and old computer dialogs." }
+  { id: "61", file: "61", width: 720, height: 1068, download: "61-original", description: "A green cross with a Paint toolbar and old computer dialogs." },
+  { id: "62", file: "62", width: 1088, height: 1088, gif: true, description: "A red rose in a blue and gold stained-glass roundel." },
+  { id: "63", file: "54_01", width: 800, height: 1504, gif: true, download: "54_01-original", description: "A green seated figure on a blue lotus beside a terminal window." }
 ];
 const windows = document.getElementById("windows");
 windows.innerHTML = works.map(work => `
