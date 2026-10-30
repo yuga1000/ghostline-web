@@ -15,13 +15,13 @@ const works = [
   { id: "62", file: "62", width: 1088, height: 1088, scale: .74, gif: true, description: "A red rose in a blue and gold stained-glass roundel." },
   { id: "63", file: "54_01", width: 800, height: 1504, scale: .74, gif: true, download: "54_01-original", description: "A green seated figure on a blue lotus beside a terminal window." },
   { id: "64", file: "64", width: 512, height: 64, scale: 2.2, gif: true, description: "A narrow stained-glass band with a red rosebud and green vines." },
-  { id: "65", file: "65", width: 128, height: 256, gif: true, description: "A blue-robed figure with angels in an arched stained-glass window." },
-  { id: "66", file: "66", width: 128, height: 256, gif: true, description: "Turning blue, red and gold rings with wings against black." },
-  { id: "67", file: "67", width: 128, height: 256, gif: true, description: "An eye surrounded by golden rings and blue, green and red wings." },
-  { id: "68", file: "68", width: 128, height: 256, gif: true, description: "A praying figure in blue and red robes among green vines and roses." },
-  { id: "69", file: "69", width: 128, height: 256, gif: true, description: "A purple bat beneath a golden star in a stained-glass arch." },
-  { id: "70", file: "70", width: 128, height: 256, gif: true, description: "A golden cross with a red central jewel among green vines." },
-  { id: "71", file: "71", width: 128, height: 256, gif: true, description: "A blue spiked flail and chain in a stained-glass arch with green vines." }
+  { id: "65", file: "65", width: 128, height: 256, scale: .5, gif: true, description: "A blue-robed figure with angels in an arched stained-glass window." },
+  { id: "66", file: "66", width: 128, height: 256, scale: .5, gif: true, description: "Turning blue, red and gold rings with wings against black." },
+  { id: "67", file: "67", width: 128, height: 256, scale: .5, gif: true, description: "An eye surrounded by golden rings and blue, green and red wings." },
+  { id: "68", file: "68", width: 128, height: 256, scale: .5, gif: true, description: "A praying figure in blue and red robes among green vines and roses." },
+  { id: "69", file: "69", width: 128, height: 256, scale: .5, gif: true, description: "A purple bat beneath a golden star in a stained-glass arch." },
+  { id: "70", file: "70", width: 128, height: 256, scale: .5, gif: true, description: "A golden cross with a red central jewel among green vines." },
+  { id: "71", file: "71", width: 128, height: 256, scale: .5, gif: true, description: "A blue spiked flail and chain in a stained-glass arch with green vines." }
 ];
 const windows = document.getElementById("windows");
 windows.innerHTML = works.map(work => `
