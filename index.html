@@ -296,9 +296,15 @@
     box-shadow: 3px 3px 0 #005500;
   }
   #customOrderBtn:hover { background: #66ff66; }
+  .cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 4px 0 1rem; }
+  .cta-row #customOrderBtn { margin: 0; }
+  #messageBtn { padding: 11px 22px; border: 2px solid #ffff55; background: #000; color: #ffff55; font: 700 14px/1.2 'Share Tech Mono', monospace; letter-spacing: 2px; cursor: pointer; box-shadow: 3px 3px 0 #aa5500; }
+  #messageBtn:hover { background: #ffff55; color: #000; }
+  #messageBtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #aa5500; }
   #customOrderBtn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #005500; }
   @media (max-width: 480px) {
     #customOrderBtn { padding: 12px 16px; font-size: 13px; letter-spacing: 1px; }
+    #messageBtn { padding: 10px 14px; font-size: 13px; letter-spacing: 1px; }
   }
 </style>
 
@@ -523,7 +529,10 @@
                     <a href="temple.html" class="console-button" id="templeBtn">TEMPLE</a>
                 </div>
             </div>
-            <button type="button" id="customOrderBtn">ORDER A CUSTOM LED PAINTING</button>
+            <div class="cta-row">
+                <button type="button" id="customOrderBtn">ORDER YOUR OWN</button>
+                <button type="button" id="messageBtn" data-contact>MESSAGE ME</button>
+            </div>
             <!-- Separator Line -->
             <div class="w-48 h-px bg-gradient-to-r from-transparent via-green-400 to-transparent mx-auto mb-12 opacity-30"></div>
             
