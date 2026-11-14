@@ -684,6 +684,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       const hidden = ['POLAROIDS', 'ORDER', 'MARKET', 'STREAM'];
       document.querySelectorAll('.tb-link').forEach(link => {
         if (hidden.includes(link.textContent.trim().replace(/^▶\s*/, ''))) link.remove();
+        else if (link.textContent.trim() === 'GALLERY') link.textContent = 'PAINTINGS';
       });
 
       // The bundled topbar predates these pages; append them to the live nav.

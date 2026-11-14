@@ -12,6 +12,9 @@ window.GHOSTLINE_SUPPORT = {
     qr: "assets/led-panels/usdt-trc20.svg"
   },
   email: "ghostlinesystem@gmail.com",
+  // Instagram direct-message link, used by the BUY window (js/buy.js).
+  // Leave it empty and the window offers email only.
+  instagram: "https://ig.me/m/____yuga______",
 
   /* Front-page partner slots. Fill `name` + `url` (and `logo` if you have one)
    * and the slot turns into a live link on index.html and reads TAKEN on

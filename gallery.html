@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>GHOSTLINE - Gallery</title>
+    <title>GHOSTLINE - Paintings</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
@@ -160,6 +160,52 @@
     .gallery-item:hover::after {
         opacity: 1;
     }
+
+    /* Name, size, price and BUY under every painting, so buying never depends
+       on finding the lightbox first. Stacked above the hover overlay and the
+       zoomed image. */
+    .art-caption {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        background: #000;
+        border-top: 1px solid #000080;
+        cursor: default;
+    }
+    .art-text { min-width: 0; }
+    .art-title {
+        color: #eee;
+        font-size: 13px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .art-meta { margin-top: 2px; color: #00aa00; font-size: 11px; letter-spacing: 1px; }
+    .art-buy {
+        flex: none;
+        min-height: 40px;
+        padding: 8px 20px;
+        border: 0;
+        background: #00ff00;
+        color: #000;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        cursor: pointer;
+        box-shadow: 3px 3px 0 #005500;
+    }
+    .art-buy:hover { background: #66ff66; }
+    .art-buy:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #005500; }
+    .art-state { flex: none; padding: 6px 10px; border: 1px solid currentColor; font-size: 11px; letter-spacing: 2px; }
+    .art-state.is-sold { color: #ff4444; }
+    .art-state.is-off { color: #777; }
 
     @media (max-width: 1024px) {
         .gallery-grid { columns: 2; }
@@ -626,7 +672,7 @@
     <div class="text-green-500 text-lg font-bold">GHOSTLINE</div>
     <nav id="nav-menu" class="flex gap-4 mt-2 text-xs">
         <a href="index.html" class="nav-link">[HOME]</a>
-        <span class="nav-link nav-active">[GALLERY]</span>
+        <span class="nav-link nav-active">[PAINTINGS]</span>
         <a href="polaroids.html" class="nav-link">[POLAROIDS]</a>
     </nav>
 </div>
@@ -638,7 +684,7 @@
     <div class="text-center mb-6">
         <div class="flex items-center justify-center gap-6 mb-4">
             <img src="components/Yuga.GIF" alt="Yuga" style="width: 80px; height: 80px; image-rendering: pixelated;">
-            <h1 class="pixel-text text-3xl">GALLERY</h1>
+            <h1 class="pixel-text text-3xl">PAINTINGS</h1>
         </div>
     </div>
 
@@ -852,9 +898,9 @@ function renderGallery() {
     const grid = document.getElementById('galleryGrid');
     const emptyState = document.getElementById('emptyState');
 
-    let filteredItems = galleryItems;
+    let filteredItems = galleryItems.filter(item => item.url);
     if (currentCategory !== 'all') {
-        filteredItems = galleryItems.filter(item => item.category === currentCategory);
+        filteredItems = filteredItems.filter(item => item.category === currentCategory);
     }
 
     if (filteredItems.length === 0) {
@@ -876,12 +922,69 @@ function renderGallery() {
                  data-status="${item.status || 'available'}"
                  data-description="${(item.description || '').replace(/"/g, '&quot;')}">
             <div class="status-indicator status-${(item.status || 'available').toLowerCase()}" data-status="${item.status || 'available'}"></div>
+            ${artCaption(item)}
         </div>
     `).join('');
+
+    grid.querySelectorAll('[data-buy]').forEach(button => {
+        button.addEventListener('click', event => {
+            event.stopPropagation();
+            buyArtwork(button.dataset.buy);
+        });
+    });
 
     preloadFirstImages();
     initLazyLoading();
     addImageClickHandlers();
+}
+
+function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+// "60x90cm", "30x30" -> "60 × 90 CM"
+function artSize(item) {
+    const size = (item.size || '').trim();
+    const match = size.match(/^(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*(?:cm)?$/i);
+    return match ? `${match[1]} × ${match[2]} CM` : size.toUpperCase();
+}
+
+// Prices are typed in dollars in admin. Small numbers left over from older
+// entries (0.2, 0.5, 1) are not dollars, so those read ON REQUEST.
+function artPrice(item) {
+    const price = Number(item.price);
+    return price >= 50 ? price : 0;
+}
+
+function artCaption(item) {
+    const status = (item.status || 'available').toLowerCase();
+    const title = escapeHtml((item.title || 'Untitled').trim());
+    const price = artPrice(item);
+    const meta = [artSize(item), status === 'available' ? (price ? `USD ${price}` : 'PRICE ON REQUEST') : '']
+        .filter(Boolean).map(escapeHtml).join(' · ');
+    const action = status === 'available'
+        ? `<button class="art-buy" type="button" data-buy="${escapeHtml(item.url)}">BUY</button>`
+        : `<span class="art-state ${status === 'sold' ? 'is-sold' : 'is-off'}">${status === 'sold' ? 'SOLD' : 'NOT FOR SALE'}</span>`;
+    return `<div class="art-caption" onclick="event.stopPropagation()">
+                <div class="art-text">
+                    <div class="art-title">${title}</div>
+                    ${meta ? `<div class="art-meta">${meta}</div>` : ''}
+                </div>
+                ${action}
+            </div>`;
+}
+
+function buyArtwork(url) {
+    const item = galleryItems.find(entry => entry.url === url);
+    if (!item || !window.GHOSTLINE_BUY) return;
+    const price = artPrice(item);
+    window.GHOSTLINE_BUY.open({
+        kind: 'painting',
+        title: (item.title || 'Untitled').trim(),
+        size: artSize(item),
+        price: price || '',
+        image: item.url
+    });
 }
 
 // Click handlers for gallery images
@@ -1012,11 +1115,19 @@ function openLightbox(imageUrl, title, status, description) {
             <span class="lb-meta-tag">ID:${scanId}</span>
             ${isDonationArt ?
                 `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openDonationEmail('${title}');">SUPPORT</button>` :
+                status === 'available' ?
+                `<button class="lightbox-contact-btn lightbox-buy-btn" type="button">▸ BUY</button>` :
                 `<button class="lightbox-contact-btn" onclick="event.stopPropagation(); closeLightbox(); openContactModal('${title}');">▸ INQUIRE</button>`
             }
         </div>
         <div class="lb-scan-line">SCAN ${timestamp} · GHOSTLINE VISION v2.1 · OBJECT CLASSIFIED</div>
     `;
+    const buyButton = lightboxInfo.querySelector('.lightbox-buy-btn');
+    if (buyButton) buyButton.addEventListener('click', event => {
+        event.stopPropagation();
+        closeLightbox();
+        buyArtwork(imageUrl);
+    });
 }
 
 function closeLightbox() {
@@ -1233,6 +1344,8 @@ function handleDonateClick() {
 <script src="supabase-env.js"></script>
 
 <script src="js/manual-modal.js"></script>
+<script src="js/support-links.js"></script>
+<script src="js/buy.js"></script>
 
 </body>
 </html>
