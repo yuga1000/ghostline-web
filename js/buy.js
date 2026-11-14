@@ -1,4 +1,5 @@
-/* GHOSTLINE - the one BUY window, shared by the paintings page and the front page.
+/* GHOSTLINE - the one BUY window, shared by the paintings page, the panels page
+ * and the front page.
  *
  * Paintings and custom panels are not paid through the site: shipping has to be
  * worked out first. So the window says what happens in three steps and opens a
@@ -6,6 +7,7 @@
  * js/support-links.js, which has to load before this file.
  *
  *   GHOSTLINE_BUY.open({ kind: "painting", title, size, price, image })
+ *   GHOSTLINE_BUY.open({ kind: "panel", title, size, priceText, image })
  *   GHOSTLINE_BUY.open({ kind: "custom" })
  */
 (function () {
@@ -22,6 +24,17 @@
         "Message me. The painting is already named in the message.",
         "I reply with payment details and the shipping cost to you.",
         "You pay, I pack it and ship it."
+      ],
+      subject: item => `Buying: ${item.title}`,
+      body: item => `Hi Yuga,\n\nI'd like to buy ${named(item)} from ghostline.live.\n\nShip to (country, city):\n`,
+      dm: item => `Hi Yuga, I'd like to buy ${named(item)} from ghostline.live`
+    },
+    panel: {
+      bar: "[ BUY_PANEL ]",
+      steps: [
+        "Message me. The panel is already named in the message.",
+        "I reply with payment details and the shipping cost to you.",
+        "You pay, I build it and ship it."
       ],
       subject: item => `Buying: ${item.title}`,
       body: item => `Hi Yuga,\n\nI'd like to buy ${named(item)} from ghostline.live.\n\nShip to (country, city):\n`,

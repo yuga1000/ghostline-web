@@ -267,6 +267,21 @@ body.has-payment-open { overflow: hidden; }
 .tall-stage video { width: 100%; height: auto; aspect-ratio: 9 / 16; background: #000; }
 .tall-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 60px rgba(0,0,0,.72); }
 .tall-ask { margin-top: 14px; }
+/* Buying, made loud: the first strip on the page, and the order buttons in
+   CGA yellow with a blinking DOS cursor, so nobody has to look for them. */
+.buy-strip { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 12px; background: var(--dos-teal); color: #000; }
+.buy-strip strong { font: 22px/1 var(--terminal); letter-spacing: .14em; font-weight: 400; }
+.buy-strip span { display: block; margin-top: 3px; font-size: 10px; letter-spacing: .1em; }
+.cmd-btn.is-buy, .buy-now { background: #ffff55; color: #000; }
+.cmd-btn.is-buy:hover, .buy-now:hover { background: #ffffff; }
+.cmd-btn.is-buy { min-height: 50px; font-size: 12px; }
+.buy-now { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 10px 22px; font-size: 13px; font-weight: 700; letter-spacing: .16em; box-shadow: 3px 3px 0 #000; }
+.buy-now:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+.cmd-btn.is-buy::before, .buy-now::before { content: "\25B8"; margin-right: 8px; animation: buyBlink 1s steps(1) infinite; }
+@keyframes buyBlink { 50% { visibility: hidden; } }
+.other-pay { display: block; width: 100%; margin-top: 10px; padding: 6px; color: var(--dos-cyan); font-size: 9px; letter-spacing: .1em; text-align: center; }
+.other-pay:hover { background: var(--dos-cyan); color: #000; }
+.spec-window { scroll-margin-top: 16px; }
 /* Support / monetization strip */
 .support-grid { display: grid; grid-template-columns: repeat(var(--support-cols, 4), minmax(0, 1fr)); gap: 1px; border: var(--bw) solid var(--dos-bright); background: var(--dos-bright); }
 .support-cell { display: flex; flex-direction: column; gap: 7px; min-height: 132px; padding: 16px; background: var(--dos-bg); }
@@ -345,6 +360,11 @@ body.has-payment-open { overflow: hidden; }
   </header>
 
   <main class="page">
+    <div class="buy-strip">
+      <div><strong>LED PANEL 42</strong><span>42 × 42 CM · USD 1199 · MADE TO ORDER</span></div>
+      <a class="buy-now" href="#order">BUY</a>
+    </div>
+
     <header class="page-head">
       <figure class="window panel-cover">
         <div class="window-bar"><span>[ MATERIAL_STUDIES.JPG ]</span><strong>GHOSTLINE</strong></div>
@@ -372,7 +392,7 @@ body.has-payment-open { overflow: hidden; }
           <div class="capture-controls" id="captureControls" aria-label="Choose animation"></div>
         </div>
 
-        <aside class="window spec-window">
+        <aside class="window spec-window" id="order">
           <div class="window-bar"><span>[ ORDER_PANEL.CMD ]</span><strong>MADE TO ORDER</strong></div>
           <div class="spec-body">
             <h2 class="product-name">LED PANEL 42</h2>
@@ -400,7 +420,8 @@ body.has-payment-open { overflow: hidden; }
             </details>
             <div class="price-line"><span>BASE PRICE</span><strong>USD 1199</strong></div>
             <p class="delivery-note"><strong>DELIVERY NOT INCLUDED.</strong><br>Calculated separately for your location.</p>
-            <button class="cmd-btn" id="payPanel" type="button">[ PAY 1199 USDT ]</button>
+            <button class="cmd-btn is-buy" id="payPanel" type="button">[ BUY · PAY 1199 USDT ]</button>
+            <button class="other-pay" id="payOther" type="button">NO CRYPTO? MESSAGE ME ▸</button>
             <a class="contact-email" href="mailto:ghostlinesystem@gmail.com">ghostlinesystem@gmail.com</a>
           </div>
         </aside>
@@ -466,7 +487,7 @@ body.has-payment-open { overflow: hidden; }
               </div>
             </details>
             <div class="price-line"><span>PRICE</span><strong>ON REQUEST</strong></div>
-            <a class="cmd-btn tall-ask" href="mailto:ghostlinesystem@gmail.com?subject=LED%20PANEL%2064">[ ASK ABOUT THIS PANEL ]</a>
+            <button class="cmd-btn is-buy tall-ask" id="buyTall" type="button">[ ORDER THIS PANEL ]</button>
             <a class="contact-email" href="mailto:ghostlinesystem@gmail.com">ghostlinesystem@gmail.com</a>
           </div>
         </aside>
@@ -516,6 +537,7 @@ body.has-payment-open { overflow: hidden; }
 
 <script src="js/cross-field.js"></script>
 <script src="js/support-links.js"></script>
+<script src="js/buy.js"></script>
 <script>
 const captures = [
   { name: "MOON", src: "assets/led-panels/video/capture-01.mp4?v=2", poster: "assets/led-panels/posters/capture-01.jpg?v=2" },
@@ -604,6 +626,21 @@ function isValidTronTxid(value) {
 }
 
 payPanel.addEventListener("click", () => setPaymentOpen(true));
+// no USDT: the same panel, chosen frame and loop, through the shared BUY window
+document.getElementById("payOther").addEventListener("click", () => window.GHOSTLINE_BUY.open({
+  kind: "panel",
+  title: "LED PANEL 42",
+  size: `42 × 42 CM / ${selectedFrame} / ${captures[selectedCapture].name}`,
+  priceText: "USD 1199",
+  image: captures[selectedCapture].poster
+}));
+document.getElementById("buyTall").addEventListener("click", () => window.GHOSTLINE_BUY.open({
+  kind: "panel",
+  title: "LED PANEL 64",
+  size: "DISPLAY 32 × 64 CM",
+  priceText: "ON REQUEST",
+  image: "assets/led-panels/posters/panel-32x64.jpg?v=2"
+}));
 document.querySelectorAll("[data-payment-close]").forEach(button => button.addEventListener("click", () => setPaymentOpen(false)));
 document.getElementById("copyPanelWallet").addEventListener("click", copyPanelWallet);
 document.addEventListener("keydown", event => {

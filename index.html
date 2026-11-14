@@ -270,6 +270,18 @@
     right: 10px;
     cursor: pointer;
   }
+  .nav-grid { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 1rem; width: 95%; max-width: 700px; }
+  .nav-row { display: flex; justify-content: center; gap: 12px; }
+  /* the top pair is bigger; beats the !important sizes style.css sets on phones */
+  .nav-grid .nav-big { min-width: 172px; padding: 15px 26px !important; font-size: 17px !important; text-align: center; }
+  @media (max-width: 480px) {
+    .nav-grid .nav-big { min-width: 148px; padding: 13px 16px !important; font-size: 15px !important; }
+  }
+  /* MYSTRA lives in the corner, stacked on top of SOCIAL */
+  #mystraDock { position: fixed; right: 20px; bottom: 84px; z-index: 9997; }
+  @media (max-width: 640px) {
+    #mystraDock { right: 10px; bottom: 70px; }
+  }
   /* the one obvious way to order a panel, under the nav */
   #customOrderBtn {
     display: inline-block;
@@ -498,13 +510,18 @@
             </div>
             
             <!-- Navigation Buttons -->
-            <div class="nav-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 1rem; width: 95%; max-width: 700px;">
-                <a href="gallery.html" class="console-button" id="galleryBtn">PAINTINGS</a>
-                <!-- hidden for now: STREAM / POLAROIDS / ORDER / MARKET / BANDANAS -->
-                <a href="lab/" class="console-button mystra-btn" id="mystraBtn">MYSTRA</a>
-                <a href="panels.html" class="console-button" id="panelsBtn">PANELS</a>
-                <a href="temple.html" class="console-button" id="templeBtn">TEMPLE</a>
-                <a href="support.html" class="console-button" id="supportBtn">SUPPORT</a>
+            <!-- Upside-down pyramid: what's for sale on top, panels first. MYSTRA
+                 sits in the corner by SOCIAL. Hidden for now: STREAM / POLAROIDS /
+                 ORDER / MARKET / BANDANAS -->
+            <div class="nav-grid">
+                <div class="nav-row">
+                    <a href="panels.html" class="console-button nav-big" id="panelsBtn" data-pixels="run">PANELS</a>
+                    <a href="gallery.html" class="console-button nav-big" id="galleryBtn" data-pixels="wander">PAINTINGS</a>
+                </div>
+                <div class="nav-row">
+                    <a href="support.html" class="console-button" id="supportBtn">SUPPORT</a>
+                    <a href="temple.html" class="console-button" id="templeBtn">TEMPLE</a>
+                </div>
             </div>
             <button type="button" id="customOrderBtn">ORDER A CUSTOM LED PAINTING</button>
             <!-- Separator Line -->
@@ -541,6 +558,8 @@
     </div>
 
 </main>
+
+<div id="mystraDock"><a href="lab/" class="console-button mystra-btn" id="mystraBtn">MYSTRA</a></div>
 
 <!-- SOCIAL Button Container -->
 <div id="socialContainer" class="pxl-frame">
@@ -970,53 +989,6 @@ let currentManifestoSlide = 0;
         }
     }
     
-    // Create fireflies around buttons - regular fireflies
-    function createFireflies() {
-        const galleryBtn = safeGetElement('galleryBtn');
-        const streamBtn = safeGetElement('streamBtn');
-        const buttons = [galleryBtn, streamBtn].filter(btn => btn !== null);
-        
-        buttons.forEach(button => {
-            if (Math.random() < 0.8) {
-                try {
-                    const rect = button.getBoundingClientRect();
-                    const firefly = document.createElement('div');
-                    firefly.className = 'firefly';
-                    
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 30 + Math.random() * 50;
-                    const startX = rect.left + rect.width/2 + Math.cos(angle) * radius;
-                    const startY = rect.top + rect.height/2 + Math.sin(angle) * radius;
-                    
-                    firefly.style.left = startX + 'px';
-                    firefly.style.top = startY + 'px';
-                    
-                    const flyDistance = 60 + Math.random() * 100;
-                    const flyAngle = Math.random() * Math.PI * 2;
-                    const flyX = Math.cos(flyAngle) * flyDistance;
-                    const flyY = Math.sin(flyAngle) * flyDistance;
-                    
-                    firefly.style.setProperty('--fly-x', flyX + 'px');
-                    firefly.style.setProperty('--fly-y', flyY + 'px');
-                    
-                    const duration = 2 + Math.random() * 3;
-                    firefly.style.animation = `fireflyFloat ${duration}s ease-in-out forwards, fireflyGlow 1.2s ease-in-out infinite`;
-                    firefly.style.animationDelay = Math.random() * 1 + 's';
-                    
-                    document.body.appendChild(firefly);
-                    
-                    setTimeout(() => {
-                        if (firefly.parentNode) {
-                            firefly.parentNode.removeChild(firefly);
-                        }
-                    }, (duration + 1) * 1000);
-                } catch (e) {
-                    console.log('Firefly creation error:', e);
-                }
-            }
-        });
-    }
-    
     // Create floating pixels
     function createFloatingPixels() {
         try {
@@ -1295,10 +1267,6 @@ let currentManifestoSlide = 0;
             // Floating pixels every 10 seconds
             setInterval(createFloatingPixels, 10000);
             createFloatingPixels();
-            
-            // Fireflies every 300ms (more frequent)
-            setInterval(createFireflies, 300);
-            createFireflies();
             
             // Rotate ASCII creature every 3 seconds
             setInterval(rotateAsciiCreature, 3000);
@@ -1645,6 +1613,7 @@ initATASquare();
   <script src="js/cross-field.js"></script>
 <script src="js/support-links.js"></script>
 <script src="js/buy.js"></script>
+<script src="js/button-pixels.js"></script>
 <script>
 document.getElementById('customOrderBtn').addEventListener('click', () => window.GHOSTLINE_BUY.open({ kind: 'custom' }));
 </script>
